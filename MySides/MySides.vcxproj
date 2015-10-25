@@ -191,6 +191,7 @@ xcopy  "$(SolutionDir)Assets" "$(TargetDir)Assets" /S /E /D /Y /I /F</Command>
   <ItemGroup>
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="Log.hpp" />
+    <ClInclude Include="Logtest.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

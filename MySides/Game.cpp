@@ -1,8 +1,13 @@
 #include "stdafx.h"
 #include "Game.hpp"
 
+#include "Logtest.hpp"
 
-Game::Game() : window_(sf::VideoMode(1280, 720, 32), "SFML App")
+//Must declare here or it breaks?
+//Globally accessible logger, use extern Log l;
+Log l;
+
+Game::Game() : window_(sf::VideoMode(1280, 720, 32), "My Sides!")
 {
 }
 
@@ -20,13 +25,10 @@ void Game::run()
 	sf::Time accumulator = sf::Time::Zero;
 
 	//Logging
-	Log::getInstance().toggleType(2);
-	Log::getInstance().lout(3, "Testing");
+	l = *(new Log());
+	logtest l;
 
-	Log::getInstance().toggleType(3);
-	Log::getInstance().lout(3, "Testing2");
-
-
+	
 #pragma endregion
 
 	//Game loop
