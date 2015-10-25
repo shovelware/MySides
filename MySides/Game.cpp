@@ -2,7 +2,7 @@
 #include "Game.hpp"
 
 #include "Logtest.hpp"
-//Must declare here or it breaks?
+
 //Globally accessible logger, use extern Log l;
 Log l;
 

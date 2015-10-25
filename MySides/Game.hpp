@@ -15,7 +15,6 @@ class Game
 public:
 	Game();
 	void run();
-	//Log l; Must be declared at top of cpp to use as extern
 private:
 	void processEvents();
 	void update(sf::Time dt);
