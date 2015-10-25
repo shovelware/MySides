@@ -6,7 +6,6 @@
 
 #include "stdafx.h"
 
-
 extern Log l;
 
 class logtest {

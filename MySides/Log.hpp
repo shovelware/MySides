@@ -171,7 +171,6 @@ public:
 			break;
 		}
 	}
-
 };
 
 #endif
