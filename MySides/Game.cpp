@@ -10,7 +10,7 @@ Game::Game() : window_(sf::VideoMode(1280, 720, 32), "My Sides!")
 {
 }
 
-void Game::run()
+int Game::run()
 {
 
 #pragma region Gamestuff
@@ -50,6 +50,8 @@ void Game::run()
 
 		render();
 	}
+
+	return EXIT_SUCCESS;
 }
 
 void Game::processEvents()

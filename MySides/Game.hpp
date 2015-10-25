@@ -11,16 +11,14 @@
 
 class Game
 {
-
-public:
-	Game();
-	void run();
 private:
 	void processEvents();
 	void update(sf::Time dt);
 	void render();	
 
 	sf::RenderWindow window_;
-
+public:
+	Game();
+	int run();
 };
 #endif
