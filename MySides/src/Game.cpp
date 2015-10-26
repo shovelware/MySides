@@ -3,7 +3,7 @@
 
 #include "Logtest.hpp"
 
-//Globally accessible logger, use extern Log l;
+//Globally accessible logger, usage: extern Log l;
 Log l;
 
 Game::Game() : window_(sf::VideoMode(1280, 720, 32), "My Sides!")

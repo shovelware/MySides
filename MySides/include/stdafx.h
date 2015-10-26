@@ -30,6 +30,7 @@
 #pragma comment(lib,"glu32.lib") 
 
 //Box2D
+#pragma comment(lib, "Box2D.lib")
 
 //Custom
 #include "Log.hpp"
