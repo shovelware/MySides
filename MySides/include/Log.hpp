@@ -33,7 +33,7 @@ public:
 	Log() : options_(TYPEFLAG::FATAL | TYPEFLAG::ERROR | TYPEFLAG::WARNING | TYPEFLAG::MESSAGE | TYPEFLAG::LOGGER) {}
 
 	//For use in other locations
-	enum Messagetype_ {
+	enum messagetype {
 		fatal = 'F',
 		error = 'E',
 		warning = 'W',
@@ -46,42 +46,42 @@ public:
 	{
 		switch (type)
 		{
-		case fatal:
+		case messagetype::fatal:
 			if (options_ & TYPEFLAG::FATAL)
 			{
 				cout << "[" << (char)fatal << "][" << location << "] " << output << endl;
 			}
 			break;
 
-		case error:
+		case messagetype::error:
 			if (options_ & TYPEFLAG::ERROR)
 			{
 				cout << "[" << (char)error << "][" << location << "] " << output << endl;
 			}
 			break;
 
-		case warning:
+		case messagetype::warning:
 			if (options_ & TYPEFLAG::WARNING)
 			{
 				cout << "[" << (char)warning << "][" << location << "] " << output << endl;
 			}
 			break;
 
-		case message:
+		case messagetype::message:
 			if (options_ & TYPEFLAG::MESSAGE)
 			{
 				cout << "["<< (char)message <<"][" << location << "] " << output << endl;
 			}
 			break;
 
-		case logger:
+		case messagetype::logger:
 			if (options_ & TYPEFLAG::LOGGER)
 			{
 				cout << "[" << (char)logger << "][" << location << "] " << output << endl;
 			}
 			break;
 
-		case priority:
+		case messagetype::priority:
 			cout << "[" << (char)priority <<"][" << location << "] " << output << endl;
 			break;
 
@@ -105,27 +105,27 @@ public:
 	{
 		switch (type)
 		{
-		case fatal:
+		case messagetype::fatal:
 			options_ |= TYPEFLAG::FATAL;
 			out(logger, location , "FATAL ENABLED");
 			break;
 
-		case error:
+		case messagetype::error:
 			options_ |= TYPEFLAG::ERROR;
 			out(logger, location, "ERROR ENABLED");
 			break;
 
-		case warning:
+		case messagetype::warning:
 			options_ |= TYPEFLAG::WARNING;
 			out(logger, location, "WARNING ENABLED");
 			break;
 
-		case message:
+		case messagetype::message:
 			options_ |= TYPEFLAG::MESSAGE;
 			out(logger, location, "MESSAGE ENABLED");
 			break;
 
-		case logger:
+		case messagetype::logger:
 			options_ |= TYPEFLAG::LOGGER;
 			out(logger, location, "LOGGER MESSAGES ENABLED");
 			break;
@@ -141,27 +141,27 @@ public:
 	{
 		switch (type)
 		{
-		case fatal:
+		case messagetype::fatal:
 			options_ &= ~TYPEFLAG::FATAL;
 			out(logger, location, "FATAL DISABLED");
 			break;
 
-		case error:
+		case messagetype::error:
 			options_ &= ~TYPEFLAG::ERROR;
 			out(logger, location, "ERROR DISABLED");
 			break;
 
-		case warning:
+		case messagetype::warning:
 			options_ &= ~TYPEFLAG::WARNING;
 			out(logger, location, "WARNING DISABLED");
 			break;
 
-		case message:
+		case messagetype::message:
 			options_ &= ~TYPEFLAG::MESSAGE;
 			out(logger, location, "MESSAGE DISABLED");
 			break;
 
-		case logger:
+		case messagetype::logger:
 			out(logger, location, "LOGGER MESSAGES DISABLED");
 			options_ &= ~TYPEFLAG::LOGGER;
 			break;

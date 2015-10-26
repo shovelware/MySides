@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "Game.hpp"
 
-#include "Logtest.hpp"
-
 //Globally accessible logger, usage: extern Log l;
 Log l;
 
@@ -17,9 +15,10 @@ int Game::run()
 
 	//Window info
 	sf::Vector2u windowSize = window_.getSize();
-
+	
 	//Fixed Timestep
 	sf::Clock frameClock;
+	sf::Time frameTime = sf::Time::Zero;
 	sf::Time tickTime = sf::Time(sf::seconds(1.f / 30.f));
 	sf::Time accumulator = sf::Time::Zero;
 
@@ -27,7 +26,10 @@ int Game::run()
 	l = *(new Log());
 
 #pragma endregion
+
+	//Display a blank window before we start our game loop
 	window_.display();
+	
 	//Game loop
 	while (!quit_)
 	{
@@ -39,7 +41,7 @@ int Game::run()
 		update_ = (window_.hasFocus() && mousein_);
 
 		//Get delta time since last frame
-		sf::Time frameTime = frameClock.restart();
+		frameTime = frameClock.restart();
 
 		//If we don't want to update, dump the frametime
 		//and skip the rest of the loop
