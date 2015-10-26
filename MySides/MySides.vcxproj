@@ -84,7 +84,11 @@ xcopy "$(SFML_SDK)\bin\sfml-network-d-2.dll" "$(TargetDir)" /Q /D /Y /F
 xcopy "$(SFML_SDK)\bin\sfml-system-d-2.dll" "$(TargetDir)" /Q /D /Y /F
 xcopy "$(SFML_SDK)\bin\sfml-window-d-2.dll" "$(TargetDir)" /Q /D /Y /F
 xcopy "$(SFML_SDK)\bin\thor-d.dll" "$(TargetDir)" /Q /D /Y /F
-xcopy  "$(SolutionDir)Assets" "$(TargetDir)Assets" /S /E /D /Y /I /F</Command>
+
+xcopy "$(SolutionDir)Assets" "$(TargetDir)Assets" /S /E /D /Y /I /F
+
+xcopy "$(Box2D)\Box2D" "$(TargetDir)Box2D" /S /E /D /Y /I /F
+xcopy "$(Box2D)\Debug" "$(TargetDir)" /Q /D /Y /F</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -115,7 +119,11 @@ xcopy "$(SFML_SDK)\bin\sfml-network-2.dll" "$(TargetDir)" /Q /D /Y
 xcopy "$(SFML_SDK)\bin\sfml-system-2.dll" "$(TargetDir)" /Q /D /Y
 xcopy "$(SFML_SDK)\bin\sfml-window-2.dll" "$(TargetDir)" /Q /D /Y
 xcopy "$(SFML_SDK)\bin\thor.dll" "$(TargetDir)" /Q /D /Y
-xcopy  "$(SolutionDir)Assets" "$(TargetDir)Assets" /S /E /D /Y /I /F</Command>
+
+xcopy "$(SolutionDir)Assets" "$(TargetDir)Assets" /S /E /D /Y /I /F
+
+xcopy "$(Box2D)\Box2D" "$(TargetDir)Box2D" /S /E /D /Y /I /F
+xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
