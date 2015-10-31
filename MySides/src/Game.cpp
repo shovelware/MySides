@@ -28,8 +28,15 @@ int Game::run()
 #pragma endregion
 
 	//Display a blank window before we start our game loop
+	//Avoids nasty white windows
 	window_.display();
 	
+	l.out(l.fatal, 'F', "Shouldn't appear");
+	l.typeDisable(l.fatal, 'F');
+	l.out(l.fatal, 'F', "Should appear");
+
+	l.typeDisable(l.message, 'G');
+
 	//Game loop
 	while (!quit_)
 	{
@@ -43,6 +50,9 @@ int Game::run()
 		//Get delta time since last frame
 		frameTime = frameClock.restart();
 
+		//update our controls with the frametime
+		//input.update(frameTime);
+
 		//If we don't want to update, dump the frametime
 		//and skip the rest of the loop
 		if (!update_)
@@ -55,7 +65,6 @@ int Game::run()
 		//Update to number of physics steps
 		while (accumulator >= tickTime)
 		{
-			l.out(l.message, 'G', "Update");
 			update(tickTime);
 			accumulator -= tickTime;
 		}
@@ -111,12 +120,13 @@ void Game::processEvents()
 
 void Game::update(sf::Time dt)
 {
-
+	l.out(l.message, 'G', "Update");
 }
 
 void Game::render()
 {
 	window_.clear();
+	l.out(l.message, 'G', "Render");
 
 	//Render stuff
 
