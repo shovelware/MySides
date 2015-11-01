@@ -31,12 +31,6 @@ int Game::run()
 	//Avoids nasty white windows
 	window_.display();
 	
-	l.out(l.fatal, 'F', "Shouldn't appear");
-	l.typeDisable(l.fatal, 'F');
-	l.out(l.fatal, 'F', "Should appear");
-
-	l.typeDisable(l.message, 'G');
-
 	//Game loop
 	while (!quit_)
 	{

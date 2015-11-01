@@ -13,7 +13,6 @@
 #include <map>
 #include <iterator>
 
-
 class XController {
 private:
 	int controllerId_;
@@ -22,18 +21,21 @@ private:
 	XINPUT_STATE curState_;
 	XINPUT_STATE prvState_;
 
-	std::map<WORD, int> heldTimes_;
+	std::map<WORD, unsigned int> heldTimes_;
 
 	float deadzoneLX_, deadzoneLY_;
 	float deadzoneRX_, deadzoneRY_;
 	float thresholdLT_, thresholdRT_;
-
+	
 	float leftX_, leftY_;
 	float rightX_, rightY_;
 	const short STICK_MAX = SHRT_MAX;
 
 	float leftTrigger_, rightTrigger_;
 	const BYTE TRIGGER_MAX = 255;
+
+	//unsigned short leftVibe, rightVibe;
+	//const unsigned short VIBE_MAX = USHRT_MAX;
 
 	void initButtons();
 	bool checkConnection();
@@ -53,19 +55,21 @@ public:
 
 	float leftX() const;
 	float leftY() const;
-	float leftdX() const;
-	float leftdY() const;
+	//float leftdX() const;
+	//float leftdY() const;
 
 	float rightX() const;
 	float rightY() const;
-	float rightdX() const;
-	float rightdY() const;
+	//float rightdX() const;
+	//float rightdY() const;
+	
+	bool setDeadzoneLX(float deadzone);
+	bool setDeadzoneLY(float deadzone);
+	bool setDeadzoneRX(float deadzone);
+	bool setDeadzoneRY(float deadzone);
 
-	void setDeadzoneL(float x, float y);
-	void setDeadzoneR(float x, float y);
-
-	void dPadX() const;
-	void dPadY() const;
+	int dPadX() const;
+	int dPadY() const;
 
 	float leftTrigger() const;
 	float rightTrigger() const;
@@ -73,23 +77,25 @@ public:
 	bool leftTriggerDown() const;
 	bool rightTriggerDown() const;
 
-	void setDeadzoneLT(float dz);
-	void setDeadzoneRT(float dz);
+	bool setThresholdLT(float threshold);
+	bool setThresholdRT(float threshold);
 
 	bool update(int milliseconds);
 
-	short absLeftX() const;
-	short absLeftY() const;
-	short absLeftdX() const;
-	short absRightdX() const;
+	//bool addVibration(float balance, float amount%, int milliseconds);
 
-	short absRightX() const;
-	short absRightY() const;
-	short absRightdX() const;
-	short absRightdY() const;
-
-	float absLeftTrigger() const;
-	short absRightTrigger() const;
+	//short absLeftX() const;
+	//short absLeftY() const;
+	//short absLeftdX() const;
+	//short absRightdX() const;
+	//
+	//short absRightX() const;
+	//short absRightY() const;
+	//short absRightdX() const;
+	//short absRightdY() const;
+	//
+	//short absLeftTrigger() const;
+	//short absRightTrigger() const;
 };
 
 #endif
