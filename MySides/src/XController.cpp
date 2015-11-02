@@ -35,15 +35,16 @@ void XController::initButtons()
 //Checks for any controller connected and uses the first one found
 bool XController::checkConnection()
 {
-	//-1 means disconnected
 	int id = DISCONNECTED;
 
+	//Step through all controller connection possibilities
 	for (int i = 0; i < XUSER_MAX_COUNT && id == -1; ++i)
 	{
 		//create and flush a state to test
 		XINPUT_STATE state;
 		memset(&state, 0, sizeof(XINPUT_STATE));
 
+		//Try to check the state, only succeeds if there's a controller there
 		if (XInputGetState(i, &state) == 0);
 		{
 			id = i;
@@ -64,21 +65,21 @@ int XController::getPort() const
 #pragma region Buttons
 
 //Returns if a button is down at all
-bool XController::isDown(WORD button) const
+bool XController::checkDown(WORD button) const
 {
 	//cur down
 	return (curState_.Gamepad.wButtons & button);
 }
 
-//Returns if a button is up
-bool XController::isUp(WORD button) const
+//Returns if a button is up at all
+bool XController::checkUp(WORD button) const
 {
 	//cur up
 	return ((curState_.Gamepad.wButtons & button) == false);
 }
 
 //Returns if a button was just pressed
-bool XController::isPressed(WORD button) const
+bool XController::checkPressed(WORD button) const
 {
 	//cur down
 	//prv up
@@ -86,7 +87,7 @@ bool XController::isPressed(WORD button) const
 }
 
 //Returns if a buttons was just released
-bool XController::isReleased(WORD button) const
+bool XController::checkReleased(WORD button) const
 {
 	//cur up
 	//prv down
@@ -94,14 +95,15 @@ bool XController::isReleased(WORD button) const
 }
 
 //Returns if a button is being held
-bool XController::isHeld(WORD button) const
+bool XController::checkHeld(WORD button) const
 {
 	//cur down
 	//prv down
 	return ((curState_.Gamepad.wButtons & button) && (prvState_.Gamepad.wButtons & button));
 }
 
-unsigned int XController::timeHeld(WORD button) const
+//Returns the time a button was held in milliseconds, or NULL if button doesn't exist
+unsigned int XController::checkTimeHeld(WORD button) const
 {
 	//Find the button in the map
 	std::map<WORD, unsigned int>::const_iterator iter(heldTimes_.find(button));
@@ -109,7 +111,7 @@ unsigned int XController::timeHeld(WORD button) const
 	//If it doesn't exist, no time
 	if (iter == heldTimes_.end())
 	{
-		return 0;
+		return NULL;
 	}
 
 	//else return time
@@ -122,67 +124,23 @@ unsigned int XController::timeHeld(WORD button) const
 #pragma region Sticks
 
 //Returns Left Stick X axis between -100f and 100f
-float XController::leftX() const
-{
-	return leftX_;
-}
+float XController::checkLeftX() const {	return leftX_; }
 
 //Returns Left Stick Y axis between -100f and 100f
-float XController::leftY() const
-{
-	return leftY_;
-}
+float XController::checkLeftY() const {	return leftY_; }
 
 //Returns Right Stick X axis between -100f and 100f
-float XController::rightX() const
-{
-	return rightX_;
-}
+float XController::checkRightX() const { return rightX_; }
 
 //Returns Right Stick Y axis between -100f and 100f
-float XController::rightY() const
-{
-	return rightY_;
-}
-
-//Sets Left Stick X axis deadzone, between 0f and .99f, returns success
-bool XController::setDeadzoneLX(float deadzone)
-{
-	deadzoneLX_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneLX_);
-
-	return (deadzoneLX_ == deadzone);
-}
-
-//Sets Left Stick Y axis deadzone, between 0f and .99f, returns success
-bool XController::setDeadzoneLY(float deadzone)
-{
-	deadzoneLY_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneLY_);
-
-	return (deadzoneLY_ == deadzone);
-}
-
-//Sets Right Stick X axis deadzone, between 0f and .99f, returns success
-bool XController::setDeadzoneRX(float deadzone)
-{
-	deadzoneRX_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneRX_);
-
-	return (deadzoneRX_ == deadzone);
-}
-
-//Sets Right Stick Y axis deadzone, between 0f and .99f, returns success
-bool XController::setDeadzoneRY(float deadzone)
-{
-	deadzoneRY_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneRY_);
-
-	return (deadzoneRY_ == deadzone);
-}
+float XController::checkRightY() const { return rightY_; }
 
 #pragma endregion
 
 #pragma region Dpad
 
 //Returns x axis of Dpad, -1 is left, 0 is nothing, 1 is right
-int XController::dPadX() const
+int XController::checkDPadX() const
 {
 	int left = -1 * (curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
 	int right = (curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
@@ -191,7 +149,7 @@ int XController::dPadX() const
 }
 
 //Returns y axis of Dpad, -1 is up, 0 is nothing, 1 is down
-int XController::dPadY() const
+int XController::checkDPadY() const
 {
 	int up = -1 * (curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP);
 	int down = (curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
@@ -204,44 +162,80 @@ int XController::dPadY() const
 #pragma region Triggers
 
 //Returns Left Trigger state between 0f and 100f
-float XController::leftTrigger() const
-{
-	return leftTrigger_;
-}
+float XController::checkLeftTrigger() const { return leftTrigger_; }
 
 //Returns Right Trigger state between 0f and 100f
-float XController::rightTrigger() const
-{
-	return rightTrigger_;
-}
+float XController::checkRightTrigger() const{ return rightTrigger_; }
 
 //Returns if Left Trigger is further than threshold
-bool XController::leftTriggerDown() const
-{
-	return (leftTrigger_ > (100 * thresholdLT_));
-}
+bool XController::checkLeftHairTrigger() const { return (leftTrigger_ > (100 * thresholdLT_)); }
 
 //Returns if Right Trigger is further than threshold
-bool XController::rightTriggerDown() const
+bool XController::checkRightHairTrigger() const { return (rightTrigger_ > (100 * thresholdRT_)); }
+
+#pragma endregion
+
+#pragma region Accessors
+
+//Sets Left Stick X axis deadzone, between 0f and .99f, returns success
+bool XController::setDeadzoneLX(float deadzone)
 {
-	return (rightTrigger_ > (100 * thresholdRT_));
+	deadzoneLX_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneLX_);
+	return (deadzoneLX_ == deadzone);
 }
 
-//Set threshold of Left Trigger, between 0f and .99f, returns success
+//Sets Left Stick Y axis deadzone, between 0f and .99f, returns success
+bool XController::setDeadzoneLY(float deadzone)
+{
+	deadzoneLY_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneLY_);
+	return (deadzoneLY_ == deadzone);
+}
+
+//Sets Right Stick X axis deadzone, between 0f and .99f, returns success
+bool XController::setDeadzoneRX(float deadzone)
+{
+	deadzoneRX_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneRX_);
+	return (deadzoneRX_ == deadzone);
+}
+
+//Sets Right Stick Y axis deadzone, between 0f and .99f, returns success
+bool XController::setDeadzoneRY(float deadzone)
+{
+	deadzoneRY_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneRY_);
+	return (deadzoneRY_ == deadzone);
+}
+
+//Sets threshold of Left Trigger, between 0f and .99f, returns success
 bool XController::setThresholdLT(float threshold)
 {
 	thresholdLT_ = ((0.f < threshold && threshold < .99f) ? threshold : thresholdLT_);
-
 	return (thresholdLT_ == threshold);
 }
 
-//Set threshold of Right Trigger, between 0f and .99f, returns success
+//Sets threshold of Right Trigger, between 0f and .99f, returns success
 bool XController::setThresholdRT(float threshold)
 {
 	thresholdRT_ = ((0.f < threshold && threshold < .99f) ? threshold : thresholdRT_);
-
 	return (thresholdRT_ == threshold);
 }
+
+//Gets Left Stick X axis deadzone
+float XController::getDeadzoneLX() const { return deadzoneLX_; }
+
+//Gets Left Stick Y axis deadzone
+float XController::getDeadzoneLY() const { return deadzoneLY_; }
+
+//Gets Right Stick X axis deadzone
+float XController::getDeadzoneRX() const { return deadzoneRX_; }
+
+//Gets Right Stick Y axis deadzone
+float XController::getDeadzoneRY() const { return deadzoneRY_; }
+
+//Gets Left Trigger threshold
+float XController::getThresholdLT() const { return thresholdLT_; }
+
+//Gets Right Trigger threshold
+float XController::getThresholdRT() const { return thresholdRT_; }
 
 #pragma endregion
 
@@ -266,7 +260,7 @@ bool XController::update(int milliseconds)
 		//Update our current state and check if we're still good
 		if (XInputGetState(controllerId_, &curState_) != 0)
 		{
-			controllerId_ = -1;
+			controllerId_ = DISCONNECTED;
 			return false;
 		}
 
@@ -316,4 +310,3 @@ bool XController::update(int milliseconds)
 	//We couldn't connect or update, something's wrong
 	return false;
 }
-

@@ -42,7 +42,7 @@ public:
 		priority = '!'
 	};
 
-	void out(char type, char location, char* output) const
+	void out(const char type, const char location, const char* output) const
 	{
 		switch (type)
 		{
@@ -101,7 +101,7 @@ public:
 		cout << endl << "==== \t ==== \t ==== \t ==== \t" << endl << endl;
 	}
 
-	void typeEnable(char type, char location)
+	void typeEnable(const char type, const char location)
 	{
 		switch (type)
 		{
@@ -137,7 +137,7 @@ public:
 
 	}
 
-	void typeDisable(char type, char location)
+	void typeDisable(const char type, const char location)
 	{
 		switch (type)
 		{

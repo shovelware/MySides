@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Game.hpp"
 
+
 //Globally accessible logger, usage: extern Log l;
 Log l;
 
@@ -30,7 +31,7 @@ int Game::run()
 	//Display a blank window before we start our game loop
 	//Avoids nasty white windows
 	window_.display();
-	
+
 	//Game loop
 	while (!quit_)
 	{
@@ -45,7 +46,7 @@ int Game::run()
 		frameTime = frameClock.restart();
 
 		//update our controls with the frametime
-		//input.update(frameTime);
+		con.update(frameTime.asMilliseconds());
 
 		//If we don't want to update, dump the frametime
 		//and skip the rest of the loop
@@ -114,13 +115,52 @@ void Game::processEvents()
 
 void Game::update(sf::Time dt)
 {
-	l.out(l.message, 'G', "Update");
+	//l.out(l.message, 'G', "Update");
+	if (con.checkDown(XINPUT_GAMEPAD_A))
+	{
+		l.out(l.message, 'G', "A Button");
+	}
+	if (con.checkDown(XINPUT_GAMEPAD_B))
+	{
+		l.out(l.message, 'G', "B Button");
+	}
+	if (con.checkDown(XINPUT_GAMEPAD_X))
+	{
+		l.out(l.message, 'G', "X Button");
+	}
+	if (con.checkDown(XINPUT_GAMEPAD_Y))
+	{
+		l.out(l.message, 'G', "Y Button");
+	}
+	if (con.checkDown(XINPUT_GAMEPAD_BACK))
+	{
+		l.out(l.message, 'G', "Back Button");
+	}
+	if (con.checkDown(XINPUT_GAMEPAD_START))
+	{
+		l.out(l.message, 'G', "Start Button");
+	}
+
+	if (con.checkLeftTrigger() > .5f)
+	{
+		std::ostringstream LS;
+		LS << "\n" << "LX " << con.checkLeftX() << "\n" << "LY " << con.checkLeftY();
+		l.out(l.message, 'G', LS.str().c_str() );
+	}
+
+	if (con.checkRightTrigger() > .5f)
+	{
+		std::ostringstream RS;
+		RS << "\n" << "RX " << con.checkRightX() << "\n" << "RY " << con.checkRightY();
+		l.out(l.message, 'G', RS.str().c_str());
+	}
+
 }
 
 void Game::render()
 {
 	window_.clear();
-	l.out(l.message, 'G', "Render");
+	//l.out(l.message, 'G', "Render");
 
 	//Render stuff
 

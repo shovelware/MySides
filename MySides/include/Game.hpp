@@ -13,6 +13,12 @@
 //Box2D
 #include <Box2D/Box2D.h>
 
+//Controller
+#include "XController.hpp"
+
+//////
+#include <sstream>
+
 class Game
 {
 private:
@@ -27,6 +33,8 @@ private:
 	bool quit_;
 
 	bool fullscreen_;
+
+	XController con;
 
 	sf::VideoMode videoMode_;
 	sf::RenderWindow window_;

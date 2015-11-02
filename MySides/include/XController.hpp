@@ -1,11 +1,18 @@
 // XController.hpp
 // Detects and reports Xbox controller input with XInput
+// Usage: Declare, update(milliseconds), ask for buttons
 // Heavily influenced by code from https://katyscode.wordpress.com/2013/08/30/xinput-tutorial-part-1-adding-gamepad-support-to-your-windows-game/
 
 #ifndef XCONTROLLER_H
 #define XCONTROLLER_H
 
+#include "stdafx.h"
+
 //Include xinput
+#if !defined(_68K_) && !defined(_MPPC_) && !defined(_X86_) && !defined(_IA64_) && !defined(_AMD64_) && !defined(_ARM_) && defined(_M_IX86)
+#define _X86_
+#endif
+
 #include <Xinput.h>
 #pragma comment(lib, "XInput9_1_0.lib")
 
@@ -41,45 +48,58 @@ private:
 	bool checkConnection();
 public:
 	XController();
+
 	int getPort() const;
 
-	bool isDown(WORD button) const;
-	bool isUp(WORD button) const;
+	//Buttons
+	bool checkDown(WORD button) const;
+	bool checkUp(WORD button) const;
 
-	bool isPressed(WORD button) const;
-	bool isReleased(WORD button) const;
+	bool checkPressed(WORD button) const;
+	bool checkReleased(WORD button) const;
 
-	bool isHeld(WORD button) const;
+	bool checkHeld(WORD button) const;
 
-	unsigned int timeHeld(WORD button) const;
+	unsigned int checkTimeHeld(WORD button) const;
 
-	float leftX() const;
-	float leftY() const;
+	//Sticks
+	float checkLeftX() const;
+	float checkLeftY() const;
+	float checkRightX() const;
+	float checkRightY() const;
+
 	//float leftdX() const;
 	//float leftdY() const;
-
-	float rightX() const;
-	float rightY() const;
 	//float rightdX() const;
 	//float rightdY() const;
-	
+
+	//Dpad
+	int checkDPadX() const;
+	int checkDPadY() const;
+
+	//Triggers
+	float checkLeftTrigger() const;
+	float checkRightTrigger() const;
+
+	bool checkLeftHairTrigger() const;
+	bool checkRightHairTrigger() const;
+
+	//Accessors
 	bool setDeadzoneLX(float deadzone);
 	bool setDeadzoneLY(float deadzone);
 	bool setDeadzoneRX(float deadzone);
 	bool setDeadzoneRY(float deadzone);
-
-	int dPadX() const;
-	int dPadY() const;
-
-	float leftTrigger() const;
-	float rightTrigger() const;
-
-	bool leftTriggerDown() const;
-	bool rightTriggerDown() const;
-
 	bool setThresholdLT(float threshold);
 	bool setThresholdRT(float threshold);
 
+	float getDeadzoneLX() const;
+	float getDeadzoneLY() const;
+	float getDeadzoneRX() const;
+	float getDeadzoneRY() const;
+	float getThresholdLT() const;
+	float getThresholdRT() const;
+
+	//Update
 	bool update(int milliseconds);
 
 	//bool addVibration(float balance, float amount%, int milliseconds);
