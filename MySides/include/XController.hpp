@@ -32,11 +32,14 @@ private:
 
 	float deadzoneLX_, deadzoneLY_;
 	float deadzoneRX_, deadzoneRY_;
+	const float DEADZONE_MAX = 1.f;
+
 	float thresholdLT_, thresholdRT_;
+	const float THRESHOLD_MAX = 1.f;
 	
 	float leftX_, leftY_;
 	float rightX_, rightY_;
-	const short STICK_MAX = SHRT_MAX;
+	const short STICK_MAX = 32767;
 
 	float leftTrigger_, rightTrigger_;
 	const BYTE TRIGGER_MAX = 255;

@@ -45,15 +45,15 @@ bool XController::checkConnection()
 		memset(&state, 0, sizeof(XINPUT_STATE));
 
 		//Try to check the state, only succeeds if there's a controller there
-		if (XInputGetState(i, &state) == 0);
+		if (XInputGetState(i, &state) == 0)
 		{
 			id = i;
 		}
-
-		controllerId_ = id;
-
-		return controllerId_ != DISCONNECTED;
 	}
+
+	controllerId_ = id;
+
+	return controllerId_ != DISCONNECTED;
 }
 
 //Returns port number of controller
@@ -142,8 +142,8 @@ float XController::checkRightY() const { return rightY_; }
 //Returns x axis of Dpad, -1 is left, 0 is nothing, 1 is right
 int XController::checkDPadX() const
 {
-	int left = -1 * (curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
-	int right = (curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
+	int left = -1 * (bool)(curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
+	int right = (bool)(curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
 
 	return left + right;
 }
@@ -151,8 +151,8 @@ int XController::checkDPadX() const
 //Returns y axis of Dpad, -1 is up, 0 is nothing, 1 is down
 int XController::checkDPadY() const
 {
-	int up = -1 * (curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP);
-	int down = (curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
+	int up = -1 * (bool)(curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP);
+	int down = (bool)(curState_.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
 
 	return up + down;
 }
@@ -180,42 +180,42 @@ bool XController::checkRightHairTrigger() const { return (rightTrigger_ > (100 *
 //Sets Left Stick X axis deadzone, between 0f and .99f, returns success
 bool XController::setDeadzoneLX(float deadzone)
 {
-	deadzoneLX_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneLX_);
+	deadzoneLX_ = ((0.f < deadzone && deadzone < DEADZONE_MAX) ? deadzone : deadzoneLX_);
 	return (deadzoneLX_ == deadzone);
 }
 
 //Sets Left Stick Y axis deadzone, between 0f and .99f, returns success
 bool XController::setDeadzoneLY(float deadzone)
 {
-	deadzoneLY_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneLY_);
+	deadzoneLY_ = ((0.f < deadzone && deadzone < DEADZONE_MAX) ? deadzone : deadzoneLY_);
 	return (deadzoneLY_ == deadzone);
 }
 
 //Sets Right Stick X axis deadzone, between 0f and .99f, returns success
 bool XController::setDeadzoneRX(float deadzone)
 {
-	deadzoneRX_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneRX_);
+	deadzoneRX_ = ((0.f < deadzone && deadzone < DEADZONE_MAX) ? deadzone : deadzoneRX_);
 	return (deadzoneRX_ == deadzone);
 }
 
 //Sets Right Stick Y axis deadzone, between 0f and .99f, returns success
 bool XController::setDeadzoneRY(float deadzone)
 {
-	deadzoneRY_ = ((0.f < deadzone && deadzone < .99f) ? deadzone : deadzoneRY_);
+	deadzoneRY_ = ((0.f < deadzone && deadzone < DEADZONE_MAX) ? deadzone : deadzoneRY_);
 	return (deadzoneRY_ == deadzone);
 }
 
 //Sets threshold of Left Trigger, between 0f and .99f, returns success
 bool XController::setThresholdLT(float threshold)
 {
-	thresholdLT_ = ((0.f < threshold && threshold < .99f) ? threshold : thresholdLT_);
+	thresholdLT_ = ((0.f < threshold && threshold < THRESHOLD_MAX) ? threshold : thresholdLT_);
 	return (thresholdLT_ == threshold);
 }
 
 //Sets threshold of Right Trigger, between 0f and .99f, returns success
 bool XController::setThresholdRT(float threshold)
 {
-	thresholdRT_ = ((0.f < threshold && threshold < .99f) ? threshold : thresholdRT_);
+	thresholdRT_ = ((0.f < threshold && threshold < THRESHOLD_MAX) ? threshold : thresholdRT_);
 	return (thresholdRT_ == threshold);
 }
 
@@ -287,15 +287,22 @@ bool XController::update(int milliseconds)
 			//Get normalised stick position
 			float normLY = fmaxf(-1, (float)curState_.Gamepad.sThumbLY / STICK_MAX);
 			float normLX = fmaxf(-1, (float)curState_.Gamepad.sThumbLX / STICK_MAX);
-			//Apply deadzones
-			if (deadzoneLX_ > 0) leftX_ *= 1 / (1 - deadzoneLX_);
-			if (deadzoneLY_ > 0) leftY_ *= 1 / (1 - deadzoneLY_);
+			
+			//Get position betweeen deadzone and edge
+			leftX_ = (abs(normLX) < deadzoneLX_ ? 0 : (abs(normLX) - deadzoneLX_) * (normLX / abs(normLX)));
+			leftY_ = (abs(normLY) < deadzoneLY_ ? 0 : (abs(normLY) - deadzoneLY_) * (normLY / abs(normLY)));
+			
+			//Scale position to between -1 and 1
+			if (deadzoneLX_ > 0) leftX_ *= 1 / (DEADZONE_MAX - deadzoneLX_);
+			if (deadzoneLY_ > 0) leftY_ *= 1 / (DEADZONE_MAX - deadzoneLY_);
 
 			//Right Stick Update
 			float normRY = fmaxf(-1, (float)curState_.Gamepad.sThumbRY / STICK_MAX);
 			float normRX = fmaxf(-1, (float)curState_.Gamepad.sThumbRX / STICK_MAX);
-			if (deadzoneRX_ > 0) rightX_ *= 1 / (1 - deadzoneRX_);
-			if (deadzoneRY_ > 0) rightY_ *= 1 / (1 - deadzoneRY_);
+			rightX_ = (abs(normRX) < deadzoneRX_ ? 0 : (abs(normRX) - deadzoneRX_) * (normRX / abs(normRX)));
+			rightY_ = (abs(normRY) < deadzoneRY_ ? 0 : (abs(normRY) - deadzoneRY_) * (normRY / abs(normRY)));
+			if (deadzoneRX_ > 0) rightX_ *= 1 / (DEADZONE_MAX - deadzoneRX_);
+			if (deadzoneRY_ > 0) rightY_ *= 1 / (DEADZONE_MAX - deadzoneRY_);
 
 			//Trigger update
 			leftTrigger_ = (float)curState_.Gamepad.bLeftTrigger / TRIGGER_MAX;

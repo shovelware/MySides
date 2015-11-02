@@ -27,15 +27,15 @@ private:
 	void render();	
 
 	bool mousein_;
-	bool focus_;
 
 	bool update_;
 	bool quit_;
 
 	bool fullscreen_;
 
+	//Testbed
 	XController con;
-
+	//
 	sf::VideoMode videoMode_;
 	sf::RenderWindow window_;
 public:

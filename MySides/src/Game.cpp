@@ -115,30 +115,80 @@ void Game::processEvents()
 
 void Game::update(sf::Time dt)
 {
+	//con.update(dt.asMilliseconds());
 	//l.out(l.message, 'G', "Update");
 	if (con.checkDown(XINPUT_GAMEPAD_A))
 	{
 		l.out(l.message, 'G', "A Button");
 	}
+
 	if (con.checkDown(XINPUT_GAMEPAD_B))
 	{
 		l.out(l.message, 'G', "B Button");
 	}
+
 	if (con.checkDown(XINPUT_GAMEPAD_X))
 	{
 		l.out(l.message, 'G', "X Button");
 	}
+
 	if (con.checkDown(XINPUT_GAMEPAD_Y))
 	{
 		l.out(l.message, 'G', "Y Button");
 	}
+
+	if (con.checkDown(XINPUT_GAMEPAD_LEFT_SHOULDER))
+	{
+		l.out(l.message, 'G', "Left Bumper");
+	}
+
+	if (con.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+	{
+		l.out(l.message, 'G', "Right Bumper");
+	}
+
+	if (con.checkDown(XINPUT_GAMEPAD_LEFT_THUMB))
+	{
+		l.out(l.message, 'G', "Left Click");
+	}
+
+	if (con.checkDown(XINPUT_GAMEPAD_RIGHT_THUMB))
+	{
+		l.out(l.message, 'G', "Right Click");
+	}
+
+	if (con.checkDPadX() != 0)
+	{
+		std::ostringstream DP;
+		DP << "DPad X " << con.checkDPadX();
+		l.out(l.message, 'G', DP.str().c_str());
+	}
+
+	if (con.checkDPadY() != 0)
+	{
+		std::ostringstream DP;
+		DP << "DPad Y " << con.checkDPadY();
+		l.out(l.message, 'G', DP.str().c_str());
+	}
+
 	if (con.checkDown(XINPUT_GAMEPAD_BACK))
 	{
 		l.out(l.message, 'G', "Back Button");
 	}
+
 	if (con.checkDown(XINPUT_GAMEPAD_START))
 	{
 		l.out(l.message, 'G', "Start Button");
+	}
+
+	if (con.checkReleased(XINPUT_GAMEPAD_A))
+	{
+		if (con.checkTimeHeld(XINPUT_GAMEPAD_A) > 0)
+		{
+			std::ostringstream HT;
+			HT << con.checkTimeHeld(XINPUT_GAMEPAD_A);
+			l.out(l.message, 'G', HT.str().c_str() );
+		}
 	}
 
 	if (con.checkLeftTrigger() > .5f)
