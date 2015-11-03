@@ -20,7 +20,7 @@ int Game::run()
 	//Fixed Timestep
 	sf::Clock frameClock;
 	sf::Time frameTime = sf::Time::Zero;
-	sf::Time tickTime = sf::Time(sf::seconds(1.f / 30.f));
+	sf::Time tickTime = sf::Time(sf::seconds(1.f / 60.f));
 	sf::Time accumulator = sf::Time::Zero;
 
 	//Logging
@@ -44,10 +44,7 @@ int Game::run()
 
 		//Get delta time since last frame
 		frameTime = frameClock.restart();
-
-		//update our controls with the frametime
-		con.update(frameTime.asMilliseconds());
-
+		
 		//If we don't want to update, dump the frametime
 		//and skip the rest of the loop
 		if (!update_)
@@ -60,7 +57,12 @@ int Game::run()
 		//Update to number of physics steps
 		while (accumulator >= tickTime)
 		{
-			update(tickTime);
+			if (checkController(tickTime))
+			{
+				update(tickTime);
+			}
+
+			//Take this step out of the accumulator
 			accumulator -= tickTime;
 		}
 
@@ -113,10 +115,10 @@ void Game::processEvents()
 	}
 }
 
-void Game::update(sf::Time dt)
+bool Game::checkController(sf::Time dt)
 {
-	//con.update(dt.asMilliseconds());
-	//l.out(l.message, 'G', "Update");
+	bool connected = con.update(dt.asMilliseconds());
+
 	if (con.checkDown(XINPUT_GAMEPAD_A))
 	{
 		l.out(l.message, 'G', "A Button");
@@ -171,14 +173,16 @@ void Game::update(sf::Time dt)
 		l.out(l.message, 'G', DP.str().c_str());
 	}
 
-	if (con.checkDown(XINPUT_GAMEPAD_BACK))
+	if (con.checkPressed(XINPUT_GAMEPAD_BACK))
 	{
 		l.out(l.message, 'G', "Back Button");
+		l.typeDisable(l.message, 'G');
 	}
 
-	if (con.checkDown(XINPUT_GAMEPAD_START))
+	if (con.checkPressed(XINPUT_GAMEPAD_START))
 	{
 		l.out(l.message, 'G', "Start Button");
+		l.typeEnable(l.message, 'G');
 	}
 
 	if (con.checkReleased(XINPUT_GAMEPAD_A))
@@ -187,7 +191,7 @@ void Game::update(sf::Time dt)
 		{
 			std::ostringstream HT;
 			HT << con.checkTimeHeld(XINPUT_GAMEPAD_A);
-			l.out(l.message, 'G', HT.str().c_str() );
+			l.out(l.message, 'G', HT.str().c_str());
 		}
 	}
 
@@ -195,7 +199,7 @@ void Game::update(sf::Time dt)
 	{
 		std::ostringstream LS;
 		LS << "\n" << "LX " << con.checkLeftX() << "\n" << "LY " << con.checkLeftY();
-		l.out(l.message, 'G', LS.str().c_str() );
+		l.out(l.message, 'G', LS.str().c_str());
 	}
 
 	if (con.checkRightTrigger() > .5f)
@@ -205,6 +209,17 @@ void Game::update(sf::Time dt)
 		l.out(l.message, 'G', RS.str().c_str());
 	}
 
+	return connected;
+
+}
+
+void Game::update(sf::Time dt)
+{
+	static int x;
+	x++;
+	std::ostringstream UD;
+	UD << "Update" << x;
+	l.out(l.message, 'G', UD.str().c_str());
 }
 
 void Game::render()

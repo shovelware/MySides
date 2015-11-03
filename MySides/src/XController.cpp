@@ -35,17 +35,18 @@ void XController::initButtons()
 //Checks for any controller connected and uses the first one found
 bool XController::checkConnection()
 {
+	//We assume we're disconnected
 	int id = DISCONNECTED;
 
 	//Step through all controller connection possibilities
-	for (int i = 0; i < XUSER_MAX_COUNT && id == -1; ++i)
+	for (DWORD i = 0; i < XUSER_MAX_COUNT && id == -1; ++i)
 	{
 		//create and flush a state to test
 		XINPUT_STATE state;
 		memset(&state, 0, sizeof(XINPUT_STATE));
 
 		//Try to check the state, only succeeds if there's a controller there
-		if (XInputGetState(i, &state) == 0)
+		if (XInputGetState(i, &state) == 0x0)
 		{
 			id = i;
 		}
@@ -258,60 +259,59 @@ bool XController::update(int milliseconds)
 		memset(&curState_, 0, sizeof(XINPUT_STATE));
 
 		//Update our current state and check if we're still good
-		if (XInputGetState(controllerId_, &curState_) != 0)
+		if (XInputGetState(controllerId_, &curState_) != 0x0)
 		{
 			controllerId_ = DISCONNECTED;
 			return false;
 		}
 
-		//Now we can start checking things, but only if there's been a change
-		if (curState_.dwPacketNumber != prvState_.dwPacketNumber)
+		//Now we can start checking things
+		//Button held times update
+		for (std::map<WORD, unsigned int>::iterator mIter = heldTimes_.begin(), mEnd = heldTimes_.end(); mIter != mEnd; ++mIter)
 		{
-			//Button held times update
-			for (std::map<WORD, unsigned int>::iterator mIter = heldTimes_.begin(), mEnd = heldTimes_.end(); mIter != mEnd; ++mIter)
+			//If a button is down, add the held time
+			if (curState_.Gamepad.wButtons & mIter->first)
 			{
-				//If a button is down, add the held time
-				if (curState_.Gamepad.wButtons & mIter->first)
-				{
-					mIter->second += milliseconds;
-				}
+				mIter->second += milliseconds;
+			}
+				
+			//If a button was up and it was up last update, clear the time
+			else if ((prvState_.Gamepad.wButtons & mIter->first) == 0)
+			{
+				mIter->second = 0;
+			}
+		}//end button update
 
-				//If a button was up and it was up last update, clear the time
-				else if (prvState_.Gamepad.wButtons ^ mIter->first)
-				{
-					mIter->second = 0;
-				}
-			}//end button update
+		//Left Stick Update
+		//Get normalised stick position
+		float normLY = fmaxf(-1, (float)curState_.Gamepad.sThumbLY / STICK_MAX);
+		float normLX = fmaxf(-1, (float)curState_.Gamepad.sThumbLX / STICK_MAX);
+		
+		//Get position betweeen deadzone and edge
+		leftX_ = (abs(normLX) < deadzoneLX_ ? 0 : (abs(normLX) - deadzoneLX_) * (normLX / abs(normLX)));
+		leftY_ = (abs(normLY) < deadzoneLY_ ? 0 : (abs(normLY) - deadzoneLY_) * (normLY / abs(normLY)));
+		
+		//Scale position to between -1 and 1
+		if (deadzoneLX_ > 0) leftX_ *= 1 / (DEADZONE_MAX - deadzoneLX_);
+		if (deadzoneLY_ > 0) leftY_ *= 1 / (DEADZONE_MAX - deadzoneLY_);
 
-			//Left Stick Update
-			//Get normalised stick position
-			float normLY = fmaxf(-1, (float)curState_.Gamepad.sThumbLY / STICK_MAX);
-			float normLX = fmaxf(-1, (float)curState_.Gamepad.sThumbLX / STICK_MAX);
-			
-			//Get position betweeen deadzone and edge
-			leftX_ = (abs(normLX) < deadzoneLX_ ? 0 : (abs(normLX) - deadzoneLX_) * (normLX / abs(normLX)));
-			leftY_ = (abs(normLY) < deadzoneLY_ ? 0 : (abs(normLY) - deadzoneLY_) * (normLY / abs(normLY)));
-			
-			//Scale position to between -1 and 1
-			if (deadzoneLX_ > 0) leftX_ *= 1 / (DEADZONE_MAX - deadzoneLX_);
-			if (deadzoneLY_ > 0) leftY_ *= 1 / (DEADZONE_MAX - deadzoneLY_);
+		//Right Stick Update
+		float normRY = fmaxf(-1, (float)curState_.Gamepad.sThumbRY / STICK_MAX);
+		float normRX = fmaxf(-1, (float)curState_.Gamepad.sThumbRX / STICK_MAX);
+		rightX_ = (abs(normRX) < deadzoneRX_ ? 0 : (abs(normRX) - deadzoneRX_) * (normRX / abs(normRX)));
+		rightY_ = (abs(normRY) < deadzoneRY_ ? 0 : (abs(normRY) - deadzoneRY_) * (normRY / abs(normRY)));
+		if (deadzoneRX_ > 0) rightX_ *= 1 / (DEADZONE_MAX - deadzoneRX_);
+		if (deadzoneRY_ > 0) rightY_ *= 1 / (DEADZONE_MAX - deadzoneRY_);
 
-			//Right Stick Update
-			float normRY = fmaxf(-1, (float)curState_.Gamepad.sThumbRY / STICK_MAX);
-			float normRX = fmaxf(-1, (float)curState_.Gamepad.sThumbRX / STICK_MAX);
-			rightX_ = (abs(normRX) < deadzoneRX_ ? 0 : (abs(normRX) - deadzoneRX_) * (normRX / abs(normRX)));
-			rightY_ = (abs(normRY) < deadzoneRY_ ? 0 : (abs(normRY) - deadzoneRY_) * (normRY / abs(normRY)));
-			if (deadzoneRX_ > 0) rightX_ *= 1 / (DEADZONE_MAX - deadzoneRX_);
-			if (deadzoneRY_ > 0) rightY_ *= 1 / (DEADZONE_MAX - deadzoneRY_);
+		//Trigger update
+		leftTrigger_ = (float)curState_.Gamepad.bLeftTrigger / TRIGGER_MAX;
+		rightTrigger_ = (float)curState_.Gamepad.bRightTrigger / TRIGGER_MAX;
 
-			//Trigger update
-			leftTrigger_ = (float)curState_.Gamepad.bLeftTrigger / TRIGGER_MAX;
-			rightTrigger_ = (float)curState_.Gamepad.bRightTrigger / TRIGGER_MAX;
-		}//end if there's a change
+		//Return update success, we're still connected
+		return true;
+
 	}//end else do actual update
 
-	//Return update success, we're still connected
-	return true;
 	
 
 	//We couldn't connect or update, something's wrong

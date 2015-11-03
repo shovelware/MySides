@@ -24,7 +24,12 @@ class Game
 private:
 	void processEvents();
 	void update(sf::Time dt);
-	void render();	
+	void render();
+
+	//This will be broken out into inputmanager
+	bool checkController(sf::Time dt);
+	XController con;
+	//
 
 	bool mousein_;
 
@@ -33,9 +38,6 @@ private:
 
 	bool fullscreen_;
 
-	//Testbed
-	XController con;
-	//
 	sf::VideoMode videoMode_;
 	sf::RenderWindow window_;
 public:
