@@ -5,7 +5,7 @@
 //Globally accessible logger, usage: extern Log l;
 Log l;
 
-Game::Game() : videoMode_(1280, 720, 32), window_(videoMode_, "My Sides!", sf::Style::Titlebar), mousein_(false), quit_(false), fullscreen_(false)
+Game::Game() : videoMode_(1280, 720, 32), window_(videoMode_, "My Sides!", sf::Style::Titlebar), mousein_(false), quit_(false), fullscreen_(false), dd_(window_)
 {
 }
 
@@ -26,6 +26,21 @@ int Game::run()
 	//Logging
 	l = *(new Log());
 
+	//World
+	world_ = new GameWorld();
+	
+	//Debugdraw
+	uint32 flags = b2Draw::e_shapeBit;
+	//flags += b2Draw::e_jointBit;
+	//flags += b2Draw::e_aabbBit;
+	//flags += b2Draw::e_pairBit;
+	//flags += b2Draw::e_centerOfMassBit;
+	dd_.SetFlags(flags);
+	world_->SetDebugDraw(&dd_);
+
+	//Body
+	world_->addBody(0, 0);
+
 #pragma endregion
 
 	//Display a blank window before we start our game loop
@@ -40,7 +55,7 @@ int Game::run()
 		//processEvents(inputManager.update());?
 		processEvents();
 
-		update_ = (window_.hasFocus() && mousein_);
+		update_ = (window_.hasFocus());// && mousein_);
 
 		//Get delta time since last frame
 		frameTime = frameClock.restart();
@@ -57,13 +72,14 @@ int Game::run()
 		//Update to number of physics steps
 		while (accumulator >= tickTime)
 		{
-			if (checkController(tickTime))
+			//Only update if the controller is connected
+			//if (checkController(tickTime))
 			{
 				update(tickTime);
+				//Take this step out of the accumulator
+				accumulator -= tickTime;
 			}
 
-			//Take this step out of the accumulator
-			accumulator -= tickTime;
 		}
 
 		render();
@@ -84,10 +100,12 @@ void Game::processEvents()
 			quit_ = true;
 			break;
 
+			//Escape : Quit game
 		case sf::Event::KeyPressed:
 			if (evt.key.code == sf::Keyboard::Key::Escape)
 				quit_ = true;
 
+			//Return: Toggle Fullscreen
 			if (evt.key.code == sf::Keyboard::Key::Return)
 				if (!fullscreen_)
 				{
@@ -215,11 +233,12 @@ bool Game::checkController(sf::Time dt)
 
 void Game::update(sf::Time dt)
 {
-	static int x;
-	x++;
-	std::ostringstream UD;
-	UD << "Update" << x;
-	l.out(l.message, 'G', UD.str().c_str());
+	world_->update(dt.asMilliseconds());
+	//static int x;
+	//x++;
+	//std::ostringstream UD;
+	//UD << "Update" << x;
+	//l.out(l.message, 'G', UD.str().c_str());
 }
 
 void Game::render()
@@ -228,6 +247,6 @@ void Game::render()
 	//l.out(l.message, 'G', "Render");
 
 	//Render stuff
-
+	world_->DrawDebugData();
 	window_.display();
 }

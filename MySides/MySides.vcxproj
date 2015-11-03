@@ -128,7 +128,9 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\GameWorld.cpp" />
     <ClCompile Include="src\MySides.cpp" />
+    <ClCompile Include="src\SFMLDebugDraw.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\XController.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -137,8 +139,9 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
   <ItemGroup>
     <ClInclude Include="CodePallet.h" />
     <ClInclude Include="include\Game.hpp" />
+    <ClInclude Include="include\GameWorld.hpp" />
     <ClInclude Include="include\Log.hpp" />
-    <ClInclude Include="include\Logtest.hpp" />
+    <ClInclude Include="include\SFMLDebugDraw.h" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\XController.hpp">

@@ -27,15 +27,18 @@
     <ClCompile Include="src\XController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GameWorld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SFMLDebugDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Game.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Log.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Logtest.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\targetver.h">
@@ -48,6 +51,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\XController.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameWorld.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SFMLDebugDraw.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -16,7 +16,10 @@
 //Controller
 #include "XController.hpp"
 
-//////
+//Game
+#include "GameWorld.hpp"
+
+//////Testing
 #include <sstream>
 
 class Game
@@ -26,20 +29,26 @@ private:
 	void update(sf::Time dt);
 	void render();
 
+	//Control bools
+	bool mousein_;
+	bool update_;
+	bool quit_;
+
+	//Drawing
+	bool fullscreen_;
+	sf::VideoMode videoMode_;
+	sf::RenderWindow window_;
+
 	//This will be broken out into inputmanager
 	bool checkController(sf::Time dt);
 	XController con;
 	//
 
-	bool mousein_;
+	//Game world 
+	GameWorld* world_;
+	SFMLDebugDraw dd_;
+	//
 
-	bool update_;
-	bool quit_;
-
-	bool fullscreen_;
-
-	sf::VideoMode videoMode_;
-	sf::RenderWindow window_;
 public:
 	Game();
 	int run();
