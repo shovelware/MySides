@@ -3,8 +3,8 @@
 // Usage: Declare, update(milliseconds), ask for buttons
 // Heavily influenced by code from https://katyscode.wordpress.com/2013/08/30/xinput-tutorial-part-1-adding-gamepad-support-to-your-windows-game/
 
-#ifndef XCONTROLLER_H
-#define XCONTROLLER_H
+#ifndef XCONTROLLER_HPP
+#define XCONTROLLER_HPP
 
 #include "stdafx.h"
 
@@ -70,6 +70,9 @@ public:
 	float checkLeftY() const;
 	float checkRightX() const;
 	float checkRightY() const;
+
+	bool checkLeftNeutral() const;
+	bool checkRightNeutral() const;
 
 	//float leftdX() const;
 	//float leftdY() const;

@@ -1,8 +1,8 @@
 #include "XController.hpp"
 
 XController::XController() :
-	deadzoneLX_(0.05f), deadzoneLY_(0.02f), 
-	deadzoneRX_(0.05f), deadzoneRY_(0.02f), 
+	deadzoneLX_(0.1f), deadzoneLY_(0.1f), 
+	deadzoneRX_(0.1f), deadzoneRY_(0.1f), 
 	thresholdLT_(0.4f), thresholdRT_(0.4f),
 	controllerId_(-1)
 {
@@ -124,17 +124,27 @@ unsigned int XController::checkTimeHeld(WORD button) const
 
 #pragma region Sticks
 
-//Returns Left Stick X axis between -100f and 100f
+//Returns Left Stick X axis between left -1f and 1f right
 float XController::checkLeftX() const {	return leftX_; }
 
-//Returns Left Stick Y axis between -100f and 100f
-float XController::checkLeftY() const {	return leftY_; }
+//Returns Left Stick Y axis between up -1f and 1f down
+float XController::checkLeftY() const {	return -leftY_; }
 
-//Returns Right Stick X axis between -100f and 100f
+//Returns Right Stick X axis between left -1f and 1f right
 float XController::checkRightX() const { return rightX_; }
 
-//Returns Right Stick Y axis between -100f and 100f
-float XController::checkRightY() const { return rightY_; }
+//Returns Right Stick Y axis between up -1f and 1f down
+float XController::checkRightY() const { return -rightY_; }
+
+bool XController::checkLeftNeutral() const
+{
+	return (leftX_ == 0 && leftY_ == 0);
+}
+
+bool XController::checkRightNeutral() const
+{
+	return (rightX_ == 0 && rightY_ == 0);
+}
 
 #pragma endregion
 
@@ -162,17 +172,17 @@ int XController::checkDPadY() const
 
 #pragma region Triggers
 
-//Returns Left Trigger state between 0f and 100f
+//Returns Left Trigger state between 0f and 1f
 float XController::checkLeftTrigger() const { return leftTrigger_; }
 
-//Returns Right Trigger state between 0f and 100f
+//Returns Right Trigger state between 0f and 1f
 float XController::checkRightTrigger() const{ return rightTrigger_; }
 
 //Returns if Left Trigger is further than threshold
-bool XController::checkLeftHairTrigger() const { return (leftTrigger_ > (100 * thresholdLT_)); }
+bool XController::checkLeftHairTrigger() const { return (leftTrigger_ > (1 * thresholdLT_)); }
 
 //Returns if Right Trigger is further than threshold
-bool XController::checkRightHairTrigger() const { return (rightTrigger_ > (100 * thresholdRT_)); }
+bool XController::checkRightHairTrigger() const { return (rightTrigger_ > (1 * thresholdRT_)); }
 
 #pragma endregion
 
@@ -241,6 +251,7 @@ float XController::getThresholdRT() const { return thresholdRT_; }
 #pragma endregion
 
 //Checks connection, updates controller states, returns connection state
+//Negative time indicates pause of held time tracking i.e. paused game
 bool XController::update(int milliseconds)
 {
 	//If we're not connected, try to connect
@@ -272,13 +283,18 @@ bool XController::update(int milliseconds)
 			//If a button is down, add the held time
 			if (curState_.Gamepad.wButtons & mIter->first)
 			{
-				mIter->second += milliseconds;
+				//But only if the time > 0, otherwise leave it as is
+				mIter->second += (milliseconds > 0 ? milliseconds : 0);
 			}
 				
 			//If a button was up and it was up last update, clear the time
 			else if ((prvState_.Gamepad.wButtons & mIter->first) == 0)
 			{
-				mIter->second = 0;
+				//But only if time > 0, otherwise we should keep what we have
+				if (milliseconds > 0)
+				{
+					mIter->second = 0;
+				}
 			}
 		}//end button update
 
