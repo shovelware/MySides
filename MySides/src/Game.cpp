@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Game.hpp"
 
-
 //Globally accessible logger, usage: extern Log l;
 Log l;
 
@@ -39,7 +38,7 @@ int Game::run()
 	world_->SetDebugDraw(&dd_);
 
 	//Body
-	world_->addBody(0, 0);
+	world_->addPlayer(2, 2);
 
 #pragma endregion
 
@@ -75,8 +74,11 @@ int Game::run()
 			//Only update if the controller is connected
 			//if (checkController(tickTime))
 			{
+				//Update with this tick
+				checkController(tickTime); //XOR with if above
 				update(tickTime);
-				//Take this step out of the accumulator
+
+				//Take this tick out of the accumulator
 				accumulator -= tickTime;
 			}
 
@@ -100,8 +102,9 @@ void Game::processEvents()
 			quit_ = true;
 			break;
 
-			//Escape : Quit game
+			//Key press event
 		case sf::Event::KeyPressed:
+			//Escape : Quit game
 			if (evt.key.code == sf::Keyboard::Key::Escape)
 				quit_ = true;
 
@@ -120,6 +123,12 @@ void Game::processEvents()
 					window_.display();
 					fullscreen_ = false;
 				}
+			
+			//Space : Pause game
+			if (evt.key.code == sf::Keyboard::Key::Space)
+			{
+				pause_ = !pause_;
+			}
 			break;
 
 		case sf::Event::MouseLeft:
@@ -135,7 +144,16 @@ void Game::processEvents()
 
 bool Game::checkController(sf::Time dt)
 {
-	bool connected = con.update(dt.asMilliseconds());
+	bool connected = false;
+
+	//If we're paused, don't update the controller's button holds
+	if (pause_)
+	{
+		connected = con.update(-1);
+	}
+
+	//Normal update
+	else connected = con.update(dt.asMilliseconds());
 
 	if (con.checkDown(XINPUT_GAMEPAD_A))
 	{
@@ -216,14 +234,14 @@ bool Game::checkController(sf::Time dt)
 	if (con.checkLeftTrigger() > .5f)
 	{
 		std::ostringstream LS;
-		LS << "\n" << "LX " << con.checkLeftX() << "\n" << "LY " << con.checkLeftY();
+		LS << con.checkLeftTrigger() << "\n" << "LX " << con.checkLeftX() << "\n" << "LY " << con.checkLeftY();
 		l.out(l.message, 'G', LS.str().c_str());
 	}
 
 	if (con.checkRightTrigger() > .5f)
 	{
 		std::ostringstream RS;
-		RS << "\n" << "RX " << con.checkRightX() << "\n" << "RY " << con.checkRightY();
+		RS << con.checkRightTrigger() << "\n" << "RX " << con.checkRightX() << "\n" << "RY " << con.checkRightY();
 		l.out(l.message, 'G', RS.str().c_str());
 	}
 
@@ -234,6 +252,12 @@ bool Game::checkController(sf::Time dt)
 void Game::update(sf::Time dt)
 {
 	world_->update(dt.asMilliseconds());
+
+	if (con.checkRightNeutral())
+	{
+		world_->player()->SetLinearVelocity(b2Vec2(con.checkLeftX() * 0.05, con.checkLeftY() * 0.05));
+	}
+	//Update counter
 	//static int x;
 	//x++;
 	//std::ostringstream UD;

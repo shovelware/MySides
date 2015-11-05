@@ -1,8 +1,8 @@
 // Game.hpp
 // Handles loops, game logic, box2d world
 
-#ifndef GAME_H
-#define GAME_H
+#ifndef GAME_HPP
+#define GAME_HPP
 
 #include "stdafx.h"
 
@@ -32,6 +32,7 @@ private:
 	//Control bools
 	bool mousein_;
 	bool update_;
+	bool pause_;
 	bool quit_;
 
 	//Drawing

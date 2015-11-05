@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef SFMLDEBUGDRAW_H
-#define SFMLDEBUGDRAW_H
+#ifndef SFMLDEBUGDRAW_HPP
+#define SFMLDEBUGDRAW_HPP
 
 #include <Box2D/Box2D.h>
 #include <SFML/Window.hpp>
@@ -24,7 +24,7 @@
 
 namespace sfdd
 {
-	const float SCALE = 32.f;
+	const float SCALE = 16.f;
 }
 
 class SFMLDebugDraw : public b2Draw
