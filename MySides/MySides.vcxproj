@@ -45,7 +45,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)include;$(SFML_SDK)\include;$(BOX2D)</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SFML_SDK)\lib;$(BOX2D)Debug</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SFML_SDK)\lib;$(BOX2D)\Debug</LibraryPath>
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <ExtensionsToDeleteOnClean>*.dll;*.jpg;*.png;*.ttf;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
     <IntDir>build\$(Configuration)\</IntDir>
