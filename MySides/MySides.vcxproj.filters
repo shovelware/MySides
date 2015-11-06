@@ -13,57 +13,75 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\System">
+      <UniqueIdentifier>{b5df2184-d970-48c6-9c65-ad3ed8b7a3f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity">
+      <UniqueIdentifier>{120bf629-faa5-41e4-ae32-0fc40dd6f254}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Entity">
+      <UniqueIdentifier>{31c0a8fc-3c39-4c45-b21a-52f16bfdb560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\System">
+      <UniqueIdentifier>{46f3abf0-dc50-4018-9422-eaab1c000435}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\XController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entity.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
     <ClCompile Include="src\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MySides.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\XController.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\System</Filter>
     </ClCompile>
     <ClCompile Include="src\GameWorld.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MySides.cpp">
+      <Filter>Source Files\System</Filter>
     </ClCompile>
     <ClCompile Include="src\SFMLDebugDraw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\System</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entity.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\Shape.cpp">
+      <Filter>Source Files\Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Entity.hpp">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\XController.hpp">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="CodePallet.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
     <ClInclude Include="include\Game.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameWorld.hpp">
+      <Filter>Header Files\System</Filter>
     </ClInclude>
     <ClInclude Include="include\Log.hpp">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SFMLDebugDraw.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CodePallet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\XController.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameWorld.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SFMLDebugDraw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Entity.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="include\Shape.hpp">
+      <Filter>Header Files\Entity</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -10,6 +10,7 @@
 #include <SFMLDebugDraw.h>
 
 #include "Entity.hpp"
+#include "Shape.hpp"
 
 class GameWorld : public b2World {
 private:
@@ -18,11 +19,13 @@ private:
 	const int POSITION_ITERS = 10;
 
 	b2Body * player_;
-	//Entity * player_;
 
+	Shape shape_;
 
 public:
 	GameWorld();
+	bool hasPlayer();
+
 	b2Body * addBody(int x, int y);
 
 	b2Body * addPlayer(int x, int y);
@@ -31,7 +34,7 @@ public:
 
 	void update(float dt);
 
-	b2Body * player() const;
+	Shape * player();
 
 };
 

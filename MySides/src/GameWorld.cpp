@@ -4,6 +4,11 @@ GameWorld::GameWorld() : b2World(GRAVITY)
 {
 }
 
+bool GameWorld::hasPlayer()
+{
+	return !(player_ == nullptr);
+}
+
 b2Body * GameWorld::addBody(int x, int y)
 {
 	//Define body, the matter
@@ -35,11 +40,12 @@ b2Body * GameWorld::addBody(int x, int y)
 }
 
 b2Body * GameWorld::addPlayer(int x, int y)
-{
-	//if (player_ != nullptr)
+{	
+	//If there's no player, add one
+	if (player_ == nullptr)
 	{
-		b2Body * player = addBody(x, y);
-		player_ = player;
+		player_ = addBody(x, y);
+		shape_ = Shape(player_);
 	}
 
 	return player_;
@@ -71,10 +77,10 @@ void GameWorld::update(float dt)
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 }
 
-b2Body * GameWorld::player() const
+Shape * GameWorld::player()
 {
-	if (player_!= nullptr)
-		return player_;
+	if (&shape_ != nullptr)
+		return &shape_;
 
 	else return nullptr;
 }

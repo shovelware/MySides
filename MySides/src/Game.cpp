@@ -253,10 +253,14 @@ void Game::update(sf::Time dt)
 {
 	world_->update(dt.asMilliseconds());
 
-	if (con.checkRightNeutral())
+	if (world_->hasPlayer())
 	{
-		world_->player()->SetLinearVelocity(b2Vec2(con.checkLeftX() * 0.05, con.checkLeftY() * 0.05));
+		if (con.checkRightNeutral())
+		{
+			world_->player()->move(b2Vec2(con.checkLeftX(), con.checkLeftY()));
+		}
 	}
+	
 	//Update counter
 	//static int x;
 	//x++;

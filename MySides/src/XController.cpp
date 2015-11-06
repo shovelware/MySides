@@ -1,15 +1,15 @@
 #include "XController.hpp"
 
 XController::XController() :
-	deadzoneLX_(0.1f), deadzoneLY_(0.1f), 
-	deadzoneRX_(0.1f), deadzoneRY_(0.1f), 
+	deadzoneLX_(0.1f), deadzoneLY_(0.1f),
+	deadzoneRX_(0.1f), deadzoneRY_(0.1f),
 	thresholdLT_(0.4f), thresholdRT_(0.4f),
 	controllerId_(-1)
 {
 	initButtons();
 }
 
-//initialises the heldtimes map with all controller buttons
+//Initialises the heldtimes map with all controller buttons
 void XController::initButtons()
 {
 	heldTimes_.emplace(XINPUT_GAMEPAD_DPAD_UP, 0);
@@ -253,7 +253,8 @@ float XController::getThresholdRT() const { return thresholdRT_; }
 #pragma endregion
 
 //Checks connection, updates controller states, returns connection state
-//Negative time indicates pause of held time tracking i.e. paused game
+//Negative time indicates rollover of held time tracking, but we still want input
+//Use Case: paused game, but still have menu control
 bool XController::update(int milliseconds)
 {
 	//If we're not connected, try to connect
@@ -329,8 +330,6 @@ bool XController::update(int milliseconds)
 		return true;
 
 	}//end else do actual update
-
-	
 
 	//We couldn't connect or update, something's wrong
 	return false;

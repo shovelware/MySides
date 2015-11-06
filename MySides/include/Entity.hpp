@@ -12,13 +12,12 @@ private:
 
 protected:
 	b2Body * body_;
-	float maxSpeed_;//?
 public:
 
 	Entity(b2Body * body);
 
-	virtual void move(b2Vec2 velocity) = 0;
-	virtual void rotate(float amount) = 0;
+	virtual void move(b2Vec2) = 0;
+	virtual void rotate(float) = 0;
 
 	void setPosition(b2Vec2 position);
 	void setRotation(float amount);
