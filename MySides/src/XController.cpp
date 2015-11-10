@@ -1,7 +1,7 @@
 #include "XController.hpp"
 
 XController::XController() :
-	deadzoneLX_(0.1f), deadzoneLY_(0.1f),
+	deadzoneLX_(0.15f), deadzoneLY_(0.15f),
 	deadzoneRX_(0.1f), deadzoneRY_(0.1f),
 	thresholdLT_(0.4f), thresholdRT_(0.4f),
 	controllerId_(-1)

@@ -9,6 +9,8 @@
 #include <Box2D\Box2D.h>
 #include <SFMLDebugDraw.h>
 
+#include <vector>
+
 #include "Entity.hpp"
 #include "Shape.hpp"
 
@@ -18,18 +20,18 @@ private:
 	const int VELOCITY_ITERS = 10;
 	const int POSITION_ITERS = 10;
 
-	b2Body * player_;
 
-	Shape shape_;
+	std::vector<Shape> shapes_;
+	std::vector<Shape>::iterator controlled_;
 
 public:
 	GameWorld();
-	bool hasPlayer();
+	bool hasControlled();
 
 	b2Body * addBody(int x, int y);
 
-	b2Body * addPlayer(int x, int y);
-	b2Body * addEnemy(int x, int y);
+	Shape * addPlayer(int x, int y);
+	//Shape * addEnemy(int x, int y);
 	b2Body * addBullet(int x, int y);
 
 	void update(float dt);

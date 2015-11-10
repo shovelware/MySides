@@ -5,7 +5,14 @@
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
 
+#include <stdafx.h>
 #include <Box2D\Box2D.h>
+
+//Using pi to convert deg <-> rad
+#define _USE_MATH_DEFINES
+#include "math.h"
+const double RD = 180 / M_PI;
+const double DR = M_PI / 180;
 
 class Entity {
 private:

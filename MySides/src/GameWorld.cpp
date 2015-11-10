@@ -4,9 +4,10 @@ GameWorld::GameWorld() : b2World(GRAVITY)
 {
 }
 
-bool GameWorld::hasPlayer()
+bool GameWorld::hasControlled()
 {
-	return !(player_ == nullptr);
+	//Return false if our pointer to the controlled shape is null
+	return !(controlled_._Ptr == nullptr);
 }
 
 b2Body * GameWorld::addBody(int x, int y)
@@ -17,41 +18,23 @@ b2Body * GameWorld::addBody(int x, int y)
 	bodyDef.position.Set(x, y);
 
 	//Create body using world's factory
-	b2Body* bodyBox = CreateBody(&bodyDef);
+	b2Body* body = CreateBody(&bodyDef);
 
-	//Create a shape, the outline
-	b2PolygonShape dynBox;
-	dynBox.SetAsBox(1, 1);
-
-	//Create a fixture, the link for body -> shape
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &dynBox;
-
-	//Add material properties to the fixture
-	fixtureDef.density = 1.0f;
-	fixtureDef.friction = 0.3f;
-	fixtureDef.restitution = 0.1f;
-
-	//Create and add fixture using body's factory
-	bodyBox->CreateFixture(&fixtureDef);
-
-	//The body is now in the collision system
-	return bodyBox;
+	return body;
 }
 
-b2Body * GameWorld::addPlayer(int x, int y)
+Shape * GameWorld::addPlayer(int x, int y)
 {	
-	//If there's no player, add one
-	if (player_ == nullptr)
-	{
-		player_ = addBody(x, y);
-		shape_ = Shape(player_);
-	}
+	//Add the shape with a body
+	shapes_.push_back(Shape(addBody(x, y)));
 
-	return player_;
+	//Set our control to the one we just put in
+	controlled_ = --shapes_.end();
+
+	return controlled_._Ptr;
 }
 
-b2Body * GameWorld::addEnemy(int x, int y)
+/*Shape * GameWorld::addEnemy(int x, int y)
 {
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
@@ -70,7 +53,7 @@ b2Body * GameWorld::addEnemy(int x, int y)
 	fixtureDef.restitution = 0.1f;
 
 	return bodyTri;
-}
+}*/
 
 void GameWorld::update(float dt)
 {
@@ -79,8 +62,10 @@ void GameWorld::update(float dt)
 
 Shape * GameWorld::player()
 {
-	if (&shape_ != nullptr)
-		return &shape_;
+	//If we have a controlled character
+	if (controlled_._Ptr != nullptr)
+		return &(*controlled_);
 
+	//Otherwise
 	else return nullptr;
 }

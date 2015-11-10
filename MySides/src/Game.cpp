@@ -251,16 +251,22 @@ bool Game::checkController(sf::Time dt)
 
 void Game::update(sf::Time dt)
 {
-	world_->update(dt.asMilliseconds());
-
-	if (world_->hasPlayer())
+	if (world_->hasControlled())
 	{
-		if (con.checkRightNeutral())
+		world_->player()->move(b2Vec2(con.checkLeftX(), con.checkLeftY()));
+		world_->player()->rotate(con.checkRightX() / 10);
+		if (con.checkDown(XINPUT_GAMEPAD_A))
 		{
-			world_->player()->move(b2Vec2(con.checkLeftX(), con.checkLeftY()));
+			world_->player()->stopMove();
+		}
+		if (con.checkDown(XINPUT_GAMEPAD_B))
+		{
+			world_->player()->stopRotate();
 		}
 	}
-	
+
+	world_->update(dt.asMilliseconds());
+
 	//Update counter
 	//static int x;
 	//x++;
