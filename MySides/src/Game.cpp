@@ -19,7 +19,7 @@ int Game::run()
 	//Fixed Timestep
 	sf::Clock frameClock;
 	sf::Time frameTime = sf::Time::Zero;
-	sf::Time tickTime = sf::Time(sf::seconds(1.f / 60.f));
+	sf::Time tickTime = sf::Time(sf::seconds(ticktime));
 	sf::Time accumulator = sf::Time::Zero;
 
 	//Logging
@@ -29,7 +29,8 @@ int Game::run()
 	world_ = new GameWorld();
 	
 	//Debugdraw
-	uint32 flags = b2Draw::e_shapeBit;
+	uint32 flags = 0;
+	flags += b2Draw::e_shapeBit;
 	//flags += b2Draw::e_jointBit;
 	//flags += b2Draw::e_aabbBit;
 	//flags += b2Draw::e_pairBit;
@@ -44,6 +45,7 @@ int Game::run()
 
 	//Display a blank window before we start our game loop
 	//Avoids nasty white windows
+	window_.clear(sf::Color::Black);
 	window_.display();
 
 	//Game loop
@@ -251,17 +253,25 @@ bool Game::checkController(sf::Time dt)
 
 void Game::update(sf::Time dt)
 {
+	//If the world has a controlled body
 	if (world_->hasControlled())
 	{
 		world_->player()->move(b2Vec2(con.checkLeftX(), con.checkLeftY()));
 		world_->player()->rotate(con.checkRightX() / 10);
+
 		if (con.checkDown(XINPUT_GAMEPAD_A))
 		{
 			world_->player()->stopMove();
 		}
+
 		if (con.checkDown(XINPUT_GAMEPAD_B))
 		{
 			world_->player()->stopRotate();
+		}
+
+		if (con.checkDown(XINPUT_GAMEPAD_X))
+		{
+			world_->player()->orient(b2Vec2_zero);
 		}
 	}
 

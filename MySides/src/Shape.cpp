@@ -6,17 +6,21 @@
 extern Log l;
 ///
 
+//Creates a shape using passed body //int sides, float radius
 Shape::Shape(b2Body * body) : Entity(body)
 {
 	//Create a shape, the outline
 	b2PolygonShape shap;
 	
 	b2Vec2 verts[3];
-	verts[0].Set(0, -1.5f);
+	verts[0].Set(0, -2.f);
 	verts[1].Set(-.75f, 0);
 	verts[2].Set(.75f, 0);
 
+	pole_ = verts[0];
+
 	shap.Set(verts, 3);
+	
 
 	//Create a fixture, the link for body -> shape
 	b2FixtureDef fixtureDef;
@@ -24,42 +28,42 @@ Shape::Shape(b2Body * body) : Entity(body)
 
 	//Add material properties to the fixture
 	fixtureDef.density = 1.0f;
-	fixtureDef.friction = 0.3f;
+	fixtureDef.friction = 0.9f;
 	fixtureDef.restitution = 0.1f;
 
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&fixtureDef);
 
-	accel_ = 0.001;
-	topSpeed_ = 0.5;
+	maxVel_ = 0.05f;
+	maxRot_ = 0.0001f;
 }
 
 void Shape::move(b2Vec2 direction)
 {
+	//Normalise dir it if it's >1
 	if (!(direction == b2Vec2_zero))
 	{
-		//Make direction an acceleration vector
-		//direction.Normalize();
-		direction *= accel_;
-
-		//Apply the force
-		body_->ApplyForceToCenter(direction, true);
-
-		//If we're faster than top speed, reset to top speed
-		//if (body_->GetLinearVelocity().Length() > topSpeed_)
-		//{
-		//	b2Vec2 velocity = body_->GetLinearVelocity();
-		//	velocity.Normalize();
-		//	velocity *= topSpeed_;
-		//
-		//	body_->SetLinearVelocity(velocity);
-		//}
+		if (direction.Length() > 1.0f)
+		{
+			direction.Normalize();
+		}
 	}
 
-	std::ostringstream vel;
-	vel << direction.x << " " << direction.y;
-	
-	l.out(l.message, 'P', vel.str().c_str());
+	//Get the body's velocity
+	b2Vec2 vel = body_->GetLinearVelocity();
+
+	//Set desired velocity (respecting max velocity)
+	b2Vec2 desiredVel = direction;
+	desiredVel *= maxVel_;
+
+	//Get the difference in current and desired
+	b2Vec2 velChange = desiredVel - vel;
+
+	//Apply appropriate impulse
+	b2Vec2 impulse = body_->GetMass() * velChange;
+	body_->ApplyLinearImpulse(impulse, body_->GetWorldCenter(), true);
+
+	//l.out(l.message, 'P', "Player move");
 }
 
 void Shape::stopMove()
@@ -69,16 +73,41 @@ void Shape::stopMove()
 
 void Shape::orient(b2Vec2 direction)
 {
+	//get angle between center->pole and 
+	b2Vec2 orientation = body_->GetWorldPoint(pole_) - body_->GetWorldCenter();
+	orientation.Normalize();
 
+	std::ostringstream o;
+	o << orientation.x << ", " << orientation.y;
+	l.out(l.message, 'P', o.str().c_str());
 }
 
 void Shape::rotate(float amount)
-{
-	if (amount != 0)
+{	
+	//Make amount in range -1 <-> +1
+	if (abs(amount) > 1)
 	{
-		body_->ApplyTorque(DR * amount, true);
+		if (amount < 0)
+		{
+			amount = -1;
+		}
+
+		else amount = 1;
 	}
 
+	//Get the body's rotation
+	float rotation = body_->GetAngle();
+
+	//Set desired rotation
+	float desiredRot = amount;
+	desiredRot *= maxRot_;
+
+	//Get the difference in current and desired
+	float rotChange = desiredRot - rotation;
+
+	//Apply appropriate impulse
+	float impulse = rotChange;
+	body_->ApplyTorque(DR * amount, true);
 
 	//std::ostringstream vel;
 	//vel << body_->GetAngularVelocity();
