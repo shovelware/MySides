@@ -35,4 +35,5 @@
 #include "Log.hpp"
 
 //Globals
-const double ticktime = 1.f / 60.f;
+const double TICKTIME = 1.f / 60.f;
+const double SCALE = 32.f;

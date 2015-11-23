@@ -12,15 +12,17 @@ Shape::Shape(b2Body * body) : Entity(body)
 	//Create a shape, the outline
 	b2PolygonShape shap;
 	
-	b2Vec2 verts[3];
-	verts[0].Set(0, -2.f);
-	verts[1].Set(-.75f, 0);
-	verts[2].Set(.75f, 0);
-
-	pole_ = verts[0];
-
-	shap.Set(verts, 3);
+	////Was experimenting with poles and orientation, DON'T FORGET
+	//b2Vec2 verts[3];
+	//verts[0].Set(0, -2.f);
+	//verts[1].Set(-.75f, 0);
+	//verts[2].Set(.75f, 0);
+	//
+	//pole_ = verts[0];
+	//
+	//shap.Set(verts, 3);
 	
+	shap.SetAsBox(1, 2);
 
 	//Create a fixture, the link for body -> shape
 	b2FixtureDef fixtureDef;
@@ -34,7 +36,7 @@ Shape::Shape(b2Body * body) : Entity(body)
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&fixtureDef);
 
-	maxVel_ = 0.05f;
+	maxVel_ = 0.025f; // max velocity in m/s
 	maxRot_ = 0.0001f;
 }
 
@@ -118,4 +120,8 @@ void Shape::rotate(float amount)
 void Shape::stopRotate()
 {
 	body_->SetAngularVelocity(0);
+}
+
+void Shape::draw(GameDrawer d)
+{
 }

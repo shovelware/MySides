@@ -19,8 +19,13 @@
 //Game
 #include "GameWorld.hpp"
 
+//Rendering
+#include "Drawer.hpp"
+//#include "GameDrawer.hpp" replace drawer with this eventually
+
 //////Testing
 #include <sstream>
+
 
 class Game
 {
@@ -39,12 +44,13 @@ private:
 	bool fullscreen_;
 	sf::VideoMode videoMode_;
 	sf::RenderWindow window_;
+	Drawer* drawer_;
 
 	//This will be broken out into inputmanager
 	bool checkController(sf::Time dt);
 	XController con;
-	//
 
+	//
 	//Game world 
 	GameWorld* world_;
 	SFMLDebugDraw dd_;

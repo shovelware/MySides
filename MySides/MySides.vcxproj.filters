@@ -25,6 +25,12 @@
     <Filter Include="Source Files\System">
       <UniqueIdentifier>{46f3abf0-dc50-4018-9422-eaab1c000435}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Render">
+      <UniqueIdentifier>{82c7d69b-c5cf-44e2-9068-d7856fda146a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Render">
+      <UniqueIdentifier>{1163684b-0ec8-4071-8054-a7dbd63b474e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\XController.cpp">
@@ -50,6 +56,12 @@
     </ClCompile>
     <ClCompile Include="src\Shape.cpp">
       <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Drawer.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameDrawer.cpp">
+      <Filter>Header Files\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +94,12 @@
     </ClInclude>
     <ClInclude Include="include\Shape.hpp">
       <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Drawer.hpp">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameDrawer.hpp">
+      <Filter>Source Files\Render</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

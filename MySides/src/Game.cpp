@@ -10,8 +10,7 @@ Game::Game() : videoMode_(1280, 720, 32), window_(videoMode_, "My Sides!", sf::S
 
 int Game::run()
 {
-
-#pragma region Gamestuff
+#pragma region Setup
 
 	//Window info
 	sf::Vector2u windowSize = window_.getSize();
@@ -19,7 +18,7 @@ int Game::run()
 	//Fixed Timestep
 	sf::Clock frameClock;
 	sf::Time frameTime = sf::Time::Zero;
-	sf::Time tickTime = sf::Time(sf::seconds(ticktime));
+	sf::Time tickTime = sf::Time(sf::seconds(TICKTIME));
 	sf::Time accumulator = sf::Time::Zero;
 
 	//Logging
@@ -27,6 +26,9 @@ int Game::run()
 
 	//World
 	world_ = new GameWorld();
+
+	//Drawing
+	drawer_ = new Drawer(window_);
 	
 	//Debugdraw
 	uint32 flags = 0;
@@ -292,5 +294,9 @@ void Game::render()
 
 	//Render stuff
 	world_->DrawDebugData();
+	drawer_->drawPoint(sf::Vector2f(10, 15));
+	drawer_->drawLine(sf::Vector2f(11, 16), sf::Vector2f(24, 28));
+	drawer_->drawCircle(sf::Vector2f(40, 40), 8);
+
 	window_.display();
 }
