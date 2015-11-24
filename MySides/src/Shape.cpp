@@ -121,7 +121,7 @@ void Shape::stopRotate()
 {
 	body_->SetAngularVelocity(0);
 }
-
-void Shape::draw(GameDrawer d)
-{
-}
+//
+//void Shape::draw(GameDrawer d)
+//{
+//}

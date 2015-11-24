@@ -1,8 +1,8 @@
 // GameWorld.hpp
 // Inherits from Box2d World, added functionality for game control
 
-#ifndef GAMEWORLD_HPP
-#define GAMEWORLD_HPP
+#ifndef MS_GAMEWORLD_HPP
+#define MS_GAMEWORLD_HPP
 
 #include "stdafx.h"
 
@@ -13,30 +13,41 @@
 
 #include "Entity.hpp"
 #include "Shape.hpp"
+#include "Bounds.hpp"
+
 
 class GameWorld : public b2World {
 private:
 	const b2Vec2 GRAVITY = b2Vec2(0, 0);
-	const int VELOCITY_ITERS = 10;
-	const int POSITION_ITERS = 10;
-
+	const int VELOCITY_ITERS = 6;
+	const int POSITION_ITERS = 6;
 
 	std::vector<Shape> shapes_;
 	std::vector<Shape>::iterator controlled_;
+	
+	Bounds bounds_;
 
+	b2Body* addDynamicBody(float x, float y);
+	b2Body* addStaticBody(float x, float y);
+	b2Body* addBulletBody(float x, float y);
 public:
+	Shape * player();
+
 	GameWorld();
 	bool hasControlled();
 
-	b2Body * addBody(int x, int y);
+	
+	//CHANGE THESE COORDINATES TO SCREENSPACE: SFML IN, B2D OUT
+	//MAYBE DO CONVERSION OUTSIDE WHO KNOWS WHY NOT DECIDE WHETHER OR NOT THEY'RE SCREENSPACE THERE?
 
-	Shape * addPlayer(int x, int y);
-	//Shape * addEnemy(int x, int y);
-	b2Body * addBullet(int x, int y);
+
+	Shape* addPlayer(float x, float y);
+	//Shape * addEnemy(float x, float y);
+	b2Body* addProjectile(float x, float y);
+	void rebound(float radius);
 
 	void update(float dt);
 
-	Shape * player();
 
 };
 

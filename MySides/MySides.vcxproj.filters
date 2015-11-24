@@ -61,7 +61,10 @@
       <Filter>Source Files\Render</Filter>
     </ClCompile>
     <ClCompile Include="src\GameDrawer.cpp">
-      <Filter>Header Files\Render</Filter>
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bounds.cpp">
+      <Filter>Source Files\Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -98,8 +101,11 @@
     <ClInclude Include="include\Drawer.hpp">
       <Filter>Header Files\Render</Filter>
     </ClInclude>
+    <ClInclude Include="include\Bounds.hpp">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
     <ClInclude Include="include\GameDrawer.hpp">
-      <Filter>Source Files\Render</Filter>
+      <Filter>Header Files\Render</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

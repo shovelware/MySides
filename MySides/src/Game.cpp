@@ -18,7 +18,7 @@ int Game::run()
 	//Fixed Timestep
 	sf::Clock frameClock;
 	sf::Time frameTime = sf::Time::Zero;
-	sf::Time tickTime = sf::Time(sf::seconds(TICKTIME));
+	sf::Time tickTime = sf::Time(sf::seconds(_TICKTIME_));
 	sf::Time accumulator = sf::Time::Zero;
 
 	//Logging
@@ -41,7 +41,9 @@ int Game::run()
 	world_->SetDebugDraw(&dd_);
 
 	//Body
-	world_->addPlayer(2, 2);
+	world_->addPlayer(4, 4);
+	world_->addPlayer(10, 10);
+	//world_->addBounds(0, 0, 10);
 
 #pragma endregion
 
@@ -276,7 +278,6 @@ void Game::update(sf::Time dt)
 			world_->player()->orient(b2Vec2_zero);
 		}
 	}
-
 	world_->update(dt.asMilliseconds());
 
 	//Update counter
@@ -294,6 +295,10 @@ void Game::render()
 
 	//Render stuff
 	world_->DrawDebugData();
+
+	//b2Shape* x = world_->player()->getVertices();
+	//b2Shape::Type y = x->GetType();
+
 	drawer_->drawPoint(sf::Vector2f(10, 15));
 	drawer_->drawLine(sf::Vector2f(11, 16), sf::Vector2f(24, 28));
 	drawer_->drawCircle(sf::Vector2f(40, 40), 8);

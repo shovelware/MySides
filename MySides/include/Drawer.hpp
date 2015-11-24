@@ -2,8 +2,8 @@
 // Basic SFML draw methods: Polygons, circles, lines, points, etc.
 // Wrapped in a box2D converter for shapes
 
-#ifndef DRAWER_HPP
-#define DRAWER_HPP
+#ifndef MS_DRAWER_HPP
+#define MS_DRAWER_HPP
 
 #include <stdafx.h>
 #include <Box2D/Box2D.h>

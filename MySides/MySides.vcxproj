@@ -127,6 +127,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Bounds.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameDrawer.cpp" />
@@ -142,6 +143,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodePallet.h" />
+    <ClInclude Include="include\Bounds.hpp" />
     <ClInclude Include="include\Entity.hpp" />
     <ClInclude Include="include\Game.hpp" />
     <ClInclude Include="include\GameDrawer.hpp" />

@@ -17,6 +17,7 @@
 #ifndef SFMLDEBUGDRAW_HPP
 #define SFMLDEBUGDRAW_HPP
 
+#include <stdafx.h>
 #include <Box2D/Box2D.h>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -24,7 +25,7 @@
 
 namespace sfdd
 {
-	const float SCALE = 32.f;
+	const float SCALE = _SCALE_;
 }
 
 class SFMLDebugDraw : public b2Draw

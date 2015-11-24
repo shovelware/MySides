@@ -2,13 +2,13 @@
 // Base entity class, includes movement functions
 // Children: Shape, Projectile, Side, Obstacle
 
-#ifndef ENTITY_HPP
-#define ENTITY_HPP
+#ifndef MS_ENTITY_HPP
+#define MS_ENTITY_HPP
 
 #include <stdafx.h>
 #include <Box2D\Box2D.h>
 
-#include "GameDrawer.hpp"
+//#include "GameDrawer.hpp"
 
 //Using pi to convert deg <-> rad
 #define _USE_MATH_DEFINES
@@ -22,16 +22,19 @@ private:
 protected:
 	b2Body * body_;
 public:
-
 	Entity(b2Body * body);
 
 	virtual void move(b2Vec2) = 0;
+	virtual void setPosition(b2Vec2 position);
+
 	virtual void rotate(float) = 0;
+	virtual void setRotation(float amount);
 
-	void setPosition(b2Vec2 position);
-	void setRotation(float amount);
-
+	b2Body * getBody();
+	/*
 	virtual void draw(GameDrawer d) = 0;
+
+	b2Shape* getVertices();*/
 };
 
 #endif

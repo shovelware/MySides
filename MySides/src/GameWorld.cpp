@@ -1,6 +1,6 @@
 #include "GameWorld.hpp"
 
-GameWorld::GameWorld() : b2World(GRAVITY)
+GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 50)
 {
 }
 
@@ -10,7 +10,8 @@ bool GameWorld::hasControlled()
 	return !(controlled_._Ptr == nullptr);
 }
 
-b2Body * GameWorld::addBody(int x, int y)
+//Adds a dynamic body to the world, returns a pointer to created body
+b2Body * GameWorld::addDynamicBody(float x, float y)
 {
 	//Define body, the matter
 	b2BodyDef bodyDef;
@@ -23,10 +24,24 @@ b2Body * GameWorld::addBody(int x, int y)
 	return body;
 }
 
-Shape * GameWorld::addPlayer(int x, int y)
+//Adds a static body to the world, returns a pointer to created body
+b2Body * GameWorld::addStaticBody(float x, float y)
+{
+	//Define body
+	b2BodyDef bodyDef;
+	bodyDef.type = b2_staticBody;
+	bodyDef.position.Set(x, y);
+
+	//Create body using world's factory
+	b2Body* body = CreateBody(&bodyDef);
+	
+	return body;
+}
+
+Shape * GameWorld::addPlayer(float x, float y)
 {	
 	//Add the shape with a body
-	shapes_.push_back(Shape(addBody(x, y)));
+	shapes_.push_back(Shape(addDynamicBody(x, y)));
 
 	//Set our control to the one we just put in
 	controlled_ = --shapes_.end();
@@ -34,7 +49,7 @@ Shape * GameWorld::addPlayer(int x, int y)
 	return controlled_._Ptr;
 }
 
-/*Shape * GameWorld::addEnemy(int x, int y)
+/*Shape * GameWorld::addEnemy(float x, float y)
 {
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
@@ -54,6 +69,19 @@ Shape * GameWorld::addPlayer(int x, int y)
 
 	return bodyTri;
 }*/
+
+//AddBullet
+
+void GameWorld::rebound(float radius)
+{
+	if (radius < bounds_.getRadius())
+	{
+		//correct for bodies outside radius
+	}
+
+	//Recreate the bounds
+	bounds_ = Bounds(bounds_.getBody(), radius);
+}
 
 void GameWorld::update(float dt)
 {

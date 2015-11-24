@@ -1,12 +1,12 @@
-// Shape.hpp
+// Shape.hpp [BASE: Entity.hpp]
 // Game entity with most complex funtion, can move, shoot, die, spawn, decide, etc.
 
-#ifndef SHAPE_HPP
-#define SHAPE_HPP
+#ifndef MS_SHAPE_HPP
+#define MS_SHAPE_HPP
 
 #include "Entity.hpp"
 
-class Shape : protected Entity {
+class Shape : public Entity {
 private:
 	/*const*/ float maxVel_;//maximum velocity
 	/*const*/ float maxRot_;//maximum rotation
@@ -28,10 +28,8 @@ public:
 	void orient(b2Vec2 direction);
 	void rotate(float amount); // override
 	void stopRotate();
-
-	void applyForces(int milliseconds);
-
-	void draw(GameDrawer d); // override
+	
+//	void draw(GameDrawer d); // override
 };
 
 #endif

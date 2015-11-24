@@ -1,8 +1,8 @@
 // Game.hpp
 // Handles loops, game logic, box2d world
 
-#ifndef GAME_HPP
-#define GAME_HPP
+#ifndef MS_GAME_HPP
+#define MS_GAME_HPP
 
 #include "stdafx.h"
 
