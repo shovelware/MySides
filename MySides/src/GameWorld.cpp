@@ -1,7 +1,7 @@
 #include "GameWorld.hpp"
 
-//Constructor initialises 
-GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(15, 10), 12)
+//Constructor initialises Box2D World and boudaries
+GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(15, 10), 10)
 {
 }
 
@@ -15,7 +15,7 @@ bool GameWorld::hasControlled()
 //Adds a dynamic body to the world, returns a pointer to created body
 b2Body * GameWorld::addDynamicBody(float x, float y)
 {
-	//Define body, the matter
+	//Define the body
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.position.Set(x, y);
@@ -29,7 +29,7 @@ b2Body * GameWorld::addDynamicBody(float x, float y)
 //Adds a static body to the world, returns a pointer to created body
 b2Body * GameWorld::addStaticBody(float x, float y)
 {
-	//Define body
+	//Define the body
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_staticBody;
 	bodyDef.position.Set(x, y);
@@ -40,9 +40,19 @@ b2Body * GameWorld::addStaticBody(float x, float y)
 	return body;
 }
 
+//Adds a bullet body to the world, returns a pointer to created body
 b2Body * GameWorld::addBulletBody(float x, float y)
 {
+	//Define the body
+	b2BodyDef bodyDef;
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.bullet = true;
+	bodyDef.position.Set(x, y);
 
+	//Create body using world's factory
+	b2Body* body = CreateBody(&bodyDef);
+
+	return body;
 }
 
 //Adds a player to the world
@@ -69,7 +79,13 @@ Shape * GameWorld::addEnemy(float x, float y)
 	return (--shapes_.end())._Ptr;
 }
 
-//AddBullet
+// Adds a projectile to the world
+Projectile* GameWorld::addProjectile(float x, float y, float vx, float vy)
+{
+	projectiles_.push_back(Projectile(addDynamicBody(x, y), b2Vec2(vx, vy)));
+
+	return (--projectiles_.end())._Ptr;
+}
 
 //Resizes the bounds to the passed radius, [correcting for shapes outside](not yet)
 void GameWorld::resizeBounds(float radius)

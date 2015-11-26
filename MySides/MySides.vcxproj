@@ -134,6 +134,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\GameWorld.cpp" />
     <ClCompile Include="src\MySides.cpp" />
     <ClCompile Include="src\Drawer.cpp" />
+    <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\SFMLDebugDraw.cpp" />
     <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
@@ -151,6 +152,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\GameWorld.hpp" />
     <ClInclude Include="include\Log.hpp" />
     <ClInclude Include="include\Drawer.hpp" />
+    <ClInclude Include="include\Projectile.hpp" />
     <ClInclude Include="include\Shape.hpp" />
     <ClInclude Include="include\SFMLDebugDraw.h" />
     <ClInclude Include="include\stdafx.h" />

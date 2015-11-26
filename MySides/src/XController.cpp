@@ -139,13 +139,13 @@ float XController::checkRightY() const { return -rightY_; }
 //Returns true if Right Stick is neutral, factoring in deadzones
 bool XController::checkLeftNeutral() const
 {
-	return (leftX_ <= 0 && leftY_ <= 0);
+	return (leftX_ == 0 && leftY_ == 0);
 }
 
 //Returns true if Left Stick is neutral, factoring in deadzones
 bool XController::checkRightNeutral() const
 {
-	return (rightX_ <= 0 && rightY_ <= 0);
+	return (rightX_ == 0 && rightY_ == 0);
 }
 
 #pragma endregion

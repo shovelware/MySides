@@ -1,7 +1,8 @@
 #include "Entity.hpp"
 
 //Construct an entity, which MUST have a body
-Entity::Entity(b2Body * body) : body_(body)
+//Entities are alive and active at construction
+Entity::Entity(b2Body * body) : body_(body), alive_(true), active_(true)
 {
 	body->SetUserData(this);
 }
@@ -18,9 +19,38 @@ void Entity::setRotation(float rotation)
 	body_->SetTransform(body_->GetTransform().p, rotation);
 }
 
+b2Vec2 Entity::getPosition() const
+{
+	return body_->GetPosition();
+}
+
+float Entity::getRotation() const
+{
+	return body_->GetAngle();
+}
+
+//Returns a pointer to the Entity's body
 b2Body * Entity::getBody()
 {
 	return body_;
+}
+
+//Returns alive
+bool Entity::getAlive() const
+{
+	return alive_;
+}
+
+//Returns active
+bool Entity::getActive() const
+{
+	return active_;
+}
+
+//Straight-up pull the plug. Can be overridden
+void Entity::kill()
+{
+	alive_ = false;
 }
 
 ////Gets points of body's first fixture, assumes polygon. Override if necessary

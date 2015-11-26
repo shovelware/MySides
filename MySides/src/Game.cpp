@@ -118,7 +118,7 @@ int Game::run()
 	return EXIT_SUCCESS;
 }
 
-b2Vec2 Game::SFtoB2(const sf::Vector2f & vec)
+b2Vec2 Game::SFtoB2(const sf::Vector2f & vec) //Do we really need to spawn things in screen space co-ords?
 {
 	return b2Vec2(vec.x / _SCALE_, vec.y / _SCALE_ );
 }
@@ -199,7 +199,14 @@ void Game::update(sf::Time dt)
 	if (world_->hasControlled())
 	{
 		world_->player()->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
-		world_->player()->rotate(con_.checkRightX() / 10);
+		//world_->player()->rotate(con_.checkRightX() / 10);
+
+		if (con_.checkRightNeutral() == false)
+		{
+			b2Vec2 fp = world_->player()->getFirePoint(con_.checkRightX(), con_.checkRightY());
+
+			world_->addProjectile(fp.x, fp.y, con_.checkRightX(), con_.checkRightY());
+		}
 
 		if (con_.checkDown(XINPUT_GAMEPAD_A))
 		{

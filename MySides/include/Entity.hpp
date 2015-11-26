@@ -18,9 +18,10 @@ const double DR = M_PI / 180;
 
 class Entity {
 private:
-
 protected:
 	b2Body * body_;
+	bool alive_;
+	bool active_;
 public:
 	Entity(b2Body * body);
 
@@ -30,6 +31,14 @@ public:
 	virtual void rotate(float) = 0;
 	virtual void setRotation(float amount);
 
+	bool getAlive() const;
+	bool getActive() const;
+
+	virtual void kill();
+	void deactivate();
+
+	b2Vec2 getPosition() const;
+	float getRotation() const;
 	b2Body * getBody();
 	/*
 	virtual void draw(GameDrawer d) = 0;

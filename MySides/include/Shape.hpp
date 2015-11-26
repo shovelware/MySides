@@ -29,12 +29,9 @@ private:
 	b2Vec2 pole_;//Orientation pole
 	int hp_;
 	int maxHP_;
-
-	bool alive_;
-	bool active_;
 public:
-	Shape(b2Body * body);
-	Shape(b2Body * body, int vertices);
+	Shape(b2Body* body);
+	Shape(b2Body* body, int vertices);
 
 	void move(b2Vec2 direction); //override
 	void orientedMove(b2Vec2 direction); //Thrusts from back and rotates towards direction
@@ -43,6 +40,8 @@ public:
 	void orient(b2Vec2 direction);
 	void rotate(float amount); // override
 	void stopRotate();
+
+	b2Vec2 getFirePoint(float x, float y);
 
 	void update(int milliseconds);
 

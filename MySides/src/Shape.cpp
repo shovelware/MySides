@@ -7,7 +7,7 @@ extern Log l;
 ///
 
 //Creates a shape using passed body //int sides, float radius
-Shape::Shape(b2Body * body) : Entity(body)
+Shape::Shape(b2Body* body) : Entity(body)
 {
 	//Create a shape, the outline
 	b2PolygonShape shap;
@@ -32,7 +32,7 @@ Shape::Shape(b2Body * body) : Entity(body)
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.0f;
 	fixtureDef.restitution = 0.99f;
-
+	//Angular damping in body???
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&fixtureDef);
 
@@ -120,6 +120,17 @@ void Shape::rotate(float amount)
 void Shape::stopRotate()
 {
 	body_->SetAngularVelocity(0);
+}
+
+b2Vec2 Shape::getFirePoint(float x, float y)
+{
+	b2Vec2 p = body_->GetPosition();
+	b2Vec2 d(x, y);
+	d.Normalize();
+
+	d *= 0.75; //MAGIC NUMBER FIX SOON
+
+	return p + d;
 }
 
 void Shape::update(int milliseconds)

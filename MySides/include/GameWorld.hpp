@@ -14,7 +14,7 @@
 #include "Entity.hpp"
 #include "Shape.hpp"
 #include "Bounds.hpp"
-
+#include "Projectile.hpp"
 
 class GameWorld : public b2World {
 private:
@@ -23,6 +23,7 @@ private:
 	const int POSITION_ITERS = 6;
 
 	std::vector<Shape> shapes_;
+	std::vector<Projectile> projectiles_;
 	std::vector<Shape>::iterator controlled_;
 	
 	Bounds bounds_;
@@ -30,8 +31,8 @@ private:
 	//CHANGE THESE COORDINATES TO SCREENSPACE: SFML IN, B2D OUT
 	//MAYBE DO CONVERSION OUTSIDE WHO KNOWS WHY NOT DECIDE WHETHER OR NOT THEY'RE SCREENSPACE THERE?
 	b2Body* addDynamicBody(float x, float y);
-	b2Body* addStaticBody(float x, float y);
-	b2Body* addBulletBody(float x, float y);
+	b2Body* addStaticBody (float x, float y);
+	b2Body* addBulletBody (float x, float y);
 public:
 	Shape * player();
 
@@ -39,8 +40,8 @@ public:
 	bool hasControlled();
 
 	Shape* addPlayer(float x, float y);
-	Shape * addEnemy(float x, float y);
-	b2Body* addProjectile(float x, float y);
+	Shape* addEnemy(float x, float y);
+	Projectile* addProjectile(float x, float y, float vx, float vy);
 	
 	void resizeBounds(float radius);
 
