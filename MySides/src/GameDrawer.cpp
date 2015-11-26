@@ -13,3 +13,9 @@ sf::Color GameDrawer::B2toSF(const b2Color& col) const
 GameDrawer::GameDrawer(GameWorld world, sf::RenderWindow win) : Drawer(win), world_(&world) 
 {
 }
+
+/*GameDrawer::DrawShape(const &Shape s)
+{
+	s.draw(this);
+}
+*/

@@ -25,11 +25,12 @@
 
 //////Testing
 #include <sstream>
-
+#include "ConTest.hpp"
 
 class Game
 {
 private:
+	b2Vec2 SFtoB2(const sf::Vector2f &vec);
 	void processEvents();
 	void update(sf::Time dt);
 	void render();
@@ -48,13 +49,16 @@ private:
 
 	//This will be broken out into inputmanager
 	bool checkController(sf::Time dt);
-	XController con;
+	XController con_;
 
-	//
 	//Game world 
 	GameWorld* world_;
+
+	//DebugDraw
 	SFMLDebugDraw dd_;
-	//
+
+	//Testing
+	ConTest* ct;
 
 public:
 	Game();

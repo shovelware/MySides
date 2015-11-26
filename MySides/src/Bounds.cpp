@@ -9,7 +9,7 @@ Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
 
 	b2Vec2* verts = new b2Vec2[maxPoints];
 
-	for (; i < maxPoints; ++i)
+	for (; i <= maxPoints; ++i)
 	{
 		verts[i] = radius_ * getCirclePoint(i, maxPoints);
 	}
@@ -43,8 +43,9 @@ void Bounds::rotate(float) {}
 b2Vec2 Bounds::getCirclePoint(int index, int maxpoints)
 {
 	b2Vec2 point;
-	point.x = (cos(6.0f / maxpoints * index));
-	point.y = (sin(6.0f / maxpoints * index));
+
+	point.x = (cos((2 * M_PI) / maxpoints * index));
+	point.y = (sin((2 * M_PI) / maxpoints * index));
 
 	return point;
 }

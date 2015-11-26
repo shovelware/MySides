@@ -6,6 +6,21 @@
 
 #include "Entity.hpp"
 
+namespace traits{
+	namespace speed 
+	{
+		/*
+	SLOWEST
+	SLOWER
+	SLOW
+	NORMAL
+	FAST
+	FASTER
+	FASTEST
+	*/
+	}
+}
+
 class Shape : public Entity {
 private:
 	/*const*/ float maxVel_;//maximum velocity
@@ -28,7 +43,9 @@ public:
 	void orient(b2Vec2 direction);
 	void rotate(float amount); // override
 	void stopRotate();
-	
+
+	void update(int milliseconds);
+
 //	void draw(GameDrawer d); // override
 };
 

@@ -1,9 +1,11 @@
 #include "GameWorld.hpp"
 
-GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(10, 10), 8)
+//Constructor initialises 
+GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(15, 10), 12)
 {
 }
 
+//Returns true if the gameworld has a controlled entity
 bool GameWorld::hasControlled()
 {
 	//Return false if our pointer to the controlled shape is null
@@ -38,9 +40,16 @@ b2Body * GameWorld::addStaticBody(float x, float y)
 	return body;
 }
 
+b2Body * GameWorld::addBulletBody(float x, float y)
+{
+
+}
+
+//Adds a player to the world
 Shape * GameWorld::addPlayer(float x, float y)
 {	
-	//Add the shape with a body
+	//Push the shape into shape vector 
+	//AND add body to world with function
 	shapes_.push_back(Shape(addDynamicBody(x, y)));
 
 	//Set our control to the one we just put in
@@ -49,30 +58,21 @@ Shape * GameWorld::addPlayer(float x, float y)
 	return controlled_._Ptr;
 }
 
-/*Shape * GameWorld::addEnemy(float x, float y)
+//Adds a basic enemy to the world
+Shape * GameWorld::addEnemy(float x, float y)
 {
-	b2BodyDef bodyDef;
-	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(x, y);
+	//Push the shape into the shape vector
+	//AND add body to world with function
+	shapes_.push_back(Shape(addDynamicBody(x, y)));
 
-	b2Body* bodyTri = CreateBody(&bodyDef);
-
-	b2PolygonShape dynTri;
-	dynTri.Set(0,3);
-
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &dynTri;
-
-	fixtureDef.density = 1.0f;
-	fixtureDef.friction = 0.3f;
-	fixtureDef.restitution = 0.1f;
-
-	return bodyTri;
-}*/
+	//Return a pointer to this enemy
+	return (--shapes_.end())._Ptr;
+}
 
 //AddBullet
 
-void GameWorld::rebound(float radius)
+//Resizes the bounds to the passed radius, [correcting for shapes outside](not yet)
+void GameWorld::resizeBounds(float radius)
 {
 	if (radius < bounds_.getRadius())
 	{
@@ -83,11 +83,41 @@ void GameWorld::rebound(float radius)
 	bounds_ = Bounds(bounds_.getBody(), radius);
 }
 
+//Moves controlled pointer to next shape in list, loops at end
+void GameWorld::controlNext()
+{
+		//Move forward
+		controlled_++;
+
+		//If we've hit the end, loop around
+		if (controlled_ == shapes_.end())
+		{
+			controlled_ = shapes_.begin();
+		}
+}
+
+//Moves controlled pointer to previous shape in list, loops at start
+void GameWorld::controlPrev()
+{
+	//If we hit the end, loop around
+	if (controlled_ == shapes_.begin())
+	{
+		controlled_ = --shapes_.end();
+	}
+	
+	//Move backwards
+	else controlled_--;
+}
+
+//Update entity code and step the world
 void GameWorld::update(float dt)
 {
+	//Update Shapes
+	//Firebullets
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 }
 
+//Gets a pointer to the controlled shape
 Shape * GameWorld::player()
 {
 	//If we have a controlled character

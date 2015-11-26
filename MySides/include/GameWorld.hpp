@@ -39,13 +39,15 @@ public:
 	bool hasControlled();
 
 	Shape* addPlayer(float x, float y);
-	//Shape * addEnemy(float x, float y);
+	Shape * addEnemy(float x, float y);
 	b2Body* addProjectile(float x, float y);
-	void rebound(float radius);
+	
+	void resizeBounds(float radius);
+
+	void controlNext();
+	void controlPrev();
 
 	void update(float dt);
-
-
 };
 
 #endif

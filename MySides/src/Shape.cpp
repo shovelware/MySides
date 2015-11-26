@@ -22,7 +22,7 @@ Shape::Shape(b2Body * body) : Entity(body)
 	//
 	//shap.Set(verts, 3);
 	
-	shap.SetAsBox(1, 2);
+	shap.SetAsBox(.5f, .5f);
 
 	//Create a fixture, the link for body -> shape
 	b2FixtureDef fixtureDef;
@@ -30,8 +30,8 @@ Shape::Shape(b2Body * body) : Entity(body)
 
 	//Add material properties to the fixture
 	fixtureDef.density = 1.0f;
-	fixtureDef.friction = 0.9f;
-	fixtureDef.restitution = 0.1f;
+	fixtureDef.friction = 0.0f;
+	fixtureDef.restitution = 0.99f;
 
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&fixtureDef);
@@ -121,7 +121,13 @@ void Shape::stopRotate()
 {
 	body_->SetAngularVelocity(0);
 }
+
+void Shape::update(int milliseconds)
+{
+}
+
 //
 //void Shape::draw(GameDrawer d)
 //{
+//
 //}

@@ -1,8 +1,8 @@
 // Logtest.hpp
 // Simple class for testing and explaining log outputs, need only be constructed
 
-#ifndef LOGTEST_H
-#define LOGTEST_H
+#ifndef MS_LOGTEST_H
+#define MS_LOGTEST_H
 
 #include "stdafx.h"
 
