@@ -1,6 +1,6 @@
 #include "GameWorld.hpp"
 
-GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 50)
+GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(10, 10), 8)
 {
 }
 

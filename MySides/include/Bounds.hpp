@@ -13,6 +13,8 @@ private:
 	void rotate(float);
 	float radius_;
 	
+	b2Vec2 getCirclePoint(int index, int maxpoints);
+
 public:
 	Bounds(b2Body* body, float radius);
 	float getRadius();

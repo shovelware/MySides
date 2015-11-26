@@ -1,9 +1,21 @@
 #include "Bounds.hpp"
 
-Bounds::Bounds(b2Body* body, float radius) : Entity(body)
+Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
 {
-	b2PolygonShape shap;
-	shap.SetAsBox(10, 10);
+	b2ChainShape shap;
+	
+	int maxPoints = 32;
+	int i = 0;
+
+	b2Vec2* verts = new b2Vec2[maxPoints];
+
+	for (; i < maxPoints; ++i)
+	{
+		verts[i] = radius_ * getCirclePoint(i, maxPoints);
+	}
+
+	shap.CreateLoop(verts, maxPoints);
+
 
 	//Create a fixture, the link for body -> shape
 	b2FixtureDef fixtureDef;
@@ -27,3 +39,12 @@ float Bounds::getRadius()
 //Though we are an entity, we don't move or rotate
 void Bounds::move(b2Vec2) {}
 void Bounds::rotate(float) {}
+
+b2Vec2 Bounds::getCirclePoint(int index, int maxpoints)
+{
+	b2Vec2 point;
+	point.x = (cos(6.0f / maxpoints * index));
+	point.y = (sin(6.0f / maxpoints * index));
+
+	return point;
+}

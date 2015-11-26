@@ -27,6 +27,8 @@ private:
 	
 	Bounds bounds_;
 
+	//CHANGE THESE COORDINATES TO SCREENSPACE: SFML IN, B2D OUT
+	//MAYBE DO CONVERSION OUTSIDE WHO KNOWS WHY NOT DECIDE WHETHER OR NOT THEY'RE SCREENSPACE THERE?
 	b2Body* addDynamicBody(float x, float y);
 	b2Body* addStaticBody(float x, float y);
 	b2Body* addBulletBody(float x, float y);
@@ -35,11 +37,6 @@ public:
 
 	GameWorld();
 	bool hasControlled();
-
-	
-	//CHANGE THESE COORDINATES TO SCREENSPACE: SFML IN, B2D OUT
-	//MAYBE DO CONVERSION OUTSIDE WHO KNOWS WHY NOT DECIDE WHETHER OR NOT THEY'RE SCREENSPACE THERE?
-
 
 	Shape* addPlayer(float x, float y);
 	//Shape * addEnemy(float x, float y);
