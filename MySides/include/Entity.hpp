@@ -25,10 +25,8 @@ protected:
 public:
 	Entity(b2Body * body);
 
-	virtual void move(b2Vec2) = 0;
 	virtual void setPosition(b2Vec2 position);
 
-	virtual void rotate(float) = 0;
 	virtual void setRotation(float amount);
 
 	bool getAlive() const;

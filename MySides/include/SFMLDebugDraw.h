@@ -25,7 +25,7 @@
 
 namespace sfdd
 {
-	const float SCALE = _SCALE_;
+	const float SCALE = (float)_SCALE_;
 }
 
 class SFMLDebugDraw : public b2Draw

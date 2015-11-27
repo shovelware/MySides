@@ -19,7 +19,7 @@ Projectile::Projectile(b2Body* body, b2Vec2 heading) : Entity(body)
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&fixtureDef);
 
-	speed_ = 0.025f; // max velocity in m/s
+	speed_ = 0.001f; // max velocity in m/s
 
 
 	//Fire the bullet

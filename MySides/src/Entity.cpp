@@ -53,6 +53,12 @@ void Entity::kill()
 	alive_ = false;
 }
 
+//Deactivate the entity
+void Entity::deactivate()
+{
+	active_ = false;
+}
+
 ////Gets points of body's first fixture, assumes polygon. Override if necessary
 //b2Shape* Entity::getVertices()
 //{

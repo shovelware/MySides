@@ -16,6 +16,7 @@ Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
 
 	shap.CreateLoop(verts, maxPoints);
 
+	delete[] verts;
 
 	//Create a fixture, the link for body -> shape
 	b2FixtureDef fixtureDef;

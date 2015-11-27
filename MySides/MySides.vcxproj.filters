@@ -110,9 +110,6 @@
     <ClInclude Include="include\GameDrawer.hpp">
       <Filter>Header Files\Render</Filter>
     </ClInclude>
-    <ClInclude Include="include\ConTest.hpp">
-      <Filter>Header Files\System</Filter>
-    </ClInclude>
     <ClInclude Include="include\Projectile.hpp">
       <Filter>Header Files\Entity</Filter>
     </ClInclude>

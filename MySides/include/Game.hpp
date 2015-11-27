@@ -25,7 +25,6 @@
 
 //////Testing
 #include <sstream>
-#include "ConTest.hpp"
 
 class Game
 {
@@ -58,7 +57,6 @@ private:
 	SFMLDebugDraw dd_;
 
 	//Testing
-	ConTest* ct;
 
 public:
 	Game();

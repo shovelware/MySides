@@ -41,7 +41,6 @@ int Game::run()
 	world_->SetDebugDraw(&dd_);
 
 	//Testing
-	ct = &ConTest(con_);
 
 	//Bodies
 	world_->addEnemy(10, 4);
@@ -186,9 +185,7 @@ bool Game::checkController(sf::Time dt)
 
 	//Normal update
 	else connected = con_.update(dt.asMilliseconds());
-
-	ct->check(dt.asMilliseconds());
-
+	
 	return connected;
 
 }
@@ -228,11 +225,12 @@ void Game::update(sf::Time dt)
 			world_->controlPrev();
 		}
 
-		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+		if (con_.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER))
 		{
 			world_->controlNext();
 		}
 	}
+
 	world_->update(dt.asMilliseconds());
 
 	//Update counter
