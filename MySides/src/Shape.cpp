@@ -32,6 +32,10 @@ Shape::Shape(b2Body* body) : Entity(body)
 	fixtureDef.density = 1.0f;
 	fixtureDef.friction = 0.0f;
 	fixtureDef.restitution = 0.99f;
+
+	//Add userdata to fixture for contacts
+	fixtureDef.userData = "shape";
+
 	//Angular damping in body???
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&fixtureDef);

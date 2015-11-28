@@ -19,11 +19,13 @@ void Entity::setRotation(float rotation)
 	body_->SetTransform(body_->GetTransform().p, rotation);
 }
 
+//Returns position
 b2Vec2 Entity::getPosition() const
 {
 	return body_->GetPosition();
 }
 
+//Returns rotation (unbounded)
 float Entity::getRotation() const
 {
 	return body_->GetAngle();
@@ -47,16 +49,22 @@ bool Entity::getActive() const
 	return active_;
 }
 
+//Set alive status of the entity
+void Entity::setAlive(bool a)
+{
+	alive_ = a;
+}
+
+//Set active status of the entity
+void Entity::setActive(bool a)
+{
+	active_ = a;
+}
+
 //Straight-up pull the plug. Can be overridden
 void Entity::kill()
 {
 	alive_ = false;
-}
-
-//Deactivate the entity
-void Entity::deactivate()
-{
-	active_ = false;
 }
 
 ////Gets points of body's first fixture, assumes polygon. Override if necessary

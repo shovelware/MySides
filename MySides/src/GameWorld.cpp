@@ -1,8 +1,9 @@
 #include "GameWorld.hpp"
 
 //Constructor initialises Box2D World and boudaries
-GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(15, 10), 10)
+GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(15, 10), 10), contactListener_(ContactListener())
 {
+	SetContactListener(&contactListener_);
 }
 
 //Returns true if the gameworld has a controlled entity
@@ -55,6 +56,7 @@ b2Body * GameWorld::addBulletBody(float x, float y)
 	return body;
 }
 
+
 //Adds a player to the world
 Shape * GameWorld::addPlayer(float x, float y)
 {	
@@ -96,7 +98,26 @@ void GameWorld::resizeBounds(float radius)
 	}
 
 	//Recreate the bounds
-	bounds_ = Bounds(bounds_.getBody(), radius);
+	bounds_.resize(radius);
+}
+
+void GameWorld::move(b2Vec2 direction)
+{
+	controlled_->move(direction);
+}
+
+void GameWorld::fire(b2Vec2 direction)
+{
+	if (direction.x != 0 || direction.y != 0)
+	{
+		b2Vec2 fp = controlled_->getFirePoint(direction.x, direction.y); //This will be abstracted to shape class
+		addProjectile(fp.x, fp.y, direction.x, direction.y);
+	}
+
+	else
+	{
+		int x = 4;
+	}
 }
 
 //Moves controlled pointer to next shape in list, loops at end
@@ -129,9 +150,35 @@ void GameWorld::controlPrev()
 void GameWorld::update(float dt)
 {
 	//Update Shapes
+
+
 	//Firebullets
+
+	for(Projectile p : projectiles_)
+	{
+		p.update(dt);
+
+		if (p.getActive() == false)
+		{
+			//DestroyBody(p.getBody());
+		}
+	}
+
+	//std::remove_if(projectiles_.begin(), projectiles_.end(), isAlive);
+
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 }
+
+/*
+UpdateShape(Shape* s, int dt)
+{
+	s->update(dt)
+	if (s->getActive == false)
+	{
+		removeBody(s->getBody);
+	}
+}
+*/
 
 //Gets a pointer to the controlled shape
 Shape * GameWorld::player()

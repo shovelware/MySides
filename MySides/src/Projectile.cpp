@@ -1,6 +1,6 @@
 #include "..\include\Projectile.hpp"
 
-Projectile::Projectile(b2Body* body, b2Vec2 heading) : Entity(body)
+Projectile::Projectile(b2Body* body, b2Vec2 heading) : Entity(body), impact_(false)
 {
 	//Create a shape, the outline
 	b2CircleShape shap;
@@ -16,10 +16,13 @@ Projectile::Projectile(b2Body* body, b2Vec2 heading) : Entity(body)
 	fixtureDef.friction = 0.0f;
 	fixtureDef.restitution = 0.0f;
 
+	//Add userdata to fixture for contacts
+	fixtureDef.userData = "projectile";
+
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&fixtureDef);
 
-	speed_ = 0.001f; // max velocity in m/s
+	speed_ = 0.0005f; // max velocity in m/s
 
 
 	//Fire the bullet
@@ -28,6 +31,18 @@ Projectile::Projectile(b2Body* body, b2Vec2 heading) : Entity(body)
 	body_->ApplyLinearImpulse(speed_ * heading, body_->GetWorldCenter(), true);
 }
 
-//Need to tidy these up
-void Projectile::move(b2Vec2) {}
-void Projectile::rotate(float) {}
+void Projectile::hit()
+{
+	if (impact_ == false)
+	{
+		impact_ = true;
+	}
+
+	alive_ = false;
+	active_ = false;
+}
+
+void Projectile::update(int milliseconds)
+{
+}
+

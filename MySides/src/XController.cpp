@@ -281,22 +281,22 @@ bool XController::update(int milliseconds)
 
 		//Now we can start checking things
 		//Button held times update
-		for (std::map<WORD, unsigned int>::iterator mIter = heldTimes_.begin(), mEnd = heldTimes_.end(); mIter != mEnd; ++mIter)
+		for (std::pair<const WORD, int> b : heldTimes_)
 		{
 			//If a button is down, add the held time
-			if (curState_.Gamepad.wButtons & mIter->first)
+			if (curState_.Gamepad.wButtons & b.first)
 			{
 				//But only if the time > 0, otherwise leave it as is
-				mIter->second += (milliseconds > 0 ? milliseconds : 0);
+				b.second += (milliseconds > 0 ? milliseconds : 0);
 			}
 				
 			//If a button was up and it was up last update, clear the time
-			else if ((prvState_.Gamepad.wButtons & mIter->first) == 0)
+			else if ((prvState_.Gamepad.wButtons & b.first) == 0)
 			{
 				//But only if time > 0, otherwise we should keep what we have
 				if (milliseconds > 0)
 				{
-					mIter->second = 0;
+					b.second = 0;
 				}
 			}
 		}//end button update

@@ -1,6 +1,6 @@
 // Entity.hpp
-// Base entity class, includes movement functions
-// Children: Shape, Projectile, Side, Obstacle
+// Base entity class, includes movement functions, body, active and alive status
+// Children: Shape, Projectile, Bounds Side, //Obstacle
 
 #ifndef MS_ENTITY_HPP
 #define MS_ENTITY_HPP
@@ -10,7 +10,7 @@
 
 //#include "GameDrawer.hpp"
 
-//Using pi to convert deg <-> rad
+//Using pi to convert deg <-> rad //DO I NEED THIS?
 #define _USE_MATH_DEFINES
 #include "math.h"
 const double RD = 180 / M_PI;
@@ -32,8 +32,10 @@ public:
 	bool getAlive() const;
 	bool getActive() const;
 
+	void setAlive(bool a);
+	void setActive(bool a);
+
 	virtual void kill();
-	void deactivate();
 
 	b2Vec2 getPosition() const;
 	float getRotation() const;

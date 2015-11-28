@@ -10,26 +10,41 @@
 #include <SFMLDebugDraw.h>
 
 #include <vector>
+#include <algorithm>
+
+#include "ContactListener.hpp"
 
 #include "Entity.hpp"
 #include "Shape.hpp"
 #include "Bounds.hpp"
 #include "Projectile.hpp"
 
+//Checks if entity is alive, predicate for remove_if
+static bool isAlive(Entity e)
+{
+	return e.getAlive();
+}
+
+//Checks if entity is active, predicate for remove_if
+static bool isActive(Entity e)
+{
+	return e.getActive();
+}
+
 class GameWorld : public b2World {
 private:
 	const b2Vec2 GRAVITY = b2Vec2(0, 0);
 	const int VELOCITY_ITERS = 6;
-	const int POSITION_ITERS = 6;
+	const int POSITION_ITERS = 2;
 
 	std::vector<Shape> shapes_;
 	std::vector<Projectile> projectiles_;
+
 	std::vector<Shape>::iterator controlled_;
 	
+	ContactListener contactListener_;
 	Bounds bounds_;
 
-	//CHANGE THESE COORDINATES TO SCREENSPACE: SFML IN, B2D OUT
-	//MAYBE DO CONVERSION OUTSIDE WHO KNOWS WHY NOT DECIDE WHETHER OR NOT THEY'RE SCREENSPACE THERE?
 	b2Body* addDynamicBody(float x, float y);
 	b2Body* addStaticBody (float x, float y);
 	b2Body* addBulletBody (float x, float y);
@@ -43,7 +58,15 @@ public:
 	Shape* addEnemy(float x, float y);
 	Projectile* addProjectile(float x, float y, float vx, float vy);
 	
+	//void clear(bool clearPlayer);
+	//void loadLevel();
+	//b2Vec2 randomPos(); //On a circle, in an arc, from centre, whatever, reuse code test stuff
+	//
+
 	void resizeBounds(float radius);
+
+	void move(b2Vec2 direction);
+	void fire(b2Vec2 direction);
 
 	void controlNext();
 	void controlPrev();

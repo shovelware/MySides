@@ -16,12 +16,6 @@
     <Filter Include="Header Files\System">
       <UniqueIdentifier>{b5df2184-d970-48c6-9c65-ad3ed8b7a3f5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Entity">
-      <UniqueIdentifier>{120bf629-faa5-41e4-ae32-0fc40dd6f254}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Entity">
-      <UniqueIdentifier>{31c0a8fc-3c39-4c45-b21a-52f16bfdb560}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\System">
       <UniqueIdentifier>{46f3abf0-dc50-4018-9422-eaab1c000435}</UniqueIdentifier>
     </Filter>
@@ -31,21 +25,24 @@
     <Filter Include="Source Files\Render">
       <UniqueIdentifier>{1163684b-0ec8-4071-8054-a7dbd63b474e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{7a0e540d-d3f2-4d30-978e-798eaac0125e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Entity">
+      <UniqueIdentifier>{120bf629-faa5-41e4-ae32-0fc40dd6f254}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game">
+      <UniqueIdentifier>{cd2fb43b-7734-488a-8303-04430a9eda59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Entity">
+      <UniqueIdentifier>{31c0a8fc-3c39-4c45-b21a-52f16bfdb560}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\XController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Entity.cpp">
-      <Filter>Source Files\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="src\stdafx.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Game\Entity</Filter>
     </ClCompile>
     <ClCompile Include="src\Game.cpp">
-      <Filter>Source Files\System</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameWorld.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
     <ClCompile Include="src\MySides.cpp">
@@ -55,7 +52,7 @@
       <Filter>Source Files\System</Filter>
     </ClCompile>
     <ClCompile Include="src\Shape.cpp">
-      <Filter>Source Files\Entity</Filter>
+      <Filter>Source Files\Game\Entity</Filter>
     </ClCompile>
     <ClCompile Include="src\Drawer.cpp">
       <Filter>Source Files\Render</Filter>
@@ -64,15 +61,27 @@
       <Filter>Source Files\Render</Filter>
     </ClCompile>
     <ClCompile Include="src\Bounds.cpp">
-      <Filter>Source Files\Entity</Filter>
+      <Filter>Source Files\Game\Entity</Filter>
     </ClCompile>
     <ClCompile Include="src\Projectile.cpp">
-      <Filter>Source Files\Entity</Filter>
+      <Filter>Source Files\Game\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameWorld.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ContactListener.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XController.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdafx.cpp">
+      <Filter>Source Files\System</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">
-      <Filter>Header Files\Entity</Filter>
+      <Filter>Header Files\Game\Entity</Filter>
     </ClInclude>
     <ClInclude Include="include\XController.hpp">
       <Filter>Header Files\System</Filter>
@@ -83,35 +92,38 @@
     <ClInclude Include="include\Game.hpp">
       <Filter>Header Files\System</Filter>
     </ClInclude>
-    <ClInclude Include="include\GameWorld.hpp">
-      <Filter>Header Files\System</Filter>
-    </ClInclude>
     <ClInclude Include="include\Log.hpp">
       <Filter>Header Files\System</Filter>
     </ClInclude>
     <ClInclude Include="include\SFMLDebugDraw.h">
       <Filter>Header Files\System</Filter>
     </ClInclude>
-    <ClInclude Include="include\stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Shape.hpp">
-      <Filter>Header Files\Entity</Filter>
+      <Filter>Header Files\Game\Entity</Filter>
     </ClInclude>
     <ClInclude Include="include\Drawer.hpp">
       <Filter>Header Files\Render</Filter>
     </ClInclude>
     <ClInclude Include="include\Bounds.hpp">
-      <Filter>Header Files\Entity</Filter>
+      <Filter>Header Files\Game\Entity</Filter>
     </ClInclude>
     <ClInclude Include="include\GameDrawer.hpp">
       <Filter>Header Files\Render</Filter>
     </ClInclude>
     <ClInclude Include="include\Projectile.hpp">
-      <Filter>Header Files\Entity</Filter>
+      <Filter>Header Files\Game\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stdafx.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="include\targetver.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameWorld.hpp">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ContactListener.hpp">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

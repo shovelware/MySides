@@ -10,7 +10,7 @@ Game::Game() : videoMode_(1280, 720, 32), window_(videoMode_, "My Sides!", sf::S
 
 int Game::run()
 {
-#pragma region Setup
+#pragma region Startup
 
 	//Window info
 	sf::Vector2u windowSize = window_.getSize();
@@ -37,7 +37,7 @@ int Game::run()
 	//flags += b2Draw::e_jointBit;
 	//flags += b2Draw::e_aabbBit;
 	flags += b2Draw::e_pairBit;
-	flags += b2Draw::e_centerOfMassBit;
+	//flags += b2Draw::e_centerOfMassBit;
 	dd_.SetFlags(flags);
 	world_->SetDebugDraw(&dd_);
 
@@ -96,6 +96,7 @@ int Game::run()
 			{
 				//Update with this tick
 				checkController(tickTime); //XOR with if above
+				if (!pause_)
 				update(tickTime);
 
 				//Take this tick out of the accumulator
@@ -108,6 +109,9 @@ int Game::run()
 	}
 #pragma endregion
 
+#pragma region Shutdown
+
+	//Exiting
 	window_.close();
 
 	//Free resources
@@ -116,6 +120,8 @@ int Game::run()
 	delete lptr;
 
 	return EXIT_SUCCESS;
+
+#pragma endregion
 }
 
 b2Vec2 Game::SFtoB2(const sf::Vector2f & vec) //Do we really need to spawn things in screen space co-ords?
@@ -188,7 +194,6 @@ bool Game::checkController(sf::Time dt)
 	else connected = con_.update(dt.asMilliseconds());
 	
 	return connected;
-
 }
 
 void Game::update(sf::Time dt)
@@ -196,15 +201,11 @@ void Game::update(sf::Time dt)
 	//If the world has a controlled body
 	if (world_->hasControlled())
 	{
-		world_->player()->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
+		world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
+		world_->fire(b2Vec2(con_.checkRightX(), con_.checkRightY()));
+
 		//world_->player()->rotate(con_.checkRightX() / 10);
 
-		if (con_.checkRightNeutral() == false)
-		{
-			b2Vec2 fp = world_->player()->getFirePoint(con_.checkRightX(), con_.checkRightY());
-
-			world_->addProjectile(fp.x, fp.y, con_.checkRightX(), con_.checkRightY());
-		}
 
 		if (con_.checkDown(XINPUT_GAMEPAD_A))
 		{
@@ -226,9 +227,14 @@ void Game::update(sf::Time dt)
 			world_->controlPrev();
 		}
 
-		if (con_.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER))
 		{
 			world_->controlNext();
+		}
+
+		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
+		{
+			world_->resizeBounds(3);
 		}
 	}
 
