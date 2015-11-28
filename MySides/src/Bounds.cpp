@@ -5,11 +5,10 @@ Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
 	b2ChainShape shap;
 	
 	int maxPoints = 32;
-	int i = 0;
 
 	b2Vec2* verts = new b2Vec2[maxPoints];
 
-	for (; i <= maxPoints; ++i)
+	for (int i = 0; i < maxPoints; ++i)
 	{
 		verts[i] = radius_ * getCirclePoint(i, maxPoints);
 	}

@@ -22,7 +22,8 @@ int Game::run()
 	sf::Time accumulator = sf::Time::Zero;
 	
 	//Logging
-	l = *(new Log());
+	Log* lptr = new Log();
+	l = *lptr;
 
 	//World
 	world_ = new GameWorld();
@@ -36,7 +37,7 @@ int Game::run()
 	//flags += b2Draw::e_jointBit;
 	//flags += b2Draw::e_aabbBit;
 	flags += b2Draw::e_pairBit;
-	//flags += b2Draw::e_centerOfMassBit;
+	flags += b2Draw::e_centerOfMassBit;
 	dd_.SetFlags(flags);
 	world_->SetDebugDraw(&dd_);
 
@@ -112,7 +113,7 @@ int Game::run()
 	//Free resources
 	delete world_;
 	delete drawer_;
-	//delete &l; //How do?
+	delete lptr;
 
 	return EXIT_SUCCESS;
 }
