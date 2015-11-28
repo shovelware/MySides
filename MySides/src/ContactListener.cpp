@@ -12,6 +12,7 @@ void ContactListener::BeginContact(b2Contact * contact)
 	//If we got a pointer back for both
 	if (fixA && fixB)
 	{
+	//	//This is causing buffer overflows, ask Alex about it
 	//	if (fixA == "projectile")
 	//	{
 	//		void* p = contact->GetFixtureA()->GetBody()->GetUserData();

@@ -113,11 +113,6 @@ void GameWorld::fire(b2Vec2 direction)
 		b2Vec2 fp = controlled_->getFirePoint(direction.x, direction.y); //This will be abstracted to shape class
 		addProjectile(fp.x, fp.y, direction.x, direction.y);
 	}
-
-	else
-	{
-		int x = 4;
-	}
 }
 
 //Moves controlled pointer to next shape in list, loops at end
