@@ -10,8 +10,22 @@ sf::Color GameDrawer::B2toSF(const b2Color& col) const
 	return sf::Color(col.r, col.g, col.b, col.a);
 }
 
-GameDrawer::GameDrawer(GameWorld world, sf::RenderWindow win) : Drawer(win), world_(&world) 
+GameDrawer::GameDrawer(sf::RenderWindow& win, GameWorld* world) : Drawer(win), world_(world) 
 {
+}
+
+void GameDrawer::draw()
+{
+	////Get a reference or friend function or what have you
+	//for (Shape s : world_->shapes_)
+	//{
+	//
+	//}
+	//
+	//for (Projectile p : world_->projectiles_)
+	//{
+	//
+	//}
 }
 
 /*GameDrawer::DrawShape(const &Shape s)

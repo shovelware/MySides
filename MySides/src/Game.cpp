@@ -29,7 +29,7 @@ int Game::run()
 	world_ = new GameWorld();
 
 	//Drawing
-	drawer_ = new Drawer(window_);
+	drawer_ = new GameDrawer(window_, world_);
 	
 	//Debugdraw
 	uint32 flags = 0;
@@ -235,6 +235,26 @@ void Game::update(sf::Time dt)
 		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
 		{
 			world_->resizeBounds(3);
+		}
+
+		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT))
+		{
+			world_->fire(b2Vec2(1, 0));
+		}
+
+		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT))
+		{
+			world_->fire(b2Vec2(-1, 0));
+		}
+
+		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_DOWN))
+		{
+			world_->fire(b2Vec2(0, 1));
+		}
+
+		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_UP))
+		{
+			world_->fire(b2Vec2(0, -1));
 		}
 	}
 

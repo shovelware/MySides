@@ -21,7 +21,7 @@
 
 //Rendering
 #include "Drawer.hpp"
-//#include "GameDrawer.hpp" replace drawer with this eventually
+#include "GameDrawer.hpp"
 
 //////Testing
 #include <sstream>
@@ -44,7 +44,7 @@ private:
 	bool fullscreen_;
 	sf::VideoMode videoMode_;
 	sf::RenderWindow window_;
-	Drawer* drawer_;
+	GameDrawer* drawer_;
 
 	//This will be broken out into inputmanager
 	bool checkController(sf::Time dt);

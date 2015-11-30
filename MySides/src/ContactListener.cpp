@@ -12,42 +12,42 @@ void ContactListener::BeginContact(b2Contact * contact)
 	//If we got a pointer back for both
 	if (fixA && fixB)
 	{
-	//	//This is causing buffer overflows, ask Alex about it
-	//	if (fixA == "projectile")
-	//	{
-	//		void* p = contact->GetFixtureA()->GetBody()->GetUserData();
-	//		Projectile* proj = static_cast<Projectile*>(p);
-	//		proj->hit();
-	//	}
-	//
-	//	if (fixB == "projectile") //Always counts???
-	//	{
-	//		void* p = contact->GetFixtureB()->GetBody()->GetUserData();
-	//		Projectile* proj = static_cast<Projectile*>(p);
-	//		proj->hit();
-	//	}
-	//
-	//	//if (fixA == "projectile" && fixB == "shape" ||
-	//	//	fixA == "shape" && fixB == "projectile")
-	//	//{
-	//	//
-	//	//}
-	//
-	//	//Entity* entityA = static_cast<Entity*>(udA);
-	//	//Entity* entityB = static_cast<Entity*>(udB);
-	//
-	//
+		if (fixA == "projectile")
+		{
+			void* p = contact->GetFixtureA()->GetBody()->GetUserData();
+			Projectile* proj = static_cast<Projectile*>(p);
+			proj->hit();
+		}
+		
+		if (fixB == "projectile") //Always counts???
+		{
+			void* p = contact->GetFixtureB()->GetBody()->GetUserData();
+			Projectile* proj = static_cast<Projectile*>(p);
+			proj->hit();
+		}
+		
+		//if (fixA == "projectile" && fixB == "shape" ||
+		//	fixA == "shape" && fixB == "projectile")
+		//{
+		//
+		//}
+		
+		//Entity* entityA = static_cast<Entity*>(udA);
+		//Entity* entityB = static_cast<Entity*>(udB);
 	}
 }
 
 void ContactListener::EndContact(b2Contact * contact)
 {
+	int thing = 5;
 }
 
 void ContactListener::PreSolve(b2Contact * contact, const b2Manifold * oldManifold)
 {
+	int thing = 5;
 }
 
 void ContactListener::PostSolve(b2Contact * contact, const b2ContactImpulse * impulse)
 {
+	int thing = 5;
 }

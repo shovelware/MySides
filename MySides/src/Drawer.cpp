@@ -1,6 +1,7 @@
 #include "Drawer.hpp"
 
-Drawer::Drawer(sf::RenderWindow& window) : window_(&window){}
+Drawer::Drawer(sf::RenderWindow& window) : window_(&window)
+{}
 
 void Drawer::drawPolygon(const sf::Vector2f * verts, int vertexCount, const sf::Color& col, const sf::Color& out, int indent)
 {

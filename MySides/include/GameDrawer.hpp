@@ -4,10 +4,10 @@
 #ifndef MS_GAMEDRAWER_HPP
 #define MS_GAMEDRAWER_HPP
 
-#include "GameWorld.hpp"
 #include "Drawer.hpp"
+#include "GameWorld.hpp"
 
-class GameDrawer : protected Drawer
+class GameDrawer : public Drawer
 {
 private:
 	sf::Vector2f B2toSF(const b2Vec2& vec, bool scale) const;
@@ -15,7 +15,8 @@ private:
 
 	GameWorld* world_;
 public:
-	GameDrawer(GameWorld world, sf::RenderWindow win);
+	GameDrawer(sf::RenderWindow& win, GameWorld* world);
+	void draw();
 };
 
 #endif

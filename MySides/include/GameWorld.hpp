@@ -20,9 +20,9 @@
 #include "Projectile.hpp"
 
 //Checks if entity is alive, predicate for remove_if
-static bool isAlive(Entity e)
+static bool isAlive(Entity* e)
 {
-	return e.getAlive();
+	return e->getAlive();
 }
 
 //Checks if entity is active, predicate for remove_if
@@ -37,8 +37,8 @@ private:
 	const int VELOCITY_ITERS = 6;
 	const int POSITION_ITERS = 2;
 
-	std::vector<Shape> shapes_;
-	std::vector<Projectile> projectiles_;
+	std::vector<Shape> shapes_; //Put players in their own vector
+	std::vector<Projectile*> projectiles_;
 
 	std::vector<Shape>::iterator controlled_;
 	
@@ -70,6 +70,11 @@ public:
 
 	void controlNext();
 	void controlPrev();
+
+	//Return a reference to these
+	std::vector<Shape> getShapes() const;
+	std::vector<Projectile>& getProjectiles() const;
+	Bounds& getBounds() const;
 
 	void update(float dt);
 };

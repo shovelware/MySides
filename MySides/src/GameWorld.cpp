@@ -47,7 +47,7 @@ b2Body * GameWorld::addBulletBody(float x, float y)
 	//Define the body
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-	bodyDef.bullet = true;
+	bodyDef.bullet = false;
 	bodyDef.position.Set(x, y);
 
 	//Create body using world's factory
@@ -84,9 +84,11 @@ Shape * GameWorld::addEnemy(float x, float y)
 // Adds a projectile to the world
 Projectile* GameWorld::addProjectile(float x, float y, float vx, float vy)
 {
-	projectiles_.push_back(Projectile(addDynamicBody(x, y), b2Vec2(vx, vy)));
+	Projectile * p = new Projectile(addDynamicBody(x, y), b2Vec2(vx, vy));
+	//projectiles_.push_back(Projectile(addDynamicBody(x, y), b2Vec2(vx, vy)));
+	projectiles_.push_back(p);
 
-	return (--projectiles_.end())._Ptr;
+	return *(--projectiles_.end());
 }
 
 //Resizes the bounds to the passed radius, [correcting for shapes outside](not yet)
@@ -141,6 +143,11 @@ void GameWorld::controlPrev()
 	else controlled_--;
 }
 
+std::vector<Shape> GameWorld::getShapes() const
+{
+	return shapes_;
+}
+
 //Update entity code and step the world
 void GameWorld::update(float dt)
 {
@@ -149,17 +156,26 @@ void GameWorld::update(float dt)
 
 	//Firebullets
 
-	for(Projectile p : projectiles_)
+	for (Projectile * p : projectiles_)
 	{
-		p.update(dt);
+		p->update(dt);
 
-		if (p.getActive() == false)
+		if (p->getActive() == false)
 		{
-			//DestroyBody(p.getBody());
+			DestroyBody(p->getBody());
 		}
 	}
 
-	//std::remove_if(projectiles_.begin(), projectiles_.end(), isAlive);
+	std::vector<Projectile*>::iterator remove_from = std::remove_if(projectiles_.begin(), projectiles_.end(), isAlive);
+	
+	for (std::vector<Projectile*>::iterator delete_from = remove_from; delete_from < projectiles_.end(); ++delete_from)
+	{
+		delete *(delete_from);
+	}
+	
+	projectiles_.erase(remove_from, projectiles_.end());
+
+
 
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 }

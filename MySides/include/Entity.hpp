@@ -16,8 +16,11 @@
 const double RD = 180 / M_PI;
 const double DR = M_PI / 180;
 
+
+
 class Entity {
 private:
+
 protected:
 	b2Body * body_;
 	bool alive_;

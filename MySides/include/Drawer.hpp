@@ -17,8 +17,6 @@ struct DrawerStates
 class Drawer {
 private:
 	sf::RenderWindow* window_;
-
-
 public:
 	Drawer(sf::RenderWindow &window);
 
