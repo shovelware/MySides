@@ -4,6 +4,10 @@
 //Globally accessible logger, usage: extern Log l;
 Log l;
 
+//inline float random functions for now
+inline float randFloat(float MAX) { return static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / MAX)); };
+inline float randFloat(float MIN, float MAX) { return MIN + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (MAX - MIN))); };
+
 Game::Game() : videoMode_(1280, 720, 32), window_(videoMode_, "My Sides!", sf::Style::Titlebar), mousein_(false), quit_(false), fullscreen_(false), dd_(window_)
 {
 }
@@ -27,7 +31,11 @@ int Game::run()
 
 	//World
 	world_ = new GameWorld();
+	camera_ = new Camera(windowSize);
 
+	//Seed random
+	srand(static_cast <unsigned> (time(0)));
+	
 	//Drawing
 	drawer_ = new GameDrawer(window_, world_);
 	
@@ -44,19 +52,7 @@ int Game::run()
 	//Testing
 
 	//Bodies
-	world_->addEnemy(10, 4);
-	world_->addEnemy(12, 4);
-	world_->addEnemy(15, 4);
-	world_->addEnemy(17, 4);
-	world_->addEnemy(20, 4);
-	
-	world_->addEnemy(10, 16);
-	world_->addEnemy(12, 16);
-	world_->addEnemy(15, 16);
-	world_->addEnemy(17, 16);
-	world_->addEnemy(20, 16);
-
-	world_->addPlayer(15, 10, true);
+	world_->addPlayer(0, 0, true);
 
 	//Display a blank window before we start our game loop
 	//Avoids nasty white windows
@@ -118,6 +114,7 @@ int Game::run()
 	delete world_;
 	delete drawer_;
 	delete lptr;
+	delete camera_;
 
 	return EXIT_SUCCESS;
 
@@ -223,6 +220,23 @@ void Game::update(sf::Time dt)
 			world_->player()->orient(b2Vec2_zero);
 		}
 
+		//Spawn enemy
+		if (con_.checkPressed(XINPUT_GAMEPAD_Y))
+		{
+			float lt = (con_.checkLeftTrigger() > 0 ? con_.checkLeftTrigger() : 0.1f);
+			int spawn = lt * 10;
+
+			for (spawn; spawn > 0; --spawn)
+			{
+				float x, y, rad = world_->getBoundsRadius() * 0.7f;
+
+				x = randFloat(-rad, rad);
+				y = randFloat(-rad, rad);
+
+				world_->addEnemy(x, y);
+			}
+		}
+
 		//Control swapping
 		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_SHOULDER))
 		{
@@ -265,8 +279,23 @@ void Game::update(sf::Time dt)
 		{
 			world_->fire(b2Vec2(0, -1));
 		}
+
+		//Clear projectiles
+		if (con_.checkPressed(XINPUT_GAMEPAD_BACK))
+		{
+			world_->clearProj();
+		}
+
+		//Quit button
+		if (con_.checkPressed(XINPUT_GAMEPAD_BACK) && con_.checkPressed(XINPUT_GAMEPAD_START))
+		{
+			quit_ = true;
+		}
 	}
 
+	camera_->setTarget(world_->player());
+
+	camera_->update(dt.asMilliseconds());
 	world_->update(dt.asMilliseconds());
 
 	//Update counter
@@ -281,6 +310,8 @@ void Game::render()
 {
 	window_.clear();
 	//l.out(l.message, 'G', "Render");
+
+	window_.setView(*(camera_->getView()));
 
 	//Render stuff
 	world_->DrawDebugData();

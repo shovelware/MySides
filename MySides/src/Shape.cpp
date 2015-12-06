@@ -132,7 +132,7 @@ b2Vec2 Shape::getFirePoint(float x, float y)
 	b2Vec2 d(x, y);
 	d.Normalize();
 
-	d *= 0.75; //MAGIC NUMBER FIX SOON
+	d *= 2; //MAGIC NUMBER FIX SOON
 
 	return p + d;
 }

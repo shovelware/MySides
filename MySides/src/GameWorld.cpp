@@ -1,7 +1,7 @@
 #include "GameWorld.hpp"
 
 //Constructor initialises Box2D World and boudaries
-GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(15, 10), 10), contactListener_(ContactListener())
+GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 10), contactListener_(ContactListener())
 {
 	SetContactListener(&contactListener_);
 }
@@ -66,7 +66,7 @@ void GameWorld::addPlayer(float x, float y, bool control)
 	if (control)
 	{
 		//Set our control to the one we just put in
-		controlled_ = shapes_.begin();
+		controlled_ = --shapes_.end();
 	}
 
 }
@@ -85,6 +85,23 @@ void GameWorld::addProjectile(float x, float y, float vx, float vy)
 	//projectiles_.push_back(Projectile(addDynamicBody(x, y), b2Vec2(vx, vy)));
 	projectiles_.emplace_back(addDynamicBody(x, y), b2Vec2(vx, vy));
 
+}
+
+void GameWorld::removeEnemy(std::list<Shape>::iterator e)
+{
+	DestroyBody(e->getBody());
+	shapes_.erase(e);
+}
+
+void GameWorld::removeProjectile(std::list<Projectile>::iterator p)
+{
+	DestroyBody(p->getBody());
+	projectiles_.erase(p);
+}
+
+float GameWorld::getBoundsRadius()
+{
+	return bounds_.getRadius();
 }
 
 //Resizes the bounds to the passed radius, [correcting for shapes outside](not yet)
@@ -143,7 +160,28 @@ void GameWorld::controlPrev()
 void GameWorld::update(float dt)
 {
 	//Update Shapes
+	if (shapes_.empty() == false)
+	{
 
+		controlled_->setActive(true);
+
+		for (std::list<Shape>::iterator s = shapes_.begin();
+		s != shapes_.end(); /*Don't increment here*/)
+		{
+			s->update(dt);
+
+			//If we're not active, increment by deleting
+			if (s->getActive() == false)
+			{
+				DestroyBody(s->getBody());
+				shapes_.erase(s++); 
+			}
+
+			//Else just increment
+			else ++s;
+		}
+		
+	}
 
 	//Firebullets
 

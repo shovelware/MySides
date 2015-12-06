@@ -38,11 +38,7 @@ void Projectile::hit()
 {
 	if (impact_ == false)
 	{
-		_ASSERT(!impact_);
 		impact_ = true;
-	}
-	if (!myBool) {
-		myBool = true;
 	}
 
 	alive_ = false;

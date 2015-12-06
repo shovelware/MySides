@@ -17,5 +17,11 @@ public:
 	void EndContact(b2Contact* contact);
 	void PreSolve(b2Contact *contact, const b2Manifold *oldManifold);
 	void PostSolve(b2Contact *contact, const b2ContactImpulse *impulse);
+
+	void handleCollision(Projectile* proj, Projectile* otherProj);
+	void handleCollision(Projectile* proj, Shape* shape);
+	void handleCollision(Projectile* proj, Bounds* bounds);
+	void handleCollision(Shape* shape, Shape* otherShape);
+	void handleCollision(Shape* shape, Bounds* bounds);
 };
 #endif

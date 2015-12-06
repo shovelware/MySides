@@ -18,6 +18,7 @@
 
 //Game
 #include "GameWorld.hpp"
+#include "Camera.hpp"
 
 //Rendering
 #include "Drawer.hpp"
@@ -52,6 +53,9 @@ private:
 
 	//Game world 
 	GameWorld* world_;
+
+	//Camera
+	Camera* camera_;
 
 	//DebugDraw
 	SFMLDebugDraw dd_;

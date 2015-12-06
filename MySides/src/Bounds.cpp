@@ -43,9 +43,12 @@ void Bounds::resize(float radius)
 		body_->DestroyFixture(fix);
 	}
 
+	//Set new radius
+	radius_ = radius;
+
 	//Remake the chain and replace in fixture definition
 	b2ChainShape chain;
-	fillChain(chain, radius, circlePoints);
+	fillChain(chain, radius_, circlePoints);
 	fixtureDef_.shape = &chain;
 
 	//Rereate fixture using body's factory

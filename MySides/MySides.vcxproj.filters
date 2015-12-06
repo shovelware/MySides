@@ -78,6 +78,9 @@
     <ClCompile Include="src\Game.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">
@@ -123,6 +126,9 @@
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="include\Game.hpp">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Camera.hpp">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
   </ItemGroup>

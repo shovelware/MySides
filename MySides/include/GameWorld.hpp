@@ -59,11 +59,27 @@ public:
 	void addEnemy(float x, float y);
 	void addProjectile(float x, float y, float vx, float vy);
 	
+	void removePlayer();
+	void removeEnemy(std::list<Shape>::iterator e);
+	void removeProjectile(std::list<Projectile>::iterator p);
+
+
+	//temporary function until lifetimes implemented
+	void clearProj()
+	{
+		for (std::list<Projectile>::iterator p = projectiles_.begin();
+		p != projectiles_.end();)
+		{
+			DestroyBody(p->getBody());
+			projectiles_.erase(p++);
+		}
+	}
 	//void clear(bool clearPlayer);
 	//void loadLevel();
 	//b2Vec2 randomPos(); //On a circle, in an arc, from centre, whatever, reuse code test stuff
 	//
 
+	float getBoundsRadius();
 	void resizeBounds(float radius);
 
 	void move(b2Vec2 direction);
