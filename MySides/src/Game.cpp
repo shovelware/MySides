@@ -1,18 +1,20 @@
 #include "stdafx.h"
 #include "Game.hpp"
 
-
 //Globally accessible logger, usage: extern Log l;
 Log l;
 
-Game::Game() : videoMode_(1280, 720, 32), window_(videoMode_, "My Sides!", sf::Style::Titlebar), mousein_(false), quit_(false), fullscreen_(false)
+//inline float random functions for now
+inline float randFloat(float MAX) { return static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / MAX)); };
+inline float randFloat(float MIN, float MAX) { return MIN + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (MAX - MIN))); };
+
+Game::Game() : videoMode_(1280, 720, 32), window_(videoMode_, "My Sides!", sf::Style::Titlebar), mousein_(false), quit_(false), fullscreen_(false), dd_(window_)
 {
 }
 
 int Game::run()
 {
-
-#pragma region Gamestuff
+#pragma region Startup
 
 	//Window info
 	sf::Vector2u windowSize = window_.getSize();
@@ -20,17 +22,45 @@ int Game::run()
 	//Fixed Timestep
 	sf::Clock frameClock;
 	sf::Time frameTime = sf::Time::Zero;
-	sf::Time tickTime = sf::Time(sf::seconds(1.f / 60.f));
+	sf::Time tickTime = sf::Time(sf::seconds(_TICKTIME_));
 	sf::Time accumulator = sf::Time::Zero;
-
+	
 	//Logging
-	l = *(new Log());
+	Log* lptr = new Log();
+	l = *lptr;
 
-#pragma endregion
+	//World
+	world_ = new GameWorld();
+	camera_ = new Camera(windowSize);
+
+	//Seed random
+	srand(static_cast <unsigned> (time(0)));
+	
+	//Drawing
+	drawer_ = new GameDrawer(window_, world_);
+	
+	//Debugdraw
+	uint32 flags = 0;
+	flags += b2Draw::e_shapeBit;
+	//flags += b2Draw::e_jointBit;
+	//flags += b2Draw::e_aabbBit;
+	flags += b2Draw::e_pairBit;
+	//flags += b2Draw::e_centerOfMassBit;
+	dd_.SetFlags(flags);
+	world_->SetDebugDraw(&dd_);
+
+	//Testing
+
+	//Bodies
+	world_->addPlayer(0, 0, true);
 
 	//Display a blank window before we start our game loop
 	//Avoids nasty white windows
+	window_.clear(sf::Color::Black);
 	window_.display();
+#pragma endregion
+
+#pragma region Game Loop
 
 	//Game loop
 	while (!quit_)
@@ -40,7 +70,7 @@ int Game::run()
 		//processEvents(inputManager.update());?
 		processEvents();
 
-		update_ = (window_.hasFocus() && mousein_);
+		update_ = (window_.hasFocus());// && mousein_);
 
 		//Get delta time since last frame
 		frameTime = frameClock.restart();
@@ -57,20 +87,43 @@ int Game::run()
 		//Update to number of physics steps
 		while (accumulator >= tickTime)
 		{
-			if (checkController(tickTime))
+			//Only update if the controller is connected
+			//if (checkController(tickTime))
 			{
+				//Update with this tick
+				checkController(tickTime); //XOR with if above
+				if (!pause_)
 				update(tickTime);
+
+				//Take this tick out of the accumulator
+				accumulator -= tickTime;
 			}
 
-			//Take this step out of the accumulator
-			accumulator -= tickTime;
 		}
 
 		render();
 	}
-	
+#pragma endregion
+
+#pragma region Shutdown
+
+	//Exiting
 	window_.close();
+
+	//Free resources
+	delete world_;
+	delete drawer_;
+	delete lptr;
+	delete camera_;
+
 	return EXIT_SUCCESS;
+
+#pragma endregion
+}
+
+b2Vec2 Game::SFtoB2(const sf::Vector2f & vec) //Do we really need to spawn things in screen space co-ords?
+{
+	return b2Vec2(vec.x / _SCALE_, vec.y / _SCALE_ );
 }
 
 void Game::processEvents()
@@ -84,10 +137,13 @@ void Game::processEvents()
 			quit_ = true;
 			break;
 
+			//Key press event
 		case sf::Event::KeyPressed:
+			//Escape : Quit game
 			if (evt.key.code == sf::Keyboard::Key::Escape)
 				quit_ = true;
 
+			//Return: Toggle Fullscreen
 			if (evt.key.code == sf::Keyboard::Key::Return)
 				if (!fullscreen_)
 				{
@@ -102,6 +158,12 @@ void Game::processEvents()
 					window_.display();
 					fullscreen_ = false;
 				}
+			
+			//Space : Pause game
+			if (evt.key.code == sf::Keyboard::Key::Space)
+			{
+				pause_ = !pause_;
+			}
 			break;
 
 		case sf::Event::MouseLeft:
@@ -117,109 +179,131 @@ void Game::processEvents()
 
 bool Game::checkController(sf::Time dt)
 {
-	bool connected = con.update(dt.asMilliseconds());
+	bool connected = false;
 
-	if (con.checkDown(XINPUT_GAMEPAD_A))
+	//If we're paused, don't update the controller's button holds
+	if (pause_)
 	{
-		l.out(l.message, 'G', "A Button");
+		connected = con_.update(-1);
 	}
 
-	if (con.checkDown(XINPUT_GAMEPAD_B))
-	{
-		l.out(l.message, 'G', "B Button");
-	}
-
-	if (con.checkDown(XINPUT_GAMEPAD_X))
-	{
-		l.out(l.message, 'G', "X Button");
-	}
-
-	if (con.checkDown(XINPUT_GAMEPAD_Y))
-	{
-		l.out(l.message, 'G', "Y Button");
-	}
-
-	if (con.checkDown(XINPUT_GAMEPAD_LEFT_SHOULDER))
-	{
-		l.out(l.message, 'G', "Left Bumper");
-	}
-
-	if (con.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER))
-	{
-		l.out(l.message, 'G', "Right Bumper");
-	}
-
-	if (con.checkDown(XINPUT_GAMEPAD_LEFT_THUMB))
-	{
-		l.out(l.message, 'G', "Left Click");
-	}
-
-	if (con.checkDown(XINPUT_GAMEPAD_RIGHT_THUMB))
-	{
-		l.out(l.message, 'G', "Right Click");
-	}
-
-	if (con.checkDPadX() != 0)
-	{
-		std::ostringstream DP;
-		DP << "DPad X " << con.checkDPadX();
-		l.out(l.message, 'G', DP.str().c_str());
-	}
-
-	if (con.checkDPadY() != 0)
-	{
-		std::ostringstream DP;
-		DP << "DPad Y " << con.checkDPadY();
-		l.out(l.message, 'G', DP.str().c_str());
-	}
-
-	if (con.checkPressed(XINPUT_GAMEPAD_BACK))
-	{
-		l.out(l.message, 'G', "Back Button");
-		l.typeDisable(l.message, 'G');
-	}
-
-	if (con.checkPressed(XINPUT_GAMEPAD_START))
-	{
-		l.out(l.message, 'G', "Start Button");
-		l.typeEnable(l.message, 'G');
-	}
-
-	if (con.checkReleased(XINPUT_GAMEPAD_A))
-	{
-		if (con.checkTimeHeld(XINPUT_GAMEPAD_A) > 0)
-		{
-			std::ostringstream HT;
-			HT << con.checkTimeHeld(XINPUT_GAMEPAD_A);
-			l.out(l.message, 'G', HT.str().c_str());
-		}
-	}
-
-	if (con.checkLeftTrigger() > .5f)
-	{
-		std::ostringstream LS;
-		LS << "\n" << "LX " << con.checkLeftX() << "\n" << "LY " << con.checkLeftY();
-		l.out(l.message, 'G', LS.str().c_str());
-	}
-
-	if (con.checkRightTrigger() > .5f)
-	{
-		std::ostringstream RS;
-		RS << "\n" << "RX " << con.checkRightX() << "\n" << "RY " << con.checkRightY();
-		l.out(l.message, 'G', RS.str().c_str());
-	}
-
+	//Normal update
+	else connected = con_.update(dt.asMilliseconds());
+	
 	return connected;
-
 }
 
 void Game::update(sf::Time dt)
 {
-	static int x;
-	x++;
-	std::ostringstream UD;
-	UD << "Update" << x;
-	l.out(l.message, 'G', UD.str().c_str());
+	//If the world has a controlled body
+	if (world_->hasControlled())
+	{
+		world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
+		world_->fire(b2Vec2(con_.checkRightX(), con_.checkRightY()));
+
+		//world_->player()->rotate(con_.checkRightX() / 10);
+
+		//HALT
+		if (con_.checkDown(XINPUT_GAMEPAD_A))
+		{
+			world_->player()->stopMove();
+		}
+
+		if (con_.checkDown(XINPUT_GAMEPAD_B))
+		{
+			world_->player()->stopRotate();
+		}
+
+		//Orientation testing
+		if (con_.checkDown(XINPUT_GAMEPAD_X))
+		{
+			world_->player()->orient(b2Vec2_zero);
+		}
+
+		//Spawn enemy
+		if (con_.checkPressed(XINPUT_GAMEPAD_Y))
+		{
+			float lt = (con_.checkLeftTrigger() > 0 ? con_.checkLeftTrigger() : 0.1f);
+			int spawn = lt * 10;
+
+			for (spawn; spawn > 0; --spawn)
+			{
+				float x, y, rad = world_->getBoundsRadius() * 0.7f;
+
+				x = randFloat(-rad, rad);
+				y = randFloat(-rad, rad);
+
+				world_->addEnemy(x, y);
+			}
+		}
+
+		//Control swapping
+		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_SHOULDER))
+		{
+			world_->controlPrev();
+		}
+
+		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+		{
+			world_->controlNext();
+		}
+
+		//Bounds resizing
+		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
+		{
+			world_->resizeBounds(5);
+		}
+
+		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
+		{
+			world_->resizeBounds(10);
+		}
+
+		//DPad firing
+		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT))
+		{
+			world_->fire(b2Vec2(1, 0));
+		}
+
+		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT))
+		{
+			world_->fire(b2Vec2(-1, 0));
+		}
+
+		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_DOWN))
+		{
+			world_->fire(b2Vec2(0, 1));
+		}
+
+		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_UP))
+		{
+			world_->fire(b2Vec2(0, -1));
+		}
+
+		//Clear projectiles
+		if (con_.checkPressed(XINPUT_GAMEPAD_BACK))
+		{
+			world_->clearProj();
+		}
+
+		//Quit button
+		if (con_.checkPressed(XINPUT_GAMEPAD_BACK) && con_.checkPressed(XINPUT_GAMEPAD_START))
+		{
+			quit_ = true;
+		}
+	}
+
+	camera_->setTarget(world_->player());
+
+	camera_->update(dt.asMilliseconds());
+	world_->update(dt.asMilliseconds());
+
+	//Update counter
+	//static int x;
+	//x++;
+	//std::ostringstream UD;
+	//UD << "Update" << x;
+	//l.out(l.message, 'G', UD.str().c_str());
 }
 
 void Game::render()
@@ -227,7 +311,17 @@ void Game::render()
 	window_.clear();
 	//l.out(l.message, 'G', "Render");
 
+	window_.setView(*(camera_->getView()));
+
 	//Render stuff
+	world_->DrawDebugData();
+
+	//b2Shape* x = world_->player()->getVertices();
+	//b2Shape::Type y = x->GetType();
+
+	drawer_->drawPoint(sf::Vector2f(10, 15));
+	drawer_->drawLine(sf::Vector2f(11, 16), sf::Vector2f(24, 28));
+	drawer_->drawCircle(sf::Vector2f(40, 40), 8);
 
 	window_.display();
 }

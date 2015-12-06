@@ -5,8 +5,8 @@
 // FEWM can be toggled on and off, I is internal messages that
 // may become overly verbose. ! can't be stopped.
 
-#ifndef LOG_H
-#define LOG_H
+#ifndef LOG_HPP
+#define LOG_HPP
 
 #include <iostream>
 

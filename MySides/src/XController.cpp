@@ -1,15 +1,15 @@
 #include "XController.hpp"
 
 XController::XController() :
-	deadzoneLX_(0.05f), deadzoneLY_(0.02f), 
-	deadzoneRX_(0.05f), deadzoneRY_(0.02f), 
+	deadzoneLX_(0.15f), deadzoneLY_(0.15f),
+	deadzoneRX_(0.15f), deadzoneRY_(0.15f),
 	thresholdLT_(0.4f), thresholdRT_(0.4f),
 	controllerId_(-1)
 {
 	initButtons();
 }
 
-//initialises the heldtimes map with all controller buttons
+//Initialises the heldtimes map with all controller buttons
 void XController::initButtons()
 {
 	heldTimes_.emplace(XINPUT_GAMEPAD_DPAD_UP, 0);
@@ -124,17 +124,29 @@ unsigned int XController::checkTimeHeld(WORD button) const
 
 #pragma region Sticks
 
-//Returns Left Stick X axis between -100f and 100f
+//Returns Left Stick X axis between left -1f and 1f right
 float XController::checkLeftX() const {	return leftX_; }
 
-//Returns Left Stick Y axis between -100f and 100f
-float XController::checkLeftY() const {	return leftY_; }
+//Returns Left Stick Y axis between up -1f and 1f down
+float XController::checkLeftY() const {	return -leftY_; }
 
-//Returns Right Stick X axis between -100f and 100f
+//Returns Right Stick X axis between left -1f and 1f right
 float XController::checkRightX() const { return rightX_; }
 
-//Returns Right Stick Y axis between -100f and 100f
-float XController::checkRightY() const { return rightY_; }
+//Returns Right Stick Y axis between up -1f and 1f down
+float XController::checkRightY() const { return -rightY_; }
+
+//Returns true if Right Stick is neutral, factoring in deadzones
+bool XController::checkLeftNeutral() const
+{
+	return (leftX_ == 0 && leftY_ == 0);
+}
+
+//Returns true if Left Stick is neutral, factoring in deadzones
+bool XController::checkRightNeutral() const
+{
+	return (rightX_ == 0 && rightY_ == 0);
+}
 
 #pragma endregion
 
@@ -162,17 +174,17 @@ int XController::checkDPadY() const
 
 #pragma region Triggers
 
-//Returns Left Trigger state between 0f and 100f
+//Returns Left Trigger state between 0f and 1f
 float XController::checkLeftTrigger() const { return leftTrigger_; }
 
-//Returns Right Trigger state between 0f and 100f
+//Returns Right Trigger state between 0f and 1f
 float XController::checkRightTrigger() const{ return rightTrigger_; }
 
 //Returns if Left Trigger is further than threshold
-bool XController::checkLeftHairTrigger() const { return (leftTrigger_ > (100 * thresholdLT_)); }
+bool XController::checkLeftHairTrigger() const { return (leftTrigger_ > (1 * thresholdLT_)); }
 
 //Returns if Right Trigger is further than threshold
-bool XController::checkRightHairTrigger() const { return (rightTrigger_ > (100 * thresholdRT_)); }
+bool XController::checkRightHairTrigger() const { return (rightTrigger_ > (1 * thresholdRT_)); }
 
 #pragma endregion
 
@@ -241,6 +253,8 @@ float XController::getThresholdRT() const { return thresholdRT_; }
 #pragma endregion
 
 //Checks connection, updates controller states, returns connection state
+//Negative time indicates rollover of held time tracking, but we still want input
+//Use Case: paused game, but still have menu control
 bool XController::update(int milliseconds)
 {
 	//If we're not connected, try to connect
@@ -267,18 +281,23 @@ bool XController::update(int milliseconds)
 
 		//Now we can start checking things
 		//Button held times update
-		for (std::map<WORD, unsigned int>::iterator mIter = heldTimes_.begin(), mEnd = heldTimes_.end(); mIter != mEnd; ++mIter)
+		for (std::pair<const WORD, int> b : heldTimes_)
 		{
 			//If a button is down, add the held time
-			if (curState_.Gamepad.wButtons & mIter->first)
+			if (curState_.Gamepad.wButtons & b.first)
 			{
-				mIter->second += milliseconds;
+				//But only if the time > 0, otherwise leave it as is
+				b.second += (milliseconds > 0 ? milliseconds : 0);
 			}
 				
 			//If a button was up and it was up last update, clear the time
-			else if ((prvState_.Gamepad.wButtons & mIter->first) == 0)
+			else if ((prvState_.Gamepad.wButtons & b.first) == 0)
 			{
-				mIter->second = 0;
+				//But only if time > 0, otherwise we should keep what we have
+				if (milliseconds > 0)
+				{
+					b.second = 0;
+				}
 			}
 		}//end button update
 
@@ -311,8 +330,6 @@ bool XController::update(int milliseconds)
 		return true;
 
 	}//end else do actual update
-
-	
 
 	//We couldn't connect or update, something's wrong
 	return false;

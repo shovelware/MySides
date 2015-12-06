@@ -33,3 +33,7 @@
 
 //Custom
 #include "Log.hpp"
+
+//Globals
+const double _TICKTIME_ = 1.f / 60.f;
+const double _SCALE_ = 32.f;
