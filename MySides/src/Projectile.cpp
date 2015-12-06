@@ -29,13 +29,20 @@ Projectile::Projectile(b2Body* body, b2Vec2 heading) : Entity(body), impact_(fal
 	heading.Normalize();
 
 	body_->ApplyLinearImpulse(speed_ * heading, body_->GetWorldCenter(), true);
+
+	myBool = false;
+	_ASSERT(!impact_);
 }
 
 void Projectile::hit()
 {
 	if (impact_ == false)
 	{
+		_ASSERT(!impact_);
 		impact_ = true;
+	}
+	if (!myBool) {
+		myBool = true;
 	}
 
 	alive_ = false;

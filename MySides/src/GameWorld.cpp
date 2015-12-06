@@ -6,7 +6,7 @@ GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(15, 10), 10), c
 	SetContactListener(&contactListener_);
 }
 
-//Returns true if the gameworld has a controlled entity
+//Returns true if the gameworld has a controlled entity !!!FIX
 bool GameWorld::hasControlled()
 {
 	//Return false if our pointer to the controlled shape is null
@@ -56,39 +56,35 @@ b2Body * GameWorld::addBulletBody(float x, float y)
 	return body;
 }
 
-
 //Adds a player to the world
-Shape * GameWorld::addPlayer(float x, float y)
-{	
-	//Push the shape into shape vector 
+void GameWorld::addPlayer(float x, float y, bool control)
+{
+	//Emplace the shape into shape list 
 	//AND add body to world with function
-	shapes_.push_back(Shape(addDynamicBody(x, y)));
+	shapes_.emplace_back(addDynamicBody(x, y));
 
-	//Set our control to the one we just put in
-	controlled_ = --shapes_.end();
+	if (control)
+	{
+		//Set our control to the one we just put in
+		controlled_ = shapes_.begin();
+	}
 
-	return controlled_._Ptr;
 }
 
 //Adds a basic enemy to the world
-Shape * GameWorld::addEnemy(float x, float y)
+void GameWorld::addEnemy(float x, float y)
 {
 	//Push the shape into the shape vector
 	//AND add body to world with function
-	shapes_.push_back(Shape(addDynamicBody(x, y)));
-
-	//Return a pointer to this enemy
-	return (--shapes_.end())._Ptr;
+	shapes_.emplace_back(addDynamicBody(x, y));
 }
 
 // Adds a projectile to the world
-Projectile* GameWorld::addProjectile(float x, float y, float vx, float vy)
+void GameWorld::addProjectile(float x, float y, float vx, float vy)
 {
-	Projectile * p = new Projectile(addDynamicBody(x, y), b2Vec2(vx, vy));
 	//projectiles_.push_back(Projectile(addDynamicBody(x, y), b2Vec2(vx, vy)));
-	projectiles_.push_back(p);
+	projectiles_.emplace_back(addDynamicBody(x, y), b2Vec2(vx, vy));
 
-	return *(--projectiles_.end());
 }
 
 //Resizes the bounds to the passed radius, [correcting for shapes outside](not yet)
@@ -143,11 +139,6 @@ void GameWorld::controlPrev()
 	else controlled_--;
 }
 
-std::vector<Shape> GameWorld::getShapes() const
-{
-	return shapes_;
-}
-
 //Update entity code and step the world
 void GameWorld::update(float dt)
 {
@@ -156,26 +147,36 @@ void GameWorld::update(float dt)
 
 	//Firebullets
 
-	for (Projectile * p : projectiles_)
+	if (projectiles_.empty() == false)
 	{
-		p->update(dt);
-
-		if (p->getActive() == false)
+		for (std::list<Projectile>::iterator p = projectiles_.begin();
+			p != projectiles_.end(); /*Don't increment here*/)
 		{
-			DestroyBody(p->getBody());
+			p->update(dt);
+
+			//If we're not active, increment by deleting
+			if (p->getActive() == false)
+			{
+				DestroyBody(p->getBody());
+				projectiles_.erase(p++);
+			}
+
+			//Else just increment
+			else ++p;
 		}
 	}
 
-	std::vector<Projectile*>::iterator remove_from = std::remove_if(projectiles_.begin(), projectiles_.end(), isAlive);
-	
-	for (std::vector<Projectile*>::iterator delete_from = remove_from; delete_from < projectiles_.end(); ++delete_from)
-	{
-		delete *(delete_from);
-	}
-	
-	projectiles_.erase(remove_from, projectiles_.end());
-
-
+	////What a body has
+	//void* s = (GetBodyList()->GetUserData());
+	////Dynamic cast what body has
+	//Shape* dcs = static_cast<Shape*>(s);
+	////What body should have
+	//Shape* as = &*shapes_.begin();
+	//
+	////What shape has
+	//b2Body* b = shapes_.begin()->getBody();
+	////What shape should have
+	//b2Body* ab = GetBodyList();
 
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 }

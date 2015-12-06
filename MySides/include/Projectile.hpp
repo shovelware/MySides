@@ -14,6 +14,8 @@ private:
 
 	int lifeTime_;
 	bool impact_;
+
+	bool myBool;
 	
 public:
 	Projectile(b2Body* body, b2Vec2 heading);

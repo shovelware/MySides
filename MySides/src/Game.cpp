@@ -49,14 +49,14 @@ int Game::run()
 	world_->addEnemy(15, 4);
 	world_->addEnemy(17, 4);
 	world_->addEnemy(20, 4);
-
+	
 	world_->addEnemy(10, 16);
 	world_->addEnemy(12, 16);
 	world_->addEnemy(15, 16);
 	world_->addEnemy(17, 16);
 	world_->addEnemy(20, 16);
 
-	world_->addPlayer(15, 10);
+	world_->addPlayer(15, 10, true);
 
 	//Display a blank window before we start our game loop
 	//Avoids nasty white windows
@@ -206,7 +206,7 @@ void Game::update(sf::Time dt)
 
 		//world_->player()->rotate(con_.checkRightX() / 10);
 
-
+		//HALT
 		if (con_.checkDown(XINPUT_GAMEPAD_A))
 		{
 			world_->player()->stopMove();
@@ -217,11 +217,13 @@ void Game::update(sf::Time dt)
 			world_->player()->stopRotate();
 		}
 
+		//Orientation testing
 		if (con_.checkDown(XINPUT_GAMEPAD_X))
 		{
 			world_->player()->orient(b2Vec2_zero);
 		}
 
+		//Control swapping
 		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_SHOULDER))
 		{
 			world_->controlPrev();
@@ -232,11 +234,18 @@ void Game::update(sf::Time dt)
 			world_->controlNext();
 		}
 
+		//Bounds resizing
 		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
 		{
-			world_->resizeBounds(3);
+			world_->resizeBounds(5);
 		}
 
+		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
+		{
+			world_->resizeBounds(10);
+		}
+
+		//DPad firing
 		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT))
 		{
 			world_->fire(b2Vec2(1, 0));

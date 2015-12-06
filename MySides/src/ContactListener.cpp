@@ -10,6 +10,8 @@ void ContactListener::BeginContact(b2Contact * contact)
 	char* fixB = static_cast<char*>(contact->GetFixtureB()->GetUserData());
 	
 	//If we got a pointer back for both
+	_ASSERT(contact->GetFixtureA() != contact->GetFixtureB());
+
 	if (fixA && fixB)
 	{
 		if (fixA == "projectile")

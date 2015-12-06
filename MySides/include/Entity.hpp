@@ -43,6 +43,7 @@ public:
 	b2Vec2 getPosition() const;
 	float getRotation() const;
 	b2Body * getBody();
+	void setBody(b2Body *);
 	/*
 	virtual void draw(GameDrawer d) = 0;
 

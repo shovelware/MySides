@@ -10,6 +10,7 @@
 #include <SFMLDebugDraw.h>
 
 #include <vector>
+#include <list> //< Replacing vectors
 #include <algorithm>
 
 #include "ContactListener.hpp"
@@ -37,10 +38,10 @@ private:
 	const int VELOCITY_ITERS = 6;
 	const int POSITION_ITERS = 2;
 
-	std::vector<Shape> shapes_; //Put players in their own vector
-	std::vector<Projectile*> projectiles_;
+	std::list<Shape> shapes_; //Put players in their own container?
+	std::list<Projectile> projectiles_;
 
-	std::vector<Shape>::iterator controlled_;
+	std::list<Shape>::iterator controlled_;
 	
 	ContactListener contactListener_;
 	Bounds bounds_;
@@ -54,9 +55,9 @@ public:
 	GameWorld();
 	bool hasControlled();
 
-	Shape* addPlayer(float x, float y);
-	Shape* addEnemy(float x, float y);
-	Projectile* addProjectile(float x, float y, float vx, float vy);
+	void addPlayer(float x, float y, bool control);
+	void addEnemy(float x, float y);
+	void addProjectile(float x, float y, float vx, float vy);
 	
 	//void clear(bool clearPlayer);
 	//void loadLevel();
@@ -71,10 +72,8 @@ public:
 	void controlNext();
 	void controlPrev();
 
-	//Return a reference to these
-	std::vector<Shape> getShapes() const;
-	std::vector<Projectile>& getProjectiles() const;
-	Bounds& getBounds() const;
+	//Return a reference to
+	//shapes, bounds, projectiles for drawing
 
 	void update(float dt);
 };
