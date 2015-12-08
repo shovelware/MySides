@@ -44,7 +44,7 @@ Shape::Shape(b2Body* body) : Entity(body)
 	maxRot_ = 0.0001f;
 
 	//
-	refireTime_ = 1000;
+	refireTime_ = 250;
 	coolDown_ = 0;
 }
 
@@ -138,9 +138,9 @@ b2Vec2 Shape::getFirePoint(float x, float y)
 
 	d *= 2; //MAGIC NUMBER FIX SOON
 
-	return p + d;
-
 	coolDown_ = refireTime_;
+	
+	return p + d;
 }
 
 bool Shape::getArmed()
