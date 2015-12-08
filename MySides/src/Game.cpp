@@ -97,11 +97,11 @@ int Game::run()
 
 				//Take this tick out of the accumulator
 				accumulator -= tickTime;
+		render();
 			}
 
 		}
 
-		render();
 	}
 #pragma endregion
 
@@ -280,15 +280,26 @@ void Game::update(sf::Time dt)
 			world_->fire(b2Vec2(0, -1));
 		}
 
-
-		if (con_.checkPressed(XINPUT_GAMEPAD_BACK))
+		if (con_.checkReleased(XINPUT_GAMEPAD_BACK))
 		{
+			if (con_.checkTimeHeld(XINPUT_GAMEPAD_BACK) > 500)
+			{
+				camera_->resetZoom();
+			}
+
+			else
+			{
+				camera_->zoom(2);
+			}
 		}
 
 		//Quit button
-		if (con_.checkPressed(XINPUT_GAMEPAD_BACK) && con_.checkPressed(XINPUT_GAMEPAD_START))
+		if (con_.checkDown(XINPUT_GAMEPAD_START) && con_.checkDown(XINPUT_GAMEPAD_BACK))
 		{
-			quit_ = true;
+			if (con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 2500U && con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 2500U)
+			{
+				quit_ = true;
+			}
 		}
 	}
 

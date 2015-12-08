@@ -5,7 +5,7 @@ Projectile::Projectile(b2Body* body, b2Vec2 heading) : Entity(body), impact_(fal
 	//Create a shape, the outline
 	b2CircleShape shap;
 
-	shap.m_radius = 0.1f;
+	shap.m_radius = 0.05f;
 
 	//Create a fixture, the link for body -> shape
 	b2FixtureDef fixtureDef;
@@ -22,14 +22,15 @@ Projectile::Projectile(b2Body* body, b2Vec2 heading) : Entity(body), impact_(fal
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&fixtureDef);
 
-	speed_ = 0.0005f; // max velocity in m/s
-
+	speed_ = 0.00025f; // max velocity in m/s
 
 	//Fire the bullet
 	heading.Normalize();
 
+	fired_ = true;
+
 	body_->ApplyLinearImpulse(speed_ * heading, body_->GetWorldCenter(), true);
-	lifeTime_ = 500;
+	lifeTime_ = 1000;
 }
 
 void Projectile::hit()

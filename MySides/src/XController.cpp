@@ -281,25 +281,44 @@ bool XController::update(int milliseconds)
 
 		//Now we can start checking things
 		//Button held times update
-		for (std::pair<const WORD, int> b : heldTimes_)
+		for (std::map<WORD, unsigned int>::iterator bIter = heldTimes_.begin(), bEnd = heldTimes_.end(); bIter != bEnd; ++bIter)
 		{
 			//If a button is down, add the held time
-			if (curState_.Gamepad.wButtons & b.first)
+			if (curState_.Gamepad.wButtons & bIter->first)
 			{
 				//But only if the time > 0, otherwise leave it as is
-				b.second += (milliseconds > 0 ? milliseconds : 0);
+				bIter->second = bIter->second + (milliseconds > 0 ? milliseconds : 0);
 			}
-				
+
 			//If a button was up and it was up last update, clear the time
-			else if ((prvState_.Gamepad.wButtons & b.first) == 0)
+			else if ((prvState_.Gamepad.wButtons & bIter->first) == 0)
 			{
 				//But only if time > 0, otherwise we should keep what we have
 				if (milliseconds > 0)
 				{
-					b.second = 0;
+					bIter->second = 0;
 				}
 			}
-		}//end button update
+		}
+		//for (std::pair<const WORD, int> b : heldTimes_)
+		//{
+		//	//If a button is down, add the held time
+		//	if (curState_.Gamepad.wButtons & b.first)
+		//	{
+		//		//But only if the time > 0, otherwise leave it as is
+		//		b.second = b.second + (milliseconds > 0 ? milliseconds : 0);
+		//	}
+		//		
+		//	//If a button was up and it was up last update, clear the time
+		//	else if ((prvState_.Gamepad.wButtons & b.first) == 0)
+		//	{
+		//		//But only if time > 0, otherwise we should keep what we have
+		//		if (milliseconds > 0)
+		//		{
+		//			b.second = 0;
+		//		}
+		//	}
+		//}//end button update
 
 		//Left Stick Update
 		//Get normalised stick position

@@ -11,7 +11,7 @@ Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
 
 	//Add material properties to the fixture
 	boundsDef_.density = 1.0f;
-	boundsDef_.friction = 0.0f;
+	boundsDef_.friction = 1.0f;
 	boundsDef_.restitution = 0.0f;
 
 	//Ground friction circle

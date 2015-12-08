@@ -8,7 +8,6 @@ target_(nullptr)
 
 }
 
-
 void Camera::setTarget(Entity* target)
 {
 	target_ = target;
@@ -35,6 +34,16 @@ void Camera::update(int milliseconds)
 sf::View * Camera::getView()
 {
 	return static_cast<sf::View*>(this);
+}
+
+void Camera::zoom(float factor) 
+{
+	sf::View::zoom(factor);
+}
+
+void Camera::resetZoom()
+{
+	setSize(screenSize_);
 }
 
 sf::Vector2f Camera::B2toSF(const b2Vec2& vec, bool scale) const

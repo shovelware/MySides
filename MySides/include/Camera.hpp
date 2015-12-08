@@ -18,6 +18,9 @@ public:
 	void move(sf::Vector2f direction);
 	sf::View* getView();
 
+	void zoom(float factor);
+	void resetZoom();
+
 	//some sort of zoom functionality
 
 private:

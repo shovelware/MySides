@@ -1,7 +1,7 @@
 #include "GameWorld.hpp"
 
 //Constructor initialises Box2D World and boudaries
-GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 32), contactListener_(ContactListener())
+GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 64), contactListener_(ContactListener())
 {
 	SetContactListener(&contactListener_);
 }
@@ -32,8 +32,8 @@ b2Body * GameWorld::addDynamicBody(float x, float y)
 	fric.bodyA = body;
 	fric.bodyB = bounds_.getBody();
 
-	fric.maxForce = 0.0001f;
-	fric.maxTorque = 0.0001f;
+	fric.maxForce	= 0.0001f;
+	fric.maxTorque	= 0.005f;
 
 	fric.collideConnected = true;
 
@@ -76,7 +76,7 @@ void GameWorld::addPlayer(float x, float y, bool control)
 {
 	//Emplace the shape into shape list 
 	//AND add body to world with function
-	shapes_.emplace_back(addDynamicBody(x, y));
+	shapes_.emplace_back(addDynamicBody(x, y), 4, .5f);
 
 	if (control)
 	{
@@ -91,7 +91,7 @@ void GameWorld::addEnemy(float x, float y)
 {
 	//Push the shape into the shape vector
 	//AND add body to world with function
-	shapes_.emplace_back(addDynamicBody(x, y));
+	shapes_.emplace_back(addDynamicBody(x, y), 4, .5f);
 }
 
 //Adds a projectile to the world
@@ -149,12 +149,11 @@ void GameWorld::fire(b2Vec2 direction)
 		{
 
 			b2Vec2 fp = controlled_->getFirePoint(direction.x, direction.y); //This will be abstracted to shape class
-			b2CircleShape* bounds = bounds_.getShape();
 			b2Transform bxf = bounds_.getBody()->GetTransform();
 
 			//Test if we're shooting on the same side of the bounds
-			bool projIn = bounds->TestPoint(bxf, fp);
-			bool shapeIn = bounds->TestPoint(bxf, controlled_->getPosition());
+			bool projIn = bounds_.getShape()->TestPoint(bxf, fp);
+			bool shapeIn = bounds_.getShape()->TestPoint(bxf, controlled_->getPosition());
 
 			if (projIn == shapeIn)
 			{

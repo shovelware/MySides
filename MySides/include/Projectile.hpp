@@ -13,6 +13,7 @@ private:
 	b2Vec2 heading_;
 
 	int lifeTime_;
+	bool fired_;
 	bool impact_;
 	
 public:

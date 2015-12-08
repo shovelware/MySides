@@ -36,7 +36,7 @@ private:
 
 public:
 	Shape(b2Body* body);
-	Shape(b2Body* body, int vertices);
+	Shape(b2Body* body, int vertices, float radius);
 
 	void move(b2Vec2 direction); //override
 	void orientedMove(b2Vec2 direction); //Thrusts from back and rotates towards direction

@@ -7,7 +7,7 @@ extern Log l;
 ///
 
 //Creates a shape using passed body //int sides, float radius
-Shape::Shape(b2Body* body) : Entity(body)
+Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body)
 {
 	//Create a shape, the outline
 	b2PolygonShape shap;
@@ -22,7 +22,7 @@ Shape::Shape(b2Body* body) : Entity(body)
 	//
 	//shap.Set(verts, 3);
 	
-	shap.SetAsBox(.5f, .5f);
+	shap.SetAsBox(radius, radius);
 
 	//Create a fixture, the link for body -> shape
 	b2FixtureDef fixtureDef;
@@ -30,8 +30,8 @@ Shape::Shape(b2Body* body) : Entity(body)
 
 	//Add material properties to the fixture
 	fixtureDef.density = 1.0f;
-	fixtureDef.friction = 0.0f;
-	fixtureDef.restitution = 0.99f;
+	fixtureDef.friction = 1.0f;
+	fixtureDef.restitution = 1.f;
 
 	//Add userdata to fixture for contacts
 	fixtureDef.userData = "shape";
@@ -40,11 +40,11 @@ Shape::Shape(b2Body* body) : Entity(body)
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&fixtureDef);
 
-	maxVel_ = 0.025f; // max velocity in m/s
+	maxVel_ = 0.05f * radius; // max velocity in m/s
 	maxRot_ = 0.0001f;
 
 	//
-	refireTime_ = 100;
+	refireTime_ = 10;
 	coolDown_ = 0;
 }
 
