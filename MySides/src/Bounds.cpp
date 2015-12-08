@@ -2,20 +2,29 @@
 
 Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
 {
+	//Add userdata to fixture for contacts
+	boundsDef_.userData = "bounds";
+
 	b2ChainShape chain;
 	fillChain(chain, radius, circlePoints);
-	fixtureDef_.shape = &chain;
+	boundsDef_.shape = &chain;
 
 	//Add material properties to the fixture
-	fixtureDef_.density = 1.0f;
-	fixtureDef_.friction = 0.0f;
-	fixtureDef_.restitution = 0.0f;
+	boundsDef_.density = 1.0f;
+	boundsDef_.friction = 0.0f;
+	boundsDef_.restitution = 0.0f;
 
-	//Add userdata to fixture for contacts
-	fixtureDef_.userData = "bounds";
+	//Ground friction circle
+	frictionDef_.userData = "friction";
+	frictionDef_.isSensor = true;
+
+	b2CircleShape circ;
+	circ.m_radius = radius;
+	frictionDef_.shape = &circ;
 
 	//Create and add fixture using body's factory
-	body_->CreateFixture(&fixtureDef_);
+	body_->CreateFixture(&boundsDef_);
+	body_->CreateFixture(&frictionDef_);
 }
 
 //Adds a generated shape to the passed chain, with radius and number of points
@@ -35,24 +44,43 @@ void Bounds::fillChain(b2ChainShape &c, float radius, int points)
 
 void Bounds::resize(float radius)
 {
-	//Check if there's a fixture there already
-	b2Fixture* fix = body_->GetFixtureList();
-	if (fix != nullptr)
-	{
-		//if so, destroy it
-		body_->DestroyFixture(fix);
-	}
-
 	//Set new radius
-	radius_ = radius;
+	if (radius_ != radius)
+	{
+		radius_ = radius;
 
-	//Remake the chain and replace in fixture definition
-	b2ChainShape chain;
-	fillChain(chain, radius_, circlePoints);
-	fixtureDef_.shape = &chain;
+		//Clear the fixture list
+		for (b2Fixture* fix = body_->GetFixtureList(); fix; fix = body_->GetFixtureList())
+		{
+			body_->DestroyFixture(fix);
+		}
 
-	//Rereate fixture using body's factory
-	body_->CreateFixture(&fixtureDef_);
+		//Remake the chain and replace in fixture definition
+		b2ChainShape chain;
+		fillChain(chain, radius_, circlePoints);
+		boundsDef_.shape = &chain;
+
+		//Resize box and replace in fixture definition
+		b2CircleShape circ;
+		circ.m_radius = radius_;
+		frictionDef_.shape = &circ;
+
+		//Rereate fixtures using body's factory
+		body_->CreateFixture(&boundsDef_);
+		body_->CreateFixture(&frictionDef_);
+	}
+}
+
+//Returns the friction circle rather than bounds for testPoint
+b2CircleShape* Bounds::getShape()
+{
+	for (b2Fixture* fix = body_->GetFixtureList(); fix; fix = fix->GetNext())
+	{
+		if (fix->GetType() == b2Shape::Type::e_circle)
+		{
+			return static_cast<b2CircleShape*>(fix->GetShape());
+		}
+	}
 }
 
 //Gets radius of bounds

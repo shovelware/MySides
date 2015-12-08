@@ -42,6 +42,10 @@ Shape::Shape(b2Body* body) : Entity(body)
 
 	maxVel_ = 0.025f; // max velocity in m/s
 	maxRot_ = 0.0001f;
+
+	//
+	refireTime_ = 1000;
+	coolDown_ = 0;
 }
 
 void Shape::move(b2Vec2 direction)
@@ -135,10 +139,26 @@ b2Vec2 Shape::getFirePoint(float x, float y)
 	d *= 2; //MAGIC NUMBER FIX SOON
 
 	return p + d;
+
+	coolDown_ = refireTime_;
+}
+
+bool Shape::getArmed()
+{
+	return (coolDown_ == 0);
 }
 
 void Shape::update(int milliseconds)
 {
+	if (coolDown_ > 0)
+	{
+		coolDown_ -= milliseconds;
+
+		if (coolDown_ < 0)
+		{
+			coolDown_ = 0;
+		}
+	}
 }
 
 //

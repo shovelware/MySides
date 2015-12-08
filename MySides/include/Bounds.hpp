@@ -8,16 +8,20 @@
 #include "Entity.hpp"
 
 class Bounds : public Entity {
+public:
+	Bounds(b2Body* body, float radius);
+	void resize(float radius);
+	b2CircleShape* getShape();
+	float getRadius();
 private:
 	float radius_;
-	b2FixtureDef fixtureDef_;
+
+	b2FixtureDef boundsDef_;
+	b2FixtureDef frictionDef_;
+
 	b2Vec2 getCirclePoint(int index, int maxpoints);
 	const int circlePoints = 32;
 
-public:
-	Bounds(b2Body* body, float radius);
 	void fillChain(b2ChainShape& c, float radius, int points);
-	void resize(float radius);
-	float getRadius();
 };
 #endif

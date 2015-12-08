@@ -29,6 +29,11 @@ private:
 	b2Vec2 pole_;//Orientation pole
 	int hp_;
 	int maxHP_;
+
+	////Temp for weapon refire
+	int refireTime_;
+	int coolDown_;
+
 public:
 	Shape(b2Body* body);
 	Shape(b2Body* body, int vertices);
@@ -43,6 +48,9 @@ public:
 
 	b2Vec2 getFirePoint(float x, float y);
 
+	////Temp for weapon refire
+	bool getArmed(); 
+	
 	void update(int milliseconds);
 
 //	void draw(GameDrawer d); // override

@@ -29,9 +29,7 @@ Projectile::Projectile(b2Body* body, b2Vec2 heading) : Entity(body), impact_(fal
 	heading.Normalize();
 
 	body_->ApplyLinearImpulse(speed_ * heading, body_->GetWorldCenter(), true);
-
-	myBool = false;
-	_ASSERT(!impact_);
+	lifeTime_ = 500;
 }
 
 void Projectile::hit()
@@ -47,5 +45,12 @@ void Projectile::hit()
 
 void Projectile::update(int milliseconds)
 {
+	lifeTime_ -= milliseconds;
+
+	if (lifeTime_ <= 0)
+	{
+		alive_ = false;
+		active_ = false;		
+	}
 }
 

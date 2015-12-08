@@ -77,6 +77,18 @@ void GameWorld::addEnemy(float x, float y)
 	//Push the shape into the shape vector
 	//AND add body to world with function
 	shapes_.emplace_back(addDynamicBody(x, y));
+
+	//b2FrictionJointDef fric;
+	//fric.localAnchorA = (b2Vec2(0, 0));
+	//fric.localAnchorB = (b2Vec2(0, 0));
+	//
+	//fric.bodyA = (--shapes_.end())->getBody();
+	//fric.bodyB = bounds_.getBody();
+	//
+	//fric.maxForce = 0.5f;
+	//fric.maxTorque = 0;
+	//
+	//CreateJoint(&fric);
 }
 
 // Adds a projectile to the world
@@ -123,10 +135,26 @@ void GameWorld::move(b2Vec2 direction)
 
 void GameWorld::fire(b2Vec2 direction)
 {
+	//If there's a direction to fire in
 	if (direction.x != 0 || direction.y != 0)
 	{
-		b2Vec2 fp = controlled_->getFirePoint(direction.x, direction.y); //This will be abstracted to shape class
-		addProjectile(fp.x, fp.y, direction.x, direction.y);
+		//And we can fire
+		if (controlled_->getArmed())
+		{
+
+			b2Vec2 fp = controlled_->getFirePoint(direction.x, direction.y); //This will be abstracted to shape class
+			b2CircleShape* bounds = bounds_.getShape();
+			b2Transform bxf = bounds_.getBody()->GetTransform();
+
+			//Test if we're shooting on the same side of the bounds
+			bool projIn = bounds->TestPoint(bxf, fp);
+			bool shapeIn = bounds->TestPoint(bxf, controlled_->getPosition());
+
+			if (projIn == shapeIn)
+			{
+				addProjectile(fp.x, fp.y, direction.x, direction.y);
+			}
+		}
 	}
 }
 
