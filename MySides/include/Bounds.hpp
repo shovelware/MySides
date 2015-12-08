@@ -13,6 +13,7 @@ public:
 	void resize(float radius);
 	b2CircleShape* getShape();
 	float getRadius();
+	float getSideLength();
 private:
 	float radius_;
 

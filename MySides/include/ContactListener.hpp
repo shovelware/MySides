@@ -18,6 +18,8 @@ public:
 	void PreSolve(b2Contact *contact, const b2Manifold *oldManifold);
 	void PostSolve(b2Contact *contact, const b2ContactImpulse *impulse);
 
+	bool handleContact(char* tagA, char* tagB, b2Fixture* fixtureA, b2Fixture* fixtureB);
+
 	void handleCollision(Projectile* proj, Projectile* otherProj);
 	void handleCollision(Projectile* proj, Shape* shape);
 	void handleCollision(Projectile* proj, Bounds* bounds);

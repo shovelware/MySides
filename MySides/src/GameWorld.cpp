@@ -1,7 +1,7 @@
 #include "GameWorld.hpp"
 
 //Constructor initialises Box2D World and boudaries
-GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 10), contactListener_(ContactListener())
+GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 32), contactListener_(ContactListener())
 {
 	SetContactListener(&contactListener_);
 }
@@ -23,6 +23,21 @@ b2Body * GameWorld::addDynamicBody(float x, float y)
 
 	//Create body using world's factory
 	b2Body* body = CreateBody(&bodyDef);
+
+	//Dynamic bodies have friction with bounds
+	b2FrictionJointDef fric;
+	fric.localAnchorA = (b2Vec2(0, 0));
+	fric.localAnchorB = (b2Vec2(0, 0));
+
+	fric.bodyA = body;
+	fric.bodyB = bounds_.getBody();
+
+	fric.maxForce = 0.0001f;
+	fric.maxTorque = 0.0001f;
+
+	fric.collideConnected = true;
+
+	CreateJoint(&fric);
 
 	return body;
 }
@@ -47,7 +62,7 @@ b2Body * GameWorld::addBulletBody(float x, float y)
 	//Define the body
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-	bodyDef.bullet = false;
+	bodyDef.bullet = true;
 	bodyDef.position.Set(x, y);
 
 	//Create body using world's factory
@@ -77,40 +92,31 @@ void GameWorld::addEnemy(float x, float y)
 	//Push the shape into the shape vector
 	//AND add body to world with function
 	shapes_.emplace_back(addDynamicBody(x, y));
-
-	//b2FrictionJointDef fric;
-	//fric.localAnchorA = (b2Vec2(0, 0));
-	//fric.localAnchorB = (b2Vec2(0, 0));
-	//
-	//fric.bodyA = (--shapes_.end())->getBody();
-	//fric.bodyB = bounds_.getBody();
-	//
-	//fric.maxForce = 0.5f;
-	//fric.maxTorque = 0;
-	//
-	//CreateJoint(&fric);
 }
 
-// Adds a projectile to the world
+//Adds a projectile to the world
 void GameWorld::addProjectile(float x, float y, float vx, float vy)
 {
 	//projectiles_.push_back(Projectile(addDynamicBody(x, y), b2Vec2(vx, vy)));
-	projectiles_.emplace_back(addDynamicBody(x, y), b2Vec2(vx, vy));
+	projectiles_.emplace_back(addBulletBody(x, y), b2Vec2(vx, vy));
 
 }
 
-void GameWorld::removeEnemy(std::list<Shape>::iterator e)
+//Removes enemy from the world and increments iterator, for use within loops
+void GameWorld::removeEnemy(std::list<Shape>::iterator& e)
 {
 	DestroyBody(e->getBody());
-	shapes_.erase(e);
+	shapes_.erase(e++);
 }
 
-void GameWorld::removeProjectile(std::list<Projectile>::iterator p)
+//Removes projectile from the world and increments iterator, for use within loops
+void GameWorld::removeProjectile(std::list<Projectile>::iterator& p)
 {
 	DestroyBody(p->getBody());
-	projectiles_.erase(p);
+	projectiles_.erase(p++);
 }
 
+//Returns the radius of the level bounds
 float GameWorld::getBoundsRadius()
 {
 	return bounds_.getRadius();
@@ -201,8 +207,7 @@ void GameWorld::update(float dt)
 			//If we're not active, increment by deleting
 			if (s->getActive() == false)
 			{
-				DestroyBody(s->getBody());
-				shapes_.erase(s++); 
+				removeEnemy(s);
 			}
 
 			//Else just increment
@@ -223,8 +228,9 @@ void GameWorld::update(float dt)
 			//If we're not active, increment by deleting
 			if (p->getActive() == false)
 			{
-				DestroyBody(p->getBody());
-				projectiles_.erase(p++);
+				removeProjectile(p);
+				float y = bounds_.getSideLength();
+				float x = y;
 			}
 
 			//Else just increment
@@ -243,6 +249,7 @@ void GameWorld::update(float dt)
 	//b2Body* b = shapes_.begin()->getBody();
 	////What shape should have
 	//b2Body* ab = GetBodyList();
+
 
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 }

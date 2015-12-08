@@ -8,7 +8,7 @@ Log l;
 inline float randFloat(float MAX) { return static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / MAX)); };
 inline float randFloat(float MIN, float MAX) { return MIN + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (MAX - MIN))); };
 
-Game::Game() : videoMode_(1280, 720, 32), window_(videoMode_, "My Sides!", sf::Style::Titlebar), mousein_(false), quit_(false), fullscreen_(false), dd_(window_)
+Game::Game() : videoMode_(1280, 720, 32), window_(videoMode_, "My Sides!", sf::Style::Titlebar, sf::ContextSettings(0u, 0u, 8u)), mousein_(false), quit_(false), fullscreen_(false), dd_(window_)
 {
 }
 
@@ -280,10 +280,9 @@ void Game::update(sf::Time dt)
 			world_->fire(b2Vec2(0, -1));
 		}
 
-		//Clear projectiles
+
 		if (con_.checkPressed(XINPUT_GAMEPAD_BACK))
 		{
-			world_->clearProj();
 		}
 
 		//Quit button

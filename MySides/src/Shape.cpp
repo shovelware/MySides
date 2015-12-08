@@ -44,7 +44,7 @@ Shape::Shape(b2Body* body) : Entity(body)
 	maxRot_ = 0.0001f;
 
 	//
-	refireTime_ = 250;
+	refireTime_ = 100;
 	coolDown_ = 0;
 }
 

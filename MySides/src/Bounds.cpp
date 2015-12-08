@@ -89,6 +89,14 @@ float Bounds::getRadius()
 	return radius_;
 }
 
+float Bounds::getSideLength()
+{
+	//a^2 = b^2 + c^2 -2bc cosA
+	float rhs = (radius_ * radius_) + (radius_ * radius_) - (2 * radius_ * radius_) * cos(2 * M_PI / circlePoints);
+
+	return sqrt(rhs);
+}
+
 //Returns a point number index on a circle divided into maxpoints
 //Begins at far left and runs cw, how to get to top and CCW?
 b2Vec2 Bounds::getCirclePoint(int index, int maxpoints)
