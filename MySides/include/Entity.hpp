@@ -16,15 +16,7 @@
 const double RD = 180 / M_PI;
 const double DR = M_PI / 180;
 
-
-
 class Entity {
-private:
-
-protected:
-	b2Body * body_;
-	bool alive_;
-	bool active_;
 public:
 	Entity(b2Body * body);
 
@@ -48,6 +40,12 @@ public:
 	virtual void draw(GameDrawer d) = 0;
 
 	b2Shape* getVertices();*/
+
+protected:
+	b2Body * body_;
+	bool alive_;
+	bool active_;
+private:
 };
 
 #endif

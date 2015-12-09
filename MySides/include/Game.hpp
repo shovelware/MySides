@@ -29,6 +29,10 @@
 
 class Game
 {
+public:
+	Game();
+	int run();
+
 private:
 	b2Vec2 SFtoB2(const sf::Vector2f &vec);
 	void processEvents();
@@ -62,8 +66,5 @@ private:
 
 	//Testing
 
-public:
-	Game();
-	int run();
 };
 #endif

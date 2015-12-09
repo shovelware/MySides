@@ -27,28 +27,11 @@ static bool isAlive(Entity* e)
 }
 
 //Checks if entity is active, predicate for remove_if
-static bool isActive(Entity e)
-{
+static bool isActive(Entity e){
 	return e.getActive();
 }
 
 class GameWorld : public b2World {
-private:
-	const b2Vec2 GRAVITY = b2Vec2(0, 0);
-	const int VELOCITY_ITERS = 6;
-	const int POSITION_ITERS = 2;
-
-	std::list<Shape> shapes_; //Put players in their own container?
-	std::list<Projectile> projectiles_;
-
-	std::list<Shape>::iterator controlled_;
-	
-	ContactListener contactListener_;
-	Bounds bounds_;
-
-	b2Body* addDynamicBody(float x, float y);
-	b2Body* addStaticBody (float x, float y);
-	b2Body* addBulletBody (float x, float y);
 public:
 	Shape * player();
 
@@ -81,6 +64,22 @@ public:
 	//shapes, bounds, projectiles for drawing
 
 	void update(float dt);
+private:
+	const b2Vec2 GRAVITY = b2Vec2(0, 0);
+	const int VELOCITY_ITERS = 6;
+	const int POSITION_ITERS = 2;
+
+	std::list<Shape> shapes_; //Put players in their own container?
+	std::list<Projectile> projectiles_;
+
+	std::list<Shape>::iterator controlled_;
+	
+	ContactListener contactListener_;
+	Bounds bounds_;
+
+	b2Body* addDynamicBody(float x, float y);
+	b2Body* addStaticBody (float x, float y);
+	b2Body* addBulletBody (float x, float y);
 };
 
 #endif

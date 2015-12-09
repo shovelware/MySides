@@ -21,34 +21,6 @@
 #include <iterator>
 
 class XController {
-private:
-	int controllerId_;
-	const int DISCONNECTED = -1;
-
-	XINPUT_STATE curState_;
-	XINPUT_STATE prvState_;
-
-	std::map<WORD, unsigned int> heldTimes_;
-
-	float deadzoneLX_, deadzoneLY_;
-	float deadzoneRX_, deadzoneRY_;
-	const float DEADZONE_MAX = 1.f;
-
-	float thresholdLT_, thresholdRT_;
-	const float THRESHOLD_MAX = 1.f;
-	
-	float leftX_, leftY_;
-	float rightX_, rightY_;
-	const short STICK_MAX = 32767;
-
-	float leftTrigger_, rightTrigger_;
-	const BYTE TRIGGER_MAX = 255;
-
-	//unsigned short leftVibe, rightVibe;
-	//const unsigned short VIBE_MAX = USHRT_MAX;
-
-	void initButtons();
-	bool checkConnection();
 public:
 	XController();
 
@@ -122,6 +94,34 @@ public:
 	//
 	//short absLeftTrigger() const;
 	//short absRightTrigger() const;
+private:
+	int controllerId_;
+	const int DISCONNECTED = -1;
+
+	XINPUT_STATE curState_;
+	XINPUT_STATE prvState_;
+
+	std::map<WORD, unsigned int> heldTimes_;
+
+	float deadzoneLX_, deadzoneLY_;
+	float deadzoneRX_, deadzoneRY_;
+	const float DEADZONE_MAX = 1.f;
+
+	float thresholdLT_, thresholdRT_;
+	const float THRESHOLD_MAX = 1.f;
+	
+	float leftX_, leftY_;
+	float rightX_, rightY_;
+	const short STICK_MAX = 32767;
+
+	float leftTrigger_, rightTrigger_;
+	const BYTE TRIGGER_MAX = 255;
+
+	//unsigned short leftVibe, rightVibe;
+	//const unsigned short VIBE_MAX = USHRT_MAX;
+
+	void initButtons();
+	bool checkConnection();
 };
 
 #endif

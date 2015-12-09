@@ -9,14 +9,14 @@
 
 class GameDrawer : public Drawer
 {
+public:
+	GameDrawer(sf::RenderWindow& win, GameWorld* world);
+	void draw();
 private:
 	sf::Vector2f B2toSF(const b2Vec2& vec, bool scale) const;
 	sf::Color B2toSF(const b2Color& col) const;
 
 	GameWorld* world_;
-public:
-	GameDrawer(sf::RenderWindow& win, GameWorld* world);
-	void draw();
 };
 
 #endif

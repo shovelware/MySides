@@ -10,7 +10,6 @@
 #include "Bounds.hpp"
 
 class ContactListener : public b2ContactListener {
-private:
 public:
 	ContactListener();
 	void BeginContact(b2Contact* contact);
@@ -25,5 +24,6 @@ public:
 	void handleCollision(Projectile* proj, Bounds* bounds);
 	void handleCollision(Shape* shape, Shape* otherShape);
 	void handleCollision(Shape* shape, Bounds* bounds);
+private:
 };
 #endif

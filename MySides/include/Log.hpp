@@ -14,21 +14,6 @@ using std::cout;
 using std::endl;
 
 class Log {
-private:
-	enum TYPEFLAG {
-		FATAL = 0x01,
-		ERROR = 0x02,
-		WARNING = 0x04,
-		MESSAGE = 0x08,
-		//0x10
-		//0x20
-		//0x40
-		LOGGER = 0x80
-	};
-
-	//Bit flags for output, all enabled by default ctor
-	unsigned int options_;
-
 public:
 	Log() : options_(TYPEFLAG::FATAL | TYPEFLAG::ERROR | TYPEFLAG::WARNING | TYPEFLAG::MESSAGE | TYPEFLAG::LOGGER) {}
 
@@ -171,6 +156,22 @@ public:
 			break;
 		}
 	}
+
+private:
+	enum TYPEFLAG {
+		FATAL = 0x01,
+		ERROR = 0x02,
+		WARNING = 0x04,
+		MESSAGE = 0x08,
+		//0x10
+		//0x20
+		//0x40
+		LOGGER = 0x80
+	};
+
+	//Bit flags for output, all enabled by default ctor
+	unsigned int options_;
+
 };
 
 #endif

@@ -4,6 +4,10 @@
 #include "Entity.hpp"
 
 class Projectile : public Entity{
+public:
+	Projectile(b2Body* body, b2Vec2 heading);
+	void hit();
+	void update(int milliseconds);
 private:
 	float speed_;
 	float damage_;
@@ -16,10 +20,6 @@ private:
 	bool fired_;
 	bool impact_;
 	
-public:
-	Projectile(b2Body* body, b2Vec2 heading);
-	void hit();
-	void update(int milliseconds);
 };
 
 #endif
