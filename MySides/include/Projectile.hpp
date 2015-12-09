@@ -20,7 +20,6 @@ private:
 	int lifeTime_;
 	bool fired_;
 	bool impact_;
-	
 };
 
 #endif

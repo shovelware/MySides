@@ -19,7 +19,7 @@ Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
 	frictionDef_.isSensor = true;
 
 	b2CircleShape circ;
-	circ.m_radius = radius;
+	circ.m_radius = radius + 1;
 	frictionDef_.shape = &circ;
 
 	//Create and add fixture using body's factory
@@ -62,7 +62,7 @@ void Bounds::resize(float radius)
 
 		//Resize box and replace in fixture definition
 		b2CircleShape circ;
-		circ.m_radius = radius_;
+		circ.m_radius = radius_ + 1;
 		frictionDef_.shape = &circ;
 
 		//Rereate fixtures using body's factory

@@ -36,9 +36,10 @@ Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body)
 	//Add userdata to fixture for contacts
 	fixtureDef.userData = "shape";
 
-	//Angular damping in body???
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&fixtureDef);
+
+	//End box2d setup
 
 	maxVel_ = 0.05f * radius; // max velocity in m/s
 	maxRot_ = 0.0001f;
@@ -143,7 +144,7 @@ b2Vec2 Shape::getFirePoint(float x, float y)
 	b2Vec2 d(x, y);
 	d.Normalize();
 
-	d *= 2; //MAGIC NUMBER FIX SOON
+	d *= 1; //MAGIC NUMBER FIX SOON
 
 	coolDown_ = refireTime_;
 	

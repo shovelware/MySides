@@ -16,9 +16,10 @@
 #include "ContactListener.hpp"
 
 #include "Entity.hpp"
-#include "Shape.hpp"
 #include "Bounds.hpp"
+#include "Shape.hpp"
 #include "Projectile.hpp"
+#include "Side.hpp"
 
 //Checks if entity is alive, predicate for remove_if
 static bool isAlive(Entity* e)
@@ -31,7 +32,7 @@ static bool isActive(Entity e){
 	return e.getActive();
 }
 
-class GameWorld : public b2World {
+class GameWorld : protected b2World {
 public:
 	Shape * player();
 
@@ -41,10 +42,12 @@ public:
 	void addPlayer(float x, float y, bool control);
 	void addEnemy(float x, float y);
 	void addProjectile(float x, float y, float vx, float vy);
+	void addSide(float x, float y, float nx, float ny, float size);
 	
 	void removePlayer();
 	void removeEnemy(std::list<Shape>::iterator& e);
 	void removeProjectile(std::list<Projectile>::iterator& p);
+	void removeSide(std::list<Side>::iterator& s);
 
 	//void clear(bool clearPlayer);
 	//void loadLevel();
@@ -53,6 +56,7 @@ public:
 
 	float getBoundsRadius();
 	void resizeBounds(float radius);
+	float getBoundsSide();
 
 	void move(b2Vec2 direction);
 	void fire(b2Vec2 direction);
@@ -60,10 +64,13 @@ public:
 	void controlNext();
 	void controlPrev();
 
+	void SetDebugDraw(b2Draw* debugDraw);
+	void DrawDebugData();
+
 	//Return a reference to
 	//shapes, bounds, projectiles for drawing
 
-	void update(float dt);
+	void update(int dt);
 private:
 	const b2Vec2 GRAVITY = b2Vec2(0, 0);
 	const int VELOCITY_ITERS = 6;
@@ -71,6 +78,7 @@ private:
 
 	std::list<Shape> shapes_; //Put players in their own container?
 	std::list<Projectile> projectiles_;
+	std::list<Side> sides_;
 
 	std::list<Shape>::iterator controlled_;
 	

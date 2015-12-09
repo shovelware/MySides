@@ -52,6 +52,8 @@ bool ContactListener::handleContact(char* tagA, char* tagB, b2Fixture* fixtureA,
 {
 	//This branching if is messy and I hate it, how do I 
 	//approach this in a nicer way? Ross, Oisin?
+	//Also can't disable contacts from this method
+
 	bool solved = false;
 
 	//Friction <-> X
@@ -61,6 +63,15 @@ bool ContactListener::handleContact(char* tagA, char* tagB, b2Fixture* fixtureA,
 	//No collision with friction
 	if (tagA == "friction")
 	{
+		solved = true;
+	}
+
+	if (tagA == "side")
+	{
+		void* s = fixtureA->GetBody()->GetUserData();
+		Side* side = static_cast<Side*>(s);
+		//side->collect();
+
 		solved = true;
 	}
 

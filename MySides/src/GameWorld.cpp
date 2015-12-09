@@ -102,6 +102,12 @@ void GameWorld::addProjectile(float x, float y, float vx, float vy)
 
 }
 
+//Adds a side to the world
+void GameWorld::addSide(float x, float y, float nx, float ny, float size)
+{
+	sides_.emplace_back(addDynamicBody(x, y), b2Vec2(nx, ny), size);
+}
+
 //Removes enemy from the world and increments iterator, for use within loops
 void GameWorld::removeEnemy(std::list<Shape>::iterator& e)
 {
@@ -114,6 +120,12 @@ void GameWorld::removeProjectile(std::list<Projectile>::iterator& p)
 {
 	DestroyBody(p->getBody());
 	projectiles_.erase(p++);
+}
+
+void GameWorld::removeSide(std::list<Side>::iterator & s)
+{
+	DestroyBody(s->getBody());
+	sides_.erase(s++);
 }
 
 //Returns the radius of the level bounds
@@ -132,6 +144,11 @@ void GameWorld::resizeBounds(float radius)
 
 	//Recreate the bounds
 	bounds_.resize(radius);
+}
+
+float GameWorld::getBoundsSide()
+{
+	return bounds_.getSideLength();
 }
 
 void GameWorld::move(b2Vec2 direction)
@@ -189,13 +206,23 @@ void GameWorld::controlPrev()
 	else controlled_--;
 }
 
+void GameWorld::SetDebugDraw(b2Draw* debugDraw)
+{
+	b2World::SetDebugDraw(debugDraw);
+}
+
+void GameWorld::DrawDebugData()
+{
+	b2World::DrawDebugData();
+}
+
 //Update entity code and step the world
-void GameWorld::update(float dt)
+void GameWorld::update(int dt)
 {
 	//Update Shapes
 	if (shapes_.empty() == false)
 	{
-
+		//invincible controlled shape
 		controlled_->setActive(true);
 
 		for (std::list<Shape>::iterator s = shapes_.begin();
@@ -206,7 +233,17 @@ void GameWorld::update(float dt)
 			//If we're not active, increment by deleting
 			if (s->getActive() == false)
 			{
-				removeEnemy(s);
+				if (s != controlled_)
+				{
+					b2Vec2 pos = s->getPosition();
+					addSide(pos.x, pos.y, 0, 0, 0.5f);
+					removeEnemy(s);
+				}
+
+				else
+				{
+					int x = 5;
+				}
 			}
 
 			//Else just increment
@@ -228,12 +265,26 @@ void GameWorld::update(float dt)
 			if (p->getActive() == false)
 			{
 				removeProjectile(p);
-				float y = bounds_.getSideLength();
-				float x = y;
 			}
 
 			//Else just increment
 			else ++p;
+		}
+	}
+
+	if (sides_.empty() == false)
+	{
+		for (std::list<Side>::iterator s = sides_.begin();
+		s != sides_.end(); /*Don't increment here*/)
+		{
+			//If we're not active, increment by deleting
+			if (s->getActive() == false)
+			{
+				removeSide(s);
+			}
+
+			//Else just increment
+			else ++s;
 		}
 	}
 

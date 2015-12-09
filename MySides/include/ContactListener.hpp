@@ -5,9 +5,10 @@
 #include <Box2D\Box2D.h>
 
 #include "Entity.hpp"
+#include "Bounds.hpp"
 #include "Shape.hpp"
 #include "Projectile.hpp"
-#include "Bounds.hpp"
+#include "Side.hpp"
 
 class ContactListener : public b2ContactListener {
 public:

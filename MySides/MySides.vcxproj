@@ -139,6 +139,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\SFMLDebugDraw.cpp" />
     <ClCompile Include="src\Shape.cpp" />
+    <ClCompile Include="src\Side.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\XController.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -158,6 +159,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\Projectile.hpp" />
     <ClInclude Include="include\Shape.hpp" />
     <ClInclude Include="include\SFMLDebugDraw.h" />
+    <ClInclude Include="include\Side.hpp" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\XController.hpp">

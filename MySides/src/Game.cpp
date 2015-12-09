@@ -42,7 +42,7 @@ int Game::run()
 	//Debugdraw
 	uint32 flags = 0;
 	flags += b2Draw::e_shapeBit;
-	flags += b2Draw::e_jointBit;
+	//flags += b2Draw::e_jointBit;
 	//flags += b2Draw::e_aabbBit;
 	flags += b2Draw::e_pairBit;
 	flags += b2Draw::e_centerOfMassBit;
@@ -83,7 +83,7 @@ int Game::run()
 		}
 
 		accumulator += frameTime;
-
+		
 		//Update to number of physics steps
 		while (accumulator >= tickTime)
 		{
@@ -133,6 +133,10 @@ void Game::processEvents()
 	sf::Event evt;
 	while (window_.pollEvent(evt))
 	{
+
+		static char x = 0;
+		x++;
+		l.out(l.priority, 'G', &x);
 		switch (evt.type)
 		{
 		case sf::Event::Closed:
@@ -205,10 +209,17 @@ void Game::update(sf::Time dt)
 
 		//world_->player()->rotate(con_.checkRightX() / 10);
 
-		//HALT
-		if (con_.checkDown(XINPUT_GAMEPAD_A))
+		//Resize bounds
+		if (con_.checkPressed(XINPUT_GAMEPAD_A))
 		{
-			world_->player()->stopMove();
+			float base = 32;
+			float lt = con_.checkLeftTrigger() * 96;
+
+			world_->resizeBounds(base + lt);
+			
+			std::cout << base + lt << "  " << world_->getBoundsSide() << std::endl;
+
+			
 		}
 
 		if (con_.checkDown(XINPUT_GAMEPAD_B))
@@ -298,7 +309,7 @@ void Game::update(sf::Time dt)
 		//Quit button
 		if (con_.checkDown(XINPUT_GAMEPAD_START) && con_.checkDown(XINPUT_GAMEPAD_BACK))
 		{
-			if (con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 2500U && con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 2500U)
+			if (con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 2000U && con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 2000U)
 			{
 				quit_ = true;
 			}
