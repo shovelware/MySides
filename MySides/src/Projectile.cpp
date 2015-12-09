@@ -31,6 +31,7 @@ Projectile::Projectile(b2Body* body, b2Vec2 heading) : Entity(body), impact_(fal
 
 	body_->ApplyLinearImpulse(speed_ * heading, body_->GetWorldCenter(), true);
 	lifeTime_ = 1000;
+	damage_ = 1;
 }
 
 void Projectile::hit()
@@ -42,6 +43,11 @@ void Projectile::hit()
 
 	alive_ = false;
 	active_ = false;
+}
+
+int Projectile::getDamage() const
+{
+	return damage_;
 }
 
 void Projectile::update(int milliseconds)

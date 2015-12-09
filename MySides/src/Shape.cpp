@@ -46,6 +46,8 @@ Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body)
 	//
 	refireTime_ = 10;
 	coolDown_ = 0;
+	maxHP_ = 4;
+	hp_ = maxHP_;
 }
 
 void Shape::move(b2Vec2 direction)
@@ -130,6 +132,11 @@ void Shape::stopRotate()
 	body_->SetAngularVelocity(0);
 }
 
+void Shape::hit(int dmg)
+{
+	hp_ -= dmg;
+}
+
 b2Vec2 Shape::getFirePoint(float x, float y)
 {
 	b2Vec2 p = body_->GetPosition();
@@ -150,13 +157,22 @@ bool Shape::getArmed()
 
 void Shape::update(int milliseconds)
 {
-	if (coolDown_ > 0)
+	if (active_)
 	{
-		coolDown_ -= milliseconds;
-
-		if (coolDown_ < 0)
+		if (coolDown_ > 0)
 		{
-			coolDown_ = 0;
+			coolDown_ -= milliseconds;
+
+			if (coolDown_ < 0)
+			{
+				coolDown_ = 0;
+			}
+		}
+
+		if (hp_ <= 0)
+		{
+			alive_ = false;
+			active_ = false;
 		}
 	}
 }

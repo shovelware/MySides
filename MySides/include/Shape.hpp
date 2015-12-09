@@ -34,9 +34,10 @@ public:
 	void rotate(float amount); // override
 	void stopRotate();
 
-	b2Vec2 getFirePoint(float x, float y);
+	void hit(int dmg);
 
 	////Temp for weapon refire
+	b2Vec2 getFirePoint(float x, float y);
 	bool getArmed(); 
 	
 	void update(int milliseconds);

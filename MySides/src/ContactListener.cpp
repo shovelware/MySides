@@ -135,7 +135,7 @@ void ContactListener::handleCollision(Projectile* proj, Projectile* otherProj)
 void ContactListener::handleCollision(Projectile* proj, Shape* shape)
 {
 	proj->hit();
-	shape->setActive(false);
+	shape->hit(proj->getDamage());
 }
 
 void ContactListener::handleCollision(Projectile* proj, Bounds* bounds)

@@ -42,10 +42,10 @@ int Game::run()
 	//Debugdraw
 	uint32 flags = 0;
 	flags += b2Draw::e_shapeBit;
-	//flags += b2Draw::e_jointBit;
+	flags += b2Draw::e_jointBit;
 	//flags += b2Draw::e_aabbBit;
 	flags += b2Draw::e_pairBit;
-	//flags += b2Draw::e_centerOfMassBit;
+	flags += b2Draw::e_centerOfMassBit;
 	dd_.SetFlags(flags);
 	world_->SetDebugDraw(&dd_);
 
@@ -97,7 +97,9 @@ int Game::run()
 
 				//Take this tick out of the accumulator
 				accumulator -= tickTime;
-		render();
+				
+				//Render this frame
+				render();
 			}
 
 		}

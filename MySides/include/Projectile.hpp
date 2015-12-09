@@ -7,6 +7,7 @@ class Projectile : public Entity{
 public:
 	Projectile(b2Body* body, b2Vec2 heading);
 	void hit();
+	int getDamage() const;
 	void update(int milliseconds);
 private:
 	float speed_;

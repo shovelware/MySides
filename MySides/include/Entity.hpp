@@ -21,21 +21,19 @@ public:
 	Entity(b2Body * body);
 
 	virtual void setPosition(b2Vec2 position);
-
 	virtual void setRotation(float amount);
+
+	b2Vec2 getPosition() const;
+	float getRotation() const;
+
+	b2Body * getBody();
 
 	bool getAlive() const;
 	bool getActive() const;
-
 	void setAlive(bool a);
 	void setActive(bool a);
 
 	virtual void kill();
-
-	b2Vec2 getPosition() const;
-	float getRotation() const;
-	b2Body * getBody();
-	void setBody(b2Body *);
 	/*
 	virtual void draw(GameDrawer d) = 0;
 
@@ -43,6 +41,7 @@ public:
 
 protected:
 	b2Body * body_;
+
 	bool alive_;
 	bool active_;
 private:
