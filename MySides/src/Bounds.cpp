@@ -19,7 +19,7 @@ Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
 	frictionDef_.isSensor = true;
 
 	b2CircleShape circ;
-	circ.m_radius = radius + 1;
+	circ.m_radius = radius;
 	frictionDef_.shape = &circ;
 
 	//Create and add fixture using body's factory
@@ -31,7 +31,6 @@ Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
 void Bounds::fillChain(b2ChainShape &c, float radius, int points)
 {
 	b2Vec2* verts = new b2Vec2[points];
-
 	for (int i = 0; i < points; ++i)
 	{
 		verts[i] = radius * getCirclePoint(i, points);
@@ -60,12 +59,12 @@ void Bounds::resize(float radius)
 		fillChain(chain, radius_, circlePoints);
 		boundsDef_.shape = &chain;
 
-		//Resize box and replace in fixture definition
+		//Resize circle and replace in fixture definition
 		b2CircleShape circ;
-		circ.m_radius = radius_ + 1;
+		circ.m_radius = radius_;
 		frictionDef_.shape = &circ;
 
-		//Rereate fixtures using body's factory
+		//Recreate fixtures using body's factory
 		body_->CreateFixture(&boundsDef_);
 		body_->CreateFixture(&frictionDef_);
 	}
@@ -103,8 +102,8 @@ b2Vec2 Bounds::getCirclePoint(int index, int maxpoints)
 {
 	b2Vec2 point;
 
-	point.x = -(cos((2 * M_PI) / maxpoints * index));
-	point.y = -(sin((2 * M_PI) / maxpoints * index));
+	point.y = -(cos((2 * M_PI) / maxpoints * index));
+	point.x = -(sin((2 * M_PI) / maxpoints * index));
 
 	return point;
 }

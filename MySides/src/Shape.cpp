@@ -12,17 +12,17 @@ Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body)
 	//Create a shape, the outline
 	b2PolygonShape shap;
 	
-	////Was experimenting with poles and orientation, DON'T FORGET
-	//b2Vec2 verts[3];
-	//verts[0].Set(0, -2.f);
-	//verts[1].Set(-.75f, 0);
-	//verts[2].Set(.75f, 0);
-	//
-	//pole_ = verts[0];
-	//
-	//shap.Set(verts, 3);
+	//Was experimenting with poles and orientation, DON'T FORGET
+	b2Vec2 verts[3];
+	verts[0].Set(0, -2.f);
+	verts[1].Set(-.75f, 0);
+	verts[2].Set(.75f, 0);
 	
-	shap.SetAsBox(radius, radius);
+	pole_ = verts[0];
+	
+	shap.Set(verts, 3);
+	
+	//shap.SetAsBox(radius, radius);
 
 	//Create a fixture, the link for body -> shape
 	b2FixtureDef fixtureDef;
@@ -41,7 +41,7 @@ Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body)
 
 	//End box2d setup
 
-	maxVel_ = 0.05f * radius; // max velocity in m/s
+	maxVel_ = 0.05f * radius; // max velocity in m/s // * radius provisionally til we make an actual calculation
 	maxRot_ = 0.0001f;
 
 	//

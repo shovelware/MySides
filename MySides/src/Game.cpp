@@ -44,8 +44,8 @@ int Game::run()
 	flags += b2Draw::e_shapeBit;
 	//flags += b2Draw::e_jointBit;
 	//flags += b2Draw::e_aabbBit;
-	flags += b2Draw::e_pairBit;
-	flags += b2Draw::e_centerOfMassBit;
+	//flags += b2Draw::e_pairBit;
+	//flags += b2Draw::e_centerOfMassBit;
 	dd_.SetFlags(flags);
 	world_->SetDebugDraw(&dd_);
 
@@ -133,10 +133,11 @@ void Game::processEvents()
 	sf::Event evt;
 	while (window_.pollEvent(evt))
 	{
+		//Rudimentary update count
+		//static char x = 0;
+		//x++;
+		//l.out(l.priority, 'G', &x);
 
-		static char x = 0;
-		x++;
-		l.out(l.priority, 'G', &x);
 		switch (evt.type)
 		{
 		case sf::Event::Closed:

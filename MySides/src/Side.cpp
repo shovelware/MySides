@@ -3,24 +3,36 @@
 Side::Side(b2Body * body, b2Vec2 normal, float size) : Entity(body), size_(size)
 {
 	//Create a shape, the outline
-	b2PolygonShape box;
+	b2EdgeShape line;
 	
-	box.SetAsBox(size_, 0.01f);
+	line.Set(b2Vec2(0, -size / 2), b2Vec2(0, size / 2));
 
 	//Create a fixture, the link for body -> shape
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &box;
+	b2FixtureDef lineDef;
+	lineDef.shape = &line;
 
 	//Add material properties to the fixture
-	fixtureDef.density = 0.5f;
-	fixtureDef.friction = 0.0f;
-	fixtureDef.restitution = 0.0f;
+	lineDef.density = 0.5f;
+	lineDef.friction = 0.0f;
+	lineDef.restitution = 0.0f;
 
 	//Add userdata to fixture for contacts
-	fixtureDef.userData = "side";
+	lineDef.userData = "side";
+
+	lineDef.isSensor = true;
+
+	body_->CreateFixture(&lineDef);
+
+	b2PolygonShape box;
+	
+	box.SetAsBox(size * 0.05f, size * 0.55f);
+	b2FixtureDef boxDef;
+	boxDef.shape = &box;
+	boxDef.userData = "sidebox";
+	boxDef.isSensor = true;
 
 	//Create and add fixture using body's factory
-	body_->CreateFixture(&fixtureDef);
+	body_->CreateFixture(&boxDef);
 
 	//End box2d setup
 }

@@ -235,15 +235,13 @@ void GameWorld::update(int dt)
 			{
 				if (s != controlled_)
 				{
+					static float side = 1.f;
 					b2Vec2 pos = s->getPosition();
-					addSide(pos.x, pos.y, 0, 0, 0.5f);
+					addSide(pos.x, pos.y, 0, 0, side++);
 					removeEnemy(s);
 				}
 
-				else
-				{
-					int x = 5;
-				}
+				else ++s;
 			}
 
 			//Else just increment

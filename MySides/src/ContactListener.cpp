@@ -6,14 +6,6 @@ ContactListener::ContactListener() : b2ContactListener()
 
 void ContactListener::BeginContact(b2Contact * contact)
 {
-}
-
-void ContactListener::EndContact(b2Contact * contact)
-{
-}
-
-void ContactListener::PreSolve(b2Contact * contact, const b2Manifold * oldManifold)
-{
 	//Should this be in presolve or begincontact
 	//Get types from fixtures
 	char* tagA = static_cast<char*>(contact->GetFixtureA()->GetUserData());
@@ -39,9 +31,17 @@ void ContactListener::PreSolve(b2Contact * contact, const b2Manifold * oldManifo
 
 		if (!solved)
 		{
-			std::cout << "UNSOLVED COLLISION" << std::endl;
+			std::cout << "UNSOLVED COLLISION: " << tagA << " " << tagB << std::endl;
 		}
 	}
+}
+
+void ContactListener::EndContact(b2Contact * contact)
+{
+}
+
+void ContactListener::PreSolve(b2Contact * contact, const b2Manifold * oldManifold)
+{
 }
 
 void ContactListener::PostSolve(b2Contact * contact, const b2ContactImpulse * impulse)
@@ -61,18 +61,30 @@ bool ContactListener::handleContact(char* tagA, char* tagB, b2Fixture* fixtureA,
 	//Shape <-> Shape, Bounds
 
 	//No collision with friction
-	if (tagA == "friction")
+	if (tagA == "friction" || tagA == "sidebox")
 	{
 		solved = true;
 	}
 
 	if (tagA == "side")
 	{
-		void* s = fixtureA->GetBody()->GetUserData();
-		Side* side = static_cast<Side*>(s);
-		//side->collect();
+		if (tagB == "shape")
+		{
+			void* s = fixtureA->GetBody()->GetUserData();
+			Side* side = static_cast<Side*>(s);
+			side->collect();
+			solved = true;
+		}
 
-		solved = true;
+		if (tagB == "projectile")
+		{
+			solved = true;
+		}
+
+		if (tagB == "side")
+		{
+			solved = true;
+		}
 	}
 
 	//Projectiles with everything
