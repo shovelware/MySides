@@ -19,6 +19,20 @@ namespace traits{
 	FASTEST
 	*/
 	}
+
+	enum type {
+		ANGLE,
+
+		TRI_ISO,
+		TRI_EQU,
+
+		SQU_,
+		SQU_RHOMBUS,
+		SQU_RECT,
+		SQU_TRAP,
+
+		PEN_
+	};
 }
 
 class Shape : public Entity {
@@ -34,7 +48,8 @@ public:
 	void rotate(float amount); // override
 	void stopRotate();
 
-	void hit(int dmg);
+	void takeDamage(int damage);
+	void collect(int value);
 
 	////Temp for weapon refire
 	b2Vec2 getFirePoint(float x, float y);
@@ -43,19 +58,31 @@ public:
 	void update(int milliseconds);
 
 //	void draw(GameDrawer d); // override
+
+	bool collide(Entity* other, bool& physicsCollision); //override
+
 private:
 	/*const*/ float maxVel_;//maximum velocity
 	/*const*/ float maxRot_;//maximum rotation
 
+
+	//Set: sides = 1 * scale
+	void setTriangleEqu(b2PolygonShape& s, float scale);
+	void setTriangleIso(b2PolygonShape& s, float scale);
+
+	//Altset: Area = 1 * scale ^2
+	void altSetTriangleEq(b2PolygonShape& s, float scale);
+	void altSetTriangleIs(b2PolygonShape& s, float scale);
+
 	b2Vec2 pole_;//Orientation pole
 	int hp_;
-	int maxHP_;
+	unsigned int maxHP_;
 
 	////Temp for weapon refire
-	int refireTime_;
+	unsigned int refireTime_;
 	int coolDown_;
 
-
+	int sides_;
 };
 
 #endif

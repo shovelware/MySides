@@ -46,3 +46,33 @@ float Side::getValue()
 {
 	return size_;
 }
+
+bool Side::collide(Entity* other, bool& physicsCollision)
+{
+	bool handled = false;
+
+	if (Shape* shape = dynamic_cast<Shape*>(other))
+	{
+		//If we're a player
+		//Or maybe other things can collect stuff?
+		collect();
+		handled = true;
+	}
+
+	else if (Projectile* proj = dynamic_cast<Projectile*>(other))
+	{
+		handled = true;
+	}
+
+	else if (Side* side = dynamic_cast<Side*>(other))
+	{
+		handled = true;
+	}
+
+	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
+	{
+		handled = true;
+	}
+
+	return handled;
+}

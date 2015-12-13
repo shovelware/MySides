@@ -4,7 +4,6 @@
 #ifndef MS_BOUNDS_HPP
 #define MS_BOUNDS_HPP
 
-#include <stdafx.h>
 #include "Entity.hpp"
 
 class Bounds : public Entity {
@@ -14,6 +13,8 @@ public:
 	b2CircleShape* getShape();
 	float getRadius();
 	float getSideLength();
+
+	bool collide(Entity* other, bool& physicsCollision); //Override
 private:
 	float radius_;
 

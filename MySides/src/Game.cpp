@@ -208,7 +208,7 @@ void Game::update(sf::Time dt)
 		world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
 		world_->fire(b2Vec2(con_.checkRightX(), con_.checkRightY()));
 
-		//world_->player()->rotate(con_.checkRightX() / 10);
+		//world_->controlled()->rotate(con_.checkRightX() / 10);
 
 		//Resize bounds
 		if (con_.checkPressed(XINPUT_GAMEPAD_A))
@@ -225,13 +225,13 @@ void Game::update(sf::Time dt)
 
 		if (con_.checkDown(XINPUT_GAMEPAD_B))
 		{
-			world_->player()->stopRotate();
+			world_->controlled()->stopRotate();
 		}
 
 		//Orientation testing
 		if (con_.checkDown(XINPUT_GAMEPAD_X))
 		{
-			world_->player()->orient(b2Vec2_zero);
+			world_->controlled()->orient(b2Vec2_zero);
 		}
 
 		//Spawn enemy
@@ -251,15 +251,14 @@ void Game::update(sf::Time dt)
 			}
 		}
 
-		//Control swapping
 		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_SHOULDER))
 		{
-			world_->controlPrev();
+			
 		}
 
 		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER))
 		{
-			world_->controlNext();
+
 		}
 
 		//Bounds resizing
@@ -317,7 +316,7 @@ void Game::update(sf::Time dt)
 		}
 	}
 
-	camera_->setTarget(world_->player());
+	camera_->setTarget(world_->controlled());
 
 	camera_->update(dt.asMilliseconds());
 	world_->update(dt.asMilliseconds());
@@ -340,7 +339,7 @@ void Game::render()
 	//Render stuff
 	world_->DrawDebugData();
 
-	//b2Shape* x = world_->player()->getVertices();
+	//b2Shape* x = world_->controlled()->getVertices();
 	//b2Shape::Type y = x->GetType();
 
 	drawer_->drawPoint(sf::Vector2f(10, 15));

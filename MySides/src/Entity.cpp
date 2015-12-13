@@ -67,6 +67,11 @@ void Entity::kill()
 	alive_ = false;
 }
 
+bool Entity::collide(Entity * other, bool & physicsCollision)
+{
+	return false;
+}
+
 ////Gets points of body's first fixture, assumes polygon. Override if necessary
 //b2Shape* Entity::getVertices()
 //{

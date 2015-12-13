@@ -6,32 +6,71 @@ ContactListener::ContactListener() : b2ContactListener()
 
 void ContactListener::BeginContact(b2Contact * contact)
 {
-	//Should this be in presolve or begincontact
+	////Should this be in presolve or begincontact
+	////Get types from fixtures
+	//char* tagA = static_cast<char*>(contact->GetFixtureA()->GetUserData());
+	//char* tagB = static_cast<char*>(contact->GetFixtureB()->GetUserData());
+	//
+	//bool solved = false;
+	//bool collide = contact->IsEnabled();
+	//
+	////If we got a pointer back for both
+	//if (tagA && tagB)
+	//{
+	//	//Pull the fixtures
+	//	b2Fixture* fixtureA = contact->GetFixtureA();
+	//	b2Fixture* fixtureB = contact->GetFixtureB();
+	//
+	//	//Handle the contact appropriately
+	//	solved = handleContact(tagA, tagB, fixtureA, fixtureB);
+	//
+	//	if (!solved)
+	//	{
+	//		//If we haven't solved it, flip the tags
+	//		solved = handleContact(tagB, tagA, fixtureB, fixtureA);
+	//	}
+	//
+	//	if (!solved)
+	//	{
+	//		std::cout << "UNSOLVED COLLISION: " << tagA << " " << tagB << std::endl;
+	//	}
+	//}
+
+	bool handle = true;
+
 	//Get types from fixtures
 	char* tagA = static_cast<char*>(contact->GetFixtureA()->GetUserData());
 	char* tagB = static_cast<char*>(contact->GetFixtureB()->GetUserData());
 
-	bool solved = false;
-
-	//If we got a pointer back for both
-	if (tagA && tagB)
+	if (tagA == "friction" || tagB == "friction")
 	{
-		//Pull the fixtures
-		b2Fixture* fixtureA = contact->GetFixtureA();
-		b2Fixture* fixtureB = contact->GetFixtureB();
+		handle = false;
+	}
 
-		//Handle the contact appropriately
-		solved = handleContact(tagA, tagB, fixtureA, fixtureB);
 
-		if (!solved)
+	if (handle)
+	{
+		Entity* entA = static_cast<Entity*>(contact->GetFixtureA()->GetBody()->GetUserData());
+		Entity* entB = static_cast<Entity*>(contact->GetFixtureB()->GetBody()->GetUserData());
+
+		//Contact enable bools
+		bool collA = true, collB = true;
+		//Return values
+		bool handledA = false, handledB = false;
+
+		//Each entity handles it's own collision
+		handledA = entA->collide(entB, collA);
+		handledB = entB->collide(entA, collB);
+
+		//Entities must agree to collide physically
+		contact->SetEnabled(collA && collB);
+
+		if (!(handledA && handledB))
 		{
-			//If we haven't solved it, flip the tags
-			solved = handleContact(tagB, tagA, fixtureB, fixtureA);
-		}
-
-		if (!solved)
-		{
-			std::cout << "UNSOLVED COLLISION: " << tagA << " " << tagB << std::endl;
+			std::cout << 
+				"UNSOLVED COLLISION: " << 
+				(handledA ? "1 " : "0 ") << tagA << " " <<
+				(handledB ? "1 " : "0 ") << tagB << std::endl;
 		}
 	}
 }
@@ -151,19 +190,19 @@ bool ContactListener::handleContact(char* tagA, char* tagB, b2Fixture* fixtureA,
 
 void ContactListener::handleCollision(Projectile* proj, Projectile* otherProj)
 {
-	proj->hit();
-	otherProj->hit();
+	proj->impact();
+	otherProj->impact();
 }
 
 void ContactListener::handleCollision(Projectile* proj, Shape* shape)
 {
-	proj->hit();
-	shape->hit(proj->getDamage());
+	proj->impact();
+	shape->takeDamage(proj->getDamage());
 }
 
 void ContactListener::handleCollision(Projectile* proj, Bounds* bounds)
 {
-	proj->hit();
+	proj->impact();
 }
 
 void ContactListener::handleCollision(Shape* shape, Shape* otherShape)

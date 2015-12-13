@@ -34,9 +34,9 @@ static bool isActive(Entity e){
 
 class GameWorld : protected b2World {
 public:
-	Shape * player();
-
 	GameWorld();
+
+	Shape * controlled();
 	bool hasControlled();
 
 	void addPlayer(float x, float y, bool control);
@@ -44,7 +44,7 @@ public:
 	void addProjectile(float x, float y, float vx, float vy);
 	void addSide(float x, float y, float nx, float ny, float size);
 	
-	void removePlayer();
+	void removePlayer(std::list<Shape>::iterator& p);
 	void removeEnemy(std::list<Shape>::iterator& e);
 	void removeProjectile(std::list<Projectile>::iterator& p);
 	void removeSide(std::list<Side>::iterator& s);
@@ -61,8 +61,8 @@ public:
 	void move(b2Vec2 direction);
 	void fire(b2Vec2 direction);
 
-	void controlNext();
-	void controlPrev();
+	void controlNextEnemy();
+	void controlPrevEnemy();
 
 	void SetDebugDraw(b2Draw* debugDraw);
 	void DrawDebugData();
@@ -72,13 +72,15 @@ public:
 
 	void update(int dt);
 private:
-	const b2Vec2 GRAVITY = b2Vec2(0, 0);
+	const b2Vec2 GRAVITY = b2Vec2(0, 0.1);
 	const int VELOCITY_ITERS = 6;
 	const int POSITION_ITERS = 2;
 
-	std::list<Shape> shapes_; //Put players in their own container?
+	std::list<Shape> players_;
+	std::list<Shape> shapes_;
 	std::list<Projectile> projectiles_;
 	std::list<Side> sides_;
+	std::list<Entity> addons_; // Addons for shapes (Store here?)
 
 	std::list<Shape>::iterator controlled_;
 	

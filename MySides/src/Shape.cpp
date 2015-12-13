@@ -13,14 +13,7 @@ Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body)
 	b2PolygonShape shap;
 	
 	//Was experimenting with poles and orientation, DON'T FORGET
-	b2Vec2 verts[3];
-	verts[0].Set(0, -2.f);
-	verts[1].Set(-.75f, 0);
-	verts[2].Set(.75f, 0);
-	
-	pole_ = verts[0];
-	
-	shap.Set(verts, 3);
+	setTriangleEqu(shap, 1.f);
 	
 	//shap.SetAsBox(radius, radius);
 
@@ -45,10 +38,50 @@ Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body)
 	maxRot_ = 0.0001f;
 
 	//
-	refireTime_ = 10;
+	refireTime_ = 100;
 	coolDown_ = 0;
 	maxHP_ = 4;
 	hp_ = maxHP_;
+	sides_ = 0;
+}
+
+//Sets shape to be an equilateral triangle with sides of 1*scale
+void Shape::setTriangleEqu(b2PolygonShape& s, float scale)
+{
+	b2Vec2 verts[3];
+	
+	verts[0].Set(0, -1.f);
+	verts[1].Set(-.5f, 0);
+	verts[2].Set(.5f, 0);
+
+	verts[0] *= scale;
+	verts[1] *= scale;
+	verts[2] *= scale;
+
+	pole_ = verts[0];
+
+	s.Set(verts, 3);
+}
+
+void Shape::setTriangleIso(b2PolygonShape& s, float scale)
+{
+	b2Vec2 verts[3];
+
+	verts[0].Set(0, -1.5f);
+	verts[1].Set(-.25f, 0);
+	verts[2].Set(.25f, 0);
+
+	verts[0] *= scale;
+	verts[1] *= scale;
+	verts[2] *= scale;
+
+	pole_ = verts[0];
+
+	s.Set(verts, 3);
+}
+
+void Shape::altSetTriangleEq(b2PolygonShape & s, float scale)
+{
 }
 
 void Shape::move(b2Vec2 direction)
@@ -97,35 +130,35 @@ void Shape::orient(b2Vec2 direction)
 
 void Shape::rotate(float amount)
 {	
-	//Make amount in range -1 <-> +1
-	if (abs(amount) > 1)
+//Make amount in range -1 <-> +1
+if (abs(amount) > 1)
+{
+	if (amount < 0)
 	{
-		if (amount < 0)
-		{
-			amount = -1;
-		}
-
-		else amount = 1;
+		amount = -1;
 	}
 
-	//Get the body's rotation
-	float rotation = body_->GetAngle();
+	else amount = 1;
+}
 
-	//Set desired rotation
-	float desiredRot = amount;
-	desiredRot *= maxRot_;
+//Get the body's rotation
+float rotation = body_->GetAngle();
 
-	//Get the difference in current and desired
-	float rotChange = desiredRot - rotation;
+//Set desired rotation
+float desiredRot = amount;
+desiredRot *= maxRot_;
 
-	//Apply appropriate impulse
-	float impulse = rotChange;
-	body_->ApplyTorque(DR * amount, true);
+//Get the difference in current and desired
+float rotChange = desiredRot - rotation;
 
-	//std::ostringstream vel;
-	//vel << body_->GetAngularVelocity();
-	//
-	//l.out(l.message, 'P', vel.str().c_str());
+//Apply appropriate impulse
+float impulse = rotChange;
+body_->ApplyTorque(DR * amount, true);
+
+//std::ostringstream vel;
+//vel << body_->GetAngularVelocity();
+//
+//l.out(l.message, 'P', vel.str().c_str());
 }
 
 void Shape::stopRotate()
@@ -133,9 +166,14 @@ void Shape::stopRotate()
 	body_->SetAngularVelocity(0);
 }
 
-void Shape::hit(int dmg)
+void Shape::takeDamage(int damage)
 {
-	hp_ -= dmg;
+	hp_ -= damage;
+}
+
+void Shape::collect(int value)
+{
+	sides_ += value;
 }
 
 b2Vec2 Shape::getFirePoint(float x, float y)
@@ -147,7 +185,7 @@ b2Vec2 Shape::getFirePoint(float x, float y)
 	d *= 1; //MAGIC NUMBER FIX SOON
 
 	coolDown_ = refireTime_;
-	
+
 	return p + d;
 }
 
@@ -170,12 +208,51 @@ void Shape::update(int milliseconds)
 			}
 		}
 
-		if (hp_ <= 0)
+		if (alive_)
 		{
-			alive_ = false;
-			active_ = false;
+			if (hp_ <= 0)
+			{
+				alive_ = false;
+				active_ = false;
+			}
 		}
 	}
+}
+
+//Only deals with the effects of this collision on this entity
+bool Shape::collide(Entity * other, bool & physicsCollision)
+{
+	bool handled = false;
+
+	if (Shape* shape = dynamic_cast<Shape*>(other))
+	{
+		handled = true;
+	}
+
+	else if (Projectile* proj = dynamic_cast<Projectile*>(other))
+	{
+		if (proj->getOwner() != this)
+		{
+			takeDamage(proj->getDamage());
+		}
+
+		else physicsCollision = false;
+
+		handled = true;
+	}
+
+	else if (Side* side = dynamic_cast<Side*>(other))
+	{
+		collect(side->getValue());
+		handled = true;
+	}
+
+	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
+	{
+		handled = true;
+	}
+
+	return handled;
 }
 
 //
@@ -183,3 +260,5 @@ void Shape::update(int milliseconds)
 //{
 //
 //}
+
+

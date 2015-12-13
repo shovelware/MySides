@@ -76,12 +76,12 @@ void GameWorld::addPlayer(float x, float y, bool control)
 {
 	//Emplace the shape into shape list 
 	//AND add body to world with function
-	shapes_.emplace_back(addDynamicBody(x, y), 4, .5f);
+	players_.emplace_back(addDynamicBody(x, y), 4, .5f);
 
 	if (control)
 	{
 		//Set our control to the one we just put in
-		controlled_ = --shapes_.end();
+		controlled_ = --players_.end();
 	}
 
 }
@@ -97,8 +97,9 @@ void GameWorld::addEnemy(float x, float y)
 //Adds a projectile to the world
 void GameWorld::addProjectile(float x, float y, float vx, float vy)
 {
-	//projectiles_.push_back(Projectile(addDynamicBody(x, y), b2Vec2(vx, vy)));
 	projectiles_.emplace_back(addBulletBody(x, y), b2Vec2(vx, vy));
+
+	
 
 }
 
@@ -106,6 +107,12 @@ void GameWorld::addProjectile(float x, float y, float vx, float vy)
 void GameWorld::addSide(float x, float y, float nx, float ny, float size)
 {
 	sides_.emplace_back(addDynamicBody(x, y), b2Vec2(nx, ny), size);
+}
+
+void GameWorld::removePlayer(std::list<Shape>::iterator& p)
+{
+	DestroyBody(p->getBody());
+	shapes_.erase(p++);
 }
 
 //Removes enemy from the world and increments iterator, for use within loops
@@ -122,6 +129,7 @@ void GameWorld::removeProjectile(std::list<Projectile>::iterator& p)
 	projectiles_.erase(p++);
 }
 
+//Removes side from the world and increments iterator, for use within loops
 void GameWorld::removeSide(std::list<Side>::iterator & s)
 {
 	DestroyBody(s->getBody());
@@ -146,6 +154,7 @@ void GameWorld::resizeBounds(float radius)
 	bounds_.resize(radius);
 }
 
+//Returns the length of one side of bounds
 float GameWorld::getBoundsSide()
 {
 	return bounds_.getSideLength();
@@ -153,7 +162,10 @@ float GameWorld::getBoundsSide()
 
 void GameWorld::move(b2Vec2 direction)
 {
-	controlled_->move(direction);
+	if (direction.x != 0 || direction.y != 0)
+	{
+		controlled_->move(direction);
+	}
 }
 
 void GameWorld::fire(b2Vec2 direction)
@@ -180,37 +192,39 @@ void GameWorld::fire(b2Vec2 direction)
 	}
 }
 
-//Moves controlled pointer to next shape in list, loops at end
-void GameWorld::controlNext()
+//Moves controlled pointer to next shape in list, loops at end NEEDS REWRITE
+void GameWorld::controlNextEnemy()
 {
-		//Move forward
-		controlled_++;
-
-		//If we've hit the end, loop around
-		if (controlled_ == shapes_.end())
-		{
-			controlled_ = shapes_.begin();
-		}
+		////Move forward
+		//controlled_++;
+		//
+		////If we've hit the end, loop around
+		//if (controlled_ == shapes_.end())
+		//{
+		//	controlled_ = shapes_.begin();
+		//}
 }
 
-//Moves controlled pointer to previous shape in list, loops at start
-void GameWorld::controlPrev()
+//Moves controlled pointer to previous shape in list, loops at start NEEDS REWRITE
+void GameWorld::controlPrevEnemy()
 {
-	//If we hit the end, loop around
-	if (controlled_ == shapes_.begin())
-	{
-		controlled_ = --shapes_.end();
-	}
-	
-	//Move backwards
-	else controlled_--;
+	////If we hit the end, loop around
+	//if (controlled_ == shapes_.begin())
+	//{
+	//	controlled_ = --shapes_.end();
+	//}
+	//
+	////Move backwards
+	//else controlled_--;
 }
 
+//Sets debugDraw of world to passed, inherited function
 void GameWorld::SetDebugDraw(b2Draw* debugDraw)
 {
 	b2World::SetDebugDraw(debugDraw);
 }
 
+//Draw's world's debug data, inherited function
 void GameWorld::DrawDebugData()
 {
 	b2World::DrawDebugData();
@@ -219,12 +233,76 @@ void GameWorld::DrawDebugData()
 //Update entity code and step the world
 void GameWorld::update(int dt)
 {
+	//Players update first
+	if (players_.empty() == false)
+	{
+		for (std::list<Shape>::iterator p = players_.begin();
+		p != players_.end(); /*Don't increment here*/)
+		{
+			p->setActive(true);
+			p->update(dt);
+
+			//If we're not active, increment by deleting
+			if (p->getActive() == false)
+			{
+				////Add a side
+				//static float side = 1.f;
+				//b2Vec2 pos = p->getPosition();
+				//addSide(pos.x, pos.y, 0, 0, side++);
+				//
+				p++;//removePlayer(p);
+			}
+
+			//Else just increment
+			else ++p;
+		}
+
+	}
+
+	////New Shape Update
+	//if (shapes_.empty() == false)
+	//{
+	//	for (std::list<Shape>::iterator s = shapes_.begin();
+	//	s != shapes_.end(); /*Don't increment here*/)
+	//	{
+	//		//Update the shape
+	//		s->update(dt);
+	//
+	//		//Spawn sides if we have any
+	//		if (s->hasSides())
+	//		{
+	//			addSides(s);
+	//		}
+	//		
+	//		//If we're alive
+	//		if (s->getAlive() == true)
+	//		{ 
+	//			Add any projectiles (Move alive check to shape?)
+	//			if (s->hasProjectiles())
+	//			{
+	//				addProjectiles(s);
+	//			}
+	//		}
+	//
+	//		//If we're not active, increment by deleting
+	//		if (s->getActive() == false)
+	//		{
+	//			//Add a side
+	//			static float side = 1.f;
+	//			b2Vec2 pos = s->getPosition();
+	//			addSide(pos.x, pos.y, 0, 0, side++);
+	//
+	//			removeEnemy(s);
+	//		}
+	//
+	//		//Else just increment
+	//		else ++s;
+	//	}
+	//}
+
 	//Update Shapes
 	if (shapes_.empty() == false)
 	{
-		//invincible controlled shape
-		controlled_->setActive(true);
-
 		for (std::list<Shape>::iterator s = shapes_.begin();
 		s != shapes_.end(); /*Don't increment here*/)
 		{
@@ -233,21 +311,17 @@ void GameWorld::update(int dt)
 			//If we're not active, increment by deleting
 			if (s->getActive() == false)
 			{
-				if (s != controlled_)
-				{
-					static float side = 1.f;
-					b2Vec2 pos = s->getPosition();
-					addSide(pos.x, pos.y, 0, 0, side++);
-					removeEnemy(s);
-				}
-
-				else ++s;
+				//Add a side
+				static float side = 1.f;
+				b2Vec2 pos = s->getPosition();
+				addSide(pos.x, pos.y, 0, 0, side++);
+				
+				removeEnemy(s);
 			}
 
 			//Else just increment
 			else ++s;
 		}
-		
 	}
 
 	//Firebullets
@@ -314,7 +388,7 @@ UpdateShape(Shape* s, int dt)
 */
 
 //Gets a pointer to the controlled shape
-Shape * GameWorld::player()
+Shape * GameWorld::controlled()
 {
 	//If we have a controlled character
 	if (controlled_._Ptr != nullptr)

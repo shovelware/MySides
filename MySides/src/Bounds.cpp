@@ -96,6 +96,11 @@ float Bounds::getSideLength()
 	return sqrt(rhs);
 }
 
+bool Bounds::collide(Entity * other, bool & physicsCollision)
+{
+	return true;
+}
+
 //Returns a point number index on a circle divided into maxpoints
 //Begins at far left and runs cw, how to get to top and CCW?
 b2Vec2 Bounds::getCirclePoint(int index, int maxpoints)
@@ -107,3 +112,4 @@ b2Vec2 Bounds::getCirclePoint(int index, int maxpoints)
 
 	return point;
 }
+

@@ -34,6 +34,8 @@ public:
 	void setActive(bool a);
 
 	virtual void kill();
+
+	virtual bool collide(Entity* other, bool& physicsCollision);
 	/*
 	virtual void draw(GameDrawer d) = 0;
 
@@ -46,5 +48,11 @@ protected:
 	bool active_;
 private:
 };
+
+//Entities know about children for collision handling
+#include "Bounds.hpp"
+#include "Shape.hpp"
+#include "Projectile.hpp"
+#include "Side.hpp"
 
 #endif
