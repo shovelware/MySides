@@ -78,10 +78,14 @@ void GameWorld::addPlayer(float x, float y, bool control)
 	//AND add body to world with function
 	players_.emplace_back(addDynamicBody(x, y), 4, .5f);
 
+	std::list<Shape>::iterator added = --players_.end();
+	added->setAI(false);
+	
 	if (control)
 	{
 		//Set our control to the one we just put in
-		controlled_ = --players_.end();
+		added->setControlled(true);
+		controlled_ = added;
 	}
 
 }
@@ -92,15 +96,18 @@ void GameWorld::addEnemy(float x, float y)
 	//Push the shape into the shape vector
 	//AND add body to world with function
 	shapes_.emplace_back(addDynamicBody(x, y), 4, .5f);
+	std::list<Shape>::iterator added = --shapes_.end();
+	added->setAI(true);
+	added->setControlled(false);
 }
 
 //Adds a projectile to the world
 void GameWorld::addProjectile(float x, float y, float vx, float vy)
 {
-	projectiles_.emplace_back(addBulletBody(x, y), b2Vec2(vx, vy));
-
-	
-
+	ProjectileDef p(addBulletBody(x, y));
+	p.heading = b2Vec2(vx, vy);
+	p.owner = &*controlled_;
+	projectiles_.emplace_back(p);
 }
 
 //Adds a side to the world
@@ -241,7 +248,7 @@ void GameWorld::update(int dt)
 		{
 			p->setActive(true);
 			p->update(dt);
-
+			
 			//If we're not active, increment by deleting
 			if (p->getActive() == false)
 			{
@@ -308,13 +315,42 @@ void GameWorld::update(int dt)
 		{
 			s->update(dt);
 
+			//Demo AI
+			if (s->getAI())
+			{
+				b2Vec2 playerPos = controlled_->getPosition();
+				b2Vec2 ePos = s->getPosition();
+				b2Vec2 between = playerPos - ePos;
+
+				if (between.Length() > 40)
+				{
+				}
+
+				else if (between.Length() < 25 && (s->getHP() == s->getMaxHP()))
+				{
+					s->move(between);
+
+					if (s->getArmed())
+					{
+						b2Vec2 fp = s->getFirePoint(between.x, between.y);
+
+						addProjectile(fp.x, fp.y, between.x, between.y);
+					}
+				}
+
+				else if (between.Length() < 10 * (s->getMaxHP() - s->getHP())) 
+				{
+					s->move(-between);
+				}
+			}
+
 			//If we're not active, increment by deleting
 			if (s->getActive() == false)
 			{
 				//Add a side
 				static float side = 1.f;
 				b2Vec2 pos = s->getPosition();
-				addSide(pos.x, pos.y, 0, 0, side++);
+				addSide(pos.x, pos.y, 0, 0, side);
 				
 				removeEnemy(s);
 			}

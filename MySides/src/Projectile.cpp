@@ -42,7 +42,7 @@ Projectile::Projectile(ProjectileDef def) :
 	Entity(def.body),
 	fired_(false), impacted_(false),
 	origin_(def.origin), heading_(def.heading),
-	maxHP_(def.maxHP), hp_(maxHP_),
+	maxHP_(def.maxHP), hp_(def.maxHP),
 	size_(def.size),
 	damage_(def.damage), 
 	lifeTime_(def.lifeTime),
@@ -57,7 +57,7 @@ void Projectile::setAsBullet(float size)
 {
 	//Shape data
 	b2CircleShape bullet;
-	bullet.m_radius = (0.05f * size);
+	bullet.m_radius = (0.1f * size);
 
 	//Fixture
 	b2FixtureDef fixtureDef;
@@ -70,7 +70,7 @@ void Projectile::setAsBullet(float size)
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&fixtureDef);
 
-	speed_ = 0.00025f;
+	speed_ = 0.000025f;
 }
 
 void Projectile::addMaterial(b2FixtureDef & def)
@@ -141,21 +141,25 @@ void Projectile::update(int milliseconds)
 {
 	lifeTime_ -= milliseconds;
 
-	if (lifeTime_ <= 0 || (impacted_ && hp_ == 0))
+	if ((impacted_ && hp_ <= 0) || lifeTime_ <= 0 )
 	{
 		alive_ = false;
 		active_ = false;		
 	}
 }
 
-bool Projectile::collide(Entity * other, bool & physicsCollision)
+bool Projectile::collide(Entity * other, b2Contact& contact)
 {
 	bool handled = false;
 
 	if (Shape* shape = dynamic_cast<Shape*>(other))////
 	{
-		impact();
-		takeDamage(1);
+		if (owner_ != shape)
+		{
+			impact();
+			takeDamage(1);
+		}
+
 		handled = true;
 	}
 
@@ -175,7 +179,7 @@ bool Projectile::collide(Entity * other, bool & physicsCollision)
 	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
 	{
 		impact();
-		takeDamage(1);
+		takeDamage(4);
 		handled = true;
 	}
 

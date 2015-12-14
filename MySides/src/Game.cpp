@@ -243,9 +243,11 @@ void Game::update(sf::Time dt)
 			for (spawn; spawn > 0; --spawn)
 			{
 				float x, y, rad = world_->getBoundsRadius() * 0.7f;
+				y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
+				x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
 
-				x = randFloat(-rad, rad);
-				y = randFloat(-rad, rad);
+				x *= rad;
+				y *= rad;
 
 				world_->addEnemy(x, y);
 			}
@@ -309,7 +311,7 @@ void Game::update(sf::Time dt)
 		//Quit button
 		if (con_.checkDown(XINPUT_GAMEPAD_START) && con_.checkDown(XINPUT_GAMEPAD_BACK))
 		{
-			if (con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 2000U && con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 2000U)
+			if (con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 750U && con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 750U)
 			{
 				quit_ = true;
 			}

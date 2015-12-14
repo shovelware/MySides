@@ -12,7 +12,7 @@ public:
 	float getValue();
 
 	//Do we need an update function?
-	bool collide(Entity* other, bool& physicsCollision);
+	bool collide(Entity* other, b2Contact& contact);
 
 private:
 	float size_;

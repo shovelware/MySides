@@ -96,7 +96,7 @@ float Bounds::getSideLength()
 	return sqrt(rhs);
 }
 
-bool Bounds::collide(Entity * other, bool & physicsCollision)
+bool Bounds::collide(Entity * other, b2Contact& contact)
 {
 	return true;
 }

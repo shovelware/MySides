@@ -14,7 +14,7 @@ public:
 	float getRadius();
 	float getSideLength();
 
-	bool collide(Entity* other, bool& physicsCollision); //Override
+	bool collide(Entity* other, b2Contact& contact); //Override
 private:
 	float radius_;
 

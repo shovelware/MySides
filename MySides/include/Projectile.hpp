@@ -55,7 +55,7 @@ public:
 	void setTarget(Entity* s);
 
 	void update(int milliseconds);
-	bool collide(Entity* other, bool& physicsCollision);
+	bool collide(Entity* other, b2Contact& contact);
 
 private:
 	void setAsBullet(float size);

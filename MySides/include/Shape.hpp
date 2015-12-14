@@ -51,6 +51,15 @@ public:
 	void takeDamage(int damage);
 	void collect(int value);
 
+	bool getControlled() const;
+	bool getAI() const;
+
+	void setControlled(bool con);
+	void setAI(bool ai);
+
+	int getHP() const;
+	unsigned int getMaxHP() const;
+
 	////Temp for weapon refire
 	b2Vec2 getFirePoint(float x, float y);
 	bool getArmed(); 
@@ -59,7 +68,7 @@ public:
 
 //	void draw(GameDrawer d); // override
 
-	bool collide(Entity* other, bool& physicsCollision); //override
+	bool collide(Entity* other, b2Contact& contact); //override
 
 private:
 	/*const*/ float maxVel_;//maximum velocity
@@ -77,6 +86,10 @@ private:
 	b2Vec2 pole_;//Orientation pole
 	int hp_;
 	unsigned int maxHP_;
+
+	//controlled and ai bools
+	bool controlled_;
+	bool ai_;
 
 	////Temp for weapon refire
 	unsigned int refireTime_;

@@ -35,11 +35,11 @@ public:
 
 	virtual void kill();
 
-	virtual bool collide(Entity* other, bool& physicsCollision);
+	virtual bool collide(Entity* other, b2Contact& contact);
 	/*
 	virtual void draw(GameDrawer d) = 0;
 
-	b2Shape* getVertices();*/
+	b2Shape& getVertices();*/
 
 protected:
 	b2Body * body_;

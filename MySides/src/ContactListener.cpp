@@ -53,17 +53,12 @@ void ContactListener::BeginContact(b2Contact * contact)
 		Entity* entA = static_cast<Entity*>(contact->GetFixtureA()->GetBody()->GetUserData());
 		Entity* entB = static_cast<Entity*>(contact->GetFixtureB()->GetBody()->GetUserData());
 
-		//Contact enable bools
-		bool collA = true, collB = true;
 		//Return values
 		bool handledA = false, handledB = false;
 
 		//Each entity handles it's own collision
-		handledA = entA->collide(entB, collA);
-		handledB = entB->collide(entA, collB);
-
-		//Entities must agree to collide physically
-		contact->SetEnabled(collA && collB);
+		handledA = entA->collide(entB, *contact);
+		handledB = entB->collide(entA, *contact);
 
 		if (!(handledA && handledB))
 		{

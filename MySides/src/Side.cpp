@@ -47,7 +47,7 @@ float Side::getValue()
 	return size_;
 }
 
-bool Side::collide(Entity* other, bool& physicsCollision)
+bool Side::collide(Entity* other, b2Contact& contact)
 {
 	bool handled = false;
 
@@ -55,7 +55,14 @@ bool Side::collide(Entity* other, bool& physicsCollision)
 	{
 		//If we're a player
 		//Or maybe other things can collect stuff?
-		collect();
+
+		char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
+		char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
+
+		if (tagA == "side" || tagB == "side")
+		{
+			collect();
+		}
 		handled = true;
 	}
 

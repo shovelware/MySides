@@ -38,11 +38,13 @@ Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body)
 	maxRot_ = 0.0001f;
 
 	//
-	refireTime_ = 100;
+	refireTime_ = 300;
 	coolDown_ = 0;
 	maxHP_ = 4;
 	hp_ = maxHP_;
 	sides_ = 0;
+	controlled_ = false;
+	ai_ = false;
 }
 
 //Sets shape to be an equilateral triangle with sides of 1*scale
@@ -176,6 +178,43 @@ void Shape::collect(int value)
 	sides_ += value;
 }
 
+bool Shape::getControlled() const
+{
+	return controlled_;
+}
+
+bool Shape::getAI() const
+{
+	return ai_;
+}
+
+void Shape::setControlled(bool con)
+{
+	controlled_ = con;
+}
+
+void Shape::setAI(bool ai)
+{
+	ai_ = ai;
+
+	//If we're an ai, dumb us down a bit //REMOVE
+	if (ai)
+	{
+		maxVel_ /= 2;
+		refireTime_ = 1000U;
+	}
+}
+
+int Shape::getHP() const
+{
+	return hp_;
+}
+
+unsigned int Shape::getMaxHP() const
+{
+	return maxHP_;
+}
+
 b2Vec2 Shape::getFirePoint(float x, float y)
 {
 	b2Vec2 p = body_->GetPosition();
@@ -198,6 +237,7 @@ void Shape::update(int milliseconds)
 {
 	if (active_)
 	{
+		//Weapon cooldown
 		if (coolDown_ > 0)
 		{
 			coolDown_ -= milliseconds;
@@ -208,6 +248,7 @@ void Shape::update(int milliseconds)
 			}
 		}
 
+		//Death check
 		if (alive_)
 		{
 			if (hp_ <= 0)
@@ -220,7 +261,7 @@ void Shape::update(int milliseconds)
 }
 
 //Only deals with the effects of this collision on this entity
-bool Shape::collide(Entity * other, bool & physicsCollision)
+bool Shape::collide(Entity * other, b2Contact& contact)
 {
 	bool handled = false;
 
@@ -236,14 +277,21 @@ bool Shape::collide(Entity * other, bool & physicsCollision)
 			takeDamage(proj->getDamage());
 		}
 
-		else physicsCollision = false;
+		else contact.SetEnabled(false);
 
 		handled = true;
 	}
 
 	else if (Side* side = dynamic_cast<Side*>(other))
 	{
-		collect(side->getValue());
+		char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
+		char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
+
+		if (tagA == "side" || tagB == "side")
+		{
+			collect(side->getValue());
+		}
+
 		handled = true;
 	}
 
