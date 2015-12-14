@@ -1,7 +1,7 @@
 #include "GameWorld.hpp"
 
 //Constructor initialises Box2D World and boudaries
-GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 64), contactListener_(ContactListener())
+GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 32), contactListener_(ContactListener())
 {
 	SetContactListener(&contactListener_);
 }
@@ -322,11 +322,12 @@ void GameWorld::update(int dt)
 				b2Vec2 ePos = s->getPosition();
 				b2Vec2 between = playerPos - ePos;
 
-				if (between.Length() > 40)
+				if (between.Length() > 40 )
 				{
+
 				}
 
-				else if (between.Length() < 25 && (s->getHP() == s->getMaxHP()))
+				else if (between.Length() < 25 && (s->getHP() >= s->getMaxHP() / 2))
 				{
 					s->move(between);
 
