@@ -17,6 +17,12 @@ private:
 	sf::Color B2toSF(const b2Color& col) const;
 
 	GameWorld* world_;
+
+	void drawPlayer(Shape& p);
+	void drawShape(Shape& s);
+	void drawBounds(Bounds& b);
+	void drawProjectile(Projectile& p);
+	void drawSide(Side& s);
 };
 
 #endif

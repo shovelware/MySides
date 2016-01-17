@@ -5,10 +5,11 @@
 
 struct ProjectileDef {
 public:
-	ProjectileDef(b2Body * b) :
-		body(b),
-		origin(b->GetPosition()),
+	ProjectileDef() :
+		body(nullptr),
+		origin(b2Vec2_zero),
 		heading(b2Vec2_zero),
+		inVelocity(b2Vec2_zero),
 		velScale(1),
 		maxHP(1),
 		size(1),
@@ -19,11 +20,48 @@ public:
 		target(nullptr)
 	{}
 
-	b2Body* body; //Contains position
+	ProjectileDef(b2Vec2 origin, b2Vec2 heading, b2Vec2 inVelocity = b2Vec2_zero) :
+		body(nullptr),
+		origin(origin),
+		heading(heading),
+		inVelocity(inVelocity),
+		velScale(1),
+		maxHP(1),
+		size(1),
+		damage(1),
+		damageScale(1),
+		lifeTime(1000),
+		owner(nullptr),
+		target(nullptr)
+	{}
+
+	ProjectileDef(const ProjectileDef& pd) :
+		body(nullptr),
+		origin(b2Vec2_zero),
+		heading(b2Vec2_zero),
+		inVelocity(pd.inVelocity),
+		velScale(pd.velScale),
+		maxHP(pd.maxHP),
+		size(pd.size),
+		damage(pd.damage),
+		damageScale(pd.damageScale),
+		lifeTime(pd.lifeTime),
+		owner(nullptr),
+		target(nullptr)
+	{}
+
+	//Some projDef fields should be manually set every time, 
+	//to avoid confusion while copying
+
+	//Not copied
+	b2Body* body;
 	
+	//Not copied
 	b2Vec2 origin;
 	b2Vec2 heading;
+	b2Vec2 inVelocity;
 
+	//Velocity handled by projectile
 	float velScale;
 
 	unsigned int maxHP;
@@ -34,14 +72,17 @@ public:
 
 	int lifeTime;
 
+	//Not copied
 	Entity* owner;
 	Entity* target;
+
+	bool isValid() { return body != nullptr; }
 };
 
 class Projectile : public Entity{
 public:
 	Projectile(b2Body* body, b2Vec2 heading);
-	Projectile(ProjectileDef def);
+	Projectile(ProjectileDef& def);
 
 	void fire(float mult);
 	void impact();

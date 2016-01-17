@@ -36,10 +36,10 @@ public:
 	virtual void kill();
 
 	virtual bool collide(Entity* other, b2Contact& contact);
-	/*
-	virtual void draw(GameDrawer d) = 0;
+	
+	//virtual void draw(GameDrawer d) = 0;
 
-	b2Shape& getVertices();*/
+	/*b2Shape& getVertices();*/
 
 protected:
 	b2Body * body_;
@@ -50,6 +50,7 @@ private:
 };
 
 //Entities know about children for collision handling
+//Ask Alex how to do this better
 #include "Bounds.hpp"
 #include "Shape.hpp"
 #include "Projectile.hpp"

@@ -5,6 +5,7 @@
 #define MS_SHAPE_HPP
 
 #include "Entity.hpp"
+//#include "Weapon.hpp"
 
 namespace traits{
 	namespace speed 
@@ -26,12 +27,12 @@ namespace traits{
 		TRI_ISO,
 		TRI_EQU,
 
-		SQU_,
-		SQU_RHOMBUS,
-		SQU_RECT,
-		SQU_TRAP,
+		SQU_EQU,
+		SQU_RHO,
+		SQU_REC,
+		SQU_TRA,
 
-		PEN_
+		PEN_EQU
 	};
 }
 
@@ -66,7 +67,7 @@ public:
 	
 	void update(int milliseconds);
 
-//	void draw(GameDrawer d); // override
+	//void draw(GameDrawer d); // override
 
 	bool collide(Entity* other, b2Contact& contact); //override
 
@@ -78,10 +79,7 @@ private:
 	//Set: sides = 1 * scale
 	void setTriangleEqu(b2PolygonShape& s, float scale);
 	void setTriangleIso(b2PolygonShape& s, float scale);
-
-	//Altset: Area = 1 * scale ^2
-	void altSetTriangleEq(b2PolygonShape& s, float scale);
-	void altSetTriangleIs(b2PolygonShape& s, float scale);
+	void setSquare(b2PolygonShape& s, float scale);
 
 	b2Vec2 pole_;//Orientation pole
 	int hp_;
@@ -96,6 +94,7 @@ private:
 	int coolDown_;
 
 	int sides_;
+	int type_;
 };
 
 #endif

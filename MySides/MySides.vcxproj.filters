@@ -84,6 +84,9 @@
     <ClCompile Include="src\Side.cpp">
       <Filter>Source Files\Game\Entity</Filter>
     </ClCompile>
+    <ClCompile Include="src\Weapon.cpp">
+      <Filter>Header Files\Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="include\Side.hpp">
       <Filter>Header Files\Game\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Weapon.hpp">
+      <Filter>Source Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

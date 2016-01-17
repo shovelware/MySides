@@ -104,10 +104,17 @@ void GameWorld::addEnemy(float x, float y)
 //Adds a projectile to the world
 void GameWorld::addProjectile(float x, float y, float vx, float vy)
 {
-	ProjectileDef p(addBulletBody(x, y));
-	p.heading = b2Vec2(vx, vy);
+	ProjectileDef p = ProjectileDef(b2Vec2(x, y), b2Vec2 (vx, vy));
+	p.body = addBulletBody(x, y);
 	p.owner = &*controlled_;
-	projectiles_.emplace_back(p);
+
+	////
+	p.inVelocity = controlled_->getBody()->GetLinearVelocity();
+
+	if (p.isValid())
+	{
+		projectiles_.emplace_back(p);
+	}
 }
 
 //Adds a side to the world
@@ -237,6 +244,31 @@ void GameWorld::DrawDebugData()
 	b2World::DrawDebugData();
 }
 
+std::list<Shape>& GameWorld::getShapes()
+{
+	return shapes_;
+}
+
+Bounds & GameWorld::getBounds()
+{
+	return bounds_;
+}
+
+std::list<Shape>& GameWorld::getPlayers()
+{
+	return players_;
+}
+
+std::list<Projectile>& GameWorld::getProjectiles()
+{
+	return projectiles_;
+}
+
+std::list<Side>& GameWorld::getSides()
+{
+	return sides_;
+}
+
 //Update entity code and step the world
 void GameWorld::update(int dt)
 {
@@ -322,7 +354,7 @@ void GameWorld::update(int dt)
 				b2Vec2 ePos = s->getPosition();
 				b2Vec2 between = playerPos - ePos;
 
-				if (between.Length() > 40 )
+				if (between.Length() > 40  || between.Length() < 5)
 				{
 
 				}
@@ -335,7 +367,7 @@ void GameWorld::update(int dt)
 					{
 						b2Vec2 fp = s->getFirePoint(between.x, between.y);
 
-						addProjectile(fp.x, fp.y, between.x, between.y);
+						//addProjectile(fp.x, fp.y, between.x, between.y);
 					}
 				}
 
@@ -434,3 +466,6 @@ Shape * GameWorld::controlled()
 	//Otherwise
 	else return nullptr;
 }
+
+//Handlers for game intent: Move, Fire, Select, Triggers
+

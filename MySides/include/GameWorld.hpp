@@ -18,7 +18,8 @@
 #include "Entity.hpp"
 #include "Bounds.hpp"
 #include "Shape.hpp"
-#include "Projectile.hpp"
+#include "Weapon.hpp"
+//#include "Projectile.hpp"
 #include "Side.hpp"
 
 //Checks if entity is alive, predicate for remove_if
@@ -69,6 +70,11 @@ public:
 
 	//Return a reference to
 	//shapes, bounds, projectiles for drawing
+	Bounds& getBounds();
+	std::list<Shape>& getPlayers();
+	std::list<Shape>& getShapes();
+	std::list<Projectile>& getProjectiles();
+	std::list<Side>& getSides();
 
 	void update(int dt);
 private:

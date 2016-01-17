@@ -32,13 +32,13 @@ Projectile::Projectile(b2Body* body, b2Vec2 heading) :
 
 	fire(1);
 
-	lifeTime_ = 1000;
+	lifeTime_ = 250;
 	damage_ = 1;
 	maxHP_ = 1;
 	hp_ = maxHP_;
 }
 
-Projectile::Projectile(ProjectileDef def) :
+Projectile::Projectile(ProjectileDef& def) :
 	Entity(def.body),
 	fired_(false), impacted_(false),
 	origin_(def.origin), heading_(def.heading),

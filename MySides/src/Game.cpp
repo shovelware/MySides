@@ -304,7 +304,7 @@ void Game::update(sf::Time dt)
 
 			else
 			{
-				camera_->zoom(2);
+				camera_->zoom(.5f);
 			}
 		}
 
@@ -339,14 +339,11 @@ void Game::render()
 	window_.setView(*(camera_->getView()));
 
 	//Render stuff
-	world_->DrawDebugData();
 
 	//b2Shape* x = world_->controlled()->getVertices();
 	//b2Shape::Type y = x->GetType();
-
-	drawer_->drawPoint(sf::Vector2f(10, 15));
-	drawer_->drawLine(sf::Vector2f(11, 16), sf::Vector2f(24, 28));
-	drawer_->drawCircle(sf::Vector2f(40, 40), 8);
+	drawer_->draw();
+	//world_->DrawDebugData();
 
 	window_.display();
 }

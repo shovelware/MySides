@@ -50,6 +50,8 @@ Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body)
 //Sets shape to be an equilateral triangle with sides of 1*scale
 void Shape::setTriangleEqu(b2PolygonShape& s, float scale)
 {
+
+	//Magic number:  0.577351f
 	b2Vec2 verts[3];
 	
 	verts[0].Set(0, -1.f);
@@ -63,8 +65,47 @@ void Shape::setTriangleEqu(b2PolygonShape& s, float scale)
 	pole_ = verts[0];
 
 	s.Set(verts, 3);
+
+	type_ = traits::type::TRI_EQU;
+
+
+	std::ostringstream o;
+	
+	b2Vec2 side = verts[2] - verts[0];
+	o << side.Length() << endl;
+	l.out(l.message, 'P', o.str().c_str());
 }
 
+//Sets shape to a regular tetrahedron with side length 1 * scale
+void Shape::setSquare(b2PolygonShape& s, float scale)
+{
+	b2Vec2 verts[4];
+
+	//This is the distance from the centre of the square
+	//To each point that results in side length 1
+	//Simple pythagoras trig math
+	float dist = sqrt(2) / 2;
+
+	verts[0] = b2Vec2(0 * scale, -dist * scale);
+	verts[1] = b2Vec2(-dist * scale, 0 * scale);
+	verts[2] = b2Vec2(0 * scale, dist * scale);
+	verts[3] = b2Vec2(dist * scale, 0 * scale);
+
+	s.Set(verts, 4);
+
+
+	type_ = traits::type::SQU_EQU;
+
+	//std::ostringstream o;
+	////o << orientation.x << ", " << orientation.y;
+	//
+	//b2Vec2 side = verts[3] - verts[2];
+	//o << side.Length() << endl;
+	//l.out(l.message, 'P', o.str().c_str());
+
+}
+
+//Need to implement
 void Shape::setTriangleIso(b2PolygonShape& s, float scale)
 {
 	b2Vec2 verts[3];
@@ -80,10 +121,8 @@ void Shape::setTriangleIso(b2PolygonShape& s, float scale)
 	pole_ = verts[0];
 
 	s.Set(verts, 3);
-}
 
-void Shape::altSetTriangleEq(b2PolygonShape & s, float scale)
-{
+	type_ = traits::type::TRI_ISO;
 }
 
 void Shape::move(b2Vec2 direction)
@@ -126,7 +165,8 @@ void Shape::orient(b2Vec2 direction)
 	orientation.Normalize();
 
 	std::ostringstream o;
-	o << orientation.x << ", " << orientation.y;
+	//o << orientation.x << ", " << orientation.y;
+	o << fmod(body_->GetAngle() * RD, 180);
 	l.out(l.message, 'P', o.str().c_str());
 }
 
@@ -253,6 +293,8 @@ void Shape::update(int milliseconds)
 		{
 			if (hp_ <= 0)
 			{
+				if (type_ == traits::type::SQU_EQU);//If we're a square drop a side and change to tri
+
 				alive_ = false;
 				active_ = false;
 			}
