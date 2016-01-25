@@ -3,10 +3,23 @@
 
 #include "Entity.hpp"
 
+struct SideDef {
+	SideDef(b2Vec2 position, b2Vec2 direction, float size) :
+		position(position),
+		direction(direction),
+		size(size)
+	{}
+
+	b2Vec2 position;
+	b2Vec2 direction;
+	float size;
+};
+
 class Side : public Entity
 {
 public:
 	Side(b2Body* body, b2Vec2 normal, float size);
+	//Side(b2Body* body, SideDef def);
 
 	void collect();
 	float getValue();
@@ -15,6 +28,8 @@ public:
 	bool collide(Entity* other, b2Contact& contact);
 
 private:
+
+	void setShape(float size);
 	float size_;
 };
 

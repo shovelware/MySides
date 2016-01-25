@@ -87,6 +87,9 @@
     <ClCompile Include="src\Weapon.cpp">
       <Filter>Header Files\Game</Filter>
     </ClCompile>
+    <ClCompile Include="src\KeyInput.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">
@@ -142,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="include\Weapon.hpp">
       <Filter>Source Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="include\KeyInput.hpp">
+      <Filter>Header Files\System</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

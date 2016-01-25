@@ -51,13 +51,14 @@ int Game::run()
 
 	//Testing
 
-	//Bodies
-	world_->addPlayer(0, 0, true);
 
 	//Display a blank window before we start our game loop
 	//Avoids nasty white windows
 	window_.clear(sf::Color::Black);
 	window_.display();
+
+	//Begin game
+	world_->resetLevel();
 #pragma endregion
 
 #pragma region Game Loop
@@ -92,8 +93,14 @@ int Game::run()
 			{
 				//Update with this tick
 				checkController(tickTime); //XOR with if above
+
+				key_.update();
+				handleInput(tickTime);
+
 				if (!pause_)
-				update(tickTime);
+				{
+					update(tickTime);
+				}
 
 				//Take this tick out of the accumulator
 				accumulator -= tickTime;
@@ -184,29 +191,34 @@ void Game::processEvents()
 	}
 }
 
-bool Game::checkController(sf::Time dt)
-{
-	bool connected = false;
-
-	//If we're paused, don't update the controller's button holds
-	if (pause_)
-	{
-		connected = con_.update(-1);
-	}
-
-	//Normal update
-	else connected = con_.update(dt.asMilliseconds());
-	
-	return connected;
-}
-
-void Game::update(sf::Time dt)
+void Game::handleInput(sf::Time dt)
 {
 	//If the world has a controlled body
 	if (world_->hasControlled())
 	{
 		world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
 		world_->fire(b2Vec2(con_.checkRightX(), con_.checkRightY()));
+
+		//Keyboard backup controls
+		b2Vec2 mv(0, 0);
+
+		if (key_.isKeyDown(Key::W)) { mv.y += -1; }
+		if (key_.isKeyDown(Key::S)) { mv.y += 1; }
+		if (key_.isKeyDown(Key::A)) { mv.x += -1; }
+		if (key_.isKeyDown(Key::D)) { mv.x += 1; }
+
+		if (key_.isKeyDown(Key::LAlt)) { mv *= 0.75f; }
+
+		world_->move(mv);
+
+		b2Vec2 fr(0, 0);
+
+		if (key_.isKeyDown(Key::Up)) { fr.y += -1; }
+		if (key_.isKeyDown(Key::Down)) { fr.y += 1; }
+		if (key_.isKeyDown(Key::Left)) { fr.x += -1; }
+		if (key_.isKeyDown(Key::Right)) { fr.x += 1; }
+
+		world_->fire(fr);
 
 		//world_->controlled()->rotate(con_.checkRightX() / 10);
 
@@ -217,10 +229,10 @@ void Game::update(sf::Time dt)
 			float lt = con_.checkLeftTrigger() * 96;
 
 			world_->resizeBounds(base + lt);
-			
+
 			std::cout << base + lt << "  " << world_->getBoundsSide() << std::endl;
 
-			
+
 		}
 
 		if (con_.checkDown(XINPUT_GAMEPAD_B))
@@ -255,7 +267,7 @@ void Game::update(sf::Time dt)
 
 		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_SHOULDER))
 		{
-			
+
 		}
 
 		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER))
@@ -308,6 +320,12 @@ void Game::update(sf::Time dt)
 			}
 		}
 
+		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_SHOULDER) && con_.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER) || 
+			con_.checkDown(XINPUT_GAMEPAD_LEFT_SHOULDER) && con_.checkPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+		{
+			world_->resetLevel();
+		}
+
 		//Quit button
 		if (con_.checkDown(XINPUT_GAMEPAD_START) && con_.checkDown(XINPUT_GAMEPAD_BACK))
 		{
@@ -317,7 +335,26 @@ void Game::update(sf::Time dt)
 			}
 		}
 	}
+}
 
+bool Game::checkController(sf::Time dt)
+{
+	bool connected = false;
+
+	//If we're paused, don't update the controller's button holds
+	if (pause_)
+	{
+		connected = con_.update(-1);
+	}
+
+	//Normal update
+	else connected = con_.update(dt.asMilliseconds());
+	
+	return connected;
+}
+
+void Game::update(sf::Time dt)
+{
 	camera_->setTarget(world_->controlled());
 
 	camera_->update(dt.asMilliseconds());
@@ -342,8 +379,8 @@ void Game::render()
 
 	//b2Shape* x = world_->controlled()->getVertices();
 	//b2Shape::Type y = x->GetType();
-	drawer_->draw();
-	//world_->DrawDebugData();
+	//drawer_->draw();
+	world_->DrawDebugData();
 
 	window_.display();
 }

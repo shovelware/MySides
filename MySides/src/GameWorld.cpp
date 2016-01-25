@@ -4,6 +4,27 @@
 GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 32), contactListener_(ContactListener())
 {
 	SetContactListener(&contactListener_);
+
+	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
+
+	bgm_.openFromFile("../assets/spriterip.ogg");
+	bgm_.setLoop(true);
+	bgm_.setVolume(50.f);
+
+	fireBuffer.loadFromFile("../assets/fire.wav");
+	fireSound.setBuffer(fireBuffer);
+
+	spawnBuffer.loadFromFile("../assets/spawn.wav");
+	spawnSound.setBuffer(spawnBuffer);
+
+	dieBuffer.loadFromFile("../assets/die.wav");
+	dieSound.setBuffer(dieBuffer);
+
+	lossBuffer.loadFromFile("../assets/loss.wav");
+	lossSound.setBuffer(lossBuffer);
+
+	collectBuffer.loadFromFile("../assets/collect.wav");
+	collectSound.setBuffer(collectBuffer);
 }
 
 //Returns true if the gameworld has a controlled entity !!!FIX
@@ -71,7 +92,7 @@ b2Body * GameWorld::addBulletBody(float x, float y)
 	return body;
 }
 
-//Adds a player to the world
+//Adds a player to the world 
 void GameWorld::addPlayer(float x, float y, bool control)
 {
 	//Emplace the shape into shape list 
@@ -104,23 +125,29 @@ void GameWorld::addEnemy(float x, float y)
 //Adds a projectile to the world
 void GameWorld::addProjectile(float x, float y, float vx, float vy)
 {
-	ProjectileDef p = ProjectileDef(b2Vec2(x, y), b2Vec2 (vx, vy));
-	p.body = addBulletBody(x, y);
+	ProjectileDef p(b2Vec2(x, y), b2Vec2 (vx, vy));
 	p.owner = &*controlled_;
 
 	////
-	p.inVelocity = controlled_->getBody()->GetLinearVelocity();
+	//p.inVelocity = controlled_->getBody()->GetLinearVelocity();
+	projectiles_.emplace_back(addBulletBody(x, y), p);
+}
 
-	if (p.isValid())
-	{
-		projectiles_.emplace_back(p);
-	}
+//Adds a projectile to the world via definition
+void GameWorld::addProjectile(ProjectileDef &def)
+{
+	projectiles_.emplace_back(addBulletBody(def.origin.x, def.origin.y), def);
+	fireSound.play();
 }
 
 //Adds a side to the world
 void GameWorld::addSide(float x, float y, float nx, float ny, float size)
 {
+	int foo;
+	
 	sides_.emplace_back(addDynamicBody(x, y), b2Vec2(nx, ny), size);
+	
+	int bar = 101293;
 }
 
 void GameWorld::removePlayer(std::list<Shape>::iterator& p)
@@ -134,6 +161,7 @@ void GameWorld::removeEnemy(std::list<Shape>::iterator& e)
 {
 	DestroyBody(e->getBody());
 	shapes_.erase(e++);
+	dieSound.play();
 }
 
 //Removes projectile from the world and increments iterator, for use within loops
@@ -148,6 +176,65 @@ void GameWorld::removeSide(std::list<Side>::iterator & s)
 {
 	DestroyBody(s->getBody());
 	sides_.erase(s++);
+	collectSound.play();
+}
+
+void GameWorld::resetLevel()
+{
+	//Clear world
+	clearWorld();
+
+	//Add a new player
+	addPlayer(0, 0, true);
+	spawnSound.play();
+
+	//Restart bgm
+	bgm_.play();
+
+	//Regenerate level somehow
+}
+
+void GameWorld::clearWorld()
+{
+	if (players_.empty() == false)
+	{
+		for (std::list<Shape>::iterator p = players_.begin();
+		p != players_.end(); /*Don't increment here*/)
+		{
+			removePlayer(p);
+		}
+	}
+	players_.clear();
+
+	if (shapes_.empty() == false)
+	{
+		for (std::list<Shape>::iterator s = shapes_.begin();
+		s != shapes_.end(); /*Don't increment here*/)
+		{
+			removeEnemy(s);
+		}
+	}
+	shapes_.clear();
+
+	if (projectiles_.empty() == false)
+	{
+		for (std::list<Projectile>::iterator p = projectiles_.begin();
+		p != projectiles_.end(); /*Don't increment here*/)
+		{
+			removeProjectile(p);
+		}
+	}
+	projectiles_.clear();
+
+	if (sides_.empty() == false)
+	{
+		for (std::list<Side>::iterator s = sides_.begin();
+		s != sides_.end(); /*Don't increment here*/)
+		{
+			removeSide(s);
+		}
+	}
+	sides_.clear();
 }
 
 //Returns the radius of the level bounds
@@ -200,7 +287,10 @@ void GameWorld::fire(b2Vec2 direction)
 
 			if (projIn == shapeIn)
 			{
-				addProjectile(fp.x, fp.y, direction.x, direction.y);
+				ProjectileDef p(b2Vec2(fp.x, fp.y), direction);
+				p.owner = &*controlled_;
+				addProjectile(p);
+				//addProjectile(fp.x, fp.y, direction.x, direction.y);
 			}
 		}
 	}
@@ -295,7 +385,6 @@ void GameWorld::update(int dt)
 			//Else just increment
 			else ++p;
 		}
-
 	}
 
 	////New Shape Update
@@ -384,7 +473,6 @@ void GameWorld::update(int dt)
 				static float side = 1.f;
 				b2Vec2 pos = s->getPosition();
 				addSide(pos.x, pos.y, 0, 0, side);
-				
 				removeEnemy(s);
 			}
 

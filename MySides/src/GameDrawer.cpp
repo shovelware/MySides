@@ -10,7 +10,6 @@ sf::Color GameDrawer::B2toSF(const b2Color& col) const
 	return sf::Color(col.r, col.g, col.b, col.a);
 }
 
-
 GameDrawer::GameDrawer(sf::RenderWindow& win, GameWorld* world) : Drawer(win), world_(world) 
 {
 }
@@ -20,28 +19,27 @@ void GameDrawer::draw()
 	drawBounds(world_->getBounds());
 
 	std::list<Shape>& players = world_->getPlayers();
-	for (Shape p : players)
+	for (Shape plyr : players)
 	{
-		drawPlayer(p);
+		drawPlayer(plyr);
 	}
 
-
 	std::list<Shape>& shapes = world_->getShapes();
-	for (Shape s : shapes)
+	for (Shape shp : shapes)
 	{
-		drawShape(s);
+		drawShape(shp);
 	}
 
 	std::list<Projectile>& projs = world_->getProjectiles();
-	for (Projectile p : projs)
+	for (Projectile prj : projs)
 	{
-		drawProjectile(p);
+		drawProjectile(prj);
 	}
 
 	std::list<Side>& sides = world_->getSides();
-	for (Side s : sides)
+	for (Side sd : sides)
 	{
-		drawSide(s);
+		//drawSide(sd);
 	}
 
 	////Get a reference or friend function or what have you
@@ -159,8 +157,8 @@ void GameDrawer::drawProjectile(Projectile& p)
 
 	//Draw shape, vel, pos
 	drawCircle(B2toSF(pos, true), rad, sf::Color(128, 128, 128), sf::Color(128, 128, 128));
-
 	drawLine(B2toSF(pos, true), B2toSF(vel, true), sf::Color::White);
+	drawPoint(B2toSF(pos, true), sf::Color::Magenta);
 }
 
 void GameDrawer::drawSide(Side& s)

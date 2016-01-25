@@ -6,14 +6,12 @@
 struct ProjectileDef {
 public:
 	ProjectileDef() :
-		body(nullptr),
 		origin(b2Vec2_zero),
 		heading(b2Vec2_zero),
 		inVelocity(b2Vec2_zero),
 		velScale(1),
 		maxHP(1),
 		size(1),
-		damage(1),
 		damageScale(1),
 		lifeTime(1000),
 		owner(nullptr),
@@ -21,14 +19,12 @@ public:
 	{}
 
 	ProjectileDef(b2Vec2 origin, b2Vec2 heading, b2Vec2 inVelocity = b2Vec2_zero) :
-		body(nullptr),
 		origin(origin),
 		heading(heading),
 		inVelocity(inVelocity),
 		velScale(1),
 		maxHP(1),
 		size(1),
-		damage(1),
 		damageScale(1),
 		lifeTime(1000),
 		owner(nullptr),
@@ -36,14 +32,12 @@ public:
 	{}
 
 	ProjectileDef(const ProjectileDef& pd) :
-		body(nullptr),
 		origin(b2Vec2_zero),
 		heading(b2Vec2_zero),
-		inVelocity(pd.inVelocity),
+		inVelocity(b2Vec2_zero),
 		velScale(pd.velScale),
 		maxHP(pd.maxHP),
 		size(pd.size),
-		damage(pd.damage),
 		damageScale(pd.damageScale),
 		lifeTime(pd.lifeTime),
 		owner(nullptr),
@@ -52,9 +46,6 @@ public:
 
 	//Some projDef fields should be manually set every time, 
 	//to avoid confusion while copying
-
-	//Not copied
-	b2Body* body;
 	
 	//Not copied
 	b2Vec2 origin;
@@ -67,7 +58,6 @@ public:
 	unsigned int maxHP;
 	float size;
 
-	float damage;
 	float damageScale;
 
 	int lifeTime;
@@ -76,13 +66,16 @@ public:
 	Entity* owner;
 	Entity* target;
 
-	bool isValid() { return body != nullptr; }
+	static enum ProjType {
+		BULLET,
+		ROCKET
+	};
 };
 
 class Projectile : public Entity{
 public:
 	Projectile(b2Body* body, b2Vec2 heading);
-	Projectile(ProjectileDef& def);
+	Projectile(b2Body* body, ProjectileDef& def);
 
 	void fire(float mult);
 	void impact();
@@ -99,7 +92,7 @@ public:
 	bool collide(Entity* other, b2Contact& contact);
 
 private:
-	void setAsBullet(float size);
+	void setAsBullet(float size, float damageScale);
 
 	void addMaterial(b2FixtureDef& def); //Abstract into entity?
 

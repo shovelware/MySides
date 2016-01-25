@@ -38,22 +38,25 @@ Projectile::Projectile(b2Body* body, b2Vec2 heading) :
 	hp_ = maxHP_;
 }
 
-Projectile::Projectile(ProjectileDef& def) :
-	Entity(def.body),
+Projectile::Projectile(b2Body* body, ProjectileDef& def) :
+	Entity(body),
 	fired_(false), impacted_(false),
 	origin_(def.origin), heading_(def.heading),
 	maxHP_(def.maxHP), hp_(def.maxHP),
 	size_(def.size),
-	damage_(def.damage), 
 	lifeTime_(def.lifeTime),
 	owner_(def.owner), 
 	target_(def.target)
 {
-	setAsBullet(size_);
+	setAsBullet(size_, def.damageScale);
+
+	//Do maths to orient body here
+	body_->SetTransform(def.origin, body_->GetAngle());
+
 	fire(def.velScale);
 }
 
-void Projectile::setAsBullet(float size)
+void Projectile::setAsBullet(float size, float damageScale = 1.f)
 {
 	//Shape data
 	b2CircleShape bullet;
@@ -71,6 +74,7 @@ void Projectile::setAsBullet(float size)
 	body_->CreateFixture(&fixtureDef);
 
 	speed_ = 0.000025f;
+	damage_ = 1 * damageScale;
 }
 
 void Projectile::addMaterial(b2FixtureDef & def)

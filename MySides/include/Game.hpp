@@ -16,6 +16,9 @@
 //Controller
 #include "XController.hpp"
 
+//Keyboard
+#include "KeyInput.hpp"
+
 //Game
 #include "GameWorld.hpp"
 #include "Camera.hpp"
@@ -36,6 +39,7 @@ public:
 private:
 	b2Vec2 SFtoB2(const sf::Vector2f &vec);
 	void processEvents();
+	void handleInput(sf::Time dt);
 	void update(sf::Time dt);
 	void render();
 
@@ -54,6 +58,11 @@ private:
 	//This will be broken out into inputmanager
 	bool checkController(sf::Time dt);
 	XController con_;
+	
+	//Keyboard
+	void checkKeyBoard();
+	KeyInput key_;
+
 
 	//Game world 
 	GameWorld* world_;
