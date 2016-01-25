@@ -142,12 +142,15 @@ void GameWorld::addProjectile(ProjectileDef &def)
 
 //Adds a side to the world
 void GameWorld::addSide(float x, float y, float nx, float ny, float size)
-{
-	int foo;
-	
+{	
 	sides_.emplace_back(addDynamicBody(x, y), b2Vec2(nx, ny), size);
-	
-	int bar = 101293;
+	std::cout 
+		<< x << ", " 
+		<< y << " /"
+		<< nx << ", "
+		<< ny << " /"
+		<< size
+		<< std::endl;
 }
 
 void GameWorld::removePlayer(std::list<Shape>::iterator& p)

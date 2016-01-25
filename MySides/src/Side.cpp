@@ -2,7 +2,7 @@
 
 Side::Side(b2Body * body, b2Vec2 normal, float size) : Entity(body), size_(size)
 {
-
+	setShape(size);
 }
 
 //Side::Side(b2Body * body, SideDef def) : Entity(body), size_(def.size)
@@ -70,6 +70,7 @@ bool Side::collide(Entity* other, b2Contact& contact)
 		char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
 		char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
 
+		//Make sure collision is with side
 		if (tagA == "side" || tagB == "side")
 		{
 			collect();

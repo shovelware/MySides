@@ -379,8 +379,8 @@ void Game::render()
 
 	//b2Shape* x = world_->controlled()->getVertices();
 	//b2Shape::Type y = x->GetType();
-	//drawer_->draw();
-	world_->DrawDebugData();
+	drawer_->draw();
+	//world_->DrawDebugData();
 
 	window_.display();
 }
