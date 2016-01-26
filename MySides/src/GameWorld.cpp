@@ -140,6 +140,8 @@ void GameWorld::addEnemy(float x, float y)
 	//AND add body to world with function
 	shapes_.emplace_back(addDynamicBody(x, y), 4, .5f);
 	std::list<Shape>::iterator added = --shapes_.end();
+	added->armShape(addProj_);
+	added->setAmmo(ProjectileDef::bulletDef());
 	added->setAI(true);
 	added->setControlled(false);
 }
@@ -390,7 +392,7 @@ void GameWorld::update(int dt)
 		for (std::list<Shape>::iterator p = players_.begin();
 		p != players_.end(); /*Don't increment here*/)
 		{
-			p->setActive(true);//Debug invincible players
+			//p->setActive(true);//Debug invincible players
 			p->update(dt);
 			positionListener(p->getPosition());
 			
@@ -402,7 +404,7 @@ void GameWorld::update(int dt)
 				//b2Vec2 pos = p->getPosition();
 				//addSide(pos.x, pos.y, 0, 0, side++);
 				//
-				p++;//removePlayer(p);
+				removePlayer(p);
 			}
 
 			//Else just increment
@@ -477,9 +479,10 @@ void GameWorld::update(int dt)
 
 					if (s->getArmed())
 					{
-						b2Vec2 fp = s->getFirePoint(between.x, between.y);
-
-						addProjectile(fp.x, fp.y, between.x, between.y);
+						s->trigger(between);
+						//b2Vec2 fp = s->getFirePoint(between.x, between.y);
+						//
+						//addProjectile(fp.x, fp.y, between.x, between.y);
 					}
 				}
 
