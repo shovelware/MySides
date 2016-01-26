@@ -273,6 +273,76 @@ bool Shape::getArmed()
 	return (coolDown_ == 0);
 }
 
+void Shape::armShape(std::function<void(ProjectileDef&)>& callback)
+{
+	fireCallback_ = callback;
+}
+
+void Shape::clearAmmo()
+{
+	ammo_ = ProjectileDef();
+}
+
+ProjectileDef Shape::getAmmo()
+{
+	return ammo_;
+}
+
+void Shape::setAmmo(ProjectileDef & def)
+{
+	ammo_ = ProjectileDef(def);
+}
+
+void Shape::trigger(b2Vec2 direction)
+{
+	if (fireCallback_ != nullptr && ammo_.isValid())
+	{
+		if (coolDown_ == 0)
+		{
+			//Set up projectile
+			ProjectileDef newProj = ProjectileDef(ammo_);
+			newProj.origin = getPosition();
+			newProj.heading = direction;
+			newProj.owner = this;
+			
+			//Fire centre
+			fireCallback_(newProj);
+
+			b2Vec2 newDir = direction;
+			float rotation = atan2f(direction.y, direction.x);
+
+			////Calculate left
+			newDir.x = cosf(rotation - 0.2f);
+			newDir.y = sinf(rotation - 0.2f);
+
+			newProj.heading = newDir;
+			fireCallback_(newProj);
+
+			newDir.x = cosf(rotation - 0.1f);
+			newDir.y = sinf(rotation - 0.1f);
+
+			newProj.heading = newDir;
+			fireCallback_(newProj);
+
+			////Calculate right
+			newDir.x = cosf(rotation + 0.2f);
+			newDir.y = sinf(rotation + 0.2f);
+
+			newProj.heading = newDir;
+			fireCallback_(newProj);
+
+
+			newDir.x = cosf(rotation + 0.1f);
+			newDir.y = sinf(rotation + 0.1f);
+
+			newProj.heading = newDir;
+			fireCallback_(newProj);
+
+			coolDown_ = refireTime_;
+		}
+	}
+}
+
 void Shape::update(int milliseconds)
 {
 	if (active_)

@@ -6,7 +6,7 @@ GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 32), con
 	SetContactListener(&contactListener_);
 
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
-
+	
 	bgm_.openFromFile("../assets/spriterip.ogg");
 	bgm_.setLoop(true);
 	bgm_.setVolume(7.5f);
@@ -159,6 +159,8 @@ void GameWorld::addProjectile(float x, float y, float vx, float vy)
 void GameWorld::addProjectile(ProjectileDef &def)
 {
 	projectiles_.emplace_back(addBulletBody(def.origin.x, def.origin.y), def);
+
+	//Play fire sound at fired position
 	positionSound(fireSound, def.origin);
 	fireSound.play();
 }
@@ -185,9 +187,11 @@ void GameWorld::removePlayer(std::list<Shape>::iterator& p)
 //Removes enemy from the world and increments iterator, for use within loops
 void GameWorld::removeEnemy(std::list<Shape>::iterator& e)
 {
+	//Play death sound at position
 	positionSound(dieSound, e->getPosition());
 	dieSound.play();
 
+	//Delete enemy
 	DestroyBody(e->getBody());
 	shapes_.erase(e++);
 }
@@ -214,6 +218,10 @@ void GameWorld::resetLevel()
 
 	//Add a new player
 	addPlayer(0, 0, true);
+
+	controlled_->armShape(addProj_);
+	controlled_->setAmmo(ProjectileDef::bulletDef());
+
 	spawnSound.play();
 
 	//Restart bgm
@@ -302,25 +310,26 @@ void GameWorld::fire(b2Vec2 direction)
 	//If there's a direction to fire in
 	if (direction.x != 0 || direction.y != 0)
 	{
-		//And we can fire
-		if (controlled_->getArmed())
-		{
-
-			b2Vec2 fp = controlled_->getFirePoint(direction.x, direction.y); //This will be abstracted to shape class
-			b2Transform bxf = bounds_.getBody()->GetTransform();
-
-			//Test if we're shooting on the same side of the bounds
-			bool projIn = bounds_.getShape()->TestPoint(bxf, fp);
-			bool shapeIn = bounds_.getShape()->TestPoint(bxf, controlled_->getPosition());
-
-			if (projIn == shapeIn)
-			{
-				ProjectileDef p(b2Vec2(fp.x, fp.y), direction);
-				p.owner = &*controlled_;
-				addProjectile(p);
-				//addProjectile(fp.x, fp.y, direction.x, direction.y);
-			}
-		}
+		controlled_->trigger(direction);
+		////And we can fire
+		//if (controlled_->getArmed())
+		//{
+		//
+		//	b2Vec2 fp = controlled_->getFirePoint(direction.x, direction.y); //This will be abstracted to shape class
+		//	b2Transform bxf = bounds_.getBody()->GetTransform();
+		//
+		//	//Test if we're shooting on the same side of the bounds
+		//	bool projIn = bounds_.getShape()->TestPoint(bxf, fp);
+		//	bool shapeIn = bounds_.getShape()->TestPoint(bxf, controlled_->getPosition());
+		//
+		//	if (projIn == shapeIn)
+		//	{
+		//		ProjectileDef p(b2Vec2(fp.x, fp.y), direction);
+		//		p.owner = &*controlled_;
+		//		addProjectile(p);
+		//		//addProjectile(fp.x, fp.y, direction.x, direction.y);
+		//	}
+		//}
 	}
 }
 
@@ -367,25 +376,10 @@ std::list<Shape>& GameWorld::getShapes()
 	return shapes_;
 }
 
-Bounds & GameWorld::getBounds()
-{
-	return bounds_;
-}
-
-std::list<Shape>& GameWorld::getPlayers()
-{
-	return players_;
-}
-
-std::list<Projectile>& GameWorld::getProjectiles()
-{
-	return projectiles_;
-}
-
-std::list<Side>& GameWorld::getSides()
-{
-	return sides_;
-}
+Bounds & GameWorld::getBounds() { return bounds_; }
+std::list<Shape>& GameWorld::getPlayers() { return players_; }
+std::list<Projectile>& GameWorld::getProjectiles() { return projectiles_; }
+std::list<Side>& GameWorld::getSides() { return sides_; }
 
 //Update entity code and step the world
 void GameWorld::update(int dt)
@@ -485,7 +479,7 @@ void GameWorld::update(int dt)
 					{
 						b2Vec2 fp = s->getFirePoint(between.x, between.y);
 
-						//addProjectile(fp.x, fp.y, between.x, between.y);
+						addProjectile(fp.x, fp.y, between.x, between.y);
 					}
 				}
 

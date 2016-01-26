@@ -5,6 +5,9 @@
 #define MS_SHAPE_HPP
 
 #include "Entity.hpp"
+#include "ProjectileDef.hpp"
+
+#include <functional>
 //#include "Weapon.hpp"
 
 namespace traits{
@@ -62,8 +65,15 @@ public:
 	unsigned int getMaxHP() const;
 
 	////Temp for weapon refire
-	b2Vec2 getFirePoint(float x, float y);
-	bool getArmed(); 
+	b2Vec2 getFirePoint(float x, float y); //
+	bool getArmed();//
+
+
+	void armShape(std::function<void(ProjectileDef&)> &callback);
+	void clearAmmo();
+	ProjectileDef getAmmo();
+	void setAmmo(ProjectileDef& def);
+	void trigger(b2Vec2 direction);
 	
 	void update(int milliseconds);
 
@@ -89,9 +99,14 @@ private:
 	bool controlled_;
 	bool ai_;
 
+
 	////Temp for weapon refire
 	unsigned int refireTime_;
 	int coolDown_;
+
+	//Definitions and callbacks
+	ProjectileDef ammo_;
+	std::function<void(ProjectileDef&)> fireCallback_;
 
 	int sides_;
 	int type_;

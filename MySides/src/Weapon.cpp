@@ -6,7 +6,7 @@ Weapon::Weapon(Entity* owner) : owner_(owner)
 	output_.owner = owner;
 }
 
-void Weapon::trigger(b2Vec2 heading)
+void Weapon::trigger(b2Vec2 &heading)
 {
 	if (canFire())
 	{
@@ -14,37 +14,14 @@ void Weapon::trigger(b2Vec2 heading)
 	}
 }
 
-bool Weapon::pollFired(ProjectileDef & out)
+void Weapon::setProjectile(ProjectileDef &pd)
 {
-	//If there's projectiles there, return true and it
-	if (!fired_.empty())
-	{
-		out = fired_.front();
-		fired_.pop();
-		return true;
-	}
-
-	else return false;
-}
-
-void Weapon::clearFired()
-{
-	while (!fired_.empty())
-	{
-		fired_.pop();
-	}
-}
-
-void Weapon::setProjectile(ProjectileDef pd)
-{
-	output_ = pd;
-	output_.owner = owner_;
+	output_ = ProjectileDef(pd);
 }
 
 void Weapon::setOwner(Entity * owner)
 {
 	owner_ = owner;
-	output_.owner = owner_;
 }
 
 bool Weapon::canFire()
@@ -52,15 +29,18 @@ bool Weapon::canFire()
 	return (coolDown_ <= 0);
 }
 
-void Weapon::fire(b2Vec2 heading)
+void Weapon::fire(b2Vec2 &heading)
 {
 	ProjectileDef newProj(output_);
 
 	newProj.origin = owner_->getPosition();
 	newProj.heading = heading;
-	newProj.owner = owner_;
+	newProj.inVelocity =  b2Vec2_zero;
 
-	fired_.push(newProj);
+	newProj.owner = owner_;
+	newProj.target = nullptr;
+
+	//Fire bullet with callback here
 
 	coolDown_ = refireTime_;
 }

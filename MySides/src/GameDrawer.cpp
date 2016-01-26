@@ -156,7 +156,7 @@ void GameDrawer::drawProjectile(Projectile& p)
 	float rad = shape->m_radius * _SCALE_;
 
 	//Draw shape, vel, pos
-	drawCircle(B2toSF(pos, true), rad, sf::Color(128, 128, 128), sf::Color(128, 128, 128));
+	drawCircle(B2toSF(pos, true), rad, sf::Color(196, 196, 0), sf::Color(128, 128, 0));
 	drawLine(B2toSF(pos, true), B2toSF(vel, true), sf::Color::White);
 	drawPoint(B2toSF(pos, true), sf::Color::Magenta);
 }

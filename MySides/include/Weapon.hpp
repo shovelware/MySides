@@ -4,25 +4,26 @@
 #ifndef MS_WEAPON_HPP
 #define MS_WEAPON_HPP
 
-#include "Projectile.hpp"
+#include "ProjectileDef.hpp"
+#include <stdafx.h>
+#include <Box2D\Box2D.h>
 
-#include <queue>
+///class ProjectileDef;
+class Entity; // Forward declarations
 
 class Weapon {
 public:
 	Weapon(Entity* owner);
 	
-	virtual void trigger(b2Vec2 heading);
-	bool pollFired(ProjectileDef& out);
-	void clearFired();
+	virtual void trigger(b2Vec2 &heading);
 
-	void setProjectile(ProjectileDef pd);
+	void setProjectile(ProjectileDef &pd);
 	void setOwner(Entity* owner);
 
 	void update(int milliseconds);
 private:
 	Entity* owner_;
-	virtual void fire(b2Vec2 heading);
+	virtual void fire(b2Vec2 &heading);
 
 	bool canFire();
 
@@ -30,8 +31,7 @@ private:
 
 	int refireTime_;
 	int coolDown_;
-	
-	std::queue<ProjectileDef> fired_;
 };
-
+//#include <ProjectileDef.hpp>
+#include <Entity.hpp>
 #endif

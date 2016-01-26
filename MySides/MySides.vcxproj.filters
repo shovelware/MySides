@@ -84,9 +84,6 @@
     <ClCompile Include="src\Side.cpp">
       <Filter>Source Files\Game\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="src\Weapon.cpp">
-      <Filter>Header Files\Game</Filter>
-    </ClCompile>
     <ClCompile Include="src\KeyInput.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
@@ -143,11 +140,11 @@
     <ClInclude Include="include\Side.hpp">
       <Filter>Header Files\Game\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="include\Weapon.hpp">
-      <Filter>Source Files\Game</Filter>
-    </ClInclude>
     <ClInclude Include="include\KeyInput.hpp">
       <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ProjectileDef.hpp">
+      <Filter>Header Files\Game\Entity</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

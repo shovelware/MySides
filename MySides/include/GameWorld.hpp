@@ -48,10 +48,10 @@ public:
 	void addSide(float x, float y, float nx, float ny, float size);
 
 	//Spawning works off definitions
-	//void addPlayer(ShapeDef def);
-	//void addEnemy(ShapeDef def)
+	//void addPlayer(ShapeDef &def);
+	//void addEnemy(ShapeDef &def)
 	void addProjectile(ProjectileDef &def);
-	void addSide(SideDef def);
+	void addSide(SideDef &def);
 
 	//And callbacks for entities
 	std::function<void(ProjectileDef&)> addProj_;	

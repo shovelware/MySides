@@ -169,9 +169,17 @@ bool Projectile::collide(Entity * other, b2Contact& contact)
 
 	else if (Projectile* proj = dynamic_cast<Projectile*>(other))
 	{
-		impact();
-		takeDamage(proj->getDamage());
-		//Maybe set contact to false so stronger proj continues?
+		//Only collide if we're not friends
+		if (owner_ != proj->getOwner())
+		{
+			impact();
+			takeDamage(proj->getDamage());
+			//Maybe set contact to false so stronger proj continues?
+		}
+
+		//Projectiles with same owner do not interact
+		else contact.SetEnabled(false);
+
 		handled = true;
 	}
 

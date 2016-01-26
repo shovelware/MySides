@@ -31,7 +31,7 @@ int Game::run()
 
 	//World
 	world_ = new GameWorld();
-	camera_ = new Camera(windowSize);
+	camera_ = new Camera(window_);
 
 	//Seed random
 	srand(static_cast <unsigned> (time(0)));
@@ -311,7 +311,7 @@ void Game::handleInput(sf::Time dt)
 		{
 			if (con_.checkTimeHeld(XINPUT_GAMEPAD_BACK) > 500)
 			{
-				camera_->resetZoom();
+				camera_->zoomReset();
 			}
 
 			else
@@ -373,7 +373,7 @@ void Game::render()
 	window_.clear();
 	//l.out(l.message, 'G', "Render");
 
-	window_.setView(*(camera_->getView()));
+	window_.setView(*(camera_));
 
 	//Render stuff
 
