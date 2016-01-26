@@ -118,6 +118,12 @@ private:
 	sf::SoundBuffer fireBuffer, spawnBuffer, dieBuffer, lossBuffer, collectBuffer;
 	sf::Sound fireSound, spawnSound, dieSound, lossSound, collectSound;
 
+	//Translates sound from b2v2 to sfv3 audio
+	void positionSound(sf::Sound& sound, b2Vec2 pos, bool scale);
+
+	//Translates a position from b2v2 to sfv3 listener
+	void positionListener(b2Vec2 pos, bool scale);
+
 };
 
 #endif

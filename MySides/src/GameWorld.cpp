@@ -9,22 +9,32 @@ GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 32), con
 
 	bgm_.openFromFile("../assets/spriterip.ogg");
 	bgm_.setLoop(true);
-	bgm_.setVolume(50.f);
+	bgm_.setVolume(7.5f);
 
 	fireBuffer.loadFromFile("../assets/fire.wav");
 	fireSound.setBuffer(fireBuffer);
+	fireSound.setMinDistance(100);
+	fireSound.setAttenuation(1);
 
 	spawnBuffer.loadFromFile("../assets/spawn.wav");
 	spawnSound.setBuffer(spawnBuffer);
+	spawnSound.setMinDistance(100);
+	spawnSound.setAttenuation(1);
 
 	dieBuffer.loadFromFile("../assets/die.wav");
 	dieSound.setBuffer(dieBuffer);
+	dieSound.setMinDistance(100);
+	dieSound.setAttenuation(1);
 
 	lossBuffer.loadFromFile("../assets/loss.wav");
 	lossSound.setBuffer(lossBuffer);
+	lossSound.setMinDistance(100);
+	lossSound.setAttenuation(1);
 
 	collectBuffer.loadFromFile("../assets/collect.wav");
 	collectSound.setBuffer(collectBuffer);
+	collectSound.setMinDistance(100);
+	collectSound.setAttenuation(1);
 }
 
 //Returns true if the gameworld has a controlled entity !!!FIX
@@ -92,6 +102,18 @@ b2Body * GameWorld::addBulletBody(float x, float y)
 	return body;
 }
 
+void GameWorld::positionSound(sf::Sound & sound, b2Vec2 pos, bool scale = true)
+{
+	sf::Vector3f sndPos(pos.x * (scale ? _SCALE_ : 1.f), pos.y * (scale ? _SCALE_ : 1.f), 0);
+	sound.setPosition(sndPos);
+}
+
+void GameWorld::positionListener(b2Vec2 pos, bool scale = true)
+{
+	sf::Vector3f lisPos(pos.x * (scale ? _SCALE_ : 1.f), pos.y * (scale ? _SCALE_ : 1.f), 0);
+	sf::Listener::setPosition(lisPos);
+}
+
 //Adds a player to the world 
 void GameWorld::addPlayer(float x, float y, bool control)
 {
@@ -137,6 +159,7 @@ void GameWorld::addProjectile(float x, float y, float vx, float vy)
 void GameWorld::addProjectile(ProjectileDef &def)
 {
 	projectiles_.emplace_back(addBulletBody(def.origin.x, def.origin.y), def);
+	positionSound(fireSound, def.origin);
 	fireSound.play();
 }
 
@@ -162,9 +185,11 @@ void GameWorld::removePlayer(std::list<Shape>::iterator& p)
 //Removes enemy from the world and increments iterator, for use within loops
 void GameWorld::removeEnemy(std::list<Shape>::iterator& e)
 {
+	positionSound(dieSound, e->getPosition());
+	dieSound.play();
+
 	DestroyBody(e->getBody());
 	shapes_.erase(e++);
-	dieSound.play();
 }
 
 //Removes projectile from the world and increments iterator, for use within loops
@@ -371,8 +396,9 @@ void GameWorld::update(int dt)
 		for (std::list<Shape>::iterator p = players_.begin();
 		p != players_.end(); /*Don't increment here*/)
 		{
-			p->setActive(true);
+			p->setActive(true);//Debug invincible players
 			p->update(dt);
+			positionListener(p->getPosition());
 			
 			//If we're not active, increment by deleting
 			if (p->getActive() == false)

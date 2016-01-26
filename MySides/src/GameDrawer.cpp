@@ -39,7 +39,7 @@ void GameDrawer::draw()
 	std::list<Side>& sides = world_->getSides();
 	for (Side sd : sides)
 	{
-		//drawSide(sd);
+		drawSide(sd);
 	}
 
 	////Get a reference or friend function or what have you
