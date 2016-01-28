@@ -1,5 +1,8 @@
 #include "GameWorld.hpp"
 
+inline float randFloat(float MAX) { return static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / MAX)); };
+inline float randFloat(float MIN, float MAX) { return MIN + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (MAX - MIN))); };
+
 //Constructor initialises Box2D World and boudaries
 GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 32), contactListener_(ContactListener())
 {
@@ -102,12 +105,30 @@ b2Body * GameWorld::addBulletBody(float x, float y)
 	return body;
 }
 
+//Spawn a random enemy
+void GameWorld::spawnEnemy()
+{
+	for (int i = 0; i < spawns_; ++i)
+	{
+		float x, y, rad = getBoundsRadius() * 0.7f;
+		y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
+		x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
+
+		x *= rad;
+		y *= rad;
+
+		addEnemy(x, y);
+	}
+}
+
+//Positions the passed sound relative to the player
 void GameWorld::positionSound(sf::Sound & sound, b2Vec2 pos, bool scale = true)
 {
 	sf::Vector3f sndPos(pos.x * (scale ? _SCALE_ : 1.f), pos.y * (scale ? _SCALE_ : 1.f), 0);
 	sound.setPosition(sndPos);
 }
 
+//Positions the listener at the player
 void GameWorld::positionListener(b2Vec2 pos, bool scale = true)
 {
 	sf::Vector3f lisPos(pos.x * (scale ? _SCALE_ : 1.f), pos.y * (scale ? _SCALE_ : 1.f), 0);
@@ -228,6 +249,9 @@ void GameWorld::resetLevel()
 {
 	//Clear world
 	clearWorld();
+	timeInLevel_ = 0;
+	lastSpawn_ = 0;
+	spawnTime_ = 5000;
 
 	//Add a new player
 	addPlayer(0, 0, true);
@@ -563,6 +587,15 @@ void GameWorld::update(int dt)
 	////What shape should have
 	//b2Body* ab = GetBodyList();
 
+	timeInLevel_ += dt;
+	timeInLevel_ % UINT16_MAX;
+
+	if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_)
+	{
+		spawnEnemy();
+		lastSpawn_ = timeInLevel_;
+		spawns_ += 1 % UINT16_MAX;
+	}
 
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 }

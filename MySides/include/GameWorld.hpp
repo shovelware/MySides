@@ -113,6 +113,15 @@ private:
 	b2Body* addStaticBody (float x, float y);
 	b2Body* addBulletBody (float x, float y);
 
+	//AI spawning
+	void spawnEnemy();
+	unsigned int lastSpawn_;
+	unsigned int spawnTime_;
+	unsigned int spawns_;
+
+	//Timing
+	unsigned int timeInLevel_;
+
 	//SFX & Music
 	sf::Music bgm_;
 	sf::SoundBuffer fireBuffer, spawnBuffer, dieBuffer, lossBuffer, collectBuffer;
