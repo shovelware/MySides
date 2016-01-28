@@ -1,5 +1,9 @@
 #include "Side.hpp"
 
+#include "Bounds.hpp"
+#include "Shape.hpp"
+#include "Projectile.hpp"
+
 Side::Side(b2Body * body, b2Vec2 normal, float size) : Entity(body), size_(size)
 {
 	setShape(size);

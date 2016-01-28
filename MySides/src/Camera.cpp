@@ -1,5 +1,6 @@
 #include "Camera.hpp"
 
+
 Camera::Camera(sf::RenderTarget& target) :
 	rentrg_(target),
 	screenSize_(target.getSize()),
@@ -12,12 +13,12 @@ Camera::Camera(sf::RenderTarget& target) :
 {
 }
 
-void Camera::setTarget(Entity * target)
+void Camera::setTarget(Shape * target)
 {
 	target_ = target;
 }
 
-Entity * Camera::getTarget()
+Shape * Camera::getTarget()
 {
 	return target_;
 }
@@ -36,7 +37,7 @@ void Camera::loadFont(std::string filename)
 {
 	sf::Font* fnt = new sf::Font();
 
-	if (fnt->loadFromFile("./" + filename));
+	if (fnt->loadFromFile("../Assets/" + filename));
 	{
 		//If we load successfully, assign font
 		font_ = fnt;
@@ -118,10 +119,15 @@ void Camera::drawHUD()
 			//Radar range
 			//text_.setString(std::string(std::to_string(target_->getRadarRange()) + "sm"));
 
+			//Sides bar
+			drawText(std::string("Sides: ") + std::to_string(target_->getSidesCollected()),
+				sf::Vector2f(0, screenSize_.y - 60),
+				sf::Color::Red);
+
 			//Health bar
-			//drawText(std::string("H: ") + std::to_string(target_->getHealth()) + std::string("/") + std::to_string(target_->getMaxHealth()),
-			//	sf::Vector2f(0, screenSize_.y - 60),
-			//	sf::Color::Red);
+			drawText(std::string("HP: ") + std::to_string(target_->getHP()) + "/" + std::to_string(target_->getHPMax()),
+				sf::Vector2f(screenSize_.x - 100, screenSize_.y - 60),
+				sf::Color::Red);
 			////Fire capabilities bar
 			//Accel bar
 
@@ -133,6 +139,27 @@ void Camera::drawHUD()
 			sf::Color::White);
 	}
 
+	rentrg_.setView(*this);
+}
+
+void Camera::drawPause()
+{
+	rentrg_.setView(rentrg_.getDefaultView());
+	sf::Vector2f offset(0, 20);
+	
+	drawTextAligned("PAUSED", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2), sf::Color::Cyan);
+
+	drawTextAligned("START : CONTINUE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 2.f, sf::Color::Cyan);
+
+
+	drawTextAligned("LS : MOVE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 4.f, sf::Color::Cyan);
+	drawTextAligned("RS : SHOOT", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 5.f, sf::Color::Cyan);
+	drawTextAligned("LB : ZOOM-", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 6.f, sf::Color::Cyan);
+	drawTextAligned("RB : ZOOM+", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 7.f, sf::Color::Cyan);
+
+	//drawTextAligned("RB : ZOOM+", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 7.f, sf::Color::Cyan);
+	//drawTextAligned("RB : ZOOM+", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 8.f, sf::Color::Cyan);
+	//drawTextAligned("RB : ZOOM+", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 9.f, sf::Color::Cyan);
 	rentrg_.setView(*this);
 }
 
@@ -148,6 +175,22 @@ void Camera::drawText(std::string info, sf::Vector2f pos = sf::Vector2f(0, 0), s
 	{
 		text_.setString(info);
 		text_.setPosition(pos);
+		text_.setColor(color);
+		rentrg_.draw(text_);
+	}
+}
+
+void Camera::drawTextAligned(std::string info, sf::Vector2f pos = sf::Vector2f(0, 0), sf::Color color = sf::Color::White)
+{
+	//Check if hud font and text are initialised
+	if (font_ != nullptr)
+	{
+
+		text_.setString(info);
+
+		sf::Vector2f offset(text_.getLocalBounds().width / 2, text_.getLocalBounds().height / 2);
+
+		text_.setPosition(pos - offset);
 		text_.setColor(color);
 		rentrg_.draw(text_);
 	}

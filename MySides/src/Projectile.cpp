@@ -1,4 +1,9 @@
-#include "..\include\Projectile.hpp"
+#include "Projectile.hpp"
+
+#include "Bounds.hpp"
+#include "Shape.hpp"
+#include "Projectile.hpp"
+#include "Side.hpp"
 
 Projectile::Projectile(b2Body* body, b2Vec2 heading) :
 	Entity(body),
@@ -158,11 +163,14 @@ bool Projectile::collide(Entity * other, b2Contact& contact)
 
 	if (Shape* shape = dynamic_cast<Shape*>(other))////
 	{
+		//Projectiles do not hurt their owner
 		if (owner_ != shape)
 		{
 			impact();
 			takeDamage(1);
 		}
+
+		else contact.SetEnabled(false);
 
 		handled = true;
 	}

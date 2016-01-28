@@ -32,6 +32,7 @@ int Game::run()
 	//World
 	world_ = new GameWorld();
 	camera_ = new Camera(window_);
+	camera_->loadFont("game_over.ttf");
 
 	//Seed random
 	srand(static_cast <unsigned> (time(0)));
@@ -50,7 +51,7 @@ int Game::run()
 	world_->SetDebugDraw(&dd_);
 
 	//Testing
-
+	//pause_ = true;
 
 	//Display a blank window before we start our game loop
 	//Avoids nasty white windows
@@ -97,10 +98,7 @@ int Game::run()
 				key_.update();
 				handleInput(tickTime);
 
-				if (!pause_)
-				{
-					update(tickTime);
-				}
+				update(tickTime);
 
 				//Take this tick out of the accumulator
 				accumulator -= tickTime;
@@ -222,7 +220,7 @@ void Game::handleInput(sf::Time dt)
 
 		//world_->controlled()->rotate(con_.checkRightX() / 10);
 
-		//Resize bounds
+		//A : Resize bounds
 		if (con_.checkPressed(XINPUT_GAMEPAD_A))
 		{
 			float base = 32;
@@ -231,22 +229,21 @@ void Game::handleInput(sf::Time dt)
 			world_->resizeBounds(base + lt);
 
 			std::cout << base + lt << "  " << world_->getBoundsSide() << std::endl;
-
-
 		}
 
+		//B : Cancel rotation
 		if (con_.checkDown(XINPUT_GAMEPAD_B))
 		{
 			world_->controlled()->stopRotate();
 		}
 
-		//Orientation testing
+		//X : Orientation testing
 		if (con_.checkDown(XINPUT_GAMEPAD_X))
 		{
 			world_->controlled()->orient(b2Vec2_zero);
 		}
 
-		//Spawn enemy
+		//Y: Spawn enemy
 		if (con_.checkPressed(XINPUT_GAMEPAD_Y))
 		{
 			float lt = (con_.checkLeftTrigger() > 0 ? con_.checkLeftTrigger() : 0.1f);
@@ -265,28 +262,28 @@ void Game::handleInput(sf::Time dt)
 			}
 		}
 
-		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_SHOULDER))
+		//LB : 
+		if (con_.checkDown(XINPUT_GAMEPAD_LEFT_SHOULDER))
 		{
-
+			camera_->zoomOut();
 		}
 
-		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+		//RB : 
+		if (con_.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER))
 		{
-
+			camera_->zoomIn();
 		}
 
-		//Bounds resizing
-		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
-		{
-			world_->resizeBounds(5);
-		}
-
+		//Thumbsticks
 		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
 		{
-			world_->resizeBounds(10);
 		}
 
-		//DPad firing
+		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
+		{
+		}
+
+		//DPad : firing
 		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT))
 		{
 			world_->fire(b2Vec2(1, 0));
@@ -307,26 +304,25 @@ void Game::handleInput(sf::Time dt)
 			world_->fire(b2Vec2(0, -1));
 		}
 
-		if (con_.checkReleased(XINPUT_GAMEPAD_BACK))
+		if (con_.checkPressed(XINPUT_GAMEPAD_BACK))
 		{
-			if (con_.checkTimeHeld(XINPUT_GAMEPAD_BACK) > 500)
-			{
-				camera_->zoomReset();
-			}
-
-			else
-			{
-				camera_->zoom(.5f);
-			}
+			camera_->zoomReset();
 		}
 
-		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_SHOULDER) && con_.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER) || 
-			con_.checkDown(XINPUT_GAMEPAD_LEFT_SHOULDER) && con_.checkPressed(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+		//Start : Pause
+		if (con_.checkReleased(XINPUT_GAMEPAD_START))
+		{
+			pause_ = !pause_;
+		}
+
+		// Start + Back : Reset
+		if (con_.checkPressed(XINPUT_GAMEPAD_START) && con_.checkDown(XINPUT_GAMEPAD_BACK) || 
+			con_.checkDown(XINPUT_GAMEPAD_START) && con_.checkPressed(XINPUT_GAMEPAD_BACK))
 		{
 			world_->resetLevel();
 		}
 
-		//Quit button
+		//[Start + Back] : Quit
 		if (con_.checkDown(XINPUT_GAMEPAD_START) && con_.checkDown(XINPUT_GAMEPAD_BACK))
 		{
 			if (con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 750U && con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 750U)
@@ -357,8 +353,14 @@ void Game::update(sf::Time dt)
 {
 	camera_->setTarget(world_->controlled());
 
+	//else camera_->clearTarget(true);
+
 	camera_->update(dt.asMilliseconds());
-	world_->update(dt.asMilliseconds());
+
+	if (!pause_)
+	{
+		world_->update(dt.asMilliseconds());
+	}
 
 	//Update counter
 	//static int x;
@@ -379,8 +381,14 @@ void Game::render()
 
 	//b2Shape* x = world_->controlled()->getVertices();
 	//b2Shape::Type y = x->GetType();
-	drawer_->draw();
 	//world_->DrawDebugData();
+	drawer_->draw();
+	camera_->drawHUD();
+
+	if (pause_)
+	{
+		camera_->drawPause();
+	}
 
 	window_.display();
 }

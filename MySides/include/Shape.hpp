@@ -62,7 +62,9 @@ public:
 	void setAI(bool ai);
 
 	int getHP() const;
-	unsigned int getMaxHP() const;
+	unsigned int getHPMax() const;
+
+	int getSidesCollected() const;
 
 	////Temp for weapon refire
 	b2Vec2 getFirePoint(float x, float y); //
@@ -108,7 +110,7 @@ private:
 	ProjectileDef ammo_;
 	std::function<void(ProjectileDef&)> fireCallback_;
 
-	int sides_;
+	int sides_; //Currency
 	int type_;
 };
 

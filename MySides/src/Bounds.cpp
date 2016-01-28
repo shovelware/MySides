@@ -1,5 +1,9 @@
 #include "Bounds.hpp"
 
+#include "Shape.hpp"
+#include "Projectile.hpp"
+#include "Side.hpp"
+
 Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
 {
 	//Add userdata to fixture for contacts

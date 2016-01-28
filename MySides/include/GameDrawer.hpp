@@ -7,6 +7,8 @@
 #include "Drawer.hpp"
 #include "GameWorld.hpp"
 
+#include <Thor/Vectors.hpp>
+
 class GameDrawer : public Drawer
 {
 public:

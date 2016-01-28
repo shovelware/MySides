@@ -23,6 +23,7 @@ void Drawer::drawCircle(const sf::Vector2f & center, float radius, const sf::Col
 {
 	sf::CircleShape circ(radius);
 	circ.setPosition(center);
+	circ.setOrigin(radius, radius);
 
 	circ.setOutlineThickness(indent);
 	circ.setFillColor(col);

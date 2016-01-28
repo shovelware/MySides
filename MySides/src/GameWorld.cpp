@@ -129,6 +129,15 @@ void GameWorld::addPlayer(float x, float y, bool control)
 		//Set our control to the one we just put in
 		added->setControlled(true);
 		controlled_ = added;
+
+		added->armShape(addProj_);
+
+		ProjectileDef newDef = ProjectileDef::bulletDef();
+		newDef.velScale = 4;
+		newDef.damageScale = 4;
+		newDef.size = 2;
+
+		added->setAmmo(newDef);
 	}
 
 }
@@ -140,8 +149,14 @@ void GameWorld::addEnemy(float x, float y)
 	//AND add body to world with function
 	shapes_.emplace_back(addDynamicBody(x, y), 4, .5f);
 	std::list<Shape>::iterator added = --shapes_.end();
+
 	added->armShape(addProj_);
-	added->setAmmo(ProjectileDef::bulletDef());
+
+	ProjectileDef newDef = ProjectileDef::bulletDef();
+	newDef.velScale = 0.5f;
+	newDef.damageScale = 1.f;
+	added->setAmmo(newDef);
+
 	added->setAI(true);
 	added->setControlled(false);
 }
@@ -171,19 +186,13 @@ void GameWorld::addProjectile(ProjectileDef &def)
 void GameWorld::addSide(float x, float y, float nx, float ny, float size)
 {	
 	sides_.emplace_back(addDynamicBody(x, y), b2Vec2(nx, ny), size);
-	std::cout 
-		<< x << ", " 
-		<< y << " /"
-		<< nx << ", "
-		<< ny << " /"
-		<< size
-		<< std::endl;
 }
 
 void GameWorld::removePlayer(std::list<Shape>::iterator& p)
 {
 	DestroyBody(p->getBody());
-	shapes_.erase(p++);
+	p = players_.erase(p);
+	//controlled_ = std::list<Shape>::iterator();
 }
 
 //Removes enemy from the world and increments iterator, for use within loops
@@ -195,22 +204,24 @@ void GameWorld::removeEnemy(std::list<Shape>::iterator& e)
 
 	//Delete enemy
 	DestroyBody(e->getBody());
-	shapes_.erase(e++);
+	e = shapes_.erase(e);
 }
 
 //Removes projectile from the world and increments iterator, for use within loops
 void GameWorld::removeProjectile(std::list<Projectile>::iterator& p)
 {
 	DestroyBody(p->getBody());
-	projectiles_.erase(p++);
+	p = projectiles_.erase(p);
 }
 
 //Removes side from the world and increments iterator, for use within loops
 void GameWorld::removeSide(std::list<Side>::iterator & s)
 {
-	DestroyBody(s->getBody());
-	sides_.erase(s++);
+	positionSound(collectSound, s->getPosition());
 	collectSound.play();
+
+	DestroyBody(s->getBody());
+	s = sides_.erase(s);
 }
 
 void GameWorld::resetLevel()
@@ -221,13 +232,10 @@ void GameWorld::resetLevel()
 	//Add a new player
 	addPlayer(0, 0, true);
 
-	controlled_->armShape(addProj_);
-	controlled_->setAmmo(ProjectileDef::bulletDef());
-
 	spawnSound.play();
 
 	//Restart bgm
-	bgm_.play();
+	//bgm_.play();
 
 	//Regenerate level somehow
 }
@@ -392,9 +400,9 @@ void GameWorld::update(int dt)
 		for (std::list<Shape>::iterator p = players_.begin();
 		p != players_.end(); /*Don't increment here*/)
 		{
-			//p->setActive(true);//Debug invincible players
 			p->update(dt);
 			positionListener(p->getPosition());
+			p->setActive(true);//Debug invincible players
 			
 			//If we're not active, increment by deleting
 			if (p->getActive() == false)
@@ -462,7 +470,7 @@ void GameWorld::update(int dt)
 			s->update(dt);
 
 			//Demo AI
-			if (s->getAI())
+			if (s->getAI() && !players_.empty())
 			{
 				b2Vec2 playerPos = controlled_->getPosition();
 				b2Vec2 ePos = s->getPosition();
@@ -473,7 +481,7 @@ void GameWorld::update(int dt)
 
 				}
 
-				else if (between.Length() < 25 && (s->getHP() >= s->getMaxHP() / 2))
+				else if (between.Length() < 25 && (s->getHP() >= s->getHPMax() / 2))
 				{
 					s->move(between);
 
@@ -486,7 +494,7 @@ void GameWorld::update(int dt)
 					}
 				}
 
-				else if (between.Length() < 10 * (s->getMaxHP() - s->getHP())) 
+				else if (between.Length() < 10 * (s->getHPMax() - s->getHP())) 
 				{
 					s->move(-between);
 				}

@@ -10,6 +10,8 @@
 
 //#include "GameDrawer.hpp"
 
+//Forward declaration for collision
+
 //Using pi to convert deg <-> rad //DO I NEED THIS?
 #define _USE_MATH_DEFINES
 #include "math.h"
@@ -51,9 +53,5 @@ private:
 
 //Entities know about children for collision handling
 //Ask Alex how to do this better
-#include "Bounds.hpp"
-#include "Shape.hpp"
-#include "Projectile.hpp"
-#include "Side.hpp"
 
 #endif

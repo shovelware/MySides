@@ -5,6 +5,10 @@
 
 #include <SFML/Graphics.hpp>
 #include "Entity.hpp"
+#include "Bounds.hpp"
+#include "Shape.hpp"
+#include "Projectile.hpp"
+#include "Side.hpp"
 
 class Camera : public sf::View {
 public:
@@ -14,8 +18,8 @@ public:
 	* \brief Sets the follow target.
 	* The camera will follow this ship until the camera is unlocked or the ship is destroyed.
 	*/
-	void setTarget(Entity* target);
-	Entity* getTarget();
+	void setTarget(Shape* target);
+	Shape* getTarget();
 
 	//! Clears the camera's target, can keep camera on target's last position or reset
 	void clearTarget(bool savexf);
@@ -37,10 +41,11 @@ public:
 
 	//! HUD Drawing controls, both of these change render target for their duration
 	void drawHUD();
+	void drawPause();
 
 	float getZoomPercent() const; //!< Returns zoom factor as a percentage
 private:
-	Entity* target_;			//!< The target followed ship
+	Shape* target_;			//!< The target followed ship
 	sf::Vector2f screenSize_; //!< Keep a record of the screen size for resets
 
 	float zoomFactor_; //!< The internal factor of the zoom
@@ -56,6 +61,7 @@ private:
 	sf::Vector2f radarPos_; //!< Radar position within HUD
 
 	void drawText(std::string info, sf::Vector2f pos, sf::Color color); //! Draws a color text at pos to HUD, called by drawHUD()
+	void drawTextAligned(std::string info, sf::Vector2f pos, sf::Color color); //! Draws a color text at pos to HUD, called by drawHUD()
 	sf::Vector2f B2toSF(const b2Vec2& vec, bool scale = true) const;
 };
 #endif

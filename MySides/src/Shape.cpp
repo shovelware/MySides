@@ -1,5 +1,9 @@
 #include "Shape.hpp"
 
+#include "Bounds.hpp"
+#include "Projectile.hpp"
+#include "Side.hpp"
+
 ///
 #include <sstream>
 #include "Log.hpp"
@@ -250,9 +254,14 @@ int Shape::getHP() const
 	return hp_;
 }
 
-unsigned int Shape::getMaxHP() const
+unsigned int Shape::getHPMax() const
 {
 	return maxHP_;
+}
+
+int Shape::getSidesCollected() const
+{
+	return sides_;
 }
 
 b2Vec2 Shape::getFirePoint(float x, float y)
@@ -338,6 +347,8 @@ void Shape::trigger(b2Vec2 direction)
 			newProj.heading = newDir;
 			fireCallback_(newProj);
 
+			//Abstract this into weapon later
+
 			coolDown_ = refireTime_;
 		}
 	}
@@ -420,5 +431,3 @@ bool Shape::collide(Entity * other, b2Contact& contact)
 //{
 //
 //}
-
-

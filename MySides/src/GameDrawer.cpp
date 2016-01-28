@@ -137,8 +137,28 @@ void GameDrawer::drawBounds(Bounds& b)
 		verts[i] = B2toSF(body->GetWorldPoint(shape->m_vertices[i]), true);
 	}
 
+	//Draw layered bounds below
+	sf::Vector2f* subVerts = new sf::Vector2f[count];
+
+	for (int i = 0; i < count; ++i)
+	{
+		subVerts[i] = verts[i];
+	}
+
+	int layers = 8;
+	for (int l = 0; l <= layers; ++l)
+	{
+		for (int v = 0; v < count; ++v)
+		{
+			subVerts[v] *= 0.8f;
+		}
+
+		drawPolygon(subVerts, count, sf::Color(64, 64, 64, l * 8), sf::Color(0, 0, 0));
+	}
+
+
 	//Draw stuff
-	drawPolygon(verts, count, sf::Color(64, 64, 64), sf::Color(0, 0, 0));
+	drawPolygon(verts, count, sf::Color(64, 64, 64, 128), sf::Color(0, 0, 0));
 
 	//Clean up
 	delete[] verts;
@@ -152,7 +172,7 @@ void GameDrawer::drawProjectile(Projectile& p)
 
 	b2Vec2 vel = pos + p.getBody()->GetLinearVelocity();
 	b2CircleShape* shape = static_cast<b2CircleShape*>(p.getBody()->GetFixtureList()->GetShape());
-
+	
 	float rad = shape->m_radius * _SCALE_;
 
 	//Draw shape, vel, pos
@@ -180,13 +200,13 @@ void GameDrawer::drawSide(Side& s)
 	b2EdgeShape* shape = static_cast<b2EdgeShape*>(fix->GetShape());
 
 	//Not long enough sides
-	b2Vec2 a = body->GetWorldPoint(shape->m_vertex0);
-	b2Vec2 b = body->GetWorldPoint(shape->m_vertex1);
+	b2Vec2 a = body->GetWorldPoint(shape->m_vertex1);
+	b2Vec2 b = body->GetWorldPoint(shape->m_vertex2);
 
 	b2Vec2 vel = pos + s.getBody()->GetLinearVelocity();
 
 	//Draw line
-	drawLine(B2toSF(a, true), B2toSF(b, true), sf::Color::Black);
+	drawLine(B2toSF(a, true), B2toSF(b, true), sf::Color::Red);
 }
 
 /*GameDrawer::DrawShape(const &Shape s)
