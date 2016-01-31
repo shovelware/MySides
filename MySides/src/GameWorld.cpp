@@ -159,6 +159,8 @@ void GameWorld::addPlayer(float x, float y, bool control)
 		newDef.size = 2;
 
 		added->setAmmo(newDef);
+		added->weapon_ = new Weapon::Rifle(&*added, addProj_);
+		added->weapon_->setProjectile(newDef);
 	}
 
 }

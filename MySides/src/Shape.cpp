@@ -11,7 +11,7 @@ extern Log l;
 ///
 
 //Creates a shape using passed body //int sides, float radius
-Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body)
+Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body), weapon_(nullptr)
 {
 	//Create a shape, the outline
 	b2PolygonShape shap;
@@ -264,22 +264,10 @@ int Shape::getSidesCollected() const
 	return sides_;
 }
 
-b2Vec2 Shape::getFirePoint(float x, float y)
-{
-	b2Vec2 p = body_->GetPosition();
-	b2Vec2 d(x, y);
-	d.Normalize();
-
-	d *= 1; //MAGIC NUMBER FIX SOON
-
-	coolDown_ = refireTime_;
-
-	return p + d;
-}
-
 bool Shape::getArmed()
 {
 	return (coolDown_ == 0);
+	//return (weapon_ == nullptr)
 }
 
 void Shape::armShape(std::function<void(ProjectileDef&)>& callback)
@@ -304,7 +292,7 @@ void Shape::setAmmo(ProjectileDef & def)
 
 void Shape::trigger(b2Vec2 direction)
 {
-	if (fireCallback_ != nullptr && ammo_.isValid())
+	if (weapon_ == nullptr && fireCallback_ != nullptr && ammo_.isValid())
 	{
 		if (coolDown_ == 0)
 		{
@@ -352,12 +340,17 @@ void Shape::trigger(b2Vec2 direction)
 			coolDown_ = refireTime_;
 		}
 	}
+
+	else weapon_->trigger(direction);
 }
 
 void Shape::update(int milliseconds)
 {
 	if (active_)
 	{
+		if (weapon_ != nullptr)
+			weapon_->update(milliseconds);
+
 		//Weapon cooldown
 		if (coolDown_ > 0)
 		{

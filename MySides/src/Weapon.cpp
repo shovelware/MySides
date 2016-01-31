@@ -1,26 +1,26 @@
 #include "Weapon.hpp"
-
-Weapon::Weapon(Shape* owner, std::function<void(ProjectileDef&)>& callback) :
-	owner_(owner),
-	fireCallback_(callback) 
-{
-
-}
-
-void Weapon::setProjectile(ProjectileDef const &pd)
-{
-	output_ = ProjectileDef(pd);
-}
-
-void Weapon::setOwner(Shape* owner)
-{
-	owner_ = owner;
-}
-
-void Weapon::trigger(b2Vec2 & heading)
-{
-	if (canFire())
+	Weapon::WeaponI::WeaponI(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo) :
+		owner_(owner),
+		fireCallback_(callback),
+		output_(ProjectileDef(ammo))
 	{
-		fire(heading);
+
 	}
-}
+
+	void Weapon::WeaponI::setProjectile(ProjectileDef const &pd)
+	{
+		output_ = ProjectileDef(pd);
+	}
+
+	void Weapon::WeaponI::setOwner(Shape* owner)
+	{
+		owner_ = owner;
+	}
+
+	void Weapon::WeaponI::trigger(b2Vec2 & heading)
+	{
+		if (canFire())
+		{
+			fire(heading);
+		}
+	}

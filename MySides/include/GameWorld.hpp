@@ -23,17 +23,7 @@
 #include "Side.hpp"
 
 #include "Weapon.hpp"
-
-//Checks if entity is alive, predicate for remove_if
-static bool isAlive(Entity* e)
-{
-	return e->getAlive();
-}
-
-//Checks if entity is active, predicate for remove_if
-static bool isActive(Entity e){
-	return e.getActive();
-}
+#include "WeapRifle.hpp"
 
 class GameWorld : protected b2World {
 public:
@@ -53,6 +43,9 @@ public:
 	//void addEnemy(ShapeDef &def)
 	void addProjectile(ProjectileDef &def);
 	void addSide(SideDef &def);
+
+	void armShape(Shape* shape);
+	void disarmShape(Shape* shape);
 
 	//And callbacks for entities
 	std::function<void(ProjectileDef&)> addProj_;	
@@ -98,12 +91,13 @@ private:
 	const b2Vec2 GRAVITY = b2Vec2(0, 0.1);
 	const int VELOCITY_ITERS = 6;
 	const int POSITION_ITERS = 2;
+	
+	//Shape player_; Who needs a list? Trim to this soon
 
 	std::list<Shape> players_;
 	std::list<Shape> shapes_;
 	std::list<Projectile> projectiles_;
 	std::list<Side> sides_;
-	std::list<Entity> addons_; // Addons for shapes (Store here?)
 
 	std::list<Shape>::iterator controlled_;
 	

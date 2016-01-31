@@ -67,7 +67,6 @@ public:
 	int getSidesCollected() const;
 
 	////Temp for weapon refire
-	b2Vec2 getFirePoint(float x, float y); //
 	bool getArmed();//
 
 
@@ -83,6 +82,8 @@ public:
 
 	bool collide(Entity* other, b2Contact& contact); //override
 
+	//New firing logic
+	Weapon::WeaponI* weapon_;
 private:
 	/*const*/ float maxVel_;//maximum velocity
 	/*const*/ float maxRot_;//maximum rotation

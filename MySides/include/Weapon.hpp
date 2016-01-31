@@ -1,5 +1,5 @@
 // Weapon.hpp
-// Controls firing logic, cooldowns and projectile types for shapes
+// Interface, controls firing logic, cooldowns and projectile types for shapes
 
 #ifndef MS_WEAPON_HPP
 #define MS_WEAPON_HPP
@@ -11,26 +11,28 @@
 
 class Shape;
 
-class Weapon {
-public:
+namespace Weapon {
+	class WeaponI {
+	public:
 
-	void setProjectile(ProjectileDef const &pd);
-	void setOwner(Shape* owner);
+		void setProjectile(ProjectileDef const &pd);
+		void setOwner(Shape* owner);
 
-	void trigger(b2Vec2 &heading);
+		void trigger(b2Vec2 &heading);
 
-	virtual void update(int dt)= 0;
+		virtual void update(int dt) = 0;
 
-protected:
-	Weapon(Shape* owner, std::function<void(ProjectileDef&)>& callback);
-	Shape* owner_;
-	ProjectileDef output_;
-	std::function<void(ProjectileDef&)> fireCallback_;
+	protected:
+		WeaponI(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo);
+		Shape* owner_;
+		ProjectileDef output_;
+		std::function<void(ProjectileDef&)> fireCallback_;
 
-	virtual void fire(b2Vec2 &heading) = 0;
-	virtual bool canFire() = 0;
-};
-
+		virtual void fire(b2Vec2 &heading) = 0;
+		virtual bool canFire() = 0;
+	};
+}
 #include "Shape.hpp"
+
 
 #endif
