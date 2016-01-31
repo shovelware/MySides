@@ -19,9 +19,10 @@
 #include "Entity.hpp"
 #include "Bounds.hpp"
 #include "Shape.hpp"
-#include "Weapon.hpp"
-//#include "Projectile.hpp"
+#include "Projectile.hpp"
 #include "Side.hpp"
+
+#include "Weapon.hpp"
 
 //Checks if entity is alive, predicate for remove_if
 static bool isAlive(Entity* e)

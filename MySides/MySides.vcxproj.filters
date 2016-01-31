@@ -37,6 +37,12 @@
     <Filter Include="Header Files\Game\Entity">
       <UniqueIdentifier>{31c0a8fc-3c39-4c45-b21a-52f16bfdb560}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game\Weapon">
+      <UniqueIdentifier>{3bb0ca03-7443-4560-bec4-98b675cf5e0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Weapon">
+      <UniqueIdentifier>{94ee5d4a-d44a-43d9-839d-98fe62dbed44}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entity.cpp">
@@ -86,6 +92,12 @@
     </ClCompile>
     <ClCompile Include="src\KeyInput.cpp">
       <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Weapon.cpp">
+      <Filter>Source Files\Game\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeapRifle.cpp">
+      <Filter>Source Files\Game\Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +157,12 @@
     </ClInclude>
     <ClInclude Include="include\ProjectileDef.hpp">
       <Filter>Header Files\Game\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Weapon.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WeapRifle.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

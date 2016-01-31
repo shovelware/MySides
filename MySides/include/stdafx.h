@@ -37,3 +37,6 @@
 //Globals
 const double _TICKTIME_ = 1.f / 60.f;
 const double _SCALE_ = 32.f;
+
+//Helpful functions
+static float tickToSec(unsigned int ticks) { return _TICKTIME_ * ticks; }

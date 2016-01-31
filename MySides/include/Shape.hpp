@@ -8,7 +8,7 @@
 #include "ProjectileDef.hpp"
 
 #include <functional>
-//#include "Weapon.hpp"
+#include "Weapon.hpp"
 
 namespace traits{
 	namespace speed 

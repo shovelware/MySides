@@ -1,37 +1,36 @@
-//Weapon.hpp:
-// Handles firing and cooling logic
+// Weapon.hpp
+// Controls firing logic, cooldowns and projectile types for shapes
 
 #ifndef MS_WEAPON_HPP
 #define MS_WEAPON_HPP
 
-#include "ProjectileDef.hpp"
 #include <stdafx.h>
-#include <Box2D\Box2D.h>
+#include <functional>
 
-///class ProjectileDef;
-class Entity; // Forward declarations
+#include "ProjectileDef.hpp"
+
+class Shape;
 
 class Weapon {
 public:
-	Weapon(Entity* owner);
-	
-	virtual void trigger(b2Vec2 &heading);
 
-	void setProjectile(ProjectileDef &pd);
-	void setOwner(Entity* owner);
+	void setProjectile(ProjectileDef const &pd);
+	void setOwner(Shape* owner);
 
-	void update(int milliseconds);
-private:
-	Entity* owner_;
-	virtual void fire(b2Vec2 &heading);
+	void trigger(b2Vec2 &heading);
 
-	bool canFire();
+	virtual void update(int dt)= 0;
 
+protected:
+	Weapon(Shape* owner, std::function<void(ProjectileDef&)>& callback);
+	Shape* owner_;
 	ProjectileDef output_;
+	std::function<void(ProjectileDef&)> fireCallback_;
 
-	int refireTime_;
-	int coolDown_;
+	virtual void fire(b2Vec2 &heading) = 0;
+	virtual bool canFire() = 0;
 };
-//#include <ProjectileDef.hpp>
-#include <Entity.hpp>
+
+#include "Shape.hpp"
+
 #endif

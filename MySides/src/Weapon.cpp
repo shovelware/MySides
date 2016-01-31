@@ -1,60 +1,26 @@
 #include "Weapon.hpp"
 
-Weapon::Weapon(Entity* owner) : owner_(owner)
+Weapon::Weapon(Shape* owner, std::function<void(ProjectileDef&)>& callback) :
+	owner_(owner),
+	fireCallback_(callback) 
 {
-	output_ = ProjectileDef();
-	output_.owner = owner;
+
 }
 
-void Weapon::trigger(b2Vec2 &heading)
-{
-	if (canFire())
-	{
-		fire(heading);
-	}
-}
-
-void Weapon::setProjectile(ProjectileDef &pd)
+void Weapon::setProjectile(ProjectileDef const &pd)
 {
 	output_ = ProjectileDef(pd);
 }
 
-void Weapon::setOwner(Entity * owner)
+void Weapon::setOwner(Shape* owner)
 {
 	owner_ = owner;
 }
 
-bool Weapon::canFire()
+void Weapon::trigger(b2Vec2 & heading)
 {
-	return (coolDown_ <= 0);
-}
-
-void Weapon::fire(b2Vec2 &heading)
-{
-	ProjectileDef newProj(output_);
-
-	newProj.origin = owner_->getPosition();
-	newProj.heading = heading;
-	newProj.inVelocity =  b2Vec2_zero;
-
-	newProj.owner = owner_;
-	newProj.target = nullptr;
-
-	//Fire bullet with callback here
-
-	coolDown_ = refireTime_;
-}
-
-void Weapon::update(int milliseconds)
-{
-	//Cooldown
-	if (coolDown_ > 0)
+	if (canFire())
 	{
-		coolDown_ -= milliseconds;
-
-		if (coolDown_ < 0)
-		{
-			coolDown_ = 0;
-		}
+		fire(heading);
 	}
 }

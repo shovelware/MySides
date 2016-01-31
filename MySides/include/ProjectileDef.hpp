@@ -4,6 +4,8 @@
 #include <stdafx.h>
 #include <Box2D\Box2D.h>
 
+class Entity;
+
 struct ProjectileDef {
 public:
 	ProjectileDef() :
