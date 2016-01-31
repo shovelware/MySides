@@ -18,7 +18,7 @@ namespace Weapon {
 		void setProjectile(ProjectileDef const &pd);
 		void setOwner(Shape* owner);
 
-		void trigger(b2Vec2 &heading);
+		void trigger(b2Vec2 &direction);
 
 		virtual void update(int dt) = 0;
 

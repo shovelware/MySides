@@ -1,14 +1,19 @@
 #include "GameWorld.hpp"
 
-inline float randFloat(float MAX) { return static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / MAX)); };
-inline float randFloat(float MIN, float MAX) { return MIN + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (MAX - MIN))); };
+//inline float randFloat(float MAX) { return static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / MAX)); };
+//inline float randFloat(float MIN, float MAX) { return MIN + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (MAX - MIN))); };
 
 //Constructor initialises Box2D World and boudaries
-GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 32), contactListener_(ContactListener())
+GameWorld::GameWorld() : 
+	b2World(GRAVITY), 
+	contactListener_(ContactListener())
 {
 	SetContactListener(&contactListener_);
 
+	bounds_ = new Bounds(addStaticBody(0, 0), 32),
+
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
+	//addSide_ = [this](SideDef& def) {addSide(def); };
 	
 	bgm_.openFromFile("../assets/spriterip.ogg");
 	bgm_.setLoop(true);
@@ -40,11 +45,16 @@ GameWorld::GameWorld() : b2World(GRAVITY), bounds_(addStaticBody(0, 0), 32), con
 	collectSound.setAttenuation(1);
 }
 
+GameWorld::~GameWorld()
+{
+	clearWorld();
+	delete bounds_;
+}
 //Returns true if the gameworld has a controlled entity !!!FIX
 bool GameWorld::hasControlled()
 {
 	//Return false if our pointer to the controlled shape is null
-	return !(controlled_._Ptr == nullptr);
+	return (controlled_ != nullptr);
 }
 
 //Adds a dynamic body to the world, returns a pointer to created body
@@ -64,7 +74,7 @@ b2Body * GameWorld::addDynamicBody(float x, float y)
 	fric.localAnchorB = (b2Vec2(0, 0));
 
 	fric.bodyA = body;
-	fric.bodyB = bounds_.getBody();
+	fric.bodyB = bounds_->getBody();
 
 	fric.maxForce	= 0.0001f;
 	fric.maxTorque	= 0.005f;
@@ -140,27 +150,25 @@ void GameWorld::addPlayer(float x, float y, bool control)
 {
 	//Emplace the shape into shape list 
 	//AND add body to world with function
-	players_.emplace_back(addDynamicBody(x, y), 4, .5f);
+	player_ = new Shape(addDynamicBody(x, y), 4, .5f);
 
-	std::list<Shape>::iterator added = --players_.end();
-	added->setAI(false);
+	player_->setAI(false);
 	
 	if (control)
 	{
 		//Set our control to the one we just put in
-		added->setControlled(true);
-		controlled_ = added;
+		player_->setControlled(true);
+		controlled_ = player_;
 
-		added->armShape(addProj_);
+		player_->armShape(addProj_);
 
 		ProjectileDef newDef = ProjectileDef::bulletDef();
 		newDef.velScale = 4;
 		newDef.damageScale = 4;
 		newDef.size = 2;
 
-		added->setAmmo(newDef);
-		added->weapon_ = new Weapon::Rifle(&*added, addProj_);
-		added->weapon_->setProjectile(newDef);
+		player_->setAmmo(newDef);
+		player_->arm(new Weapon::Shotgun(&*player_, addProj_, newDef));
 	}
 
 }
@@ -170,8 +178,8 @@ void GameWorld::addEnemy(float x, float y)
 {
 	//Push the shape into the shape vector
 	//AND add body to world with function
-	shapes_.emplace_back(addDynamicBody(x, y), 4, .5f);
-	std::list<Shape>::iterator added = --shapes_.end();
+	shapes_.push_back(new Shape(addDynamicBody(x, y), 4, .5f));
+	Shape* added = *(--shapes_.end());
 
 	added->armShape(addProj_);
 
@@ -185,20 +193,20 @@ void GameWorld::addEnemy(float x, float y)
 }
 
 //Adds a projectile to the world
-void GameWorld::addProjectile(float x, float y, float vx, float vy)
-{
-	ProjectileDef p(b2Vec2(x, y), b2Vec2 (vx, vy));
-	p.owner = &*controlled_;
-
-	////
-	//p.inVelocity = controlled_->getBody()->GetLinearVelocity();
-	projectiles_.emplace_back(addBulletBody(x, y), p);
-}
+//void GameWorld::addProjectile(float x, float y, float vx, float vy)
+//{
+//	ProjectileDef p(b2Vec2(x, y), b2Vec2 (vx, vy));
+//	p.owner = &*controlled_;
+//
+//	////
+//	//p.inVelocity = controlled_->getBody()->GetLinearVelocity();
+//	projectiles_.emplace_back(addBulletBody(x, y), p);
+//}
 
 //Adds a projectile to the world via definition
 void GameWorld::addProjectile(ProjectileDef &def)
 {
-	projectiles_.emplace_back(addBulletBody(def.origin.x, def.origin.y), def);
+	projectiles_.push_back(new Projectile(addBulletBody(def.origin.x, def.origin.y), def));
 
 	//Play fire sound at fired position
 	positionSound(fireSound, def.origin);
@@ -208,42 +216,45 @@ void GameWorld::addProjectile(ProjectileDef &def)
 //Adds a side to the world
 void GameWorld::addSide(float x, float y, float nx, float ny, float size)
 {	
-	sides_.emplace_back(addDynamicBody(x, y), b2Vec2(nx, ny), size);
+	sides_.push_back(new Side(addDynamicBody(x, y), b2Vec2(nx, ny), size));
 }
 
-void GameWorld::removePlayer(std::list<Shape>::iterator& p)
+void GameWorld::removePlayer()
 {
-	DestroyBody(p->getBody());
-	p = players_.erase(p);
-	//controlled_ = std::list<Shape>::iterator();
+	delete player_;
+	player_ = nullptr;
 }
 
 //Removes enemy from the world and increments iterator, for use within loops
-void GameWorld::removeEnemy(std::list<Shape>::iterator& e)
+void GameWorld::removeEnemy(std::list<Shape*>::iterator& e)
 {
 	//Play death sound at position
-	positionSound(dieSound, e->getPosition());
+	positionSound(dieSound, (*e)->getPosition());
 	dieSound.play();
 
 	//Delete enemy
-	DestroyBody(e->getBody());
+	DestroyBody((*e)->getBody());
+	delete (*e);
+
 	e = shapes_.erase(e);
 }
 
 //Removes projectile from the world and increments iterator, for use within loops
-void GameWorld::removeProjectile(std::list<Projectile>::iterator& p)
+void GameWorld::removeProjectile(std::list<Projectile*>::iterator& p)
 {
-	DestroyBody(p->getBody());
+	DestroyBody((*p)->getBody());
+	delete (*p);
+
 	p = projectiles_.erase(p);
 }
 
 //Removes side from the world and increments iterator, for use within loops
-void GameWorld::removeSide(std::list<Side>::iterator & s)
+void GameWorld::removeSide(std::list<Side*>::iterator & s)
 {
-	positionSound(collectSound, s->getPosition());
+	positionSound(collectSound, (*s)->getPosition());
 	collectSound.play();
 
-	DestroyBody(s->getBody());
+	DestroyBody((*s)->getBody());
 	s = sides_.erase(s);
 }
 
@@ -268,19 +279,11 @@ void GameWorld::resetLevel()
 
 void GameWorld::clearWorld()
 {
-	if (players_.empty() == false)
-	{
-		for (std::list<Shape>::iterator p = players_.begin();
-		p != players_.end(); /*Don't increment here*/)
-		{
-			removePlayer(p);
-		}
-	}
-	players_.clear();
+	player_ = nullptr;
 
 	if (shapes_.empty() == false)
 	{
-		for (std::list<Shape>::iterator s = shapes_.begin();
+		for (std::list<Shape*>::iterator s = shapes_.begin();
 		s != shapes_.end(); /*Don't increment here*/)
 		{
 			removeEnemy(s);
@@ -290,7 +293,7 @@ void GameWorld::clearWorld()
 
 	if (projectiles_.empty() == false)
 	{
-		for (std::list<Projectile>::iterator p = projectiles_.begin();
+		for (std::list<Projectile*>::iterator p = projectiles_.begin();
 		p != projectiles_.end(); /*Don't increment here*/)
 		{
 			removeProjectile(p);
@@ -300,7 +303,7 @@ void GameWorld::clearWorld()
 
 	if (sides_.empty() == false)
 	{
-		for (std::list<Side>::iterator s = sides_.begin();
+		for (std::list<Side*>::iterator s = sides_.begin();
 		s != sides_.end(); /*Don't increment here*/)
 		{
 			removeSide(s);
@@ -312,25 +315,25 @@ void GameWorld::clearWorld()
 //Returns the radius of the level bounds
 float GameWorld::getBoundsRadius()
 {
-	return bounds_.getRadius();
+	return bounds_->getRadius();
 }
 
 //Resizes the bounds to the passed radius, [correcting for shapes outside](not yet)
 void GameWorld::resizeBounds(float radius)
 {
-	if (radius < bounds_.getRadius())
+	if (radius < bounds_->getRadius())
 	{
 		//correct for bodies outside radius
 	}
 
 	//Recreate the bounds
-	bounds_.resize(radius);
+	bounds_->resize(radius);
 }
 
 //Returns the length of one side of bounds
 float GameWorld::getBoundsSide()
 {
-	return bounds_.getSideLength();
+	return bounds_->getSideLength();
 }
 
 void GameWorld::move(b2Vec2 direction)
@@ -407,42 +410,33 @@ void GameWorld::DrawDebugData()
 	b2World::DrawDebugData();
 }
 
-std::list<Shape>& GameWorld::getShapes()
-{
-	return shapes_;
-}
-
-Bounds & GameWorld::getBounds() { return bounds_; }
-std::list<Shape>& GameWorld::getPlayers() { return players_; }
-std::list<Projectile>& GameWorld::getProjectiles() { return projectiles_; }
-std::list<Side>& GameWorld::getSides() { return sides_; }
+Bounds*& GameWorld::getBounds() { return bounds_; }
+std::list<Shape*>& GameWorld::getShapes() {	return shapes_; }
+Shape*& GameWorld::getPlayer() { return player_; }
+std::list<Projectile*>& GameWorld::getProjectiles() { return projectiles_; }
+std::list<Side*>& GameWorld::getSides() { return sides_; }
 
 //Update entity code and step the world
 void GameWorld::update(int dt)
 {
 	//Players update first
-	if (players_.empty() == false)
+	if (player_ != nullptr)
 	{
-		for (std::list<Shape>::iterator p = players_.begin();
-		p != players_.end(); /*Don't increment here*/)
-		{
-			p->update(dt);
-			positionListener(p->getPosition());
-			p->setActive(true);//Debug invincible players
-			
-			//If we're not active, increment by deleting
-			if (p->getActive() == false)
-			{
-				////Add a side
-				//static float side = 1.f;
-				//b2Vec2 pos = p->getPosition();
-				//addSide(pos.x, pos.y, 0, 0, side++);
-				//
-				removePlayer(p);
-			}
+		player_->update(dt);
+		positionListener(player_->getPosition());
 
-			//Else just increment
-			else ++p;
+		////
+		player_->setActive(true);//Debug invincible players
+		
+		//If we're not active
+		if (player_->getActive() == false)
+		{
+			////Add a side
+			//static float side = 1.f;
+			//b2Vec2 pos = p->getPosition();
+			//addSide(pos.x, pos.y, 0, 0, side++);
+			//
+			removePlayer();
 		}
 	}
 
@@ -490,16 +484,19 @@ void GameWorld::update(int dt)
 	//Update Shapes
 	if (shapes_.empty() == false)
 	{
-		for (std::list<Shape>::iterator s = shapes_.begin();
-		s != shapes_.end(); /*Don't increment here*/)
+		for (std::list<Shape*>::iterator shapeIt = shapes_.begin();
+		shapeIt != shapes_.end(); /*Don't increment here*/)
 		{
-			s->update(dt);
+			//Pull pointer from iter for readability
+			Shape* shp = (*shapeIt);
+
+			shp->update(dt);
 
 			//Demo AI
-			if (s->getAI() && !players_.empty())
+			if (shp->getAI() && player_ != nullptr)
 			{
 				b2Vec2 playerPos = controlled_->getPosition();
-				b2Vec2 ePos = s->getPosition();
+				b2Vec2 ePos = shp->getPosition();
 				b2Vec2 between = playerPos - ePos;
 
 				if (between.Length() > 40  || between.Length() < 5)
@@ -507,37 +504,37 @@ void GameWorld::update(int dt)
 
 				}
 
-				else if (between.Length() < 25 && (s->getHP() >= s->getHPMax() / 2))
+				else if (between.Length() < 25 && (shp->getHP() >= shp->getHPMax() / 2))
 				{
-					s->move(between);
+					shp->move(between);
 
-					if (s->getArmed())
+					if (shp->getArmed())
 					{
-						s->trigger(between);
+						shp->trigger(between);
 						//b2Vec2 fp = s->getFirePoint(between.x, between.y);
 						//
 						//addProjectile(fp.x, fp.y, between.x, between.y);
 					}
 				}
 
-				else if (between.Length() < 10 * (s->getHPMax() - s->getHP())) 
+				else if (between.Length() < 10 * (shp->getHPMax() - shp->getHP())) 
 				{
-					s->move(-between);
+					shp->move(-between);
 				}
 			}
 
 			//If we're not active, increment by deleting
-			if (s->getActive() == false)
+			if (shp->getActive() == false)
 			{
 				//Add a side
 				static float side = 1.f;
-				b2Vec2 pos = s->getPosition();
+				b2Vec2 pos = shp->getPosition();
 				addSide(pos.x, pos.y, 0, 0, side);
-				removeEnemy(s);
+				removeEnemy(shapeIt);
 			}
 
 			//Else just increment
-			else ++s;
+			else ++shapeIt;
 		}
 	}
 
@@ -545,35 +542,41 @@ void GameWorld::update(int dt)
 
 	if (projectiles_.empty() == false)
 	{
-		for (std::list<Projectile>::iterator p = projectiles_.begin();
-			p != projectiles_.end(); /*Don't increment here*/)
+		for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
+			projIt != projectiles_.end(); /*Don't increment here*/)
 		{
-			p->update(dt);
+			//Pull pointer from it for readability
+			Projectile* prj = (*projIt);
+
+			prj->update(dt);
 
 			//If we're not active, increment by deleting
-			if (p->getActive() == false)
+			if (prj->getActive() == false)
 			{
-				removeProjectile(p);
+				removeProjectile(projIt);
 			}
 
 			//Else just increment
-			else ++p;
+			else ++projIt;
 		}
 	}
 
 	if (sides_.empty() == false)
 	{
-		for (std::list<Side>::iterator s = sides_.begin();
-		s != sides_.end(); /*Don't increment here*/)
+		for (std::list<Side*>::iterator sideIt = sides_.begin();
+		sideIt != sides_.end(); /*Don't increment here*/)
 		{
+			//Pull pointer
+			Side* sd = (*sideIt);
+
 			//If we're not active, increment by deleting
-			if (s->getActive() == false)
+			if (sd->getActive() == false)
 			{
-				removeSide(s);
+				removeSide(sideIt);
 			}
 
 			//Else just increment
-			else ++s;
+			else ++sideIt;
 		}
 	}
 
@@ -616,12 +619,7 @@ UpdateShape(Shape* s, int dt)
 //Gets a pointer to the controlled shape
 Shape * GameWorld::controlled()
 {
-	//If we have a controlled character
-	if (controlled_._Ptr != nullptr)
-		return &(*controlled_);
-
-	//Otherwise
-	else return nullptr;
+	return player_;
 }
 
 //Handlers for game intent: Move, Fire, Select, Triggers

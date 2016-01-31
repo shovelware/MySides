@@ -17,10 +17,10 @@
 		owner_ = owner;
 	}
 
-	void Weapon::WeaponI::trigger(b2Vec2 & heading)
+	void Weapon::WeaponI::trigger(b2Vec2 & direction)
 	{
 		if (canFire())
 		{
-			fire(heading);
+			fire(direction);
 		}
 	}

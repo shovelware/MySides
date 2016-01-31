@@ -99,6 +99,9 @@
     <ClCompile Include="src\WeapRifle.cpp">
       <Filter>Source Files\Game\Weapon</Filter>
     </ClCompile>
+    <ClCompile Include="src\WeapShotgun.cpp">
+      <Filter>Source Files\Game\Weapon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">
@@ -162,6 +165,12 @@
       <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\WeapRifle.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WeapShotgun.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Magazine.hpp">
       <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
   </ItemGroup>

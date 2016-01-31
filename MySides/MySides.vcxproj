@@ -144,6 +144,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
     <ClCompile Include="src\WeapRifle.cpp" />
+    <ClCompile Include="src\WeapShotgun.cpp" />
     <ClCompile Include="src\XController.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
@@ -160,6 +161,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\KeyInput.hpp" />
     <ClInclude Include="include\Log.hpp" />
     <ClInclude Include="include\Drawer.hpp" />
+    <ClInclude Include="include\Magazine.hpp" />
     <ClInclude Include="include\Projectile.hpp" />
     <ClInclude Include="include\ProjectileDef.hpp" />
     <ClInclude Include="include\Shape.hpp" />
@@ -169,6 +171,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\Weapon.hpp" />
     <ClInclude Include="include\WeapRifle.hpp" />
+    <ClInclude Include="include\WeapShotgun.hpp" />
     <ClInclude Include="include\XController.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>

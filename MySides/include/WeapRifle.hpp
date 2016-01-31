@@ -5,42 +5,7 @@
 #define MS_WRIFLE_HPP
 
 #include "Weapon.hpp"
-
-	class Magazine {
-	private:
-		int count_;
-		int countMAX_;
-	public:
-		Magazine(int maxRounds) :
-			countMAX_(maxRounds),
-			count_(maxRounds)
-		{
-
-		}
-
-		void remove()
-		{
-			if (count_ - 1 >= 0)
-			{
-				count_ -= 1;
-			}
-
-			else
-			{
-				count_ = 0;
-			}
-		}
-
-		void reload()
-		{
-			count_ = countMAX_;
-		}
-
-		bool checkEmpty()
-		{
-			return (count_ <= 0);
-		}
-	};
+#include "Magazine.hpp"
 
 namespace Weapon {
 	class Rifle : public WeaponI {

@@ -51,6 +51,15 @@ Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body), weapon_(n
 	ai_ = false;
 }
 
+//Destroys weapon if we have one
+Shape::~Shape()
+{
+	if (weapon_ != nullptr)
+	{
+		delete weapon_;
+	}
+}
+
 //Sets shape to be an equilateral triangle with sides of 1*scale
 void Shape::setTriangleEqu(b2PolygonShape& s, float scale)
 {
@@ -342,6 +351,29 @@ void Shape::trigger(b2Vec2 direction)
 	}
 
 	else weapon_->trigger(direction);
+}
+
+void Shape::arm(Weapon::WeaponI * weapon)
+{
+	weapon_ = weapon;
+}
+
+void Shape::disarm()
+{
+	if (weapon_ != nullptr)
+	{
+		delete weapon_;
+	}
+
+	weapon_ = nullptr;
+}
+
+void Shape::fire(b2Vec2 direction)
+{
+	if (weapon_ != nullptr)
+	{
+		weapon_->trigger(direction);
+	}
 }
 
 void Shape::update(int milliseconds)

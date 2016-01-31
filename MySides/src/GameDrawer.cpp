@@ -18,26 +18,27 @@ void GameDrawer::draw()
 {
 	drawBounds(world_->getBounds());
 
-	std::list<Shape>& players = world_->getPlayers();
-	for (Shape plyr : players)
+
+	Shape*& player = world_->getPlayer();
+	if (player != nullptr)
 	{
-		drawPlayer(plyr);
+		drawPlayer(player);
 	}
 
-	std::list<Shape>& shapes = world_->getShapes();
-	for (Shape shp : shapes)
+	std::list<Shape*>& shapes = world_->getShapes();
+	for (Shape* shp : shapes)
 	{
 		drawShape(shp);
 	}
 
-	std::list<Projectile>& projs = world_->getProjectiles();
-	for (Projectile prj : projs)
+	std::list<Projectile*>& projs = world_->getProjectiles();
+	for (Projectile* prj : projs)
 	{
 		drawProjectile(prj);
 	}
 
-	std::list<Side>& sides = world_->getSides();
-	for (Side sd : sides)
+	std::list<Side*>& sides = world_->getSides();
+	for (Side* sd : sides)
 	{
 		drawSide(sd);
 	}
@@ -54,13 +55,13 @@ void GameDrawer::draw()
 	//}
 }
 
-void GameDrawer::drawPlayer(Shape& p)
+void GameDrawer::drawPlayer(Shape*& p)
 {
 	//Pull vars
-	b2Body* body = p.getBody();
+	b2Body* body = p->getBody();
 	b2Vec2 pos = body->GetWorldCenter();
 	b2Vec2 vel = pos + body->GetLinearVelocity();
-	b2PolygonShape* shape = static_cast<b2PolygonShape*>(p.getBody()->GetFixtureList()->GetShape());
+	b2PolygonShape* shape = static_cast<b2PolygonShape*>(p->getBody()->GetFixtureList()->GetShape());
 	int count = shape->GetVertexCount();
 
 	//Convert verts
@@ -84,13 +85,13 @@ void GameDrawer::drawPlayer(Shape& p)
 	delete[] verts;
 }
 
-void GameDrawer::drawShape(Shape& s)
+void GameDrawer::drawShape(Shape*& s)
 {
 	//Pull vars
-	b2Body* body = s.getBody();
+	b2Body* body = s->getBody();
 	b2Vec2 pos = body->GetWorldCenter();
-	b2Vec2 vel = pos + s.getBody()->GetLinearVelocity();
-	b2PolygonShape* shape = static_cast<b2PolygonShape*>(s.getBody()->GetFixtureList()->GetShape());
+	b2Vec2 vel = pos + s->getBody()->GetLinearVelocity();
+	b2PolygonShape* shape = static_cast<b2PolygonShape*>(s->getBody()->GetFixtureList()->GetShape());
 	int count = shape->GetVertexCount();
 
 	//Convert verts
@@ -113,10 +114,10 @@ void GameDrawer::drawShape(Shape& s)
 	delete[] verts;
 }
 
-void GameDrawer::drawBounds(Bounds& b)
+void GameDrawer::drawBounds(Bounds*& b)
 {
 	//Pull vars
-	b2Body* body = b.getBody();
+	b2Body* body = b->getBody();
 	b2Fixture* fix = body->GetFixtureList();
 	
 	//It must be one of two
@@ -164,14 +165,14 @@ void GameDrawer::drawBounds(Bounds& b)
 	delete[] verts;
 }
 
-void GameDrawer::drawProjectile(Projectile& p)
+void GameDrawer::drawProjectile(Projectile*& p)
 {
 	//Pull vars
-	b2Body* body = p.getBody();
+	b2Body* body = p->getBody();
 	b2Vec2 pos = body->GetWorldCenter();
 
-	b2Vec2 vel = pos + p.getBody()->GetLinearVelocity();
-	b2CircleShape* shape = static_cast<b2CircleShape*>(p.getBody()->GetFixtureList()->GetShape());
+	b2Vec2 vel = pos + p->getBody()->GetLinearVelocity();
+	b2CircleShape* shape = static_cast<b2CircleShape*>(p->getBody()->GetFixtureList()->GetShape());
 	
 	float rad = shape->m_radius * _SCALE_;
 
@@ -181,11 +182,11 @@ void GameDrawer::drawProjectile(Projectile& p)
 	drawPoint(B2toSF(pos, true), sf::Color::Magenta);
 }
 
-void GameDrawer::drawSide(Side& s)
+void GameDrawer::drawSide(Side*& s)
 {
 	//Pull vars
-	b2Body* body = s.getBody();
-	b2Vec2 pos = s.getPosition();
+	b2Body* body = s->getBody();
+	b2Vec2 pos = s->getPosition();
 
 
 	b2Fixture* fix = body->GetFixtureList();
@@ -203,7 +204,7 @@ void GameDrawer::drawSide(Side& s)
 	b2Vec2 a = body->GetWorldPoint(shape->m_vertex1);
 	b2Vec2 b = body->GetWorldPoint(shape->m_vertex2);
 
-	b2Vec2 vel = pos + s.getBody()->GetLinearVelocity();
+	b2Vec2 vel = pos + s->getBody()->GetLinearVelocity();
 
 	//Draw line
 	drawLine(B2toSF(a, true), B2toSF(b, true), sf::Color::Red);

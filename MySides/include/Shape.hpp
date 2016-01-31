@@ -43,6 +43,7 @@ class Shape : public Entity {
 public:
 	Shape(b2Body* body);
 	Shape(b2Body* body, int vertices, float radius);
+	~Shape();
 
 	void move(b2Vec2 direction); //override
 	void orientedMove(b2Vec2 direction); //Thrusts from back and rotates towards direction
@@ -75,6 +76,11 @@ public:
 	ProjectileDef getAmmo();
 	void setAmmo(ProjectileDef& def);
 	void trigger(b2Vec2 direction);
+	
+	//New weapons system
+	void arm(Weapon::WeaponI* weapon);
+	void disarm();
+	void fire(b2Vec2 direction);
 	
 	void update(int milliseconds);
 
