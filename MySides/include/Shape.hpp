@@ -58,12 +58,13 @@ public:
 	void takeDamage(int damage);
 	void collect(int value);
 
+	//Setting of ai and controlled, should be inheritance
 	bool getControlled() const;
 	bool getAI() const;
-
 	void setControlled(bool con);
 	void setAI(bool ai);
 
+	//HP values
 	int getHP() const;
 	unsigned int getHPMax() const;
 
@@ -73,7 +74,6 @@ public:
 	void arm(Weapon::WeaponI* weapon);
 	void disarm();
 	bool getArmed();
-
 	void fire(b2Vec2 direction);
 	
 	void update(int milliseconds);
@@ -94,12 +94,16 @@ private:
 	void setAsSquare(float size);
 	void setAsPentagon(float size);
 
+	//Add physics and shapes
 	void addMaterial(b2FixtureDef & def);
 	void setPoly(b2PolygonShape& s, int vertices, float radius);
+	void clearb2();
 
 	b2Vec2 pole_;//Orientation pole
+
+	//HP
 	int hp_;
-	unsigned int maxHP_;
+	unsigned int hpMAX_;
 
 	//controlled and ai bools
 	bool controlled_;
@@ -108,8 +112,12 @@ private:
 	//New firing logic
 	Weapon::WeaponI* weapon_;
 
+	int shapeVertices_;
+	int vertices_;
+	int size_;
+
 	int sides_; //Currency
-	int type_;
+	//int type_; //Possibly type enum
 };
 
 #endif

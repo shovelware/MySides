@@ -9,7 +9,7 @@ public:
 	ShapeDef() :
 		position(b2Vec2_zero),
 		heading(b2Vec2_zero),
-		maxHP(1),
+		hpMAX(1),
 		size(1),
 		vertices(0)
 	{}
@@ -17,7 +17,7 @@ public:
 	ShapeDef(b2Vec2 position, b2Vec2 heading, int vertices) :
 		position(position),
 		heading(heading),
-		maxHP(1),
+		hpMAX(vertices),
 		size(1),
 		vertices(vertices)
 	{}
@@ -25,7 +25,7 @@ public:
 	ShapeDef(const ShapeDef& sd) :
 		position(sd.position),
 		heading(sd.heading),
-		maxHP(sd.maxHP),
+		hpMAX(sd.hpMAX),
 		size(sd.size),
 		vertices(sd.vertices),
 		colPrim(sd.colPrim),
@@ -36,7 +36,7 @@ public:
 	b2Vec2 position;
 	b2Vec2 heading;
 
-	unsigned int maxHP;
+	unsigned int hpMAX;
 	float size;
 
 	int vertices;

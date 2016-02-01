@@ -149,7 +149,7 @@ void GameWorld::positionListener(b2Vec2 pos, bool scale = true)
 //Adds a player to the world 
 void GameWorld::addPlayer(float x, float y, bool control)
 {
-	ShapeDef play = ShapeDef(b2Vec2(x, y), b2Vec2_zero);
+	ShapeDef play = ShapeDef(b2Vec2(x, y), b2Vec2_zero, 5);
 
 	player_ = new Shape(addDynamicBody(x, y), play);
 
@@ -186,15 +186,15 @@ void GameWorld::addEnemy(float x, float y)
 
 	Weapon::WeaponI* newWeap;
 	
-	if (coinFlip())
-	{
-		newWeap = new Weapon::Shotgun(&*added, addProj_, newDef);
-	}
-	
-	else
-	{
+	//if (coinFlip())
+	//{
+	//	newWeap = new Weapon::Shotgun(&*added, addProj_, newDef);
+	//}
+	//
+	//else
+	//{
 		newWeap = new Weapon::Rifle(&*added, addProj_, newDef);
-	}
+	//}
 
 	added->arm(newWeap);
 	added->setAI(true);
@@ -489,7 +489,7 @@ void GameWorld::update(int dt)
 				b2Vec2 ePos = shp->getPosition();
 				b2Vec2 between = playerPos - ePos;
 
-				if (between.Length() > 40  || between.Length() < 5)
+				if (between.Length() > 40  || between.Length() < 2.5f)
 				{
 
 				}
@@ -586,7 +586,7 @@ void GameWorld::update(int dt)
 	{
 		spawnEnemy();
 		lastSpawn_ = timeInLevel_;
-		spawns_ += 1 % UINT16_MAX;
+		spawns_ = 1 % UINT16_MAX;
 	}
 
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);

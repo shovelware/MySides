@@ -13,7 +13,7 @@ public:
 		heading(b2Vec2_zero),
 		inVelocity(b2Vec2_zero),
 		velScale(1),
-		maxHP(0),
+		hpMAX(0),
 		size(0),
 		damageScale(1),
 		lifeTime(0),
@@ -29,7 +29,7 @@ public:
 		heading(heading),
 		inVelocity(inVelocity),
 		velScale(1),
-		maxHP(1),
+		hpMAX(1),
 		size(1),
 		damageScale(1),
 		lifeTime(1000),
@@ -45,7 +45,7 @@ public:
 		heading(b2Vec2_zero),
 		inVelocity(b2Vec2_zero),
 		velScale(pd.velScale),
-		maxHP(pd.maxHP),
+		hpMAX(pd.hpMAX),
 		size(pd.size),
 		damageScale(pd.damageScale),
 		lifeTime(pd.lifeTime),
@@ -67,7 +67,7 @@ public:
 	//Velocity handled by projectile
 	float velScale;
 
-	unsigned int maxHP;
+	unsigned int hpMAX;
 	float size;
 
 	float damageScale;
@@ -92,7 +92,7 @@ public:
 	{
 		ProjectileDef bullet = ProjectileDef();		
 		bullet.velScale = 1;
-		bullet.maxHP = 1;
+		bullet.hpMAX = 1;
 		bullet.size = 1;
 		bullet.damageScale = 1;
 		bullet.lifeTime = 1000;

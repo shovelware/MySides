@@ -195,9 +195,9 @@ void Game::handleInput(sf::Time dt)
 	if (world_->hasControlled())
 	{
 
-		//Keyboard backup controls
+		//Keyboard backup controls		
+		//W,A,S,D : Movement
 		b2Vec2 mv(0, 0);
-
 		if (key_.isKeyDown(Key::W)) { mv.y += -1; }
 		if (key_.isKeyDown(Key::S)) { mv.y += 1; }
 		if (key_.isKeyDown(Key::A)) { mv.x += -1; }
@@ -207,8 +207,8 @@ void Game::handleInput(sf::Time dt)
 
 		world_->move(mv);
 
+		//Arrows : Firing
 		b2Vec2 fr(0, 0);
-
 		if (key_.isKeyDown(Key::Up)) { fr.y += -1; }
 		if (key_.isKeyDown(Key::Down)) { fr.y += 1; }
 		if (key_.isKeyDown(Key::Left)) { fr.x += -1; }
@@ -216,14 +216,19 @@ void Game::handleInput(sf::Time dt)
 
 		world_->fire(fr);
 
+		//I,O,P : Camera controls
 		if (key_.isKeyDown(Key::I)) { camera_->zoomIn(); }
 		if (key_.isKeyDown(Key::O)) { camera_->zoomOut(); }
 		if (key_.isKeyPressed(Key::P)) { camera_->zoomReset(); }
 
+		//Escape : Quit
 		if (key_.isKeyPressed(Key::Escape)) { quit_ = true; }
 
+		//E : Spawn
+		if (key_.isKeyPressed(Key::E)) { world_->PutEnemy(); }
 
-		//Controller Controls
+
+		//Controller Control
 		world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
 		world_->fire(b2Vec2(con_.checkRightX(), con_.checkRightY()));
 

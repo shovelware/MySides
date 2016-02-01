@@ -41,8 +41,11 @@ Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body), weapon_(n
 	maxVel_ = 0.05f * radius; // max velocity in m/s // * radius provisionally til we make an actual calculation
 	maxRot_ = 0.0001f;
 
-	maxHP_ = 4;
-	hp_ = maxHP_;
+	vertices_ = 0;
+	shapeVertices_ = 0;
+
+	hpMAX_ = 4;
+	hp_ = hpMAX_;
 	sides_ = 0;
 	controlled_ = false;
 	ai_ = false;
@@ -65,17 +68,21 @@ Shape::Shape(b2Body* body, ShapeDef &def) : Entity(body), weapon_(nullptr)
 		setAsTriangle(def.size * 2);
 		break;
 	}
+	
+	size_ = def.size;
+	shapeVertices_ = def.vertices;
+	vertices_ = shapeVertices_;
 
 	//Color data
 	colPrim_ = def.colPrim;
 	colSecn_ = def.colSecn;
 	colTert_ = def.colTert;
 
-	maxVel_ = 0.05f * def.size; // max velocity in m/s // * size provisionally til we make an actual calculation
+	maxVel_ = 0.025f * def.size; // max velocity in m/s // * size provisionally til we make an actual calculation
 	maxRot_ = 0.0001f;
 
-	maxHP_ = 4;
-	hp_ = maxHP_;
+	hpMAX_ = def.hpMAX;
+	hp_ = hpMAX_;
 	sides_ = 0;
 	controlled_ = false;
 	ai_ = false;
@@ -109,7 +116,7 @@ void Shape::setTriangleEqu(b2PolygonShape& s, float scale)
 
 	s.Set(verts, 3);
 
-	type_ = traits::type::TRI_EQU;
+	//type_ = traits::type::TRI_EQU;
 
 
 	std::ostringstream o;
@@ -137,7 +144,7 @@ void Shape::setSquare(b2PolygonShape& s, float scale)
 	s.Set(verts, 4);
 
 
-	type_ = traits::type::SQU_EQU;
+//	type_ = traits::type::SQU_EQU;
 
 	//std::ostringstream o;
 	////o << orientation.x << ", " << orientation.y;
@@ -236,6 +243,11 @@ void Shape::setPoly(b2PolygonShape & s, int vertices, float radius)
 	}
 }
 
+void Shape::clearb2()
+{
+	body_->DestroyFixture(body_->GetFixtureList());
+}
+
 //Move in passed direction at constant speed
 void Shape::move(b2Vec2 direction)
 {
@@ -323,6 +335,18 @@ void Shape::stopRotate()
 void Shape::takeDamage(int damage)
 {
 	hp_ -= damage;
+
+	//Go back a shape if we can
+	if (hp_ <= 0 && vertices_ > 3)
+	{
+		vertices_ = (vertices_ - 1 >= 2 ? vertices_ - 1 : 2);
+
+		if (vertices_ > 2)
+		{
+			hpMAX_ = vertices_;
+			hp_ = hpMAX_;
+		}
+	}
 }
 
 void Shape::collect(int value)
@@ -363,7 +387,7 @@ int Shape::getHP() const
 
 unsigned int Shape::getHPMax() const
 {
-	return maxHP_;
+	return hpMAX_;
 }
 
 int Shape::getSidesCollected() const
@@ -375,7 +399,6 @@ bool Shape::getArmed()
 {
 	return (weapon_ != nullptr);
 }
-
 
 void Shape::arm(Weapon::WeaponI * weapon)
 {
@@ -410,9 +433,29 @@ void Shape::update(int milliseconds)
 		//Death check
 		if (alive_)
 		{
-			if (hp_ <= 0)
+			if (vertices_ > 2 && vertices_ != shapeVertices_)
 			{
-				if (type_ == traits::type::SQU_EQU);//If we're a square drop a side and change to tri
+				switch (vertices_)
+				{
+				case 3:
+					clearb2();
+					setAsTriangle(size_);
+					break;
+				case 4:
+					clearb2();
+					setAsSquare(size_);
+					break;
+				case 5:
+					clearb2();
+					setAsPentagon(size_);
+					break;
+				}
+			}
+
+
+			if (hp_ <= 0 && vertices_ <= 0)
+			{
+				//if (type_ == traits::type::SQU_EQU);//If we're a square drop a side and change to tri
 
 				alive_ = false;
 				active_ = false;

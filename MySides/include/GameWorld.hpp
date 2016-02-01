@@ -68,6 +68,9 @@ public:
 	//b2Vec2 randomPos(); //On a circle, in an arc, from centre, whatever, reuse code test stuff
 	//
 
+	////TEMP
+	void PutEnemy() { spawnEnemy(); }
+
 	void resetLevel();
 	void clearWorld();
 
@@ -97,8 +100,6 @@ private:
 	const int VELOCITY_ITERS = 6;
 	const int POSITION_ITERS = 2;
 	
-	//Shape player_; Who needs a list? Trim to this soon
-
 	Shape* player_;
 	std::list<Shape*> shapes_;
 	std::list<Projectile*> projectiles_;

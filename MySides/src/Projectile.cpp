@@ -9,7 +9,7 @@ Projectile::Projectile(b2Body* body, ProjectileDef& def) :
 	Entity(body),
 	fired_(false), impacted_(false),
 	origin_(def.origin), heading_(def.heading),
-	maxHP_(def.maxHP), hp_(def.maxHP),
+	maxHP_(def.hpMAX), hp_(def.hpMAX),
 	size_(def.size),
 	lifeTime_(def.lifeTime),
 	owner_(def.owner), 

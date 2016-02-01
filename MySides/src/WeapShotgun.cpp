@@ -30,6 +30,8 @@ void Weapon::Shotgun::fire(b2Vec2 &heading)
 	b2Vec2 newDir = heading;
 	float rotation = atan2f(heading.y, heading.x);
 
+	//Thor distributions
+
 	////Calculate left
 	newDir.x = cosf(rotation - 0.2f);
 	newDir.y = sinf(rotation - 0.2f);
