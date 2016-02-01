@@ -194,8 +194,6 @@ void Game::handleInput(sf::Time dt)
 	//If the world has a controlled body
 	if (world_->hasControlled())
 	{
-		world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
-		world_->fire(b2Vec2(con_.checkRightX(), con_.checkRightY()));
 
 		//Keyboard backup controls
 		b2Vec2 mv(0, 0);
@@ -217,6 +215,17 @@ void Game::handleInput(sf::Time dt)
 		if (key_.isKeyDown(Key::Right)) { fr.x += 1; }
 
 		world_->fire(fr);
+
+		if (key_.isKeyDown(Key::I)) { camera_->zoomIn(); }
+		if (key_.isKeyDown(Key::O)) { camera_->zoomOut(); }
+		if (key_.isKeyPressed(Key::P)) { camera_->zoomReset(); }
+
+		if (key_.isKeyPressed(Key::Escape)) { quit_ = true; }
+
+
+		//Controller Controls
+		world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
+		world_->fire(b2Vec2(con_.checkRightX(), con_.checkRightY()));
 
 		//world_->controlled()->rotate(con_.checkRightX() / 10);
 
@@ -351,9 +360,12 @@ bool Game::checkController(sf::Time dt)
 
 void Game::update(sf::Time dt)
 {
-	camera_->setTarget(world_->controlled());
-
-	//else camera_->clearTarget(true);
+	if (world_->controlled() != nullptr)
+	{
+		camera_->setTarget(world_->controlled());
+	}
+	
+	else camera_->clearTarget(true); //TESTING
 
 	camera_->update(dt.asMilliseconds());
 

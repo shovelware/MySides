@@ -6,7 +6,7 @@
 
 class Entity;
 
-struct ProjectileDef {
+class ProjectileDef {
 public:
 	ProjectileDef() :
 		origin(b2Vec2_zero),
@@ -17,6 +17,9 @@ public:
 		size(0),
 		damageScale(1),
 		lifeTime(0),
+		colPrim(b2Color(255, 255, 000)),
+		colSecn(b2Color(255, 000, 255)),
+		colTert(b2Color(255, 255, 255)),
 		owner(nullptr),
 		target(nullptr)
 	{}
@@ -30,6 +33,9 @@ public:
 		size(1),
 		damageScale(1),
 		lifeTime(1000),
+		colPrim(b2Color(255, 255, 000)),
+		colSecn(b2Color(255, 000, 255)),
+		colTert(b2Color(255, 255, 255)),
 		owner(nullptr),
 		target(nullptr)
 	{}
@@ -43,6 +49,9 @@ public:
 		size(pd.size),
 		damageScale(pd.damageScale),
 		lifeTime(pd.lifeTime),
+		colPrim(pd.colPrim),
+		colSecn(pd.colSecn),
+		colTert(pd.colTert),
 		owner(nullptr),
 		target(nullptr)
 	{}
@@ -64,6 +73,11 @@ public:
 	float damageScale;
 
 	int lifeTime;
+
+	//Colours
+	b2Color colPrim;
+	b2Color colSecn;
+	b2Color colTert;
 
 	//Not copied
 	Entity* owner;

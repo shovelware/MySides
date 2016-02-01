@@ -48,6 +48,11 @@ protected:
 
 	bool alive_;
 	bool active_;
+
+	//Colors
+	b2Color colPrim_;
+	b2Color colSecn_;
+	b2Color colTert_;
 private:
 };
 

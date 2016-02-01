@@ -1,12 +1,12 @@
 #include "WeapRifle.hpp"
 	Weapon::Rifle::Rifle(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo) :
 		WeaponI(owner, callback, ammo),
-		magazine_(100)
+		magazine_(30)
 	{
 		refireTimeMAX_ = 100;
 		refireTime_ = 0;
 
-		reloadTimeMAX_ = 10000;
+		reloadTimeMAX_ = 5000;
 		reloadTime_ = 0;
 	}
 

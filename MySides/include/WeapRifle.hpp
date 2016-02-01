@@ -12,6 +12,9 @@ namespace Weapon {
 	public:
 		Rifle(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo);
 		void update(int dt);
+
+		int refireTimeMAX_;
+		int reloadTimeMAX_;
 	private:
 		void fire(b2Vec2 &heading);
 		bool canFire();
@@ -19,10 +22,8 @@ namespace Weapon {
 		Magazine magazine_;
 
 		int refireTime_;
-		int refireTimeMAX_;
 
 		int reloadTime_;
-		int reloadTimeMAX_;
 	};
 }
 #endif

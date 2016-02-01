@@ -4,8 +4,10 @@
 #ifndef MS_SHAPE_HPP
 #define MS_SHAPE_HPP
 
+#include <Thor\Vectors\VectorAlgebra2D.hpp>
+
 #include "Entity.hpp"
-#include "ProjectileDef.hpp"
+#include "ShapeDef.hpp"
 
 #include <functional>
 #include "Weapon.hpp"
@@ -41,8 +43,8 @@ namespace traits{
 
 class Shape : public Entity {
 public:
-	Shape(b2Body* body);
 	Shape(b2Body* body, int vertices, float radius);
+	Shape(b2Body* body, ShapeDef &def);
 	~Shape();
 
 	void move(b2Vec2 direction); //override
@@ -66,20 +68,12 @@ public:
 	unsigned int getHPMax() const;
 
 	int getSidesCollected() const;
-
-	////Temp for weapon refire
-	bool getArmed();//
-
-
-	void armShape(std::function<void(ProjectileDef&)> &callback);
-	void clearAmmo();
-	ProjectileDef getAmmo();
-	void setAmmo(ProjectileDef& def);
-	void trigger(b2Vec2 direction);
-	
+		
 	//New weapons system
 	void arm(Weapon::WeaponI* weapon);
 	void disarm();
+	bool getArmed();
+
 	void fire(b2Vec2 direction);
 	
 	void update(int milliseconds);
@@ -87,18 +81,21 @@ public:
 	//void draw(GameDrawer d); // override
 
 	bool collide(Entity* other, b2Contact& contact); //override
-
-	//New firing logic
-	Weapon::WeaponI* weapon_;
 private:
 	/*const*/ float maxVel_;//maximum velocity
 	/*const*/ float maxRot_;//maximum rotation
 
-
 	//Set: sides = 1 * scale
 	void setTriangleEqu(b2PolygonShape& s, float scale);
-	void setTriangleIso(b2PolygonShape& s, float scale);
 	void setSquare(b2PolygonShape& s, float scale);
+
+	//These three repeat themselves, I'd like to make this neater. KISS,DRY!
+	void setAsTriangle(float size);
+	void setAsSquare(float size);
+	void setAsPentagon(float size);
+
+	void addMaterial(b2FixtureDef & def);
+	void setPoly(b2PolygonShape& s, int vertices, float radius);
 
 	b2Vec2 pole_;//Orientation pole
 	int hp_;
@@ -108,14 +105,8 @@ private:
 	bool controlled_;
 	bool ai_;
 
-
-	////Temp for weapon refire
-	unsigned int refireTime_;
-	int coolDown_;
-
-	//Definitions and callbacks
-	ProjectileDef ammo_;
-	std::function<void(ProjectileDef&)> fireCallback_;
+	//New firing logic
+	Weapon::WeaponI* weapon_;
 
 	int sides_; //Currency
 	int type_;

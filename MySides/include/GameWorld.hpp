@@ -22,6 +22,7 @@
 #include "Projectile.hpp"
 #include "Side.hpp"
 
+#include "ShapeDef.hpp"
 
 #include "Weapon.hpp"
 #include "WeapRifle.hpp"

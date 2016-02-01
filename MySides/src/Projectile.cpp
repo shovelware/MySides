@@ -5,44 +5,6 @@
 #include "Projectile.hpp"
 #include "Side.hpp"
 
-Projectile::Projectile(b2Body* body, b2Vec2 heading) :
-	Entity(body),
-	fired_(false), impacted_(false),
-	origin_(body_->GetPosition()), heading_(heading)
-{
-
-	//Create a fixture, the link for body -> shape
-	b2FixtureDef fixtureDef;
-	b2CircleShape circ;
-	circ.m_radius = 0.05f;
-
-	//Add material properties to the fixture
-	fixtureDef.density = 0.5f;
-	fixtureDef.friction = 0.0f;
-	fixtureDef.restitution = 0.0f;
-
-	fixtureDef.shape = &circ;
-
-	//Add userdata to fixture for contacts
-	fixtureDef.userData = "projectile";
-
-	//Create and add fixture using body's factory
-	body_->CreateFixture(&fixtureDef);
-
-	//End box2d setup
-
-	speed_ = 0.00025f; // max velocity in m/s
-
-	//Fire the bullet
-
-	fire(1);
-
-	lifeTime_ = 250;
-	damage_ = 1;
-	maxHP_ = 1;
-	hp_ = maxHP_;
-}
-
 Projectile::Projectile(b2Body* body, ProjectileDef& def) :
 	Entity(body),
 	fired_(false), impacted_(false),
@@ -58,12 +20,17 @@ Projectile::Projectile(b2Body* body, ProjectileDef& def) :
 	//Do maths to orient body here
 	body_->SetTransform(def.origin, body_->GetAngle());
 
+	//Set up colours
+	colPrim_ = def.colPrim;
+	colSecn_ = def.colSecn;
+	colTert_ = def.colTert;
+
 	fire(def.velScale);
 }
 
 void Projectile::setAsBullet(float size, float damageScale = 1.f)
 {
-	//Shape data
+	//Shape
 	b2CircleShape bullet;
 	bullet.m_radius = (0.1f * size);
 
@@ -71,12 +38,14 @@ void Projectile::setAsBullet(float size, float damageScale = 1.f)
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &bullet;
 
-	//Collision data
+	//Collision
 	fixtureDef.userData = "projectile";
 	addMaterial(fixtureDef);
 
-	//Create and add fixture using body's factory
+	//Bind fixture
 	body_->CreateFixture(&fixtureDef);
+
+	//End box2d setup
 
 	speed_ = 0.000025f;
 	damage_ = 1 * damageScale;

@@ -6,7 +6,6 @@
 
 class Projectile : public Entity{
 public:
-	Projectile(b2Body* body, b2Vec2 heading);
 	Projectile(b2Body* body, ProjectileDef& def);
 
 	void fire(float mult);

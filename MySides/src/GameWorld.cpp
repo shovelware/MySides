@@ -50,7 +50,8 @@ GameWorld::~GameWorld()
 	clearWorld();
 	delete bounds_;
 }
-//Returns true if the gameworld has a controlled entity !!!FIX
+
+//Returns true if the gameworld has a controlled entity
 bool GameWorld::hasControlled()
 {
 	//Return false if our pointer to the controlled shape is null
@@ -148,9 +149,9 @@ void GameWorld::positionListener(b2Vec2 pos, bool scale = true)
 //Adds a player to the world 
 void GameWorld::addPlayer(float x, float y, bool control)
 {
-	//Emplace the shape into shape list 
-	//AND add body to world with function
-	player_ = new Shape(addDynamicBody(x, y), 4, .5f);
+	ShapeDef play = ShapeDef(b2Vec2(x, y), b2Vec2_zero);
+
+	player_ = new Shape(addDynamicBody(x, y), play);
 
 	player_->setAI(false);
 	
@@ -160,14 +161,11 @@ void GameWorld::addPlayer(float x, float y, bool control)
 		player_->setControlled(true);
 		controlled_ = player_;
 
-		player_->armShape(addProj_);
-
 		ProjectileDef newDef = ProjectileDef::bulletDef();
-		newDef.velScale = 4;
-		newDef.damageScale = 4;
-		newDef.size = 2;
+		newDef.velScale = 1.f;
+		newDef.damageScale = 1.f;
+		newDef.size = 1;
 
-		player_->setAmmo(newDef);
 		player_->arm(new Weapon::Shotgun(&*player_, addProj_, newDef));
 	}
 
@@ -181,13 +179,24 @@ void GameWorld::addEnemy(float x, float y)
 	shapes_.push_back(new Shape(addDynamicBody(x, y), 4, .5f));
 	Shape* added = *(--shapes_.end());
 
-	added->armShape(addProj_);
-
 	ProjectileDef newDef = ProjectileDef::bulletDef();
 	newDef.velScale = 0.5f;
 	newDef.damageScale = 1.f;
-	added->setAmmo(newDef);
+	newDef.size = 1;
 
+	Weapon::WeaponI* newWeap;
+	
+	if (coinFlip())
+	{
+		newWeap = new Weapon::Shotgun(&*added, addProj_, newDef);
+	}
+	
+	else
+	{
+		newWeap = new Weapon::Rifle(&*added, addProj_, newDef);
+	}
+
+	added->arm(newWeap);
 	added->setAI(true);
 	added->setControlled(false);
 }
@@ -349,26 +358,7 @@ void GameWorld::fire(b2Vec2 direction)
 	//If there's a direction to fire in
 	if (direction.x != 0 || direction.y != 0)
 	{
-		controlled_->trigger(direction);
-		////And we can fire
-		//if (controlled_->getArmed())
-		//{
-		//
-		//	b2Vec2 fp = controlled_->getFirePoint(direction.x, direction.y); //This will be abstracted to shape class
-		//	b2Transform bxf = bounds_.getBody()->GetTransform();
-		//
-		//	//Test if we're shooting on the same side of the bounds
-		//	bool projIn = bounds_.getShape()->TestPoint(bxf, fp);
-		//	bool shapeIn = bounds_.getShape()->TestPoint(bxf, controlled_->getPosition());
-		//
-		//	if (projIn == shapeIn)
-		//	{
-		//		ProjectileDef p(b2Vec2(fp.x, fp.y), direction);
-		//		p.owner = &*controlled_;
-		//		addProjectile(p);
-		//		//addProjectile(fp.x, fp.y, direction.x, direction.y);
-		//	}
-		//}
+		controlled_->fire(direction);
 	}
 }
 
@@ -510,10 +500,7 @@ void GameWorld::update(int dt)
 
 					if (shp->getArmed())
 					{
-						shp->trigger(between);
-						//b2Vec2 fp = s->getFirePoint(between.x, between.y);
-						//
-						//addProjectile(fp.x, fp.y, between.x, between.y);
+						shp->fire(between);
 					}
 				}
 

@@ -41,9 +41,39 @@ Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body), weapon_(n
 	maxVel_ = 0.05f * radius; // max velocity in m/s // * radius provisionally til we make an actual calculation
 	maxRot_ = 0.0001f;
 
-	//
-	refireTime_ = 300;
-	coolDown_ = 0;
+	maxHP_ = 4;
+	hp_ = maxHP_;
+	sides_ = 0;
+	controlled_ = false;
+	ai_ = false;
+}
+
+Shape::Shape(b2Body* body, ShapeDef &def) : Entity(body), weapon_(nullptr)
+{
+	switch (def.vertices)
+	{
+	case 3:
+		setAsTriangle(def.size);
+		break;
+	case 4:
+		setAsSquare(def.size);
+		break;
+	case 5:
+		setAsPentagon(def.size);
+		break;
+	default:
+		setAsTriangle(def.size * 2);
+		break;
+	}
+
+	//Color data
+	colPrim_ = def.colPrim;
+	colSecn_ = def.colSecn;
+	colTert_ = def.colTert;
+
+	maxVel_ = 0.05f * def.size; // max velocity in m/s // * size provisionally til we make an actual calculation
+	maxRot_ = 0.0001f;
+
 	maxHP_ = 4;
 	hp_ = maxHP_;
 	sides_ = 0;
@@ -118,26 +148,95 @@ void Shape::setSquare(b2PolygonShape& s, float scale)
 
 }
 
-//Need to implement
-void Shape::setTriangleIso(b2PolygonShape& s, float scale)
+void Shape::setAsTriangle(float size)
 {
-	b2Vec2 verts[3];
+	//Shape data
+	b2PolygonShape shap;
+	setPoly(shap, 3, size);
 
-	verts[0].Set(0, -1.5f);
-	verts[1].Set(-.25f, 0);
-	verts[2].Set(.25f, 0);
+	//Fixture data
+	b2FixtureDef fixtureDef;
+	fixtureDef.shape = &shap;
 
-	verts[0] *= scale;
-	verts[1] *= scale;
-	verts[2] *= scale;
+	//Collision
+	fixtureDef.userData = "shape";
+	addMaterial(fixtureDef);
 
-	pole_ = verts[0];
+	//Bind fixture
+	body_->CreateFixture(&fixtureDef);
 
-	s.Set(verts, 3);
-
-	type_ = traits::type::TRI_ISO;
+	//End box2d setup
 }
 
+void Shape::setAsSquare(float size)
+{
+	//Shape data
+	b2PolygonShape shap;
+	setPoly(shap, 4, size);
+
+	//Fixture data
+	b2FixtureDef fixtureDef;
+	fixtureDef.shape = &shap;
+
+	//Collision
+	fixtureDef.userData = "shape";
+	addMaterial(fixtureDef);
+
+	//Bind fixture
+	body_->CreateFixture(&fixtureDef);
+
+	//End box2d setup
+}
+
+void Shape::setAsPentagon(float size)
+{
+	//Shape data
+	b2PolygonShape shap;
+	setPoly(shap, 5, size);
+
+	//Fixture data
+	b2FixtureDef fixtureDef;
+	fixtureDef.shape = &shap;
+
+	//Collision
+	fixtureDef.userData = "shape";
+	addMaterial(fixtureDef);
+
+	//Bind fixture
+	body_->CreateFixture(&fixtureDef);
+
+	//End box2d setup
+}
+
+//Add material data to passed fixture def
+void Shape::addMaterial(b2FixtureDef &def)
+{
+	def.density = 1.0f;
+	def.friction = 1.0f;
+	def.restitution = 1.f;
+}
+
+//Should only be called by set[shape] methods
+void Shape::setPoly(b2PolygonShape & s, int vertices, float radius)
+{
+	assert(2 < vertices && vertices < 9);
+	if (2 < vertices && vertices < 9)
+	{
+		b2Vec2* pnts = new b2Vec2[vertices];
+
+		for (int i = 0; i < vertices; ++i)
+		{
+			pnts[i].x = radius * (cos(DR * 360 / vertices * i));
+			pnts[i].y = radius * (sin(DR * 360 / vertices * i));
+		}
+
+		s.Set(pnts, vertices);
+
+		delete[] pnts;
+	}
+}
+
+//Move in passed direction at constant speed
 void Shape::move(b2Vec2 direction)
 {
 	//Normalise dir it if it's >1
@@ -254,7 +353,6 @@ void Shape::setAI(bool ai)
 	if (ai)
 	{
 		maxVel_ /= 2;
-		refireTime_ = 1000U;
 	}
 }
 
@@ -275,83 +373,9 @@ int Shape::getSidesCollected() const
 
 bool Shape::getArmed()
 {
-	return (coolDown_ == 0);
-	//return (weapon_ == nullptr)
+	return (weapon_ != nullptr);
 }
 
-void Shape::armShape(std::function<void(ProjectileDef&)>& callback)
-{
-	fireCallback_ = callback;
-}
-
-void Shape::clearAmmo()
-{
-	ammo_ = ProjectileDef();
-}
-
-ProjectileDef Shape::getAmmo()
-{
-	return ammo_;
-}
-
-void Shape::setAmmo(ProjectileDef & def)
-{
-	ammo_ = ProjectileDef(def);
-}
-
-void Shape::trigger(b2Vec2 direction)
-{
-	if (weapon_ == nullptr && fireCallback_ != nullptr && ammo_.isValid())
-	{
-		if (coolDown_ == 0)
-		{
-			//Set up projectile
-			ProjectileDef newProj = ProjectileDef(ammo_);
-			newProj.origin = getPosition();
-			newProj.heading = direction;
-			newProj.owner = this;
-			
-			//Fire centre
-			fireCallback_(newProj);
-
-			b2Vec2 newDir = direction;
-			float rotation = atan2f(direction.y, direction.x);
-
-			////Calculate left
-			newDir.x = cosf(rotation - 0.2f);
-			newDir.y = sinf(rotation - 0.2f);
-
-			newProj.heading = newDir;
-			fireCallback_(newProj);
-
-			newDir.x = cosf(rotation - 0.1f);
-			newDir.y = sinf(rotation - 0.1f);
-
-			newProj.heading = newDir;
-			fireCallback_(newProj);
-
-			////Calculate right
-			newDir.x = cosf(rotation + 0.2f);
-			newDir.y = sinf(rotation + 0.2f);
-
-			newProj.heading = newDir;
-			fireCallback_(newProj);
-
-
-			newDir.x = cosf(rotation + 0.1f);
-			newDir.y = sinf(rotation + 0.1f);
-
-			newProj.heading = newDir;
-			fireCallback_(newProj);
-
-			//Abstract this into weapon later
-
-			coolDown_ = refireTime_;
-		}
-	}
-
-	else weapon_->trigger(direction);
-}
 
 void Shape::arm(Weapon::WeaponI * weapon)
 {
@@ -382,17 +406,6 @@ void Shape::update(int milliseconds)
 	{
 		if (weapon_ != nullptr)
 			weapon_->update(milliseconds);
-
-		//Weapon cooldown
-		if (coolDown_ > 0)
-		{
-			coolDown_ -= milliseconds;
-
-			if (coolDown_ < 0)
-			{
-				coolDown_ = 0;
-			}
-		}
 
 		//Death check
 		if (alive_)

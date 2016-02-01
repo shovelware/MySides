@@ -173,5 +173,8 @@
     <ClInclude Include="include\Magazine.hpp">
       <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="include\ShapeDef.hpp">
+      <Filter>Header Files\Game\Entity</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
