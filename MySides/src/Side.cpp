@@ -4,15 +4,19 @@
 #include "Shape.hpp"
 #include "Projectile.hpp"
 
-Side::Side(b2Body * body, b2Vec2 normal, float size) : Entity(body), size_(size)
+Side::Side(b2Body * body, b2Vec2 normal, float length) : Entity(body), length_(length)
 {
-	setShape(size);
+	setShape(length);
 }
 
-Side::Side(b2Body * body, SideDef def) : Entity(body), size_(def.size)
+Side::Side(b2Body * body, SideDef def) : Entity(body), length_(def.length)
 {
+	//Align side to normal here--------------v
 	body_->SetTransform(def.position, body_->GetAngle());
-	body_->SetLinearVelocity(def.direction);
+
+	//Shoot off, while spinning
+	body_->SetLinearVelocity(def.normal);
+	body_->ApplyAngularImpulse(randFloat(0, 1), true);
 }
 
 void Side::setShape(float size)
@@ -45,7 +49,7 @@ void Side::collect()
 
 float Side::getValue()
 {
-	return size_;
+	return length_;
 }
 
 bool Side::collide(Entity* other, b2Contact& contact)

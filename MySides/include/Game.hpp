@@ -43,6 +43,8 @@ private:
 	void update(sf::Time dt);
 	void render();
 
+	void toggleFullscreen();
+
 	//Control bools
 	bool mousein_;
 	bool update_;

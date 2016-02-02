@@ -1,5 +1,5 @@
-#ifndef MS_SHAPEDEF_H
-#define MS_SHAPEDEF_H
+#ifndef MS_SHAPEDEF_HPP
+#define MS_SHAPEDEF_HPP
 
 #include <stdafx.h>
 #include <Box2D\Box2D.h>

@@ -8,7 +8,13 @@ Log l;
 //inline float randFloat(float MAX) { return static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / MAX)); };
 //inline float randFloat(float MIN, float MAX) { return MIN + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (MAX - MIN))); };
 
-Game::Game() : videoMode_(1280, 720, 32), window_(videoMode_, "My Sides!", sf::Style::Titlebar, sf::ContextSettings(0u, 0u, 8u)), mousein_(false), quit_(false), fullscreen_(false), dd_(window_)
+Game::Game() : 
+	videoMode_(1280, 720, 32),
+	window_(videoMode_, "My Sides!", sf::Style::Titlebar, sf::ContextSettings(0u, 0u, 8u)),
+	mousein_(false),
+	quit_(false),
+	fullscreen_(false),
+	dd_(window_)
 {
 }
 
@@ -149,35 +155,6 @@ void Game::processEvents()
 			quit_ = true;
 			break;
 
-			//Key press event
-		case sf::Event::KeyPressed:
-			//Escape : Quit game
-			if (evt.key.code == sf::Keyboard::Key::Escape)
-				quit_ = true;
-
-			//Return: Toggle Fullscreen
-			if (evt.key.code == sf::Keyboard::Key::Return)
-				if (!fullscreen_)
-				{
-					window_.create(sf::VideoMode::getDesktopMode(), "My Sides!", sf::Style::Fullscreen);
-					window_.display();
-					fullscreen_ = true;
-				}
-
-				else if (fullscreen_)
-				{
-					window_.create(videoMode_, "My Sides!", sf::Style::Titlebar);
-					window_.display();
-					fullscreen_ = false;
-				}
-			
-			//Space : Pause game
-			if (evt.key.code == sf::Keyboard::Key::Space)
-			{
-				pause_ = !pause_;
-			}
-			break;
-
 		case sf::Event::MouseLeft:
 			mousein_ = false;
 			break;
@@ -192,159 +169,163 @@ void Game::processEvents()
 void Game::handleInput(sf::Time dt)
 {
 	//If the world has a controlled body
-	if (world_->hasControlled())
+	
+	//Keyboard backup controls		
+	//W,A,S,D : Movement
+	b2Vec2 mv(0, 0);
+	if (key_.isKeyDown(Key::W)) { mv.y += -1; }
+	if (key_.isKeyDown(Key::S)) { mv.y += 1; }
+	if (key_.isKeyDown(Key::A)) { mv.x += -1; }
+	if (key_.isKeyDown(Key::D)) { mv.x += 1; }
+
+	if (key_.isKeyDown(Key::LAlt)) { mv *= 0.75f; }
+
+	world_->move(mv);
+
+	//Arrows : Firing
+	b2Vec2 fr(0, 0);
+	if (key_.isKeyDown(Key::Up)) { fr.y += -1; }
+	if (key_.isKeyDown(Key::Down)) { fr.y += 1; }
+	if (key_.isKeyDown(Key::Left)) { fr.x += -1; }
+	if (key_.isKeyDown(Key::Right)) { fr.x += 1; }
+
+	world_->fire(fr);
+
+	//I,O,P : Camera controls
+	if (key_.isKeyDown(Key::I)) { camera_->zoomIn(); }
+	if (key_.isKeyDown(Key::O)) { camera_->zoomOut(); }
+	if (key_.isKeyPressed(Key::P)) { camera_->zoomReset(); }
+
+	//Escape : Quit
+	if (key_.isKeyPressed(Key::Escape)) { quit_ = true; }
+
+	//E : Spawn
+	if (key_.isKeyPressed(Key::E)) { world_->PutEnemy(); }
+
+	//Return : Fullscreen
+	if (key_.isKeyPressed(Key::Return)) { toggleFullscreen(); }
+
+	//Space : Pause
+	if (key_.isKeyPressed(Key::Space)) { pause_ = !pause_; }
+
+
+	//Controller Control
+	world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
+	world_->fire(b2Vec2(con_.checkRightX(), con_.checkRightY()));
+
+	//world_->controlled()->rotate(con_.checkRightX() / 10);
+
+	//A : Resize bounds
+	if (con_.checkPressed(XINPUT_GAMEPAD_A))
 	{
+		//float base = 32;
+		//float lt = con_.checkLeftTrigger() * 96;
+		//
+		//world_->resizeBounds(base + lt);
+		//
+		//std::cout << base + lt << "  " << world_->getBoundsSide() << std::endl;
+	}
 
-		//Keyboard backup controls		
-		//W,A,S,D : Movement
-		b2Vec2 mv(0, 0);
-		if (key_.isKeyDown(Key::W)) { mv.y += -1; }
-		if (key_.isKeyDown(Key::S)) { mv.y += 1; }
-		if (key_.isKeyDown(Key::A)) { mv.x += -1; }
-		if (key_.isKeyDown(Key::D)) { mv.x += 1; }
+	//B : Cancel rotation
+	if (con_.checkDown(XINPUT_GAMEPAD_B))
+	{
+		//world_->controlled()->stopRotate();
+	}
 
-		if (key_.isKeyDown(Key::LAlt)) { mv *= 0.75f; }
+	//X : Orientation testing
+	if (con_.checkDown(XINPUT_GAMEPAD_X))
+	{
+		//world_->controlled()->orient(b2Vec2_zero);
+	}
 
-		world_->move(mv);
+	//Y: Spawn enemy
+	if (con_.checkPressed(XINPUT_GAMEPAD_Y))
+	{
+		//float lt = (con_.checkLeftTrigger() > 0 ? con_.checkLeftTrigger() : 0.1f);
+		//int spawn = lt * 10;
+		//
+		//for (spawn; spawn > 0; --spawn)
+		//{
+		//	float x, y, rad = world_->getBoundsRadius() * 0.7f;
+		//	y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
+		//	x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
+		//
+		//	x *= rad;
+		//	y *= rad;
+		//
+		//	world_->addEnemy(x, y);
+		//}
+	}
 
-		//Arrows : Firing
-		b2Vec2 fr(0, 0);
-		if (key_.isKeyDown(Key::Up)) { fr.y += -1; }
-		if (key_.isKeyDown(Key::Down)) { fr.y += 1; }
-		if (key_.isKeyDown(Key::Left)) { fr.x += -1; }
-		if (key_.isKeyDown(Key::Right)) { fr.x += 1; }
+	//LB : 
+	if (con_.checkDown(XINPUT_GAMEPAD_LEFT_SHOULDER))
+	{
+		camera_->zoomOut();
+	}
 
-		world_->fire(fr);
+	//RB : 
+	if (con_.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+	{
+		camera_->zoomIn();
+	}
 
-		//I,O,P : Camera controls
-		if (key_.isKeyDown(Key::I)) { camera_->zoomIn(); }
-		if (key_.isKeyDown(Key::O)) { camera_->zoomOut(); }
-		if (key_.isKeyPressed(Key::P)) { camera_->zoomReset(); }
+	//Thumbsticks
+	if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
+	{
+		toggleFullscreen();
+	}
 
-		//Escape : Quit
-		if (key_.isKeyPressed(Key::Escape)) { quit_ = true; }
+	if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
+	{
+		camera_->zoomReset();
+	}
 
-		//E : Spawn
-		if (key_.isKeyPressed(Key::E)) { world_->PutEnemy(); }
+	//DPad : firing
+	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT))
+	{
+		world_->fire(b2Vec2(1, 0));
+	}
 
+	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT))
+	{
+		world_->fire(b2Vec2(-1, 0));
+	}
 
-		//Controller Control
-		world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
-		world_->fire(b2Vec2(con_.checkRightX(), con_.checkRightY()));
+	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_DOWN))
+	{
+		world_->fire(b2Vec2(0, 1));
+	}
 
-		//world_->controlled()->rotate(con_.checkRightX() / 10);
+	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_UP))
+	{
+		world_->fire(b2Vec2(0, -1));
+	}
 
-		//A : Resize bounds
-		if (con_.checkPressed(XINPUT_GAMEPAD_A))
+	if (con_.checkPressed(XINPUT_GAMEPAD_BACK))
+	{
+		camera_->zoomReset();
+	}
+
+	//Start : Pause
+	if (con_.checkPressed(XINPUT_GAMEPAD_START))
+	{
+		pause_ = !pause_;
+	}
+
+	if (con_.checkPressed(XINPUT_GAMEPAD_BACK))
+	{
+		if (pause_)
 		{
-			float base = 32;
-			float lt = con_.checkLeftTrigger() * 96;
-
-			world_->resizeBounds(base + lt);
-
-			std::cout << base + lt << "  " << world_->getBoundsSide() << std::endl;
-		}
-
-		//B : Cancel rotation
-		if (con_.checkDown(XINPUT_GAMEPAD_B))
-		{
-			world_->controlled()->stopRotate();
-		}
-
-		//X : Orientation testing
-		if (con_.checkDown(XINPUT_GAMEPAD_X))
-		{
-			world_->controlled()->orient(b2Vec2_zero);
-		}
-
-		//Y: Spawn enemy
-		if (con_.checkPressed(XINPUT_GAMEPAD_Y))
-		{
-			float lt = (con_.checkLeftTrigger() > 0 ? con_.checkLeftTrigger() : 0.1f);
-			int spawn = lt * 10;
-
-			for (spawn; spawn > 0; --spawn)
-			{
-				float x, y, rad = world_->getBoundsRadius() * 0.7f;
-				y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
-				x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
-
-				x *= rad;
-				y *= rad;
-
-				world_->addEnemy(x, y);
-			}
-		}
-
-		//LB : 
-		if (con_.checkDown(XINPUT_GAMEPAD_LEFT_SHOULDER))
-		{
-			camera_->zoomOut();
-		}
-
-		//RB : 
-		if (con_.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER))
-		{
-			camera_->zoomIn();
-		}
-
-		//Thumbsticks
-		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
-		{
-		}
-
-		if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
-		{
-		}
-
-		//DPad : firing
-		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT))
-		{
-			world_->fire(b2Vec2(1, 0));
-		}
-
-		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT))
-		{
-			world_->fire(b2Vec2(-1, 0));
-		}
-
-		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_DOWN))
-		{
-			world_->fire(b2Vec2(0, 1));
-		}
-
-		if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_UP))
-		{
-			world_->fire(b2Vec2(0, -1));
-		}
-
-		if (con_.checkPressed(XINPUT_GAMEPAD_BACK))
-		{
-			camera_->zoomReset();
-		}
-
-		//Start : Pause
-		if (con_.checkReleased(XINPUT_GAMEPAD_START))
-		{
-			pause_ = !pause_;
-		}
-
-		// Start + Back : Reset
-		if (con_.checkPressed(XINPUT_GAMEPAD_START) && con_.checkDown(XINPUT_GAMEPAD_BACK) || 
-			con_.checkDown(XINPUT_GAMEPAD_START) && con_.checkPressed(XINPUT_GAMEPAD_BACK))
-		{
-			world_->resetLevel();
-		}
-
-		//[Start + Back] : Quit
-		if (con_.checkDown(XINPUT_GAMEPAD_START) && con_.checkDown(XINPUT_GAMEPAD_BACK))
-		{
-			if (con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 750U && con_.checkTimeHeld(XINPUT_GAMEPAD_START) > 750U)
-			{
-				quit_ = true;
-			}
+			quit_ = true;
 		}
 	}
+
+	// Start + Back : Reset
+	if (con_.checkPressed(XINPUT_GAMEPAD_START) && con_.checkDown(XINPUT_GAMEPAD_BACK) || 
+		con_.checkDown(XINPUT_GAMEPAD_START) && con_.checkPressed(XINPUT_GAMEPAD_BACK))
+	{
+		world_->resetLevel();
+	}	
 }
 
 bool Game::checkController(sf::Time dt)
@@ -364,13 +345,8 @@ bool Game::checkController(sf::Time dt)
 }
 
 void Game::update(sf::Time dt)
-{
-	if (world_->controlled() != nullptr)
-	{
-		camera_->setTarget(world_->controlled());
-	}
-	
-	else camera_->clearTarget(true); //TESTING
+{		
+	//camera_->clearTarget(true); //TESTING
 
 	camera_->update(dt.asMilliseconds());
 
@@ -378,6 +354,13 @@ void Game::update(sf::Time dt)
 	{
 		world_->update(dt.asMilliseconds());
 	}
+	
+	//if (world_->controlled() != nullptr)
+	//{
+		camera_->setTarget(world_->controlled());
+	//}
+
+	//else camera_->clearTarget(true);
 
 	//Update counter
 	//static int x;
@@ -398,7 +381,7 @@ void Game::render()
 
 	//b2Shape* x = world_->controlled()->getVertices();
 	//b2Shape::Type y = x->GetType();
-	//world_->DrawDebugData();
+	//orld_->DrawDebugData();
 	drawer_->draw();
 	camera_->drawHUD();
 
@@ -408,4 +391,28 @@ void Game::render()
 	}
 
 	window_.display();
+}
+
+void Game::toggleFullscreen()
+{	
+	if (!fullscreen_)
+	{
+		sf::VideoMode fsmode = sf::VideoMode::getDesktopMode();
+		window_.create(fsmode, "My Sides!", sf::Style::Fullscreen, sf::ContextSettings(0u, 0u, 8u));
+
+		camera_->updateBounds(sf::Vector2f(fsmode.width, fsmode.height));
+
+		window_.display();
+		fullscreen_ = true;
+	}
+
+	else if (fullscreen_)
+	{
+		window_.create(videoMode_, "My Sides!", sf::Style::Titlebar, sf::ContextSettings(0u, 0u, 8u));
+		
+		camera_->updateBounds(sf::Vector2f(videoMode_.width, videoMode_.height));
+
+		window_.display();
+		fullscreen_ = false;
+	}
 }

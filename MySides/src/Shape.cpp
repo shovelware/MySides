@@ -237,6 +237,8 @@ void Shape::setPoly(b2PolygonShape & s, int vertices, float radius)
 			pnts[i].y = radius * (sin(DR * 360 / vertices * i));
 		}
 
+		shapeVertices_ = vertices;
+
 		s.Set(pnts, vertices);
 
 		delete[] pnts;
@@ -428,7 +430,9 @@ void Shape::update(int milliseconds)
 	if (active_)
 	{
 		if (weapon_ != nullptr)
+		{
 			weapon_->update(milliseconds);
+		}
 
 		//Death check
 		if (alive_)
@@ -452,8 +456,8 @@ void Shape::update(int milliseconds)
 				}
 			}
 
-
-			if (hp_ <= 0 && vertices_ <= 0)
+			//If no health triangle
+			if (hp_ <= 0 && vertices_ <= 3)
 			{
 				//if (type_ == traits::type::SQU_EQU);//If we're a square drop a side and change to tri
 

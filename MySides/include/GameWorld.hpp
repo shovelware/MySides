@@ -40,7 +40,6 @@ public:
 	//These should go soon
 	void addPlayer(float x, float y, bool control);
 	void addEnemy(float x, float y);
-	//void addProjectile(float x, float y, float vx, float vy);
 	void addSide(float x, float y, float nx, float ny, float size);
 
 	//Spawning works off definitions
@@ -69,7 +68,17 @@ public:
 	//
 
 	////TEMP
-	void PutEnemy() { spawnEnemy(); }
+	void PutEnemy() 
+	{
+		float x, y, rad = getBoundsRadius() * 0.7f;
+		y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
+		x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
+
+		x *= rad;
+		y *= rad;
+
+		addEnemy(x, y);
+	}
 
 	void resetLevel();
 	void clearWorld();

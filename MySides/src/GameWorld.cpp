@@ -201,17 +201,6 @@ void GameWorld::addEnemy(float x, float y)
 	added->setControlled(false);
 }
 
-//Adds a projectile to the world
-//void GameWorld::addProjectile(float x, float y, float vx, float vy)
-//{
-//	ProjectileDef p(b2Vec2(x, y), b2Vec2 (vx, vy));
-//	p.owner = &*controlled_;
-//
-//	////
-//	//p.inVelocity = controlled_->getBody()->GetLinearVelocity();
-//	projectiles_.emplace_back(addBulletBody(x, y), p);
-//}
-
 //Adds a projectile to the world via definition
 void GameWorld::addProjectile(ProjectileDef &def)
 {
@@ -222,6 +211,11 @@ void GameWorld::addProjectile(ProjectileDef &def)
 	fireSound.play();
 }
 
+void GameWorld::addSide(SideDef & def)
+{
+	sides_.push_back(new Side(addDynamicBody(def.position.x, def.position.y), def));
+}
+
 //Adds a side to the world
 void GameWorld::addSide(float x, float y, float nx, float ny, float size)
 {	
@@ -230,6 +224,13 @@ void GameWorld::addSide(float x, float y, float nx, float ny, float size)
 
 void GameWorld::removePlayer()
 {
+	DestroyBody(player_->getBody());
+
+	if (controlled_ == player_)
+	{
+		controlled_ = nullptr;
+	}
+
 	delete player_;
 	player_ = nullptr;
 }
@@ -345,23 +346,6 @@ float GameWorld::getBoundsSide()
 	return bounds_->getSideLength();
 }
 
-void GameWorld::move(b2Vec2 direction)
-{
-	if (direction.x != 0 || direction.y != 0)
-	{
-		controlled_->move(direction);
-	}
-}
-
-void GameWorld::fire(b2Vec2 direction)
-{
-	//If there's a direction to fire in
-	if (direction.x != 0 || direction.y != 0)
-	{
-		controlled_->fire(direction);
-	}
-}
-
 //Moves controlled pointer to next shape in list, loops at end NEEDS REWRITE
 void GameWorld::controlNextEnemy()
 {
@@ -415,8 +399,7 @@ void GameWorld::update(int dt)
 		player_->update(dt);
 		positionListener(player_->getPosition());
 
-		////
-		player_->setActive(true);//Debug invincible players
+		////player_->setActive(true);//Debug invincible players
 		
 		//If we're not active
 		if (player_->getActive() == false)
@@ -426,6 +409,7 @@ void GameWorld::update(int dt)
 			//b2Vec2 pos = p->getPosition();
 			//addSide(pos.x, pos.y, 0, 0, side++);
 			//
+
 			removePlayer();
 		}
 	}
@@ -516,6 +500,7 @@ void GameWorld::update(int dt)
 				//Add a side
 				static float side = 1.f;
 				b2Vec2 pos = shp->getPosition();
+
 				addSide(pos.x, pos.y, 0, 0, side);
 				removeEnemy(shapeIt);
 			}
@@ -592,17 +577,6 @@ void GameWorld::update(int dt)
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 }
 
-/*
-UpdateShape(Shape* s, int dt)
-{
-	s->update(dt)
-	if (s->getActive == false)
-	{
-		removeBody(s->getBody);
-	}
-}
-*/
-
 //Gets a pointer to the controlled shape
 Shape * GameWorld::controlled()
 {
@@ -610,4 +584,19 @@ Shape * GameWorld::controlled()
 }
 
 //Handlers for game intent: Move, Fire, Select, Triggers
+void GameWorld::move(b2Vec2 direction)
+{
+	if (controlled_ != nullptr && (direction.x != 0 || direction.y != 0))
+	{
+		controlled_->move(direction);
+	}
+}
+void GameWorld::fire(b2Vec2 direction)
+{
+	//If there's a direction to fire in
+	if (controlled_ != nullptr && (direction.x != 0 || direction.y != 0))
+	{
+		controlled_->fire(direction);
+	}
+}
 

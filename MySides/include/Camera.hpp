@@ -42,8 +42,11 @@ public:
 	//! HUD Drawing controls, both of these change render target for their duration
 	void drawHUD();
 	void drawPause();
+	void drawOver();
 
 	float getZoomPercent() const; //!< Returns zoom factor as a percentage
+
+	void updateBounds(sf::Vector2f newSize);
 private:
 	Shape* target_;			//!< The target followed ship
 	sf::Vector2f screenSize_; //!< Keep a record of the screen size for resets

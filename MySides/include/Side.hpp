@@ -2,18 +2,7 @@
 #define MS_SIDE_HPP
 
 #include "Entity.hpp"
-
-struct SideDef {
-	SideDef(b2Vec2 position, b2Vec2 direction, float size) :
-		position(position),
-		direction(direction),
-		size(size)
-	{}
-
-	b2Vec2 position;
-	b2Vec2 direction;
-	float size;
-};
+#include "SideDef.hpp"
 
 class Side : public Entity
 {
