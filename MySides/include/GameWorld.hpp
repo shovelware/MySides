@@ -22,7 +22,11 @@
 #include "Projectile.hpp"
 #include "Side.hpp"
 
+#include "Player.hpp"
+#include "Enemy.hpp"
+
 #include "ShapeDef.hpp"
+#include "SideDef.hpp"
 
 #include "Weapon.hpp"
 #include "WeapRifle.hpp"
@@ -40,7 +44,6 @@ public:
 	//These should go soon
 	void addPlayer(float x, float y, bool control);
 	void addEnemy(float x, float y);
-	void addSide(float x, float y, float nx, float ny, float size);
 
 	//Spawning works off definitions
 	//void addPlayer(ShapeDef &def);
@@ -53,12 +56,12 @@ public:
 
 	//And callbacks for entities
 	std::function<void(ProjectileDef&)> addProj_;	
-	//std::function<void(SideDef &def)> addSide_;
+	std::function<void(SideDef &def)> addSide_;
 	//std::function<void(ShapeDef &def)> addShape_;
 
 	//Called by update
 	void removePlayer();
-	void removeEnemy(std::list<Shape*>::iterator& e);
+	void removeEnemy(std::list<Enemy*>::iterator& e);
 	void removeProjectile(std::list<Projectile*>::iterator& p);
 	void removeSide(std::list<Side*>::iterator& s);
 
@@ -97,9 +100,9 @@ public:
 	void DrawDebugData();
 
 	//Return a reference to shapes, bounds, projectiles for drawing
-	Bounds*& getBounds();
-	Shape*& getPlayer();
-	std::list<Shape*>& getShapes();
+	Bounds* getBounds();
+	Shape* getPlayer();
+	std::list<Enemy*>& getShapes();
 	std::list<Projectile*>& getProjectiles();
 	std::list<Side*>& getSides();
 
@@ -109,8 +112,8 @@ private:
 	const int VELOCITY_ITERS = 6;
 	const int POSITION_ITERS = 2;
 	
-	Shape* player_;
-	std::list<Shape*> shapes_;
+	Player* player_;
+	std::list<Enemy*> shapes_;
 	std::list<Projectile*> projectiles_;
 	std::list<Side*> sides_;
 

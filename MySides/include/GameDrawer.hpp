@@ -20,11 +20,11 @@ private:
 
 	GameWorld* world_;
 
-	void drawPlayer(Shape*& p);
-	void drawShape(Shape*& s);
-	void drawBounds(Bounds*& b);
-	void drawProjectile(Projectile*& p);
-	void drawSide(Side*& s);
+	void drawPlayer(Shape* const p);
+	void drawShape(Shape* const s);
+	void drawBounds(Bounds* const b);
+	void drawProjectile(Projectile* const p);
+	void drawSide(Side* const s);
 };
 
 #endif

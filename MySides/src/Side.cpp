@@ -11,11 +11,13 @@ Side::Side(b2Body * body, b2Vec2 normal, float length) : Entity(body), length_(l
 
 Side::Side(b2Body * body, SideDef def) : Entity(body), length_(def.length)
 {
+	setShape(length_);
+
 	//Align side to normal here--------------v
 	body_->SetTransform(def.position, body_->GetAngle());
 
 	//Shoot off, while spinning
-	body_->SetLinearVelocity(def.normal);
+	//body_->SetLinearVelocity(def.normal);
 	body_->ApplyAngularImpulse(randFloat(0, 1), true);
 }
 

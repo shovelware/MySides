@@ -10,47 +10,6 @@
 extern Log l;
 ///
 
-//Creates a shape using passed body //int sides, float radius
-Shape::Shape(b2Body* body, int vertices, float radius) : Entity(body), weapon_(nullptr)
-{
-	//Create a shape, the outline
-	b2PolygonShape shap;
-	
-	//Was experimenting with poles and orientation, DON'T FORGET
-	setTriangleEqu(shap, 1.f);
-	
-	//shap.SetAsBox(radius, radius);
-
-	//Create a fixture, the link for body -> shape
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &shap;
-
-	//Add material properties to the fixture
-	fixtureDef.density = 1.0f;
-	fixtureDef.friction = 1.0f;
-	fixtureDef.restitution = 1.f;
-
-	//Add userdata to fixture for contacts
-	fixtureDef.userData = "shape";
-
-	//Create and add fixture using body's factory
-	body_->CreateFixture(&fixtureDef);
-
-	//End box2d setup
-
-	maxVel_ = 0.05f * radius; // max velocity in m/s // * radius provisionally til we make an actual calculation
-	maxRot_ = 0.0001f;
-
-	vertices_ = 0;
-	shapeVertices_ = 0;
-
-	hpMAX_ = 4;
-	hp_ = hpMAX_;
-	sides_ = 0;
-	controlled_ = false;
-	ai_ = false;
-}
-
 Shape::Shape(b2Body* body, ShapeDef &def) : Entity(body), weapon_(nullptr)
 {
 	switch (def.vertices)
@@ -78,7 +37,7 @@ Shape::Shape(b2Body* body, ShapeDef &def) : Entity(body), weapon_(nullptr)
 	colSecn_ = def.colSecn;
 	colTert_ = def.colTert;
 
-	maxVel_ = 0.025f * def.size; // max velocity in m/s // * size provisionally til we make an actual calculation
+	maxVel_ = 0.025f * (def.size >= 1 ? def.size : 1); // max velocity in m/s // * size provisionally til we make an actual calculation
 	maxRot_ = 0.0001f;
 
 	hpMAX_ = def.hpMAX;
@@ -227,6 +186,7 @@ void Shape::addMaterial(b2FixtureDef &def)
 void Shape::setPoly(b2PolygonShape & s, int vertices, float radius)
 {
 	assert(2 < vertices && vertices < 9);
+	assert(radius > 0);
 	if (2 < vertices && vertices < 9)
 	{
 		b2Vec2* pnts = new b2Vec2[vertices];

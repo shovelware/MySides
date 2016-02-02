@@ -7,7 +7,7 @@
 class Side : public Entity
 {
 public:
-	Side(b2Body* body, b2Vec2 normal, float size);
+	Side(b2Body* body, b2Vec2 normal, float length);
 	Side(b2Body* body, SideDef def);
 
 	void collect();
@@ -19,7 +19,7 @@ public:
 private:
 
 	void setShape(float size);
-	float size_;
+	float length_;
 };
 
 #endif

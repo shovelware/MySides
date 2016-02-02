@@ -43,7 +43,6 @@ namespace traits{
 
 class Shape : public Entity {
 public:
-	Shape(b2Body* body, int vertices, float radius);
 	Shape(b2Body* body, ShapeDef &def);
 	~Shape();
 
@@ -114,7 +113,7 @@ private:
 
 	int shapeVertices_;
 	int vertices_;
-	int size_;
+	float size_;
 
 	int sides_; //Currency
 	//int type_; //Possibly type enum

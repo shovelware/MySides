@@ -16,6 +16,8 @@ namespace Weapon {
 		int refireTimeMax_;
 		int reloadTime_;
 		int reloadTimeMAX_;
+
+		int pellets_;
 	};
 }
 #endif

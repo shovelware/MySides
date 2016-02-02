@@ -13,7 +13,7 @@ GameWorld::GameWorld() :
 	bounds_ = new Bounds(addStaticBody(0, 0), 32),
 
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
-	//addSide_ = [this](SideDef& def) {addSide(def); };
+	addSide_ = [this](SideDef& def) {addSide(def); };
 	
 	bgm_.openFromFile("../assets/spriterip.ogg");
 	bgm_.setLoop(true);
@@ -151,7 +151,7 @@ void GameWorld::addPlayer(float x, float y, bool control)
 {
 	ShapeDef play = ShapeDef(b2Vec2(x, y), b2Vec2_zero, 5);
 
-	player_ = new Shape(addDynamicBody(x, y), play);
+	player_ = new Player(addDynamicBody(x, y), play);
 
 	player_->setAI(false);
 	
@@ -176,7 +176,11 @@ void GameWorld::addEnemy(float x, float y)
 {
 	//Push the shape into the shape vector
 	//AND add body to world with function
-	shapes_.push_back(new Shape(addDynamicBody(x, y), 4, .5f));
+	ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, static_cast<int>(randFloat(3, 5)));
+	enem.size = .5f;
+
+	shapes_.push_back(new Enemy(addDynamicBody(enem.position.x, enem.position.y), enem));
+
 	Shape* added = *(--shapes_.end());
 
 	ProjectileDef newDef = ProjectileDef::bulletDef();
@@ -216,12 +220,6 @@ void GameWorld::addSide(SideDef & def)
 	sides_.push_back(new Side(addDynamicBody(def.position.x, def.position.y), def));
 }
 
-//Adds a side to the world
-void GameWorld::addSide(float x, float y, float nx, float ny, float size)
-{	
-	sides_.push_back(new Side(addDynamicBody(x, y), b2Vec2(nx, ny), size));
-}
-
 void GameWorld::removePlayer()
 {
 	DestroyBody(player_->getBody());
@@ -236,7 +234,7 @@ void GameWorld::removePlayer()
 }
 
 //Removes enemy from the world and increments iterator, for use within loops
-void GameWorld::removeEnemy(std::list<Shape*>::iterator& e)
+void GameWorld::removeEnemy(std::list<Enemy*>::iterator& e)
 {
 	//Play death sound at position
 	positionSound(dieSound, (*e)->getPosition());
@@ -293,10 +291,10 @@ void GameWorld::clearWorld()
 
 	if (shapes_.empty() == false)
 	{
-		for (std::list<Shape*>::iterator s = shapes_.begin();
-		s != shapes_.end(); /*Don't increment here*/)
+		for (std::list<Enemy*>::iterator e = shapes_.begin();
+		e != shapes_.end(); /*Don't increment here*/)
 		{
-			removeEnemy(s);
+			removeEnemy(e);
 		}
 	}
 	shapes_.clear();
@@ -384,9 +382,9 @@ void GameWorld::DrawDebugData()
 	b2World::DrawDebugData();
 }
 
-Bounds*& GameWorld::getBounds() { return bounds_; }
-std::list<Shape*>& GameWorld::getShapes() {	return shapes_; }
-Shape*& GameWorld::getPlayer() { return player_; }
+Bounds* GameWorld::getBounds() { return bounds_; }
+Shape* GameWorld::getPlayer() { return player_; }
+std::list<Enemy*>& GameWorld::getShapes() {	return shapes_; }
 std::list<Projectile*>& GameWorld::getProjectiles() { return projectiles_; }
 std::list<Side*>& GameWorld::getSides() { return sides_; }
 
@@ -458,7 +456,7 @@ void GameWorld::update(int dt)
 	//Update Shapes
 	if (shapes_.empty() == false)
 	{
-		for (std::list<Shape*>::iterator shapeIt = shapes_.begin();
+		for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
 		shapeIt != shapes_.end(); /*Don't increment here*/)
 		{
 			//Pull pointer from iter for readability
@@ -500,8 +498,11 @@ void GameWorld::update(int dt)
 				//Add a side
 				static float side = 1.f;
 				b2Vec2 pos = shp->getPosition();
+				//addSide(pos.x, pos.y, 0, 0, side);
 
-				addSide(pos.x, pos.y, 0, 0, side);
+				SideDef def = SideDef(pos, pos, 1.f);
+				addSide(def);
+
 				removeEnemy(shapeIt);
 			}
 

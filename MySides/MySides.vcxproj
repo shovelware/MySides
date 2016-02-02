@@ -154,6 +154,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\Bounds.hpp" />
     <ClInclude Include="include\Camera.hpp" />
     <ClInclude Include="include\ContactListener.hpp" />
+    <ClInclude Include="include\Enemy.hpp" />
     <ClInclude Include="include\Entity.hpp" />
     <ClInclude Include="include\Game.hpp" />
     <ClInclude Include="include\GameDrawer.hpp" />
@@ -162,12 +163,14 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\Log.hpp" />
     <ClInclude Include="include\Drawer.hpp" />
     <ClInclude Include="include\Magazine.hpp" />
+    <ClInclude Include="include\Player.hpp" />
     <ClInclude Include="include\Projectile.hpp" />
     <ClInclude Include="include\ProjectileDef.hpp" />
     <ClInclude Include="include\Shape.hpp" />
     <ClInclude Include="include\SFMLDebugDraw.h" />
     <ClInclude Include="include\ShapeDef.hpp" />
     <ClInclude Include="include\Side.hpp" />
+    <ClInclude Include="include\SideDef.hpp" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\Weapon.hpp" />

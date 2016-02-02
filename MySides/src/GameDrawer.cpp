@@ -18,15 +18,14 @@ void GameDrawer::draw()
 {
 	drawBounds(world_->getBounds());
 
-
-	Shape*& player = world_->getPlayer();
+	Shape* player = world_->getPlayer();
 	if (player != nullptr)
 	{
 		drawPlayer(player);
 	}
 
-	std::list<Shape*>& shapes = world_->getShapes();
-	for (Shape* shp : shapes)
+	std::list<Enemy*>& shapes = world_->getShapes();
+	for (Enemy* shp : shapes)
 	{
 		drawShape(shp);
 	}
@@ -55,7 +54,7 @@ void GameDrawer::draw()
 	//}
 }
 
-void GameDrawer::drawPlayer(Shape*& p)
+void GameDrawer::drawPlayer(Shape* const p)
 {
 	//Pull vars
 	b2Body* body = p->getBody();
@@ -85,7 +84,7 @@ void GameDrawer::drawPlayer(Shape*& p)
 	delete[] verts;
 }
 
-void GameDrawer::drawShape(Shape*& s)
+void GameDrawer::drawShape(Shape* const s)
 {
 	//Pull vars
 	b2Body* body = s->getBody();
@@ -114,7 +113,7 @@ void GameDrawer::drawShape(Shape*& s)
 	delete[] verts;
 }
 
-void GameDrawer::drawBounds(Bounds*& b)
+void GameDrawer::drawBounds(Bounds* const b)
 {
 	//Pull vars
 	b2Body* body = b->getBody();
@@ -165,7 +164,7 @@ void GameDrawer::drawBounds(Bounds*& b)
 	delete[] verts;
 }
 
-void GameDrawer::drawProjectile(Projectile*& p)
+void GameDrawer::drawProjectile(Projectile* const p)
 {
 	//Pull vars
 	b2Body* body = p->getBody();
@@ -182,7 +181,7 @@ void GameDrawer::drawProjectile(Projectile*& p)
 	drawPoint(B2toSF(pos, true), sf::Color::Magenta);
 }
 
-void GameDrawer::drawSide(Side*& s)
+void GameDrawer::drawSide(Side* const s)
 {
 	//Pull vars
 	b2Body* body = s->getBody();
