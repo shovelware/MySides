@@ -6,7 +6,7 @@
 class Player : public Shape 
 {
 public:
-	Player(b2Body* body, ShapeDef def) : Shape(body, def)
+	Player(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback) : Shape(body, def, callback)
 	{}
 };
 

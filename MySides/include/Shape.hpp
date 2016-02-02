@@ -11,6 +11,7 @@
 
 #include <functional>
 #include "Weapon.hpp"
+#include "SideDef.hpp"
 
 namespace traits{
 	namespace speed 
@@ -43,7 +44,7 @@ namespace traits{
 
 class Shape : public Entity {
 public:
-	Shape(b2Body* body, ShapeDef &def);
+	Shape(b2Body* body, ShapeDef &def, std::function<void(SideDef&)>& callback);
 	~Shape();
 
 	void move(b2Vec2 direction); //override
@@ -99,6 +100,10 @@ private:
 	void clearb2();
 
 	b2Vec2 pole_;//Orientation pole
+
+	//Side dropping
+	std::function<void(SideDef&)> sideCallback_;
+	void dropSide(b2Vec2 dir, float size);
 
 	//HP
 	int hp_;

@@ -10,7 +10,7 @@
 extern Log l;
 ///
 
-Shape::Shape(b2Body* body, ShapeDef &def) : Entity(body), weapon_(nullptr)
+Shape::Shape(b2Body* body, ShapeDef &def, std::function<void(SideDef&)>& callback) : Entity(body), weapon_(nullptr)
 {
 	switch (def.vertices)
 	{
@@ -28,14 +28,20 @@ Shape::Shape(b2Body* body, ShapeDef &def) : Entity(body), weapon_(nullptr)
 		break;
 	}
 	
+	
+
+	//Local storing of def items
 	size_ = def.size;
 	shapeVertices_ = def.vertices;
 	vertices_ = shapeVertices_;
+	//ROTATE TO FACE HEADING HERE
 
 	//Color data
 	colPrim_ = def.colPrim;
 	colSecn_ = def.colSecn;
 	colTert_ = def.colTert;
+
+	sideCallback_ = callback;
 
 	maxVel_ = 0.025f * (def.size >= 1 ? def.size : 1); // max velocity in m/s // * size provisionally til we make an actual calculation
 	maxRot_ = 0.0001f;
@@ -208,6 +214,13 @@ void Shape::setPoly(b2PolygonShape & s, int vertices, float radius)
 void Shape::clearb2()
 {
 	body_->DestroyFixture(body_->GetFixtureList());
+}
+
+void Shape::dropSide(b2Vec2 dir, float size)
+{
+	b2Vec2 offset = b2Vec2(randFloat(-5, 5), randFloat(-5, 5));
+	SideDef newSide = SideDef(getPosition() + offset, dir, size);
+	sideCallback_(newSide);
 }
 
 //Move in passed direction at constant speed
@@ -389,16 +402,23 @@ void Shape::update(int milliseconds)
 {
 	if (active_)
 	{
-		if (weapon_ != nullptr)
-		{
-			weapon_->update(milliseconds);
-		}
-
 		//Death check
 		if (alive_)
 		{
+			if (weapon_ != nullptr)
+			{
+				weapon_->update(milliseconds);
+			}
+
 			if (vertices_ > 2 && vertices_ != shapeVertices_)
 			{
+				int diff = shapeVertices_ - vertices_;
+
+				for (int i = diff; i > 0; --i)
+				{
+					dropSide(b2Vec2_zero, 1);
+				}
+
 				switch (vertices_)
 				{
 				case 3:
@@ -416,16 +436,23 @@ void Shape::update(int milliseconds)
 				}
 			}
 
-			//If no health triangle
+			//If we're a  0 health triangle, die
 			if (hp_ <= 0 && vertices_ <= 3)
 			{
 				//if (type_ == traits::type::SQU_EQU);//If we're a square drop a side and change to tri
 
+				for (int i = 3; i > 0; --i)
+				{
+					dropSide(b2Vec2_zero, 1);
+				}
+
 				alive_ = false;
-				active_ = false;
 			}
-		}
-	}
+		}//End alive
+
+	else active_ = false;
+
+	}//end active
 }
 
 //Only deals with the effects of this collision on this entity

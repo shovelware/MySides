@@ -151,7 +151,7 @@ void GameWorld::addPlayer(float x, float y, bool control)
 {
 	ShapeDef play = ShapeDef(b2Vec2(x, y), b2Vec2_zero, 5);
 
-	player_ = new Player(addDynamicBody(x, y), play);
+	player_ = new Player(addDynamicBody(x, y), play, addSide_);
 
 	player_->setAI(false);
 	
@@ -176,10 +176,10 @@ void GameWorld::addEnemy(float x, float y)
 {
 	//Push the shape into the shape vector
 	//AND add body to world with function
-	ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, static_cast<int>(randFloat(3, 5)));
+	ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, static_cast<int>(randFloat(3, 5) + 1));
 	enem.size = .5f;
 
-	shapes_.push_back(new Enemy(addDynamicBody(enem.position.x, enem.position.y), enem));
+	shapes_.push_back(new Enemy(addDynamicBody(enem.position.x, enem.position.y), enem, addSide_));
 
 	Shape* added = *(--shapes_.end());
 
@@ -495,14 +495,6 @@ void GameWorld::update(int dt)
 			//If we're not active, increment by deleting
 			if (shp->getActive() == false)
 			{
-				//Add a side
-				static float side = 1.f;
-				b2Vec2 pos = shp->getPosition();
-				//addSide(pos.x, pos.y, 0, 0, side);
-
-				SideDef def = SideDef(pos, pos, 1.f);
-				addSide(def);
-
 				removeEnemy(shapeIt);
 			}
 
