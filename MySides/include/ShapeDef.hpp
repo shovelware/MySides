@@ -11,6 +11,7 @@ public:
 		heading(b2Vec2_zero),
 		hpMAX(1),
 		size(1),
+		speedScale(1),
 		vertices(0),
 		colPrim(b2Color(.5f, .5f, .5f)),
 		colSecn(b2Color(.75f, .75f, .75f)),
@@ -22,6 +23,7 @@ public:
 		heading(heading),
 		hpMAX(vertices),
 		size(1),
+		speedScale(1),
 		vertices(vertices),
 		colPrim(b2Color(.5f, .5f, .5f)),
 		colSecn(b2Color(.75f, .75f, .75f)),
@@ -33,6 +35,7 @@ public:
 		heading(sd.heading),
 		hpMAX(sd.hpMAX),
 		size(sd.size),
+		speedScale(sd.speedScale),
 		vertices(sd.vertices),
 		colPrim(sd.colPrim),
 		colSecn(sd.colSecn),
@@ -44,6 +47,8 @@ public:
 
 	unsigned int hpMAX;
 	float size;
+
+	float speedScale;
 
 	int vertices;
 

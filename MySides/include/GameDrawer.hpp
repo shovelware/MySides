@@ -20,7 +20,6 @@ private:
 
 	GameWorld* world_;
 
-	void drawPlayer(Shape* const p);
 	void drawShape(Shape* const s);
 	void drawBounds(Bounds* const b);
 	void drawProjectile(Projectile* const p);

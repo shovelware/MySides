@@ -42,6 +42,7 @@ public:
 	//! HUD Drawing controls, both of these change render target for their duration
 	void drawHUD();
 	void drawPause();
+	void drawSpr3(int timeLeft, int shapes, int sides);
 	void drawOver(int sides, int time);
 
 	float getZoomPercent() const; //!< Returns zoom factor as a percentage

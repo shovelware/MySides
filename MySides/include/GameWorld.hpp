@@ -38,7 +38,7 @@ public:
 	GameWorld();
 	~GameWorld();
 
-	Shape* controlled();
+	Shape* getControlled();
 	bool hasControlled();
 
 	//These should go soon
@@ -58,6 +58,8 @@ public:
 	std::function<void(ProjectileDef&)> addProj_;	
 	std::function<void(SideDef &def)> addSide_;
 	//std::function<void(ShapeDef &def)> addShape_;
+
+	std::function<Shape*()> getControlled_;
 
 	//Called by update
 	void removePlayer();
@@ -110,7 +112,15 @@ public:
 	//////SPRINT 3 SLINGING
 	int hiSides;
 	unsigned int hiTime;
+
 	void bomb();
+
+	int enemies;
+	int freesides;
+
+	int maxTime = 120;
+	int getTimeInLevel() { return timeInLevel_ / 1000; }
+
 private:
 	const b2Vec2 GRAVITY = b2Vec2(0, 0.1);
 	const int VELOCITY_ITERS = 6;
@@ -129,6 +139,8 @@ private:
 	b2Body* addDynamicBody(float x, float y);
 	b2Body* addStaticBody (float x, float y);
 	b2Body* addBulletBody (float x, float y);
+
+	void popInside(Entity* ent);
 
 	//AI spawning
 	void spawnEnemy();

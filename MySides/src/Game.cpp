@@ -224,11 +224,6 @@ void Game::handleInput(sf::Time dt)
 		//world_->resizeBounds(base + lt);
 		//
 		//std::cout << base + lt << "  " << world_->getBoundsSide() << std::endl;
-
-		if (!world_->hasControlled())
-		{
-			world_->resetLevel();
-		}
 	}
 
 	//B : Cancel rotation
@@ -241,6 +236,12 @@ void Game::handleInput(sf::Time dt)
 	if (con_.checkDown(XINPUT_GAMEPAD_X))
 	{
 		//world_->controlled()->orient(b2Vec2_zero);
+
+		if (pause_)
+		{
+			world_->resetLevel();
+			camera_->setCenter(sf::Vector2f(0, 0));
+		}
 	}
 
 	//Y: Spawn enemy
@@ -274,42 +275,23 @@ void Game::handleInput(sf::Time dt)
 		camera_->zoomIn();
 	}
 
-	//Thumbsticks
+	//LC : Fullscreen
 	if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
 	{
 		toggleFullscreen();
 	}
 
+	//RC : Reset zoom
 	if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
 	{
 		camera_->zoomReset();
 	}
 
-	//DPad : firing
-	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT))
-	{
-		world_->fire(b2Vec2(1, 0));
-	}
-
-	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT))
-	{
-		world_->fire(b2Vec2(-1, 0));
-	}
-
-	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_DOWN))
-	{
-		world_->fire(b2Vec2(0, 1));
-	}
-
-	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_UP))
-	{
-		world_->fire(b2Vec2(0, -1));
-	}
-
-	if (con_.checkPressed(XINPUT_GAMEPAD_BACK))
-	{
-		camera_->zoomReset();
-	}
+	//DPad :
+	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT)){}
+	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT)){}
+	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_DOWN)){}
+	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_UP)){}
 
 	//Start : Pause
 	if (con_.checkPressed(XINPUT_GAMEPAD_START))
@@ -317,6 +299,7 @@ void Game::handleInput(sf::Time dt)
 		pause_ = !pause_;
 	}
 
+	//Back : Quit / Reset
 	if (con_.checkPressed(XINPUT_GAMEPAD_BACK))
 	{
 		if (pause_)
@@ -324,15 +307,12 @@ void Game::handleInput(sf::Time dt)
 			quit_ = true;
 		}
 	}
-
-	// Start + Back : Reset
-	if (con_.checkPressed(XINPUT_GAMEPAD_START) && con_.checkDown(XINPUT_GAMEPAD_BACK) || 
-		con_.checkDown(XINPUT_GAMEPAD_START) && con_.checkPressed(XINPUT_GAMEPAD_BACK))
-	{
-		world_->resetLevel();
-	}
-
-	if (con_.checkLeftTrigger() > 0.5f && con_.checkRightTrigger() > 0.5f && con_.checkPressed(XINPUT_GAMEPAD_A))
+	
+	if (con_.checkLeftHairTrigger() &&
+		con_.checkDown(XINPUT_GAMEPAD_A) &&
+		con_.checkDown(XINPUT_GAMEPAD_B) &&
+		con_.checkDown(XINPUT_GAMEPAD_X) &&
+		con_.checkDown(XINPUT_GAMEPAD_Y))
 	{
 		world_->bomb();
 	}
@@ -355,16 +335,15 @@ bool Game::checkController(sf::Time dt)
 }
 
 void Game::update(sf::Time dt)
-{		
-
-	camera_->update(dt.asMilliseconds());
+{
 
 	if (!pause_)
 	{
+		camera_->update(dt.asMilliseconds());
 		world_->update(dt.asMilliseconds());
 	}
 	
-	camera_->setTarget(world_->controlled());
+	camera_->setTarget(world_->getControlled());
 
 	if (world_->hasControlled() == false && !pause_)
 	{
@@ -393,6 +372,7 @@ void Game::render()
 	//world_->DrawDebugData();
 	drawer_->draw();
 	camera_->drawHUD();
+	camera_->drawSpr3(world_->maxTime - world_->getTimeInLevel(), world_->enemies, world_->freesides);
 
 	if (pause_)
 	{

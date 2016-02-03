@@ -22,16 +22,10 @@ void GameDrawer::draw()
 {
 	drawBounds(world_->getBounds());
 
-	Shape* player = world_->getPlayer();
-	if (player != nullptr)
+	std::list<Side*>& sides = world_->getSides();
+	for (Side* sd : sides)
 	{
-		drawShape(player);
-	}
-
-	std::list<Enemy*>& shapes = world_->getShapes();
-	for (Enemy* shp : shapes)
-	{
-		drawShape(shp);
+		drawSide(sd);
 	}
 
 	std::list<Projectile*>& projs = world_->getProjectiles();
@@ -40,45 +34,18 @@ void GameDrawer::draw()
 		drawProjectile(prj);
 	}
 
-	std::list<Side*>& sides = world_->getSides();
-	for (Side* sd : sides)
+	std::list<Enemy*>& shapes = world_->getShapes();
+	for (Enemy* shp : shapes)
 	{
-		drawSide(sd);
-	}
-}
-
-//Deprecated, remove?
-void GameDrawer::drawPlayer(Shape* const p)
-{
-	//Pull vars
-	b2Body* body = p->getBody();
-	b2Vec2 pos = body->GetWorldCenter();
-	b2Vec2 vel = pos + body->GetLinearVelocity();
-	b2PolygonShape* shape = static_cast<b2PolygonShape*>(p->getBody()->GetFixtureList()->GetShape());
-	int count = shape->GetVertexCount();
-	sf::Color pri = B2toSF(p->getPrimary());
-	sf::Color sec = B2toSF(p->getSecondary());
-	sf::Color ter = B2toSF(p->getTertiary());
-
-	//Convert verts
-	sf::Vector2f* verts = new sf::Vector2f[count];
-
-	for (int i = 0; i < count; ++i)
-	{
-		verts[i] = B2toSF(body->GetWorldPoint(shape->GetVertex(i)), true);
+		drawShape(shp);
 	}
 
-	//Draw shape, vel, pos
-	drawPolygon(verts, count, pri, sec);
+	Shape* player = world_->getPlayer();
+	if (player != nullptr)
+	{
+		drawShape(player);
+	}
 
-	drawLine(B2toSF(pos, true), B2toSF(vel, true), ter);
-
-	drawCircle(B2toSF(pos, true), 1, sec, pri); // Fix off center
-
-	drawPoint(B2toSF(pos, true), sf::Color::Red);
-
-	//Clean up
-	delete[] verts;
 }
 
 void GameDrawer::drawShape(Shape* const s)
@@ -87,9 +54,11 @@ void GameDrawer::drawShape(Shape* const s)
 	b2Body* body = s->getBody();
 	b2PolygonShape* shape = static_cast<b2PolygonShape*>(s->getBody()->GetFixtureList()->GetShape());
 	int count = shape->GetVertexCount();
+	float size = s->getSize();
 	
 	sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
-	sf::Vector2f vel = pos + B2toSF(s->getBody()->GetLinearVelocity(), true);
+	sf::Vector2f vel = B2toSF(body->GetLinearVelocity(), true);
+	vel *= (float)(size * _SCALE_ * 2);
 	
 	sf::Color pri = B2toSF(s->getPrimary());
 	sf::Color sec = B2toSF(s->getSecondary());
@@ -105,11 +74,11 @@ void GameDrawer::drawShape(Shape* const s)
 	}
 
 	//Draw shape, vel, pos
-	drawPolygon(verts, count, pri, sec);
-	
-	drawLine(pos, vel, ter);
+	drawLine(pos, pos - vel, ter);
 
-	drawCircle(pos, 1, sec, pri); // Fix off center
+	drawPolygon(verts, count, pri, sec);
+
+	drawCircle(pos, size * 4, sec, ter);
 	
 	//Clean up
 	delete[] verts;
@@ -180,7 +149,8 @@ void GameDrawer::drawProjectile(Projectile* const p)
 	b2Body* body = p->getBody();
 
 	sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
-	sf::Vector2f vel = pos + B2toSF(p->getBody()->GetLinearVelocity(), true);
+	sf::Vector2f vel = B2toSF(body->GetLinearVelocity(), true);
+	vel *= (float)_SCALE_;
 
 	sf::Color pri = B2toSF(p->getPrimary());
 	sf::Color sec = B2toSF(p->getSecondary());
@@ -191,17 +161,19 @@ void GameDrawer::drawProjectile(Projectile* const p)
 	float rad = shape->m_radius * _SCALE_;
 
 	//Draw shape, vel, pos
+	drawLine(pos, pos - vel, ter);
 	drawCircle(pos, rad, pri, sec);
-	drawLine(pos, vel, ter);
-	drawPoint(pos, sec);
+	drawPoint(pos, ter);
 }
 
 void GameDrawer::drawSide(Side* const s)
 {
 	//Pull vars
 	b2Body* body = s->getBody();
+	float length = s->getValue();
 	sf::Vector2f pos = B2toSF(s->getPosition(), true);
-	sf::Vector2f vel = pos + B2toSF(s->getBody()->GetLinearVelocity(), true);
+	sf::Vector2f vel = B2toSF(body->GetLinearVelocity(), true);
+	vel *= 16.f;
 
 	sf::Color pri = B2toSF(s->getPrimary());
 	sf::Color sec = B2toSF(s->getSecondary());
@@ -223,7 +195,7 @@ void GameDrawer::drawSide(Side* const s)
 
 	//Draw line
 	drawLine(a, b, pri);
-	drawPoint(pos, sec);
+	drawCircle(pos, length, sec, pri, 0);
 }
 
 /*GameDrawer::DrawShape(const &Shape s)

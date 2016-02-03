@@ -9,7 +9,14 @@ Side::Side(b2Body * body, SideDef def) : Entity(body), length_(def.length)
 	setShape(length_);
 
 	//Align side to normal here--------------v
-	body_->SetTransform(def.position, body_->GetAngle());
+
+
+
+	float bodyAngle = body_->GetAngle();
+	b2Vec2 toTarget = def.normal;
+	float desiredAngle = atan2f(-toTarget.x, toTarget.y);
+
+	body_->SetTransform(def.position, desiredAngle);
 
 	//Shoot off, while spinning
 	//body_->SetLinearVelocity(def.normal);

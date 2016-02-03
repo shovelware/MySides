@@ -6,14 +6,15 @@
 //Constructor initialises Box2D World and boudaries
 GameWorld::GameWorld() : 
 	b2World(GRAVITY), 
-	contactListener_(ContactListener())
+	contactListener_(ContactListener()),
+	controlled_(nullptr)
 {
 	SetContactListener(&contactListener_);
 
 	bounds_ = new Bounds(addStaticBody(0, 0), 32),
 
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
-	addSide_ = [this](SideDef& def) {addSide(def); };
+	addSide_ = [this](SideDef& def) { addSide(def); };
 	
 	bgm_.openFromFile("../assets/spriterip.ogg");
 	bgm_.setLoop(true);
@@ -59,7 +60,7 @@ GameWorld::~GameWorld()
 //Returns true if the gameworld has a controlled entity
 bool GameWorld::hasControlled()
 {
-	//Return false if our pointer to the controlled shape is null
+	//Return false if the pointer to our controlled shape is null
 	return (controlled_ != nullptr);
 }
 
@@ -121,6 +122,20 @@ b2Body * GameWorld::addBulletBody(float x, float y)
 	return body;
 }
 
+void GameWorld::popInside(Entity * ent)
+{
+	b2Vec2 between = ent->getPosition();
+	float dist = between.Length();
+	float rad = bounds_->getRadius();
+
+	if (dist > bounds_->getRadius())
+	{
+		between.Normalize();
+		between *= (rad * 90);
+		ent->setPosition(between);
+	}
+}
+
 //Spawn a random enemy
 void GameWorld::spawnEnemy()
 {
@@ -155,18 +170,15 @@ void GameWorld::positionListener(b2Vec2 pos, bool scale = true)
 void GameWorld::addPlayer(float x, float y, bool control)
 {
 	ShapeDef play = ShapeDef(b2Vec2(x, y), b2Vec2_zero, 5);
-	play.colPrim = b2Color(0.f, 1.f, 0.f);
-	play.colSecn = b2Color(1.f, 1.f, 0.f);
-	play.colTert = b2Color(0.f, 0.f, 1.f);
+	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
+	play.colSecn = b2Color(0.f, 1.f, 1.f);
+	play.colTert = b2Color(1.f, 0.f, 0.f);
 
 	player_ = new Player(addDynamicBody(x, y), play, addSide_);
-
-	player_->setAI(false);
 	
 	if (control)
 	{
 		//Set our control to the one we just put in
-		player_->setControlled(true);
 		controlled_ = player_;
 
 		ProjectileDef newDef = ProjectileDef::bulletDef();
@@ -184,14 +196,14 @@ void GameWorld::addEnemy(float x, float y)
 {
 	//Push the shape into the shape vector
 	//AND add body to world with function
-	ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, static_cast<int>(randFloat(3, 5) + 1));
+	ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
 	enem.size = .5f;
+	enem.speedScale = .5f;
 	enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
 	enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
-	enem.colTert = b2Color(0.f, 0.f, 0.f);
+	enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.5f, 1.f), randFloat(0.5f, 1.f));
 
-
-	shapes_.push_back(new Enemy(addDynamicBody(enem.position.x, enem.position.y), enem, addSide_));
+	shapes_.push_back(new Enemy(addDynamicBody(enem.position.x, enem.position.y), enem, addSide_, getControlled_));
 
 	Shape* added = *(--shapes_.end());
 
@@ -199,10 +211,6 @@ void GameWorld::addEnemy(float x, float y)
 	newDef.velScale = 0.5f;
 	newDef.damageScale = 1.f;
 	newDef.size = 1;
-
-	newDef.colPrim = b2Color(enem.colPrim.r + 0.1f, enem.colPrim.g + 0.1f, enem.colPrim.b + 0.1f);
-	newDef.colSecn = b2Color(enem.colSecn.r + 0.1f, enem.colSecn.g + 0.1f, enem.colSecn.b + 0.1f);
-	newDef.colTert = b2Color(enem.colTert.r + 0.1f, enem.colTert.g + 0.1f, enem.colTert.b + 0.1f);
 
 	Weapon::WeaponI* newWeap;
 	
@@ -217,11 +225,11 @@ void GameWorld::addEnemy(float x, float y)
 	}
 
 	added->arm(newWeap);
-	added->setAI(true);
-	added->setControlled(false);
 
 	positionSound(spawnSound, added->getPosition());
 	spawnSound.play();
+
+	enemies++;
 }
 
 //Adds a projectile to the world via definition
@@ -241,23 +249,29 @@ void GameWorld::addSide(SideDef & def)
 	
 	positionSound(dropSound, def.position);
 	dropSound.play();
+
+	freesides++;
 }
 
+//Removes the player from the game world
 void GameWorld::removePlayer()
 {
-	DestroyBody(player_->getBody());
-
 	if (controlled_ == player_)
 	{
 		controlled_ = nullptr;
 	}
-	
-	//Play loss sound at position
-	positionSound(lossSound, b2Vec2_zero);
-	lossSound.play();
 
-	delete player_;
-	player_ = nullptr;
+	if (player_ != nullptr)
+	{
+		//Play loss sound at position
+		positionSound(lossSound, b2Vec2_zero);
+		lossSound.play();
+		
+		DestroyBody(player_->getBody());
+
+		delete player_;
+		player_ = nullptr;
+	}
 }
 
 //Removes enemy from the world and increments iterator, for use within loops
@@ -270,8 +284,9 @@ void GameWorld::removeEnemy(std::list<Enemy*>::iterator& e)
 	//Delete enemy
 	DestroyBody((*e)->getBody());
 	delete (*e);
-
 	e = shapes_.erase(e);
+
+	enemies--;
 }
 
 //Removes projectile from the world and increments iterator, for use within loops
@@ -291,6 +306,8 @@ void GameWorld::removeSide(std::list<Side*>::iterator & s)
 
 	DestroyBody((*s)->getBody());
 	s = sides_.erase(s);
+
+	freesides--;
 }
 
 //Resets the level
@@ -304,19 +321,23 @@ void GameWorld::resetLevel()
 
 	//Add a new player
 	addPlayer(0, 0, true);
+	getControlled_ = std::bind(&GameWorld::getControlled, this);
 
 	spawnSound.play();
+	spawns_ = 1;
 
 	//Restart bgm
 	bgm_.play();
 
 	//Regenerate level somehow
 	hiSides = 0;
+	enemies = 0;
+	freesides = 0;
 }
 
 void GameWorld::clearWorld()
 {
-	player_ = nullptr;
+	removePlayer();
 
 	if (shapes_.empty() == false)
 	{
@@ -449,6 +470,8 @@ void GameWorld::update(int dt)
 	if (player_ != nullptr)
 	{
 		player_->update(dt);
+		popInside(player_);
+
 		positionListener(player_->getPosition());
 
 		////player_->setActive(true);//Debug invincible players
@@ -467,38 +490,11 @@ void GameWorld::update(int dt)
 		shapeIt != shapes_.end(); /*Don't increment here*/)
 		{
 			//Pull pointer from iter for readability
-			Shape* shp = (*shapeIt);
+			Enemy* shp = (*shapeIt);
 
 			shp->update(dt);
-
-			//Demo AI
-			if (shp->getAI() && player_ != nullptr)
-			{
-				b2Vec2 playerPos = controlled_->getPosition();
-				b2Vec2 ePos = shp->getPosition();
-				b2Vec2 between = playerPos - ePos;
-
-				if (between.Length() > 40  || between.Length() < 2.5f)
-				{
-
-				}
-
-				else if (between.Length() < 25 && (shp->getHP() >= shp->getHPMax() / 2))
-				{
-					shp->move(between);
-
-					if (shp->getArmed())
-					{
-						shp->fire(between);
-					}
-				}
-
-				else if (between.Length() < 10 * (shp->getHPMax() - shp->getHP())) 
-				{
-					shp->move(-between);
-				}
-			}
-
+			popInside(shp);
+			
 			//If we're not active, increment by deleting
 			if (shp->getActive() == false)
 			{
@@ -520,6 +516,7 @@ void GameWorld::update(int dt)
 			Projectile* prj = (*projIt);
 
 			prj->update(dt);
+			popInside(prj);
 
 			//If we're not active, increment by deleting
 			if (prj->getActive() == false)
@@ -539,6 +536,8 @@ void GameWorld::update(int dt)
 		{
 			//Pull pointer
 			Side* sd = (*sideIt);
+
+			popInside(sd);
 
 			//If we're not active, increment by deleting
 			if (sd->getActive() == false)
@@ -569,10 +568,16 @@ void GameWorld::update(int dt)
 
 	if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_)
 	{
-		spawnEnemy();
 		lastSpawn_ = timeInLevel_;
-		spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
+		
+		//if we want to do less than double the enemy number
+		if (enemies < spawns_* 2)
+		{
+			spawnEnemy();
+			spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
+		}
 	}
+
 
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 
@@ -580,13 +585,19 @@ void GameWorld::update(int dt)
 	{
 		hiSides = player_->getSidesCollected();
 		hiTime = timeInLevel_;
+	
+		//2 minute time limit
+		if (timeInLevel_ >= maxTime * 1000)
+		{
+			removePlayer();
+		}
 	}
 }
 
-//Gets a pointer to the controlled shape
-Shape * GameWorld::controlled()
+//Gets a pointer to the controlled shape, or null if there isn't one
+Shape * GameWorld::getControlled()
 {
-	return player_;
+	return controlled_;
 }
 
 //Handlers for game intent: Move, Fire, Select, Triggers
@@ -602,7 +613,12 @@ void GameWorld::fire(b2Vec2 direction)
 	//If there's a direction to fire in
 	if (controlled_ != nullptr && (direction.x != 0 || direction.y != 0))
 	{
-		controlled_->fire(direction);
+		if (direction.Length() <= 0.75f)
+		{
+			controlled_->orient(direction);
+		}
+
+		else controlled_->fire(direction);
 	}
 }
 

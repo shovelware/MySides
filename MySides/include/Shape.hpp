@@ -58,17 +58,12 @@ public:
 	void takeDamage(int damage);
 	void collect(int value);
 
-	//Setting of ai and controlled, should be inheritance
-	bool getControlled() const;
-	bool getAI() const;
-	void setControlled(bool con);
-	void setAI(bool ai);
-
 	//HP values
 	int getHP() const;
 	unsigned int getHPMax() const;
 
 	int getSidesCollected() const;
+	float getSize() const;
 		
 	void explode();
 
@@ -87,18 +82,11 @@ private:
 	/*const*/ float maxVel_;//maximum velocity
 	/*const*/ float maxRot_;//maximum rotation
 
-	//Set: sides = 1 * scale
-	void setTriangleEqu(b2PolygonShape& s, float scale);
-	void setSquare(b2PolygonShape& s, float scale);
-
-	//These three repeat themselves, I'd like to make this neater. KISS,DRY!
-	void setAsTriangle(float size);
-	void setAsSquare(float size);
-	void setAsPentagon(float size);
+	b2FixtureDef shapeFixDef_;
 
 	//Add physics and shapes
 	void addMaterial(b2FixtureDef & def);
-	void setPoly(b2PolygonShape& s, int vertices, float radius);
+	void setPoly(int vertices, float radius);
 	void clearb2();
 
 	b2Vec2 pole_;//Orientation pole
@@ -110,11 +98,7 @@ private:
 	//HP
 	int hp_;
 	unsigned int hpMAX_;
-
-	//controlled and ai bools
-	bool controlled_;
-	bool ai_;
-
+	
 	//New firing logic
 	Weapon::WeaponI* weapon_;
 

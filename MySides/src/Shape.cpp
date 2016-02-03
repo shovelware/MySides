@@ -11,24 +11,12 @@ extern Log l;
 ///
 
 Shape::Shape(b2Body* body, ShapeDef &def, std::function<void(SideDef&)>& callback) : Entity(body), weapon_(nullptr)
-{
-	switch (def.vertices)
-	{
-	case 3:
-		setAsTriangle(def.size);
-		break;
-	case 4:
-		setAsSquare(def.size);
-		break;
-	case 5:
-		setAsPentagon(def.size);
-		break;
-	default:
-		setAsTriangle(def.size * 2);
-		break;
-	}
-	
-	
+{	
+	//Collision
+	shapeFixDef_.userData = "shape";
+	addMaterial(shapeFixDef_);
+
+	setPoly(def.vertices, def.size);
 
 	//Local storing of def items
 	size_ = def.size;
@@ -43,14 +31,12 @@ Shape::Shape(b2Body* body, ShapeDef &def, std::function<void(SideDef&)>& callbac
 
 	sideCallback_ = callback;
 
-	maxVel_ = 0.025f * (def.size >= 1 ? def.size : 1); // max velocity in m/s // * size provisionally til we make an actual calculation
+	maxVel_ = 0.025f * (def.speedScale >= 0.5f ? def.speedScale : 0.5f); // max velocity in m/s // * size provisionally til we make an actual calculation
 	maxRot_ = 0.0001f;
 
 	hpMAX_ = def.hpMAX;
 	hp_ = hpMAX_;
 	sides_ = 0;
-	controlled_ = false;
-	ai_ = false;
 }
 
 //Destroys weapon if we have one
@@ -62,124 +48,6 @@ Shape::~Shape()
 	}
 }
 
-//Sets shape to be an equilateral triangle with sides of 1*scale
-void Shape::setTriangleEqu(b2PolygonShape& s, float scale)
-{
-
-	//Magic number:  0.577351f
-	b2Vec2 verts[3];
-	
-	verts[0].Set(0, -1.f);
-	verts[1].Set(-.5f, 0);
-	verts[2].Set(.5f, 0);
-
-	verts[0] *= scale;
-	verts[1] *= scale;
-	verts[2] *= scale;
-
-	pole_ = verts[0];
-
-	s.Set(verts, 3);
-
-	//type_ = traits::type::TRI_EQU;
-
-
-	std::ostringstream o;
-	
-	b2Vec2 side = verts[2] - verts[0];
-	o << side.Length() << endl;
-	l.out(l.message, 'P', o.str().c_str());
-}
-
-//Sets shape to a regular tetrahedron with side length 1 * scale
-void Shape::setSquare(b2PolygonShape& s, float scale)
-{
-	b2Vec2 verts[4];
-
-	//This is the distance from the centre of the square
-	//To each point that results in side length 1
-	//Simple pythagoras trig math
-	float dist = sqrt(2) / 2;
-
-	verts[0] = b2Vec2(0 * scale, -dist * scale);
-	verts[1] = b2Vec2(-dist * scale, 0 * scale);
-	verts[2] = b2Vec2(0 * scale, dist * scale);
-	verts[3] = b2Vec2(dist * scale, 0 * scale);
-
-	s.Set(verts, 4);
-
-
-//	type_ = traits::type::SQU_EQU;
-
-	//std::ostringstream o;
-	////o << orientation.x << ", " << orientation.y;
-	//
-	//b2Vec2 side = verts[3] - verts[2];
-	//o << side.Length() << endl;
-	//l.out(l.message, 'P', o.str().c_str());
-
-}
-
-void Shape::setAsTriangle(float size)
-{
-	//Shape data
-	b2PolygonShape shap;
-	setPoly(shap, 3, size);
-
-	//Fixture data
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &shap;
-
-	//Collision
-	fixtureDef.userData = "shape";
-	addMaterial(fixtureDef);
-
-	//Bind fixture
-	body_->CreateFixture(&fixtureDef);
-
-	//End box2d setup
-}
-
-void Shape::setAsSquare(float size)
-{
-	//Shape data
-	b2PolygonShape shap;
-	setPoly(shap, 4, size);
-
-	//Fixture data
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &shap;
-
-	//Collision
-	fixtureDef.userData = "shape";
-	addMaterial(fixtureDef);
-
-	//Bind fixture
-	body_->CreateFixture(&fixtureDef);
-
-	//End box2d setup
-}
-
-void Shape::setAsPentagon(float size)
-{
-	//Shape data
-	b2PolygonShape shap;
-	setPoly(shap, 5, size);
-
-	//Fixture data
-	b2FixtureDef fixtureDef;
-	fixtureDef.shape = &shap;
-
-	//Collision
-	fixtureDef.userData = "shape";
-	addMaterial(fixtureDef);
-
-	//Bind fixture
-	body_->CreateFixture(&fixtureDef);
-
-	//End box2d setup
-}
-
 //Add material data to passed fixture def
 void Shape::addMaterial(b2FixtureDef &def)
 {
@@ -189,10 +57,14 @@ void Shape::addMaterial(b2FixtureDef &def)
 }
 
 //Should only be called by set[shape] methods
-void Shape::setPoly(b2PolygonShape & s, int vertices, float radius)
+void Shape::setPoly(int vertices, float radius)
 {
+	//Shape data
+	b2PolygonShape shap;
+
 	assert(2 < vertices && vertices < 9);
 	assert(radius > 0);
+
 	if (2 < vertices && vertices < 9)
 	{
 		b2Vec2* pnts = new b2Vec2[vertices];
@@ -205,21 +77,42 @@ void Shape::setPoly(b2PolygonShape & s, int vertices, float radius)
 
 		shapeVertices_ = vertices;
 
-		s.Set(pnts, vertices);
+		shap.Set(pnts, vertices);
 
 		delete[] pnts;
 	}
+
+	//Fixture shape
+	shapeFixDef_.shape = &shap;
+
+	//If there's something there, clear it
+	if (body_->GetFixtureList()) 
+	{
+		clearb2();
+	}
+
+	//Bind fixture
+	body_->CreateFixture(&shapeFixDef_);
+
+	//End box2d setup
 }
 
+//Clears the box2d fixture list of the first fixture (We should only have one anyway)
 void Shape::clearb2()
 {
 	body_->DestroyFixture(body_->GetFixtureList());
 }
 
+//Uses a callback to drop a side
 void Shape::dropSide(b2Vec2 dir, float size)
 {
 	b2Vec2 offset = b2Vec2(randFloat(-5, 5), randFloat(-5, 5));
 	SideDef newSide = SideDef(getPosition() + offset, dir, size);
+	
+	newSide.colPrim = colSecn_;
+	newSide.colSecn = colPrim_;
+	newSide.colTert = colTert_;
+
 	sideCallback_(newSide);
 }
 
@@ -259,14 +152,10 @@ void Shape::stopMove()
 
 void Shape::orient(b2Vec2 direction)
 {
-	//get angle between center->pole and 
-	b2Vec2 orientation = body_->GetWorldPoint(pole_) - body_->GetWorldCenter();
-	orientation.Normalize();
-
-	std::ostringstream o;
-	//o << orientation.x << ", " << orientation.y;
-	o << fmod(body_->GetAngle() * RD, 180);
-	l.out(l.message, 'P', o.str().c_str());
+	float bodyAngle = body_->GetAngle();
+	b2Vec2 toTarget = direction;
+	float desiredAngle = atan2f(-toTarget.x, toTarget.y);
+	body_->SetTransform(body_->GetPosition(), desiredAngle);
 }
 
 void Shape::rotate(float amount)
@@ -329,32 +218,6 @@ void Shape::collect(int value)
 	sides_ += value;
 }
 
-bool Shape::getControlled() const
-{
-	return controlled_;
-}
-
-bool Shape::getAI() const
-{
-	return ai_;
-}
-
-void Shape::setControlled(bool con)
-{
-	controlled_ = con;
-}
-
-void Shape::setAI(bool ai)
-{
-	ai_ = ai;
-
-	//If we're an ai, dumb us down a bit //REMOVE
-	if (ai)
-	{
-		maxVel_ /= 2;
-	}
-}
-
 int Shape::getHP() const
 {
 	return hp_;
@@ -370,11 +233,16 @@ int Shape::getSidesCollected() const
 	return sides_;
 }
 
+float Shape::getSize() const
+{
+	return size_;
+}
+
 void Shape::explode()
 {
 	for (int i = vertices_; i > 0; --i)
 	{
-		dropSide(b2Vec2_zero, 1);
+		dropSide(b2Vec2(randFloat(-5, 5), randFloat(-5, 5)), 1);
 	}
 
 	alive_ = false;
@@ -388,6 +256,9 @@ bool Shape::getArmed()
 void Shape::arm(Weapon::WeaponI * weapon)
 {
 	weapon_ = weapon;
+	weapon_->setPrimary(colPrim_);
+	weapon_->setSecondary(colSecn_);
+	weapon_->setTertiary(colTert_);
 }
 
 void Shape::disarm()
@@ -402,6 +273,7 @@ void Shape::disarm()
 
 void Shape::fire(b2Vec2 direction)
 {
+	orient(direction);
 	if (weapon_ != nullptr)
 	{
 		weapon_->trigger(direction);
@@ -415,41 +287,36 @@ void Shape::update(int milliseconds)
 		//Death check
 		if (alive_)
 		{
+			//Update weapon if we have on
 			if (weapon_ != nullptr)
 			{
 				weapon_->update(milliseconds);
 			}
 
+			//If our internal shape mismatches our displayed shape
 			if (vertices_ > 2 && vertices_ != shapeVertices_)
 			{
 				int diff = shapeVertices_ - vertices_;
 
+				//This means we've moved down
 				if (diff > 0)
 				{
+					//Drop the sides we lost
 					for (int i = diff; i > 0; --i)
 					{
-						dropSide(b2Vec2_zero, 1);
+						dropSide(b2Vec2(randFloat(-5, 5), randFloat(-5, 5)), 1);
 					}
 				}
 
-				switch (vertices_)
-				{
-				case 3:
-					clearb2();
-					setAsTriangle(size_);
-					break;
-				case 4:
-					clearb2();
-					setAsSquare(size_);
-					break;
-				case 5:
-					clearb2();
-					setAsPentagon(size_);
-					break;
-				}
+				//Correct mismatch
+				setPoly(vertices_, size_);
+
+				hpMAX_ = vertices_;
+				hp_ = hpMAX_;
 			}
 
-			else if (sides_ >= 16 && vertices_ < 5)
+			//If we have a bunch of sides and could go up
+			else if (sides_ >= 16 && vertices_ < 8)
 			{
 				sides_ -= 16;
 				vertices_ += 1;
@@ -458,12 +325,7 @@ void Shape::update(int milliseconds)
 			//If we're a  0 health triangle, die
 			if (hp_ <= 0 && vertices_ <= 3)
 			{
-				//if (type_ == traits::type::SQU_EQU);//If we're a square drop a side and change to tri
-
-				for (int i = 3; i > 0; --i)
-				{
-					dropSide(b2Vec2_zero, 1);
-				}
+				explode();
 
 				alive_ = false;
 			}
