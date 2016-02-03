@@ -56,7 +56,9 @@ void GameDrawer::drawShape(Shape* const s)
 	int count = shape->GetVertexCount();
 	float size = s->getSize();
 	float angle = body->GetAngle();
+
 	sf::Vector2f pointing(sin(angle), -cos(angle));
+	pointing *= (float)(_SCALE_ * 1.5);
 	
 	sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
 	sf::Vector2f vel = B2toSF(body->GetLinearVelocity(), true);
@@ -75,15 +77,26 @@ void GameDrawer::drawShape(Shape* const s)
 		verts[i] = B2toSF(body->GetWorldPoint(shape->GetVertex(i)), true);
 	}
 
-	//Draw shape, vel, pos
+	//Draw
+	//Velocity line
 	drawLine(pos, pos - vel, ter);
 
+	//Actual shape
 	drawPolygon(verts, count, pri, sec);
 
-	drawCircle(pos, size * 4, sec, ter);
+	//Centre circle
+	drawCircle(pos, size * 4, sec, sec, 0);
 	
-	pointing *= (float)(_SCALE_ * 1.5);
-	drawCircle(pos - pointing, 4, pri, sec);
+	//Orientation circle
+	drawCircle(pos - pointing, 4, ter, sec);
+	
+	//sf::Vector2f* arrow = new sf::Vector2f[3];
+	//arrow[1] = (pos - pointing);
+	//arrow[2] = (pos - sf::Vector2f(-pointing.x, pointing.y / 2));
+	//arrow[3] = (pos - sf::Vector2f(pointing.x, pointing.y / 2));
+	//
+	//drawPolygon(arrow, 3, ter, sec);
+
 	//Clean up
 	delete[] verts;
 }

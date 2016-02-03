@@ -122,13 +122,16 @@ b2Body * GameWorld::addBulletBody(float x, float y)
 	return body;
 }
 
+//Pops an entity back inside the bounds
 void GameWorld::popInside(Entity * ent)
 {
+	//Bounds centre on origin so between is just pos
 	b2Vec2 between = ent->getPosition();
+
 	float dist = between.Length();
 	float rad = bounds_->getRadius();
 
-	if (dist > bounds_->getRadius())
+	if (dist > rad)
 	{
 		between.Normalize();
 		between *= (rad * 90);
@@ -199,9 +202,10 @@ void GameWorld::addEnemy(float x, float y)
 	ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
 	enem.size = .5f;
 	enem.speedScale = .5f;
+
 	enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
 	enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
-	enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.5f, 1.f), randFloat(0.5f, 1.f));
+	enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.1f, 0.3f), randFloat(0.1f, 0.3f));
 
 	shapes_.push_back(new Enemy(addDynamicBody(enem.position.x, enem.position.y), enem, addSide_, getControlled_));
 

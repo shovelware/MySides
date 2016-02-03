@@ -4,12 +4,13 @@
 #ifndef MS_SHAPE_HPP
 #define MS_SHAPE_HPP
 
+#include <functional>
+
 #include <Thor\Vectors\VectorAlgebra2D.hpp>
 
 #include "Entity.hpp"
 #include "ShapeDef.hpp"
 
-#include <functional>
 #include "Weapon.hpp"
 #include "SideDef.hpp"
 
@@ -52,7 +53,6 @@ public:
 	void stopMove();
 
 	void orient(b2Vec2 direction);
-	void rotate(float amount); // override
 	void stopRotate();
 
 	void takeDamage(int damage);

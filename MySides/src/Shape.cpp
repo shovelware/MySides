@@ -71,8 +71,8 @@ void Shape::setPoly(int vertices, float radius)
 
 		for (int i = 0; i < vertices; ++i)
 		{
-			pnts[i].x = radius * (cos(DR * 360 / vertices * i)); //MAKE THESE START WITH DOWN
-			pnts[i].y = radius * (sin(DR * 360 / vertices * i)); //MAKE THESE START WITH DOWN
+			pnts[i].y = radius * (cos(DR * 360 / vertices * i)); //MAKE THESE START WITH DOWN
+			pnts[i].x = radius * (-sin(DR * 360 / vertices * i)); //MAKE THESE START WITH DOWN
 		}
 
 		shapeVertices_ = vertices;
@@ -145,6 +145,12 @@ void Shape::move(b2Vec2 direction)
 	//l.out(l.message, 'P', "Player move");
 }
 
+void Shape::orientedMove(b2Vec2 direction)
+{
+	orient(direction);
+	move(direction);
+}
+
 void Shape::stopMove()
 {
 	body_->SetLinearVelocity(b2Vec2_zero);
@@ -153,42 +159,17 @@ void Shape::stopMove()
 void Shape::orient(b2Vec2 direction)
 {
 	float bodyAngle = body_->GetAngle();
-	b2Vec2 toTarget = direction;
-	float desiredAngle = atan2f(-toTarget.x, toTarget.y);
-	body_->SetTransform(body_->GetPosition(), desiredAngle);
-}
+	float desiredAngle = atan2f(-direction.x, direction.y);
+	float nextAngle = body_->GetAngle() + body_->GetAngularVelocity() / _TICKTIME_;
 
-void Shape::rotate(float amount)
-{	
-//Make amount in range -1 <-> +1
-if (abs(amount) > 1)
-{
-	if (amount < 0)
-	{
-		amount = -1;
-	}
+	float totalRotation = desiredAngle - bodyAngle;
 
-	else amount = 1;
-}
+	while (totalRotation < -180 * DR) totalRotation += 360 * DR;
+	while (totalRotation >  180 * DR) totalRotation -= 360 * DR;
 
-//Get the body's rotation
-float rotation = body_->GetAngle();
-
-//Set desired rotation
-float desiredRot = amount;
-desiredRot *= maxRot_;
-
-//Get the difference in current and desired
-float rotChange = desiredRot - rotation;
-
-//Apply appropriate impulse
-float impulse = rotChange;
-body_->ApplyTorque(DR * amount, true);
-
-//std::ostringstream vel;
-//vel << body_->GetAngularVelocity();
-//
-//l.out(l.message, 'P', vel.str().c_str());
+	float change = 30 * DR; //allow 30 degree rotation per time step
+	float newAngle = bodyAngle + std::min(change, std::max(-change, totalRotation));
+	body_->SetTransform(body_->GetPosition(), newAngle);
 }
 
 void Shape::stopRotate()
@@ -256,9 +237,9 @@ bool Shape::getArmed()
 void Shape::arm(Weapon::WeaponI * weapon)
 {
 	weapon_ = weapon;
-	weapon_->setPrimary(colPrim_);
+	weapon_->setPrimary(colTert_);
 	weapon_->setSecondary(colSecn_);
-	weapon_->setTertiary(colTert_);
+	weapon_->setTertiary(colSecn_);
 }
 
 void Shape::disarm()
