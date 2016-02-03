@@ -39,6 +39,11 @@ GameWorld::GameWorld() :
 	lossSound.setMinDistance(100);
 	lossSound.setAttenuation(1);
 
+	dropBuffer.loadFromFile("../assets/drop.wav");
+	dropSound.setBuffer(dropBuffer);
+	dropSound.setMinDistance(100);
+	dropSound.setAttenuation(1);
+
 	collectBuffer.loadFromFile("../assets/collect.wav");
 	collectSound.setBuffer(collectBuffer);
 	collectSound.setMinDistance(100);
@@ -150,6 +155,9 @@ void GameWorld::positionListener(b2Vec2 pos, bool scale = true)
 void GameWorld::addPlayer(float x, float y, bool control)
 {
 	ShapeDef play = ShapeDef(b2Vec2(x, y), b2Vec2_zero, 5);
+	play.colPrim = b2Color(0.f, 1.f, 0.f);
+	play.colSecn = b2Color(1.f, 1.f, 0.f);
+	play.colTert = b2Color(0.f, 0.f, 1.f);
 
 	player_ = new Player(addDynamicBody(x, y), play, addSide_);
 
@@ -178,6 +186,10 @@ void GameWorld::addEnemy(float x, float y)
 	//AND add body to world with function
 	ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, static_cast<int>(randFloat(3, 5) + 1));
 	enem.size = .5f;
+	enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
+	enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
+	enem.colTert = b2Color(0.f, 0.f, 0.f);
+
 
 	shapes_.push_back(new Enemy(addDynamicBody(enem.position.x, enem.position.y), enem, addSide_));
 
@@ -188,21 +200,28 @@ void GameWorld::addEnemy(float x, float y)
 	newDef.damageScale = 1.f;
 	newDef.size = 1;
 
+	newDef.colPrim = b2Color(enem.colPrim.r + 0.1f, enem.colPrim.g + 0.1f, enem.colPrim.b + 0.1f);
+	newDef.colSecn = b2Color(enem.colSecn.r + 0.1f, enem.colSecn.g + 0.1f, enem.colSecn.b + 0.1f);
+	newDef.colTert = b2Color(enem.colTert.r + 0.1f, enem.colTert.g + 0.1f, enem.colTert.b + 0.1f);
+
 	Weapon::WeaponI* newWeap;
 	
-	//if (coinFlip())
-	//{
-	//	newWeap = new Weapon::Shotgun(&*added, addProj_, newDef);
-	//}
-	//
-	//else
-	//{
+	if (coinFlip())
+	{
+		newWeap = new Weapon::Shotgun(&*added, addProj_, newDef);
+	}
+	
+	else
+	{
 		newWeap = new Weapon::Rifle(&*added, addProj_, newDef);
-	//}
+	}
 
 	added->arm(newWeap);
 	added->setAI(true);
 	added->setControlled(false);
+
+	positionSound(spawnSound, added->getPosition());
+	spawnSound.play();
 }
 
 //Adds a projectile to the world via definition
@@ -215,9 +234,13 @@ void GameWorld::addProjectile(ProjectileDef &def)
 	fireSound.play();
 }
 
+//Adds a side to game world via definition
 void GameWorld::addSide(SideDef & def)
 {
 	sides_.push_back(new Side(addDynamicBody(def.position.x, def.position.y), def));
+	
+	positionSound(dropSound, def.position);
+	dropSound.play();
 }
 
 void GameWorld::removePlayer()
@@ -228,6 +251,10 @@ void GameWorld::removePlayer()
 	{
 		controlled_ = nullptr;
 	}
+	
+	//Play loss sound at position
+	positionSound(lossSound, b2Vec2_zero);
+	lossSound.play();
 
 	delete player_;
 	player_ = nullptr;
@@ -266,6 +293,7 @@ void GameWorld::removeSide(std::list<Side*>::iterator & s)
 	s = sides_.erase(s);
 }
 
+//Resets the level
 void GameWorld::resetLevel()
 {
 	//Clear world
@@ -280,9 +308,10 @@ void GameWorld::resetLevel()
 	spawnSound.play();
 
 	//Restart bgm
-	//bgm_.play();
+	bgm_.play();
 
 	//Regenerate level somehow
+	hiSides = 0;
 }
 
 void GameWorld::clearWorld()
@@ -318,6 +347,31 @@ void GameWorld::clearWorld()
 		}
 	}
 	sides_.clear();
+}
+
+void GameWorld::bomb()
+{
+	//Explode shapes
+	if (shapes_.empty() == false)
+	{
+		for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
+		shapeIt != shapes_.end(); ++shapeIt)
+		{
+			(*shapeIt)->explode();
+		}
+	}
+
+	//Baleet projectiles
+
+	if (projectiles_.empty() == false)
+	{
+		for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
+		projIt != projectiles_.end(); ++projIt)
+		{
+			(*projIt)->setActive(false);
+		}
+	}
+
 }
 
 //Returns the radius of the level bounds
@@ -402,56 +456,9 @@ void GameWorld::update(int dt)
 		//If we're not active
 		if (player_->getActive() == false)
 		{
-			////Add a side
-			//static float side = 1.f;
-			//b2Vec2 pos = p->getPosition();
-			//addSide(pos.x, pos.y, 0, 0, side++);
-			//
-
 			removePlayer();
 		}
 	}
-
-	////New Shape Update
-	//if (shapes_.empty() == false)
-	//{
-	//	for (std::list<Shape>::iterator s = shapes_.begin();
-	//	s != shapes_.end(); /*Don't increment here*/)
-	//	{
-	//		//Update the shape
-	//		s->update(dt);
-	//
-	//		//Spawn sides if we have any
-	//		if (s->hasSides())
-	//		{
-	//			addSides(s);
-	//		}
-	//		
-	//		//If we're alive
-	//		if (s->getAlive() == true)
-	//		{ 
-	//			Add any projectiles (Move alive check to shape?)
-	//			if (s->hasProjectiles())
-	//			{
-	//				addProjectiles(s);
-	//			}
-	//		}
-	//
-	//		//If we're not active, increment by deleting
-	//		if (s->getActive() == false)
-	//		{
-	//			//Add a side
-	//			static float side = 1.f;
-	//			b2Vec2 pos = s->getPosition();
-	//			addSide(pos.x, pos.y, 0, 0, side++);
-	//
-	//			removeEnemy(s);
-	//		}
-	//
-	//		//Else just increment
-	//		else ++s;
-	//	}
-	//}
 
 	//Update Shapes
 	if (shapes_.empty() == false)
@@ -504,7 +511,6 @@ void GameWorld::update(int dt)
 	}
 
 	//Firebullets
-
 	if (projectiles_.empty() == false)
 	{
 		for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
@@ -557,6 +563,7 @@ void GameWorld::update(int dt)
 	////What shape should have
 	//b2Body* ab = GetBodyList();
 
+	//Basic difficulty ramp
 	timeInLevel_ += dt;
 	timeInLevel_ % UINT16_MAX;
 
@@ -564,10 +571,16 @@ void GameWorld::update(int dt)
 	{
 		spawnEnemy();
 		lastSpawn_ = timeInLevel_;
-		spawns_ = 1 % UINT16_MAX;
+		spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
 	}
 
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
+
+	if (hasControlled())
+	{
+		hiSides = player_->getSidesCollected();
+		hiTime = timeInLevel_;
+	}
 }
 
 //Gets a pointer to the controlled shape

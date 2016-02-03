@@ -65,23 +65,9 @@ public:
 	void removeProjectile(std::list<Projectile*>::iterator& p);
 	void removeSide(std::list<Side*>::iterator& s);
 
-	//void clear(bool clearPlayer);
 	//void loadLevel();
 	//b2Vec2 randomPos(); //On a circle, in an arc, from centre, whatever, reuse code test stuff
 	//
-
-	////TEMP
-	void PutEnemy() 
-	{
-		float x, y, rad = getBoundsRadius() * 0.7f;
-		y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
-		x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
-
-		x *= rad;
-		y *= rad;
-
-		addEnemy(x, y);
-	}
 
 	void resetLevel();
 	void clearWorld();
@@ -107,6 +93,24 @@ public:
 	std::list<Side*>& getSides();
 
 	void update(int dt);
+
+	////TEMP
+	void PutEnemy() 
+	{
+		float x, y, rad = getBoundsRadius() * 0.7f;
+		y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
+		x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
+
+		x *= rad;
+		y *= rad;
+
+		addEnemy(x, y);
+	}
+
+	//////SPRINT 3 SLINGING
+	int hiSides;
+	unsigned int hiTime;
+	void bomb();
 private:
 	const b2Vec2 GRAVITY = b2Vec2(0, 0.1);
 	const int VELOCITY_ITERS = 6;
@@ -137,8 +141,8 @@ private:
 
 	//SFX & Music
 	sf::Music bgm_;
-	sf::SoundBuffer fireBuffer, spawnBuffer, dieBuffer, lossBuffer, collectBuffer;
-	sf::Sound fireSound, spawnSound, dieSound, lossSound, collectSound;
+	sf::SoundBuffer fireBuffer, spawnBuffer, dieBuffer, lossBuffer, dropBuffer, collectBuffer;
+	sf::Sound fireSound, spawnSound, dieSound, lossSound, dropSound, collectSound;
 
 	//Translates sound from b2v2 to sfv3 audio
 	void positionSound(sf::Sound& sound, b2Vec2 pos, bool scale);

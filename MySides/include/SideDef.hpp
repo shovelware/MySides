@@ -9,20 +9,29 @@ public:
 	SideDef() :
 		position(b2Vec2_zero),
 		normal(b2Vec2_zero),
-		length(0)
+		length(0),
+		colPrim(b2Color(1.f, 0.f, 0.f)),
+		colSecn(b2Color(.75f, .75f, .75f)),
+		colTert(b2Color(1.f, 1.f, 1.f))
 	{}
 
 
 	SideDef(b2Vec2 position, b2Vec2 normal, float length) :
 		position(position),
 		normal(normal),
-		length(length)
+		length(length),
+		colPrim(b2Color(1.f, 0.f, 0.f)),
+		colSecn(b2Color(.75f, .75f, .75f)),
+		colTert(b2Color(1.f, 1.f, 1.f))
 	{}
 
 	SideDef(const SideDef &sd) :
 		position(sd.position),
 		normal(sd.normal),
-		length(sd.length)
+		length(sd.length),
+		colPrim(sd.colPrim),
+		colSecn(sd.colSecn),
+		colTert(sd.colTert)
 	{}
 
 	b2Vec2 position;

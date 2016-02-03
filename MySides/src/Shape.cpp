@@ -370,6 +370,16 @@ int Shape::getSidesCollected() const
 	return sides_;
 }
 
+void Shape::explode()
+{
+	for (int i = vertices_; i > 0; --i)
+	{
+		dropSide(b2Vec2_zero, 1);
+	}
+
+	alive_ = false;
+}
+
 bool Shape::getArmed()
 {
 	return (weapon_ != nullptr);
@@ -414,9 +424,12 @@ void Shape::update(int milliseconds)
 			{
 				int diff = shapeVertices_ - vertices_;
 
-				for (int i = diff; i > 0; --i)
+				if (diff > 0)
 				{
-					dropSide(b2Vec2_zero, 1);
+					for (int i = diff; i > 0; --i)
+					{
+						dropSide(b2Vec2_zero, 1);
+					}
 				}
 
 				switch (vertices_)
@@ -436,6 +449,12 @@ void Shape::update(int milliseconds)
 				}
 			}
 
+			else if (sides_ >= 16 && vertices_ < 5)
+			{
+				sides_ -= 16;
+				vertices_ += 1;
+			}
+
 			//If we're a  0 health triangle, die
 			if (hp_ <= 0 && vertices_ <= 3)
 			{
@@ -451,6 +470,7 @@ void Shape::update(int milliseconds)
 		}//End alive
 
 	else active_ = false;
+	//Do death stuff in this else, then set active to false
 
 	}//end active
 }

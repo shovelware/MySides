@@ -4,11 +4,6 @@
 #include "Shape.hpp"
 #include "Projectile.hpp"
 
-Side::Side(b2Body * body, b2Vec2 normal, float length) : Entity(body), length_(length)
-{
-	setShape(length);
-}
-
 Side::Side(b2Body * body, SideDef def) : Entity(body), length_(def.length)
 {
 	setShape(length_);
@@ -19,6 +14,11 @@ Side::Side(b2Body * body, SideDef def) : Entity(body), length_(def.length)
 	//Shoot off, while spinning
 	//body_->SetLinearVelocity(def.normal);
 	body_->ApplyAngularImpulse(randFloat(0, 1), true);
+
+	//Color data
+	colPrim_ = def.colPrim;
+	colSecn_ = def.colSecn;
+	colTert_ = def.colTert;
 }
 
 void Side::setShape(float size)

@@ -7,7 +7,11 @@ sf::Vector2f GameDrawer::B2toSF(const b2Vec2& vec, bool scale) const
 
 sf::Color GameDrawer::B2toSF(const b2Color& col) const
 {
-	return sf::Color(col.r, col.g, col.b, col.a);
+	return sf::Color(
+		255U * col.r,
+		255U * col.g,
+		255U * col.b,
+		255U * col.a);
 }
 
 GameDrawer::GameDrawer(sf::RenderWindow& win, GameWorld* world) : Drawer(win), world_(world) 
@@ -21,7 +25,7 @@ void GameDrawer::draw()
 	Shape* player = world_->getPlayer();
 	if (player != nullptr)
 	{
-		drawPlayer(player);
+		drawShape(player);
 	}
 
 	std::list<Enemy*>& shapes = world_->getShapes();
@@ -41,19 +45,9 @@ void GameDrawer::draw()
 	{
 		drawSide(sd);
 	}
-
-	////Get a reference or friend function or what have you
-	//for (Shape s : world_->shapes_)
-	//{
-	//
-	//}
-	//
-	//for (Projectile p : world_->projectiles_)
-	//{
-	//
-	//}
 }
 
+//Deprecated, remove?
 void GameDrawer::drawPlayer(Shape* const p)
 {
 	//Pull vars
@@ -62,6 +56,9 @@ void GameDrawer::drawPlayer(Shape* const p)
 	b2Vec2 vel = pos + body->GetLinearVelocity();
 	b2PolygonShape* shape = static_cast<b2PolygonShape*>(p->getBody()->GetFixtureList()->GetShape());
 	int count = shape->GetVertexCount();
+	sf::Color pri = B2toSF(p->getPrimary());
+	sf::Color sec = B2toSF(p->getSecondary());
+	sf::Color ter = B2toSF(p->getTertiary());
 
 	//Convert verts
 	sf::Vector2f* verts = new sf::Vector2f[count];
@@ -72,11 +69,11 @@ void GameDrawer::drawPlayer(Shape* const p)
 	}
 
 	//Draw shape, vel, pos
-	drawPolygon(verts, count, sf::Color(0, 128, 0), sf::Color(0, 128,0));
+	drawPolygon(verts, count, pri, sec);
 
-	drawLine(B2toSF(pos, true), B2toSF(vel, true), sf::Color::Black);
+	drawLine(B2toSF(pos, true), B2toSF(vel, true), ter);
 
-	drawCircle(B2toSF(pos, true), 2); // Fix off center
+	drawCircle(B2toSF(pos, true), 1, sec, pri); // Fix off center
 
 	drawPoint(B2toSF(pos, true), sf::Color::Red);
 
@@ -88,10 +85,15 @@ void GameDrawer::drawShape(Shape* const s)
 {
 	//Pull vars
 	b2Body* body = s->getBody();
-	b2Vec2 pos = body->GetWorldCenter();
-	b2Vec2 vel = pos + s->getBody()->GetLinearVelocity();
 	b2PolygonShape* shape = static_cast<b2PolygonShape*>(s->getBody()->GetFixtureList()->GetShape());
 	int count = shape->GetVertexCount();
+	
+	sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
+	sf::Vector2f vel = pos + B2toSF(s->getBody()->GetLinearVelocity(), true);
+	
+	sf::Color pri = B2toSF(s->getPrimary());
+	sf::Color sec = B2toSF(s->getSecondary());
+	sf::Color ter = B2toSF(s->getTertiary());
 
 	//Convert verts
 	sf::Vector2f* verts = new sf::Vector2f[count];
@@ -103,11 +105,11 @@ void GameDrawer::drawShape(Shape* const s)
 	}
 
 	//Draw shape, vel, pos
-	drawPolygon(verts, count, sf::Color(128, 0, 0));
+	drawPolygon(verts, count, pri, sec);
 	
-	drawLine(B2toSF(pos, true), B2toSF(vel, true), sf::Color::Black);
+	drawLine(pos, vel, ter);
 
-	drawPoint(B2toSF(pos, true), sf::Color::White);
+	drawCircle(pos, 1, sec, pri); // Fix off center
 	
 	//Clean up
 	delete[] verts;
@@ -118,6 +120,12 @@ void GameDrawer::drawBounds(Bounds* const b)
 	//Pull vars
 	b2Body* body = b->getBody();
 	b2Fixture* fix = body->GetFixtureList();
+	
+	sf::Vector2f pos = B2toSF(b->getPosition(), true);
+
+	sf::Color pri = B2toSF(b->getPrimary());
+	sf::Color sec = B2toSF(b->getSecondary());
+	sf::Color ter = B2toSF(b->getTertiary());
 	
 	//It must be one of two
 	if (fix->GetUserData() != "bounds")
@@ -153,12 +161,14 @@ void GameDrawer::drawBounds(Bounds* const b)
 			subVerts[v] *= 0.8f;
 		}
 
-		drawPolygon(subVerts, count, sf::Color(64, 64, 64, l * 8), sf::Color(0, 0, 0));
+		drawPolygon(subVerts, count, sf::Color(pri.r, pri.g, pri.b, l * 8), sec);
 	}
 
 
 	//Draw stuff
-	drawPolygon(verts, count, sf::Color(64, 64, 64, 128), sf::Color(0, 0, 0));
+	drawPolygon(verts, count, sf::Color(pri.r, pri.g, pri.b, 128), sec);
+
+	drawCircle(pos, 1, ter, pri);
 
 	//Clean up
 	delete[] verts;
@@ -168,25 +178,34 @@ void GameDrawer::drawProjectile(Projectile* const p)
 {
 	//Pull vars
 	b2Body* body = p->getBody();
-	b2Vec2 pos = body->GetWorldCenter();
 
-	b2Vec2 vel = pos + p->getBody()->GetLinearVelocity();
-	b2CircleShape* shape = static_cast<b2CircleShape*>(p->getBody()->GetFixtureList()->GetShape());
+	sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
+	sf::Vector2f vel = pos + B2toSF(p->getBody()->GetLinearVelocity(), true);
+
+	sf::Color pri = B2toSF(p->getPrimary());
+	sf::Color sec = B2toSF(p->getSecondary());
+	sf::Color ter = B2toSF(p->getTertiary());
 	
+	//This will cause problems once projectiles stop being only circles
+	b2CircleShape* shape = static_cast<b2CircleShape*>(p->getBody()->GetFixtureList()->GetShape());
 	float rad = shape->m_radius * _SCALE_;
 
 	//Draw shape, vel, pos
-	drawCircle(B2toSF(pos, true), rad, sf::Color(196, 196, 0), sf::Color(128, 128, 0));
-	drawLine(B2toSF(pos, true), B2toSF(vel, true), sf::Color::White);
-	drawPoint(B2toSF(pos, true), sf::Color::Magenta);
+	drawCircle(pos, rad, pri, sec);
+	drawLine(pos, vel, ter);
+	drawPoint(pos, sec);
 }
 
 void GameDrawer::drawSide(Side* const s)
 {
 	//Pull vars
 	b2Body* body = s->getBody();
-	b2Vec2 pos = s->getPosition();
+	sf::Vector2f pos = B2toSF(s->getPosition(), true);
+	sf::Vector2f vel = pos + B2toSF(s->getBody()->GetLinearVelocity(), true);
 
+	sf::Color pri = B2toSF(s->getPrimary());
+	sf::Color sec = B2toSF(s->getSecondary());
+	sf::Color ter = B2toSF(s->getTertiary());
 
 	b2Fixture* fix = body->GetFixtureList();
 
@@ -199,14 +218,12 @@ void GameDrawer::drawSide(Side* const s)
 	//Pull other vars
 	b2EdgeShape* shape = static_cast<b2EdgeShape*>(fix->GetShape());
 
-	//Not long enough sides
-	b2Vec2 a = body->GetWorldPoint(shape->m_vertex1);
-	b2Vec2 b = body->GetWorldPoint(shape->m_vertex2);
-
-	b2Vec2 vel = pos + s->getBody()->GetLinearVelocity();
+	sf::Vector2f a = B2toSF(body->GetWorldPoint(shape->m_vertex1), true);
+	sf::Vector2f b = B2toSF(body->GetWorldPoint(shape->m_vertex2), true);
 
 	//Draw line
-	drawLine(B2toSF(a, true), B2toSF(b, true), sf::Color::Red);
+	drawLine(a, b, pri);
+	drawPoint(pos, sec);
 }
 
 /*GameDrawer::DrawShape(const &Shape s)

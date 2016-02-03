@@ -32,8 +32,18 @@ public:
 
 	bool getAlive() const;
 	bool getActive() const;
+
 	void setAlive(bool a);
 	void setActive(bool a);
+
+
+	b2Color getPrimary() const;
+	b2Color getSecondary() const;
+	b2Color getTertiary() const;
+
+	void setPrimary(b2Color col);
+	void setSecondary(b2Color col);
+	void setTertiary(b2Color col);
 
 	virtual void kill();
 

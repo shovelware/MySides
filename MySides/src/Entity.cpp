@@ -61,6 +61,14 @@ void Entity::setActive(bool a)
 	active_ = a;
 }
 
+b2Color Entity::getPrimary() const { return colPrim_; }
+b2Color Entity::getSecondary() const { return colSecn_; }
+b2Color Entity::getTertiary() const { return colTert_; }
+
+void Entity::setPrimary(b2Color col) { colPrim_ = col; }
+void Entity::setSecondary(b2Color col) { colSecn_ = col; }
+void Entity::setTertiary(b2Color col) { colTert_ = col; }
+
 //Straight-up pull the plug. Can be overridden
 void Entity::kill()
 {

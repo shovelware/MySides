@@ -163,6 +163,22 @@ void Camera::drawPause()
 	rentrg_.setView(*this);
 }
 
+void Camera::drawOver(int sides, int time)
+{
+	rentrg_.setView(rentrg_.getDefaultView());
+	sf::Vector2f offset(0, 20);
+
+	drawTextAligned("GAME OVER", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2), sf::Color::Cyan);
+
+	drawTextAligned("SIDES: " + std::to_string(sides), sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 2.f, sf::Color::Cyan);
+	drawTextAligned("TIME: " + std::to_string(time / 1000) + "s", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 3.f, sf::Color::Cyan);
+
+	drawTextAligned("A : RESTART", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 5.f, sf::Color::Cyan);
+	drawTextAligned("SELECT : QUIT", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 6.f, sf::Color::Cyan);
+
+	rentrg_.setView(*this);
+}
+
 float Camera::getZoomPercent() const
 {
 	return 200 - (zoomFactor_ * 100);

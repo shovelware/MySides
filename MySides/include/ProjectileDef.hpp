@@ -17,9 +17,9 @@ public:
 		size(0),
 		damageScale(1),
 		lifeTime(0),
-		colPrim(b2Color(255, 255, 000)),
-		colSecn(b2Color(255, 000, 255)),
-		colTert(b2Color(255, 255, 255)),
+		colPrim(b2Color(.75f, .75f, 0.f)),
+		colSecn(b2Color(.75f, .75f, 0.f)),
+		colTert(b2Color(1.f, 1.f, 1.f)),
 		owner(nullptr),
 		target(nullptr)
 	{}
@@ -33,9 +33,9 @@ public:
 		size(1),
 		damageScale(1),
 		lifeTime(1000),
-		colPrim(b2Color(255, 255, 000)),
-		colSecn(b2Color(255, 000, 255)),
-		colTert(b2Color(255, 255, 255)),
+		colPrim(b2Color(.75f, .75f, 0.f)),
+		colSecn(b2Color(.75f, .75f, 0.f)),
+		colTert(b2Color(1.f, 1.f, 1.f)),
 		owner(nullptr),
 		target(nullptr)
 	{}

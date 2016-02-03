@@ -70,6 +70,8 @@ public:
 
 	int getSidesCollected() const;
 		
+	void explode();
+
 	//New weapons system
 	void arm(Weapon::WeaponI* weapon);
 	void disarm();

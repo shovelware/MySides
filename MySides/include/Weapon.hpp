@@ -20,6 +20,14 @@ namespace Weapon {
 
 		void trigger(b2Vec2 &direction);
 
+		b2Color getPrimary() const;
+		b2Color getSecondary() const;
+		b2Color getTertiary() const;
+
+		void setPrimary(b2Color col);
+		void setSecondary(b2Color col);
+		void setTertiary(b2Color col);
+
 		virtual void update(int dt) = 0;
 
 	protected:

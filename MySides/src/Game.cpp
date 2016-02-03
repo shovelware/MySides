@@ -178,7 +178,7 @@ void Game::handleInput(sf::Time dt)
 	if (key_.isKeyDown(Key::A)) { mv.x += -1; }
 	if (key_.isKeyDown(Key::D)) { mv.x += 1; }
 
-	if (key_.isKeyDown(Key::LAlt)) { mv *= 0.75f; }
+	if (key_.isKeyDown(Key::LAlt)) { mv *= 0.5f; }
 
 	world_->move(mv);
 
@@ -224,6 +224,11 @@ void Game::handleInput(sf::Time dt)
 		//world_->resizeBounds(base + lt);
 		//
 		//std::cout << base + lt << "  " << world_->getBoundsSide() << std::endl;
+
+		if (!world_->hasControlled())
+		{
+			world_->resetLevel();
+		}
 	}
 
 	//B : Cancel rotation
@@ -325,7 +330,12 @@ void Game::handleInput(sf::Time dt)
 		con_.checkDown(XINPUT_GAMEPAD_START) && con_.checkPressed(XINPUT_GAMEPAD_BACK))
 	{
 		world_->resetLevel();
-	}	
+	}
+
+	if (con_.checkLeftTrigger() > 0.5f && con_.checkRightTrigger() > 0.5f && con_.checkPressed(XINPUT_GAMEPAD_A))
+	{
+		world_->bomb();
+	}
 }
 
 bool Game::checkController(sf::Time dt)
@@ -346,7 +356,6 @@ bool Game::checkController(sf::Time dt)
 
 void Game::update(sf::Time dt)
 {		
-	//camera_->clearTarget(true); //TESTING
 
 	camera_->update(dt.asMilliseconds());
 
@@ -355,12 +364,12 @@ void Game::update(sf::Time dt)
 		world_->update(dt.asMilliseconds());
 	}
 	
-	//if (world_->controlled() != nullptr)
-	//{
-		camera_->setTarget(world_->controlled());
-	//}
+	camera_->setTarget(world_->controlled());
 
-	//else camera_->clearTarget(true);
+	if (world_->hasControlled() == false && !pause_)
+	{
+		pause_ = true;
+	}
 
 	//Update counter
 	//static int x;
@@ -381,13 +390,18 @@ void Game::render()
 
 	//b2Shape* x = world_->controlled()->getVertices();
 	//b2Shape::Type y = x->GetType();
-	//orld_->DrawDebugData();
+	//world_->DrawDebugData();
 	drawer_->draw();
 	camera_->drawHUD();
 
 	if (pause_)
 	{
-		camera_->drawPause();
+		if (world_->hasControlled())
+		{
+			camera_->drawPause();
+		}
+
+		else camera_->drawOver(world_->hiSides, world_->hiTime);
 	}
 
 	window_.display();

@@ -4,7 +4,9 @@
 #include "Projectile.hpp"
 #include "Side.hpp"
 
-Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
+Bounds::Bounds(b2Body* body, float radius) : 
+	Entity(body), 
+	radius_(radius)
 {
 	//Add userdata to fixture for contacts
 	boundsDef_.userData = "bounds";
@@ -25,6 +27,11 @@ Bounds::Bounds(b2Body* body, float radius) : Entity(body), radius_(radius)
 	b2CircleShape circ;
 	circ.m_radius = radius;
 	frictionDef_.shape = &circ;
+
+
+	colPrim_ = b2Color(.75f, .75f, .75f);
+	colSecn_ = b2Color(0.f, 0.f, 0.f);
+	colTert_ = b2Color(.5f, .5f, .5f);
 
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&boundsDef_);
