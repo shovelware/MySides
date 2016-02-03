@@ -168,7 +168,8 @@ void Camera::drawPause()
 void Camera::drawSpr3(int timeLeft, int shapes, int sides)
 {
 	rentrg_.setView(rentrg_.getDefaultView());
-
+	
+	drawTextAligned("LEVEL 1", sf::Vector2f(screenSize_.x - 100, 20), sf::Color(64, 64, 64));
 	drawTextAligned("TIME: " + std::to_string(timeLeft), sf::Vector2f(screenSize_.x - 100, 40), sf::Color::Cyan);
 	drawTextAligned("SHAPES: " + std::to_string(shapes), sf::Vector2f(screenSize_.x - 100, 60), sf::Color::Red);
 	drawTextAligned("SIDES: " + std::to_string(sides), sf::Vector2f(screenSize_.x - 100, 80), sf::Color::Green);

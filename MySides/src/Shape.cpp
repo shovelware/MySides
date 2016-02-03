@@ -71,8 +71,8 @@ void Shape::setPoly(int vertices, float radius)
 
 		for (int i = 0; i < vertices; ++i)
 		{
-			pnts[i].x = radius * (cos(DR * 360 / vertices * i));
-			pnts[i].y = radius * (sin(DR * 360 / vertices * i));
+			pnts[i].x = radius * (cos(DR * 360 / vertices * i)); //MAKE THESE START WITH DOWN
+			pnts[i].y = radius * (sin(DR * 360 / vertices * i)); //MAKE THESE START WITH DOWN
 		}
 
 		shapeVertices_ = vertices;

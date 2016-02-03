@@ -55,6 +55,8 @@ void GameDrawer::drawShape(Shape* const s)
 	b2PolygonShape* shape = static_cast<b2PolygonShape*>(s->getBody()->GetFixtureList()->GetShape());
 	int count = shape->GetVertexCount();
 	float size = s->getSize();
+	float angle = body->GetAngle();
+	sf::Vector2f pointing(sin(angle), -cos(angle));
 	
 	sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
 	sf::Vector2f vel = B2toSF(body->GetLinearVelocity(), true);
@@ -80,6 +82,8 @@ void GameDrawer::drawShape(Shape* const s)
 
 	drawCircle(pos, size * 4, sec, ter);
 	
+	pointing *= (float)(_SCALE_ * 1.5);
+	drawCircle(pos - pointing, 4, pri, sec);
 	//Clean up
 	delete[] verts;
 }

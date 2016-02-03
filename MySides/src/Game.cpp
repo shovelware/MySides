@@ -224,6 +224,8 @@ void Game::handleInput(sf::Time dt)
 		//world_->resizeBounds(base + lt);
 		//
 		//std::cout << base + lt << "  " << world_->getBoundsSide() << std::endl;
+
+		pause_ = !pause_;
 	}
 
 	//B : Cancel rotation
@@ -233,7 +235,7 @@ void Game::handleInput(sf::Time dt)
 	}
 
 	//X : Orientation testing
-	if (con_.checkDown(XINPUT_GAMEPAD_X))
+	if (con_.checkPressed(XINPUT_GAMEPAD_X))
 	{
 		//world_->controlled()->orient(b2Vec2_zero);
 
