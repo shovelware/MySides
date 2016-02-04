@@ -40,6 +40,11 @@ int Game::run()
 	camera_ = new Camera(window_);
 	camera_->loadFont("game_over.ttf");
 
+	//Start fullscreen
+	toggleFullscreen();
+
+	//Start paused
+
 	//Seed random
 	srand(static_cast <unsigned> (time(0)));
 	
@@ -224,8 +229,10 @@ void Game::handleInput(sf::Time dt)
 		//world_->resizeBounds(base + lt);
 		//
 		//std::cout << base + lt << "  " << world_->getBoundsSide() << std::endl;
-
-		pause_ = !pause_;
+		if (pause_)
+		{
+			pause_ = false;
+		}
 	}
 
 	//B : Cancel rotation
