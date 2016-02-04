@@ -287,7 +287,7 @@ void Game::handleInput(sf::Time dt)
 	//LC : Fullscreen
 	if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
 	{
-		toggleFullscreen();
+		//toggleFullscreen();
 	}
 
 	//RC : Reset zoom
