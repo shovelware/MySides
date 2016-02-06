@@ -13,6 +13,7 @@ public:
 		heading(b2Vec2_zero),
 		inVelocity(b2Vec2_zero),
 		velScale(1),
+		bounce(0),
 		hpMAX(0),
 		size(0),
 		damageScale(1),
@@ -29,6 +30,7 @@ public:
 		heading(heading),
 		inVelocity(inVelocity),
 		velScale(1),
+		bounce(0),
 		hpMAX(1),
 		size(1),
 		damageScale(1),
@@ -45,6 +47,7 @@ public:
 		heading(b2Vec2_zero),
 		inVelocity(b2Vec2_zero),
 		velScale(pd.velScale),
+		bounce(pd.bounce),
 		hpMAX(pd.hpMAX),
 		size(pd.size),
 		damageScale(pd.damageScale),
@@ -66,6 +69,8 @@ public:
 
 	//Velocity handled by projectile
 	float velScale;
+
+	float bounce;
 
 	unsigned int hpMAX;
 	float size;

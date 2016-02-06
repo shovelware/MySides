@@ -24,6 +24,7 @@ int Game::run()
 
 	//Window info
 	sf::Vector2u windowSize = window_.getSize();
+	window_.setVerticalSyncEnabled(true);
 	
 	//Fixed Timestep
 	sf::Clock frameClock;
@@ -41,7 +42,7 @@ int Game::run()
 	camera_->loadFont("game_over.ttf");
 
 	//Start fullscreen
-	toggleFullscreen();
+	//toggleFullscreen();
 
 	//Start paused
 
@@ -98,7 +99,7 @@ int Game::run()
 		accumulator += frameTime;
 		
 		//Update to number of physics steps
-		while (accumulator >= tickTime)
+		while (accumulator >= tickTime && !quit_)
 		{
 			//Only update if the controller is connected
 			//if (checkController(tickTime))
@@ -206,6 +207,7 @@ void Game::handleInput(sf::Time dt)
 
 	//E : Spawn
 	if (key_.isKeyPressed(Key::E)) { world_->PutEnemy(); }
+	if (key_.isKeyDown(Key::R)) { world_->PutEnemy(); }
 
 	//Return : Fullscreen
 	if (key_.isKeyPressed(Key::Return)) { toggleFullscreen(); }
@@ -404,6 +406,7 @@ void Game::toggleFullscreen()
 		window_.create(fsmode, "My Sides!", sf::Style::Fullscreen, sf::ContextSettings(0u, 0u, 8u));
 
 		camera_->updateBounds(sf::Vector2f(fsmode.width, fsmode.height));
+		window_.setMouseCursorVisible(false);
 
 		window_.display();
 		fullscreen_ = true;
@@ -414,6 +417,7 @@ void Game::toggleFullscreen()
 		window_.create(videoMode_, "My Sides!", sf::Style::Titlebar, sf::ContextSettings(0u, 0u, 8u));
 		
 		camera_->updateBounds(sf::Vector2f(videoMode_.width, videoMode_.height));
+		window_.setMouseCursorVisible(true);
 
 		window_.display();
 		fullscreen_ = false;

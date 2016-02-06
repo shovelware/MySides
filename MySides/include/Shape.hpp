@@ -55,7 +55,7 @@ public:
 	void orient(b2Vec2 direction);
 	void stopRotate();
 
-	void takeDamage(int damage);
+	void takeDamage(int damage, b2Vec2 direction);
 	void collect(int value);
 
 	//HP values
@@ -75,9 +75,7 @@ public:
 	
 	void update(int milliseconds);
 
-	//void draw(GameDrawer d); // override
-
-	bool collide(Entity* other, b2Contact& contact); //override
+	//void draw(GameDrawer d); // override//override
 private:
 	/*const*/ float maxVel_;//maximum velocity
 	/*const*/ float maxRot_;//maximum rotation
@@ -89,7 +87,7 @@ private:
 	void setPoly(int vertices, float radius);
 	void clearb2();
 
-	b2Vec2 pole_;//Orientation pole
+	b2Vec2 lastDamage_;
 
 	//Side dropping
 	std::function<void(SideDef&)> sideCallback_;

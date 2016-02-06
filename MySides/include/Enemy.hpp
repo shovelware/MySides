@@ -12,6 +12,8 @@ public:
 
 	void update(int milliseconds);
 
+	bool collide(Entity* other, b2Contact& contact);
+
 private:
 	static std::list<Enemy*> others_; //Provision for swarming
 

@@ -16,9 +16,9 @@ Bounds::Bounds(b2Body* body, float radius) :
 	boundsDef_.shape = &chain;
 
 	//Add material properties to the fixture
-	boundsDef_.density = 1.0f;
-	boundsDef_.friction = 1.0f;
-	boundsDef_.restitution = 0.0f;
+	boundsDef_.density = 0.0f;
+	boundsDef_.friction = 0.5f;
+	boundsDef_.restitution = 1.0f;
 
 	//Ground friction circle
 	frictionDef_.userData = "friction";

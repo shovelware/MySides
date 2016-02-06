@@ -1,28 +1,33 @@
 #include "Shape.hpp"
 
-#include "Bounds.hpp"
-#include "Projectile.hpp"
-#include "Side.hpp"
-
 ///
 #include <sstream>
 #include "Log.hpp"
 extern Log l;
 ///
 
-Shape::Shape(b2Body* body, ShapeDef &def, std::function<void(SideDef&)>& callback) : Entity(body), weapon_(nullptr)
+Shape::Shape(b2Body* body, ShapeDef &def, std::function<void(SideDef&)>& callback) : 
+	Entity(body),
+	weapon_(nullptr),
+	lastDamage_(b2Vec2_zero)
 {	
 	//Collision
 	shapeFixDef_.userData = "shape";
 	addMaterial(shapeFixDef_);
 
-	setPoly(def.vertices, def.size);
 
 	//Local storing of def items
 	size_ = def.size;
 	shapeVertices_ = def.vertices;
+	
+	//Corrections
+	shapeVertices_ = (shapeVertices_ > 0 ? shapeVertices_ : 3);
+	shapeVertices_ = (shapeVertices_ < 9 ? shapeVertices_ : 8);
 	vertices_ = shapeVertices_;
-	//ROTATE TO FACE HEADING HERE
+
+	setPoly(vertices_, size_);
+
+	orient(def.heading); //Make snap to method later
 
 	//Color data
 	colPrim_ = def.colPrim;
@@ -52,7 +57,7 @@ Shape::~Shape()
 void Shape::addMaterial(b2FixtureDef &def)
 {
 	def.density = 1.0f;
-	def.friction = 1.0f;
+	def.friction = 0.8f;
 	def.restitution = 1.f;
 }
 
@@ -106,12 +111,18 @@ void Shape::clearb2()
 //Uses a callback to drop a side
 void Shape::dropSide(b2Vec2 dir, float size)
 {
-	b2Vec2 offset = b2Vec2(randFloat(-5, 5), randFloat(-5, 5));
+	b2Vec2 offset = dir;
+	offset.Normalize();
+	offset *= getSize();
 	SideDef newSide = SideDef(getPosition() + offset, dir, size);
 	
 	newSide.colPrim = colSecn_;
 	newSide.colSecn = colPrim_;
 	newSide.colTert = colTert_;
+
+	float rhs = (size_ * size_) + (size_ * size_) - (2 * size_ * size_) * cos(2 * M_PI / shapeVertices_);
+
+	newSide.length = std::sqrt(rhs);
 
 	sideCallback_(newSide);
 }
@@ -177,9 +188,11 @@ void Shape::stopRotate()
 	body_->SetAngularVelocity(0);
 }
 
-void Shape::takeDamage(int damage)
+void Shape::takeDamage(int damage, b2Vec2 direction)
 {
 	hp_ -= damage;
+	lastDamage_ = direction;
+	lastDamage_.Normalize();
 
 	//Go back a shape if we can
 	if (hp_ <= 0 && vertices_ > 3)
@@ -221,9 +234,24 @@ float Shape::getSize() const
 
 void Shape::explode()
 {
-	for (int i = vertices_; i > 0; --i)
+	b2PolygonShape* shape = static_cast<b2PolygonShape*>(body_->GetFixtureList()->GetShape());
+
+	for (int i = 0, count = vertices_; i < count; ++i)
 	{
-		dropSide(b2Vec2(randFloat(-5, 5), randFloat(-5, 5)), 1);
+
+		int a = i;
+		int b = (a + 1 != count ? a + 1 : 0);
+
+		b2Vec2 vA = shape->GetVertex(a);
+		b2Vec2 vB = shape->GetVertex(b);
+		
+		b2Vec2 mid = vA + vB;
+		mid.x /= 2.f;
+		mid.y /= 2.f;
+
+		b2Vec2 dir = getPosition();
+
+		dropSide(mid, 1);
 	}
 
 	alive_ = false;
@@ -285,7 +313,7 @@ void Shape::update(int milliseconds)
 					//Drop the sides we lost
 					for (int i = diff; i > 0; --i)
 					{
-						dropSide(b2Vec2(randFloat(-5, 5), randFloat(-5, 5)), 1);
+						dropSide(lastDamage_, 1);
 					}
 				}
 
@@ -318,51 +346,3 @@ void Shape::update(int milliseconds)
 	}//end active
 }
 
-//Only deals with the effects of this collision on this entity
-bool Shape::collide(Entity * other, b2Contact& contact)
-{
-	bool handled = false;
-
-	if (Shape* shape = dynamic_cast<Shape*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Projectile* proj = dynamic_cast<Projectile*>(other))
-	{
-		if (proj->getOwner() != this)
-		{
-			takeDamage(proj->getDamage());
-		}
-
-		else contact.SetEnabled(false);
-
-		handled = true;
-	}
-
-	else if (Side* side = dynamic_cast<Side*>(other))
-	{
-		char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
-		char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
-
-		if (tagA == "side" || tagB == "side")
-		{
-			collect(side->getValue());
-		}
-
-		handled = true;
-	}
-
-	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
-	{
-		handled = true;
-	}
-
-	return handled;
-}
-
-//
-//void Shape::draw(GameDrawer d)
-//{
-//
-//}

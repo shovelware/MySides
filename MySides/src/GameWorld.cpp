@@ -86,7 +86,7 @@ b2Body * GameWorld::addDynamicBody(float x, float y)
 	fric.maxForce	= 0.0001f;
 	fric.maxTorque	= 0.005f;
 
-	fric.collideConnected = true;
+	fric.collideConnected = false;
 
 	CreateJoint(&fric);
 
@@ -126,16 +126,24 @@ b2Body * GameWorld::addBulletBody(float x, float y)
 void GameWorld::popInside(Entity * ent)
 {
 	//Bounds centre on origin so between is just pos
-	b2Vec2 between = ent->getPosition();
-
-	float dist = between.Length();
 	float rad = bounds_->getRadius();
 
-	if (dist > rad)
+	b2Vec2 boundsEdge = ent->getPosition();
+	boundsEdge.Normalize();
+	boundsEdge *= rad;
+
+	b2Vec2 between = ent->getPosition() - boundsEdge;
+
+	float dist = ent->getPosition().Length();
+
+	if (dist > rad || dist < 0)
 	{
-		between.Normalize();
-		between *= (rad * 90);
-		ent->setPosition(between);
+
+		//between.Normalize();
+		between *= 0.005f;
+		//between *= (rad * .9f);
+		//ent->setPosition(between);
+		ent->getBody()->ApplyForceToCenter(-between, true);
 	}
 }
 
@@ -186,10 +194,13 @@ void GameWorld::addPlayer(float x, float y, bool control)
 
 		ProjectileDef newDef = ProjectileDef::bulletDef();
 		newDef.velScale = 1.f;
-		newDef.damageScale = 1.f;
-		newDef.size = 1;
+		newDef.lifeTime = 3000;
+		newDef.damageScale = 4.f;
+		newDef.hpMAX = 1.f;
+		newDef.size = 0.1f;
+		newDef.bounce = 1.f;
 
-		player_->arm(new Weapon::Shotgun(&*player_, addProj_, newDef));
+		player_->arm(new Weapon::Rifle(&*player_, addProj_, newDef));
 	}
 
 }
@@ -200,6 +211,7 @@ void GameWorld::addEnemy(float x, float y)
 	//Push the shape into the shape vector
 	//AND add body to world with function
 	ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
+	//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
 	enem.size = .5f;
 	enem.speedScale = .5f;
 

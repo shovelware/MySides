@@ -19,13 +19,15 @@ public:
 	Entity* getTarget();
 	void setTarget(Entity* s);
 
+	b2Vec2 getDirection() const;
+
 	void update(int milliseconds);
 	bool collide(Entity* other, b2Contact& contact);
 
 private:
-	void setAsBullet(float size, float damageScale);
+	void setAsBullet(float size, float damageScale, float bounce);
 
-	void addMaterial(b2FixtureDef& def); //Abstract into entity?
+	void addMaterial(b2FixtureDef& def, float bounce); //Abstract into entity?
 
 	float size_;
 	float speed_;

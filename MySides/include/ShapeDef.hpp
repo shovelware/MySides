@@ -21,7 +21,7 @@ public:
 	ShapeDef(b2Vec2 position, b2Vec2 heading, int vertices) :
 		position(position),
 		heading(heading),
-		hpMAX(vertices),
+		hpMAX(vertices > 0 ? vertices : 1),
 		size(1),
 		speedScale(1),
 		vertices(vertices),

@@ -12,10 +12,13 @@ public:
 	void collect();
 	float getValue();
 
+	b2Vec2 getHeading();
+
 	//Do we need an update function?
 	bool collide(Entity* other, b2Contact& contact);
 
 private:
+	b2Vec2 heading_;
 
 	void setShape(float size);
 	float length_;

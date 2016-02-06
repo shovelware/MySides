@@ -15,7 +15,7 @@ Projectile::Projectile(b2Body* body, ProjectileDef& def) :
 	owner_(def.owner), 
 	target_(def.target)
 {
-	setAsBullet(size_, def.damageScale);
+	setAsBullet(size_, def.damageScale, def.bounce);
 
 	//Do maths to orient body here
 	body_->SetTransform(def.origin, body_->GetAngle());
@@ -28,7 +28,7 @@ Projectile::Projectile(b2Body* body, ProjectileDef& def) :
 	fire(def.velScale);
 }
 
-void Projectile::setAsBullet(float size, float damageScale = 1.f)
+void Projectile::setAsBullet(float size, float damageScale = 1.f, float bounce = 0.f)
 {
 	//Shape
 	b2CircleShape bullet;
@@ -40,7 +40,7 @@ void Projectile::setAsBullet(float size, float damageScale = 1.f)
 
 	//Collision
 	fixtureDef.userData = "projectile";
-	addMaterial(fixtureDef);
+	addMaterial(fixtureDef, bounce);
 
 	//Bind fixture
 	body_->CreateFixture(&fixtureDef);
@@ -51,11 +51,11 @@ void Projectile::setAsBullet(float size, float damageScale = 1.f)
 	damage_ = 1 * damageScale;
 }
 
-void Projectile::addMaterial(b2FixtureDef & def)
+void Projectile::addMaterial(b2FixtureDef & def, float bounce)
 {
 	def.density = 0.5f;
 	def.friction = 0.0f;
-	def.restitution = 0.0f;
+	def.restitution = bounce;
 }
 
 void Projectile::fire(float mult)
@@ -113,6 +113,11 @@ Entity* Projectile::getTarget()
 void Projectile::setTarget(Entity* s)
 {
 	target_ = s;
+}
+
+b2Vec2 Projectile::getDirection() const
+{
+	return heading_;
 }
 
 void Projectile::update(int milliseconds)

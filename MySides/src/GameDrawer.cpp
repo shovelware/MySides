@@ -189,8 +189,7 @@ void GameDrawer::drawSide(Side* const s)
 	b2Body* body = s->getBody();
 	float length = s->getValue();
 	sf::Vector2f pos = B2toSF(s->getPosition(), true);
-	sf::Vector2f vel = B2toSF(body->GetLinearVelocity(), true);
-	vel *= 16.f;
+	sf::Vector2f dir = B2toSF(s->getHeading(), true);
 
 	sf::Color pri = B2toSF(s->getPrimary());
 	sf::Color sec = B2toSF(s->getSecondary());
@@ -212,6 +211,7 @@ void GameDrawer::drawSide(Side* const s)
 
 	//Draw line
 	drawLine(a, b, pri);
+	drawLine(pos, pos + dir, ter);
 	drawCircle(pos, length, sec, pri, 0);
 }
 
