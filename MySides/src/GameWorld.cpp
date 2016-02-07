@@ -520,7 +520,7 @@ void GameWorld::update(int dt)
 		}
 	}
 
-	//Firebullets
+	//Update projectiles
 	if (projectiles_.empty() == false)
 	{
 		for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
@@ -543,6 +543,7 @@ void GameWorld::update(int dt)
 		}
 	}
 
+	//Update Sides
 	if (sides_.empty() == false)
 	{
 		for (std::list<Side*>::iterator sideIt = sides_.begin();
@@ -550,6 +551,14 @@ void GameWorld::update(int dt)
 		{
 			//Pull pointer
 			Side* sd = (*sideIt);
+
+			if (player_ != nullptr)
+			{
+				b2Vec2 between = player_->getPosition() - sd->getPosition();
+
+				if (between.Length() < 7.5f)
+					sd->attract(between);
+			}
 
 			popInside(sd);
 

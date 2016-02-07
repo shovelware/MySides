@@ -79,6 +79,15 @@ b2Vec2 Side::getHeading()
 	return heading_;
 }
 
+void Side::attract(b2Vec2 dir)
+{
+	dir.Normalize();
+	dir *= 0.002f;
+
+	if(body_->GetLinearVelocity().Length() < 0.01)
+		body_->ApplyForceToCenter(dir, true);
+}
+
 bool Side::collide(Entity* other, b2Contact& contact)
 {
 	bool handled = false;
