@@ -231,14 +231,20 @@ void Game::handleInput(sf::Time dt)
 		//world_->resizeBounds(base + lt);
 		//
 		//std::cout << base + lt << "  " << world_->getBoundsSide() << std::endl;
+
 		if (pause_)
 		{
 			pause_ = false;
 		}
+
+		else
+		{
+			world_->testBed();
+		}
 	}
 
-	//B : Testing func
-	if (con_.checkDown(XINPUT_GAMEPAD_B))
+	//B : Testing func in player
+	if (con_.checkPressed(XINPUT_GAMEPAD_B))
 	{
 		world_->getPlayer()->testBed();
 	}
@@ -287,9 +293,10 @@ void Game::handleInput(sf::Time dt)
 	}
 
 	//LC : Fullscreen
-	if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
+	if (con_.checkDown(XINPUT_GAMEPAD_LEFT_THUMB))
 	{
-		//toggleFullscreen();
+		world_->testBed();
+		world_->getPlayer()->testBed();
 	}
 
 	//RC : Reset zoom

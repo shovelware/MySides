@@ -4,6 +4,7 @@
 GameWorld::GameWorld() : 
 	b2World(GRAVITY), 
 	contactListener_(ContactListener()),
+	player_(nullptr),
 	controlled_(nullptr)
 {
 	SetContactListener(&contactListener_);
@@ -46,11 +47,14 @@ GameWorld::GameWorld() :
 	collectSound.setBuffer(collectBuffer);
 	collectSound.setMinDistance(100);
 	collectSound.setAttenuation(1);
+
+	getControlled_ = std::bind(&GameWorld::getControlled, this);
 }
 
 GameWorld::~GameWorld()
 {
 	clearWorld();
+	delete player_;
 	delete bounds_;
 }
 
@@ -175,6 +179,7 @@ void GameWorld::positionListener(b2Vec2 pos, bool scale = true)
 	sf::Listener::setPosition(lisPos);
 }
 
+
 //Adds a player to the world 
 void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 {
@@ -182,6 +187,11 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
 	play.colSecn = b2Color(0.f, 1.f, 1.f);
 	play.colTert = b2Color(1.f, 0.f, 0.f);
+
+	if (player_ != nullptr)
+	{
+		delete player_;
+	}
 
 	player_ = new Player(addDynamicBody(pos), play, addSide_);
 	
@@ -335,7 +345,6 @@ void GameWorld::resetLevel()
 
 	//Add a new player
 	addPlayer(b2Vec2_zero, true);
-	getControlled_ = std::bind(&GameWorld::getControlled, this);
 
 	spawnSound.play();
 	spawns_ = 1;
@@ -409,6 +418,11 @@ void GameWorld::bomb()
 
 }
 
+void GameWorld::testBed()
+{
+	randomiseCol(bounds_);
+}
+
 //Returns the radius of the level bounds
 float GameWorld::getBoundsRadius()
 {
@@ -469,6 +483,13 @@ void GameWorld::SetDebugDraw(b2Draw* debugDraw)
 void GameWorld::DrawDebugData()
 {
 	b2World::DrawDebugData();
+}
+
+void GameWorld::randomiseCol(Entity * e)
+{
+	e->setPrimary(b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f)));
+	e->setSecondary(b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f)));
+	e->setTertiary(b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f)));
 }
 
 Bounds* GameWorld::getBounds() { return bounds_; }

@@ -19,6 +19,19 @@ sf::Color GameDrawer::tweakAlpha(const sf::Color & col, int alpha) const
 	return sf::Color(col.r, col.g, col.b, alpha);
 }
 
+sf::Color GameDrawer::blend(const sf::Color& a, int aParts, const sf::Color& b, int bParts) const
+{
+	
+	int totalParts = aParts + bParts;
+
+	sf::Color total(
+		(a.r * aParts + b.r * bParts) / totalParts,
+		(a.g * aParts + b.g * bParts) / totalParts,
+		(a.b * aParts + b.b * bParts) / totalParts);
+
+		return total;
+}
+
 GameDrawer::GameDrawer(sf::RenderWindow& win, GameWorld* world) : Drawer(win), world_(world) 
 {
 }
@@ -158,7 +171,7 @@ void GameDrawer::drawBounds(Bounds* const b)
 			subVerts[v] *= 0.8f;
 		}
 
-		drawPolygon(subVerts, count, tweakAlpha(pri + sec, l * 8), sec);
+		drawPolygon(subVerts, count, tweakAlpha(blend(ter, l + 1, pri, layers - 2), l * 8), sec);
 	}
 
 

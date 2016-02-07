@@ -36,7 +36,6 @@ public:
 	void setAlive(bool a);
 	void setActive(bool a);
 
-
 	b2Color getPrimary() const;
 	b2Color getSecondary() const;
 	b2Color getTertiary() const;

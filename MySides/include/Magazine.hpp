@@ -12,6 +12,19 @@ public:
 
 	}
 
+	void add()
+	{
+		if (count_ + 1 <= countMAX_)
+		{
+			count_ += 1;
+		}
+
+		else
+		{
+			count_ = countMAX_;
+		}
+	}
+
 	void remove()
 	{
 		if (count_ - 1 >= 0)

@@ -31,7 +31,7 @@ Bounds::Bounds(b2Body* body, float radius) :
 
 	colPrim_ = b2Color(.75f, .75f, .75f);
 	colSecn_ = b2Color(0.f, 0.f, 0.f);
-	colTert_ = b2Color(.5f, .5f, .5f);
+	colTert_ = b2Color(0.f, 1.f, 0.f);
 
 	//Create and add fixture using body's factory
 	body_->CreateFixture(&boundsDef_);

@@ -70,21 +70,27 @@ public:
 	//b2Vec2 randomPos(); //On a circle, in an arc, from centre, whatever, reuse code test stuff
 	//
 
+	//Cleaning up
 	void resetLevel();
 	void clearWorld();
 
+	//Bounds manipulation
 	float getBoundsRadius();
 	void resizeBounds(float radius);
 	float getBoundsSide();
 
+	//Controlled manipulation
 	void move(b2Vec2 direction);
 	void fire(b2Vec2 direction);
 
+	//Legacy
 	void controlNextEnemy();
 	void controlPrevEnemy();
 
+	//Passthroughs to b2world
 	void SetDebugDraw(b2Draw* debugDraw);
 	void DrawDebugData();
+
 
 	//Return a reference to shapes, bounds, projectiles for drawing
 	Bounds* getBounds();
@@ -119,6 +125,9 @@ public:
 
 	int maxTime = 120;
 	int getTimeInLevel() { return timeInLevel_ / 1000; }
+
+	/////Debug
+	void testBed();
 
 private:
 	const b2Vec2 GRAVITY = b2Vec2(0, 0.1);
@@ -160,6 +169,11 @@ private:
 
 	//Translates a position from b2v2 to sfv3 listener
 	void positionListener(b2Vec2 pos, bool scale);
+
+
+	//Just for fun
+	void randomiseCol(Entity* e);
+
 };
 
 #endif

@@ -55,7 +55,16 @@ Shape::~Shape()
 
 void Shape::testBed()
 {
-	body_->ApplyAngularImpulse(1000, true);
+	setPrimary(b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f)));
+	setSecondary(b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f)));
+	setTertiary(b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f)));
+
+	if (weapon_ != nullptr)
+	{
+		weapon_->setPrimary(colPrim_);
+		weapon_->setSecondary(colSecn_);
+		weapon_->setTertiary(colTert_);
+	}
 }
 
 //Add material data to passed fixture def

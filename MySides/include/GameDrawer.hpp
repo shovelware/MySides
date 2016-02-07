@@ -19,6 +19,7 @@ private:
 	sf::Color B2toSF(const b2Color& col) const;
 
 	sf::Color tweakAlpha(const sf::Color& col, int alpha) const;
+	sf::Color blend(const sf::Color& a, int aParts, const sf::Color& b, int bParts) const;
 
 	GameWorld* world_;
 
