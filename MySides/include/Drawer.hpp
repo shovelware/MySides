@@ -24,6 +24,9 @@ public:
 	void drawLine(const sf::Vector2f& a, const sf::Vector2f& b, const sf::Color& col = sf::Color::Green);
 	void drawPoint(const sf::Vector2f& p, const sf::Color& col = sf::Color::Red);
 private:
+	sf::CircleShape circ;
+	sf::ConvexShape poly;
+
 	sf::RenderWindow* window_;
 };
 #endif

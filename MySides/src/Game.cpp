@@ -237,10 +237,10 @@ void Game::handleInput(sf::Time dt)
 		}
 	}
 
-	//B : Cancel rotation
+	//B : Testing func
 	if (con_.checkDown(XINPUT_GAMEPAD_B))
 	{
-		//world_->controlled()->stopRotate();
+		world_->getPlayer()->testBed();
 	}
 
 	//X : Orientation testing

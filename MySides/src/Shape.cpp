@@ -6,7 +6,7 @@
 extern Log l;
 ///
 
-Shape::Shape(b2Body* body, ShapeDef &def, std::function<void(SideDef&)>& callback) : 
+Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& callback) : 
 	Entity(body),
 	weapon_(nullptr),
 	lastDamage_(b2Vec2_zero)
@@ -51,6 +51,11 @@ Shape::~Shape()
 	{
 		delete weapon_;
 	}
+}
+
+void Shape::testBed()
+{
+	body_->ApplyAngularImpulse(1000, true);
 }
 
 //Add material data to passed fixture def
@@ -178,14 +183,14 @@ void Shape::orient(b2Vec2 direction)
 	while (totalRotation < -180 * DR) totalRotation += 360 * DR;
 	while (totalRotation >  180 * DR) totalRotation -= 360 * DR;
 
-	float change = 30 * DR; //allow 30 degree rotation per time step
+	float change = 20 * DR; //allow 20 degree rotation per time step
 	float newAngle = bodyAngle + std::min(change, std::max(-change, totalRotation));
 	body_->SetTransform(body_->GetPosition(), newAngle);
 }
 
 void Shape::stopRotate()
 {
-	body_->SetAngularVelocity(0);
+	//body_->SetAngularVelocity(0);
 }
 
 void Shape::takeDamage(int damage, b2Vec2 direction)
@@ -249,8 +254,7 @@ void Shape::explode()
 		mid.x /= 2.f;
 		mid.y /= 2.f;
 
-		b2Vec2 dir = getPosition();
-
+		mid.Normalize();
 		dropSide(mid, 1);
 	}
 
@@ -260,6 +264,18 @@ void Shape::explode()
 bool Shape::getArmed()
 {
 	return (weapon_ != nullptr);
+}
+
+bool Shape::getWeaponReady()
+{
+	bool ready = false;
+	
+	if (weapon_ != nullptr)
+	{
+		ready = weapon_->canFire();
+	}
+
+	return ready;
 }
 
 void Shape::arm(Weapon::WeaponI * weapon)

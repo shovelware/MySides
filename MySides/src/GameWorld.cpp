@@ -1,8 +1,5 @@
 #include "GameWorld.hpp"
 
-//inline float randFloat(float MAX) { return static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / MAX)); };
-//inline float randFloat(float MIN, float MAX) { return MIN + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (MAX - MIN))); };
-
 //Constructor initialises Box2D World and boudaries
 GameWorld::GameWorld() : 
 	b2World(GRAVITY), 
@@ -11,7 +8,7 @@ GameWorld::GameWorld() :
 {
 	SetContactListener(&contactListener_);
 
-	bounds_ = new Bounds(addStaticBody(0, 0), 32),
+	bounds_ = new Bounds(addStaticBody(b2Vec2_zero), 32),
 
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
 	addSide_ = [this](SideDef& def) { addSide(def); };
@@ -65,12 +62,12 @@ bool GameWorld::hasControlled()
 }
 
 //Adds a dynamic body to the world, returns a pointer to created body
-b2Body * GameWorld::addDynamicBody(float x, float y)
+b2Body * GameWorld::addDynamicBody(const b2Vec2& pos)
 {
 	//Define the body
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
-	bodyDef.position.Set(x, y);
+	bodyDef.position = pos;
 
 	//Create body using world's factory
 	b2Body* body = CreateBody(&bodyDef);
@@ -84,7 +81,7 @@ b2Body * GameWorld::addDynamicBody(float x, float y)
 	fric.bodyB = bounds_->getBody();
 
 	fric.maxForce	= 0.0001f;
-	fric.maxTorque	= 0.005f;
+	fric.maxTorque = 0.0005f;
 
 	fric.collideConnected = false;
 
@@ -94,12 +91,12 @@ b2Body * GameWorld::addDynamicBody(float x, float y)
 }
 
 //Adds a static body to the world, returns a pointer to created body
-b2Body * GameWorld::addStaticBody(float x, float y)
+b2Body * GameWorld::addStaticBody(const b2Vec2& pos)
 {
 	//Define the body
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_staticBody;
-	bodyDef.position.Set(x, y);
+	bodyDef.position = pos;
 
 	//Create body using world's factory
 	b2Body* body = CreateBody(&bodyDef);
@@ -108,14 +105,13 @@ b2Body * GameWorld::addStaticBody(float x, float y)
 }
 
 //Adds a bullet body to the world, returns a pointer to created body
-b2Body * GameWorld::addBulletBody(float x, float y)
+b2Body * GameWorld::addBulletBody(const b2Vec2& pos)
 {
 	//Define the body
 	b2BodyDef bodyDef;
 	bodyDef.type = b2_dynamicBody;
 	bodyDef.bullet = true;
-	bodyDef.position.Set(x, y);
-
+	bodyDef.position = pos;
 	//Create body using world's factory
 	b2Body* body = CreateBody(&bodyDef);
 
@@ -138,11 +134,13 @@ void GameWorld::popInside(Entity * ent)
 
 	if (dist > rad || dist < 0)
 	{
-
+		//Pop inside
 		//between.Normalize();
-		between *= 0.005f;
 		//between *= (rad * .9f);
 		//ent->setPosition(between);
+
+		//Push inside
+		between *= 0.005f;
 		ent->getBody()->ApplyForceToCenter(-between, true);
 	}
 }
@@ -152,14 +150,14 @@ void GameWorld::spawnEnemy()
 {
 	for (int i = 0; i < spawns_; ++i)
 	{
-		float x, y, rad = getBoundsRadius() * 0.7f;
-		y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
-		x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
+		b2Vec2 pos;
+		float rad = getBoundsRadius() * 0.7f;
+		pos.y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
+		pos.x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
 
-		x *= rad;
-		y *= rad;
+		pos *= rad;
 
-		addEnemy(x, y);
+		addEnemy(pos);
 	}
 }
 
@@ -178,14 +176,14 @@ void GameWorld::positionListener(b2Vec2 pos, bool scale = true)
 }
 
 //Adds a player to the world 
-void GameWorld::addPlayer(float x, float y, bool control)
+void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 {
-	ShapeDef play = ShapeDef(b2Vec2(x, y), b2Vec2_zero, 5);
+	ShapeDef play = ShapeDef(pos, b2Vec2_zero, 5);
 	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
 	play.colSecn = b2Color(0.f, 1.f, 1.f);
 	play.colTert = b2Color(1.f, 0.f, 0.f);
 
-	player_ = new Player(addDynamicBody(x, y), play, addSide_);
+	player_ = new Player(addDynamicBody(pos), play, addSide_);
 	
 	if (control)
 	{
@@ -200,17 +198,17 @@ void GameWorld::addPlayer(float x, float y, bool control)
 		newDef.size = 0.1f;
 		newDef.bounce = 1.f;
 
-		player_->arm(new Weapon::Rifle(&*player_, addProj_, newDef));
+		player_->arm(new Weapon::Shotgun(&*player_, addProj_, newDef));
 	}
 
 }
 
 //Adds a basic enemy to the world
-void GameWorld::addEnemy(float x, float y)
+void GameWorld::addEnemy(const b2Vec2& pos)
 {
 	//Push the shape into the shape vector
 	//AND add body to world with function
-	ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
+	ShapeDef enem = ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
 	//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
 	enem.size = .5f;
 	enem.speedScale = .5f;
@@ -219,7 +217,7 @@ void GameWorld::addEnemy(float x, float y)
 	enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
 	enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.1f, 0.3f), randFloat(0.1f, 0.3f));
 
-	shapes_.push_back(new Enemy(addDynamicBody(enem.position.x, enem.position.y), enem, addSide_, getControlled_));
+	shapes_.push_back(new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_));
 
 	Shape* added = *(--shapes_.end());
 
@@ -249,9 +247,9 @@ void GameWorld::addEnemy(float x, float y)
 }
 
 //Adds a projectile to the world via definition
-void GameWorld::addProjectile(ProjectileDef &def)
+void GameWorld::addProjectile(const ProjectileDef& def)
 {
-	projectiles_.push_back(new Projectile(addBulletBody(def.origin.x, def.origin.y), def));
+	projectiles_.push_back(new Projectile(addBulletBody(def.origin), def));
 
 	//Play fire sound at fired position
 	positionSound(fireSound, def.origin);
@@ -259,9 +257,9 @@ void GameWorld::addProjectile(ProjectileDef &def)
 }
 
 //Adds a side to game world via definition
-void GameWorld::addSide(SideDef & def)
+void GameWorld::addSide(const SideDef& def)
 {
-	sides_.push_back(new Side(addDynamicBody(def.position.x, def.position.y), def));
+	sides_.push_back(new Side(addDynamicBody(def.position), def));
 	
 	positionSound(dropSound, def.position);
 	dropSound.play();
@@ -336,7 +334,7 @@ void GameWorld::resetLevel()
 	spawnTime_ = 5000;
 
 	//Add a new player
-	addPlayer(0, 0, true);
+	addPlayer(b2Vec2_zero, true);
 	getControlled_ = std::bind(&GameWorld::getControlled, this);
 
 	spawnSound.play();

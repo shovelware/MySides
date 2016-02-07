@@ -11,13 +11,13 @@ namespace Weapon {
 	class Rifle : public WeaponI {
 	public:
 		Rifle(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo);
+		bool canFire();
 		void update(int dt);
 
 		int refireTimeMAX_;
 		int reloadTimeMAX_;
 	private:
 		void fire(b2Vec2 &heading);
-		bool canFire();
 
 		Magazine magazine_;
 

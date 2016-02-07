@@ -14,6 +14,11 @@ sf::Color GameDrawer::B2toSF(const b2Color& col) const
 		255U * col.a);
 }
 
+sf::Color GameDrawer::tweakAlpha(const sf::Color & col, int alpha) const
+{
+	return sf::Color(col.r, col.g, col.b, alpha);
+}
+
 GameDrawer::GameDrawer(sf::RenderWindow& win, GameWorld* world) : Drawer(win), world_(world) 
 {
 }
@@ -77,6 +82,12 @@ void GameDrawer::drawShape(Shape* const s)
 		verts[i] = B2toSF(body->GetWorldPoint(shape->GetVertex(i)), true);
 	}
 
+	bool armed = s->getArmed();
+	if (armed)
+	{
+		armed = s->getWeaponReady();
+	}
+
 	//Draw
 	//Velocity line
 	drawLine(pos, pos - vel, ter);
@@ -88,7 +99,7 @@ void GameDrawer::drawShape(Shape* const s)
 	drawCircle(pos, size * 4, sec, sec, 0);
 	
 	//Orientation circle
-	drawCircle(pos - pointing, 4, ter, sec);
+	drawCircle(pos - pointing, 4, (armed ? ter : tweakAlpha(ter, 128)), (armed ? sec : tweakAlpha(sec, 128)));
 	
 	//sf::Vector2f* arrow = new sf::Vector2f[3];
 	//arrow[1] = (pos - pointing);
@@ -147,12 +158,12 @@ void GameDrawer::drawBounds(Bounds* const b)
 			subVerts[v] *= 0.8f;
 		}
 
-		drawPolygon(subVerts, count, sf::Color(pri.r, pri.g, pri.b, l * 8), sec);
+		drawPolygon(subVerts, count, tweakAlpha(pri + sec, l * 8), sec);
 	}
 
 
 	//Draw stuff
-	drawPolygon(verts, count, sf::Color(pri.r, pri.g, pri.b, 128), sec);
+	drawPolygon(verts, count, tweakAlpha(pri, 128), sec);
 
 	drawCircle(pos, 1, ter, pri);
 
@@ -211,8 +222,8 @@ void GameDrawer::drawSide(Side* const s)
 
 	//Draw line
 	drawLine(a, b, pri);
-	drawLine(pos, pos + dir, ter);
-	drawCircle(pos, length, sec, pri, 0);
+	drawCircle(pos, thor::length(dir), tweakAlpha(pri, 16), tweakAlpha(sec, 32));
+	//drawCircle(pos, length, sec, pri, 0);
 }
 
 /*GameDrawer::DrawShape(const &Shape s)

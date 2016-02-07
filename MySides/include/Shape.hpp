@@ -45,7 +45,7 @@ namespace traits{
 
 class Shape : public Entity {
 public:
-	Shape(b2Body* body, ShapeDef &def, std::function<void(SideDef&)>& callback);
+	Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& callback);
 	~Shape();
 
 	void move(b2Vec2 direction); //override
@@ -71,9 +71,12 @@ public:
 	void arm(Weapon::WeaponI* weapon);
 	void disarm();
 	bool getArmed();
+	bool getWeaponReady();
 	void fire(b2Vec2 direction);
 	
 	void update(int milliseconds);
+
+	void testBed();
 
 	//void draw(GameDrawer d); // override//override
 private:

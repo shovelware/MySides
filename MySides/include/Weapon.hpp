@@ -28,6 +28,8 @@ namespace Weapon {
 		void setSecondary(b2Color col);
 		void setTertiary(b2Color col);
 
+		virtual bool canFire() = 0;
+
 		virtual void update(int dt) = 0;
 
 	protected:
@@ -37,7 +39,6 @@ namespace Weapon {
 		std::function<void(ProjectileDef&)> fireCallback_;
 
 		virtual void fire(b2Vec2 &heading) = 0;
-		virtual bool canFire() = 0;
 	};
 }
 #include "Shape.hpp"

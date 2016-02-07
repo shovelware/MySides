@@ -4,24 +4,32 @@
 #include "Shape.hpp"
 #include "Projectile.hpp"
 
-Side::Side(b2Body * body, SideDef def) : 
+Side::Side(b2Body * body, const SideDef& def) : 
 	Entity(body), 
 	length_(def.length),
 	heading_(def.normal)
 {
 	setShape(length_);
 
-	//Align side to normal here--------------v
-	float bodyAngle = body_->GetAngle();
 	float desiredAngle = atan2f(-def.normal.x, def.normal.y);
-
 	body_->SetTransform(def.position, desiredAngle);
 
 	//Shoot off, while spinning
 	b2Vec2 impulse = heading_;
-	impulse *= 0.085f;
+
+	float rotation = atan2f(heading_.y, heading_.x);
+	float adjust = randFloat(-0.2f, 0.2f);
+	impulse.x = cosf(rotation + adjust);
+	impulse.y = sinf(rotation + adjust);
+
+	impulse.Normalize();
+	impulse *= 0.03f;
+
 	body_->ApplyLinearImpulse(impulse, body_->GetWorldCenter(), true);
-	body_->ApplyAngularImpulse(randFloat(-100, 100), true);
+
+	bool dir = coinFlip();
+	body_->SetAngularVelocity(randFloat(0.035f, 0.037f) * (dir ? 1 : -1));
+	body_->SetAngularDamping(randFloat(0.0001f, 0.0003f));
 
 	//Color data
 	colPrim_ = def.colPrim;
@@ -63,7 +71,7 @@ void Side::collect()
 
 float Side::getValue()
 {
-	return length_;
+	return std::ceil(length_); //Round up as some shapes can drop sides of <1 length
 }
 
 b2Vec2 Side::getHeading()

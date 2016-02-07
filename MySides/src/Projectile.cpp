@@ -5,7 +5,7 @@
 #include "Projectile.hpp"
 #include "Side.hpp"
 
-Projectile::Projectile(b2Body* body, ProjectileDef& def) :
+Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 	Entity(body),
 	fired_(false), impacted_(false),
 	origin_(def.origin), heading_(def.heading),

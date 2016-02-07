@@ -7,7 +7,7 @@
 class Side : public Entity
 {
 public:
-	Side(b2Body* body, SideDef def);
+	Side(b2Body* body, const SideDef& def);
 
 	void collect();
 	float getValue();

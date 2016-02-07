@@ -7,10 +7,10 @@ namespace Weapon {
 	{
 	public:
 		Shotgun(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo);
+		bool canFire();
 		void update(int dt);
 	private:
 		void fire(b2Vec2 &heading);
-		bool canFire();
 
 		int refireTime_;
 		int refireTimeMax_;

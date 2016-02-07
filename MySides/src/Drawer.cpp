@@ -5,8 +5,8 @@ Drawer::Drawer(sf::RenderWindow& window) : window_(&window)
 
 void Drawer::drawPolygon(const sf::Vector2f * verts, int vertexCount, const sf::Color& col, const sf::Color& out, int indent)
 {
-	sf::ConvexShape poly(vertexCount);
-
+	poly.setPointCount(vertexCount);
+	
 	for (int p = 0; p < vertexCount; p++)
 	{
 		poly.setPoint(p, verts[p]);
@@ -21,7 +21,7 @@ void Drawer::drawPolygon(const sf::Vector2f * verts, int vertexCount, const sf::
 
 void Drawer::drawCircle(const sf::Vector2f & center, float radius, const sf::Color& col, const sf::Color& out, int indent)
 {
-	sf::CircleShape circ(radius);
+	circ.setRadius(radius);
 	circ.setPosition(center);
 	circ.setOrigin(radius, radius);
 

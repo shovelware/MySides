@@ -18,6 +18,8 @@ private:
 	sf::Vector2f B2toSF(const b2Vec2& vec, bool scale) const;
 	sf::Color B2toSF(const b2Color& col) const;
 
+	sf::Color tweakAlpha(const sf::Color& col, int alpha) const;
+
 	GameWorld* world_;
 
 	void drawShape(Shape* const s);

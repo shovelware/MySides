@@ -42,23 +42,22 @@ public:
 	bool hasControlled();
 
 	//These should go soon
-	void addPlayer(float x, float y, bool control);
-	void addEnemy(float x, float y);
+	void addPlayer(const b2Vec2& pos, bool control);
+	void addEnemy(const b2Vec2& pos);
 
 	//Spawning works off definitions
-	//void addPlayer(ShapeDef &def);
-	//void addEnemy(ShapeDef &def)
-	void addProjectile(ProjectileDef &def);
-	void addSide(SideDef &def);
+	void addPlayer(const ShapeDef& def);
+	void addEnemy(const ShapeDef& def);
+	void addProjectile(const ProjectileDef& def);
+	void addSide(const SideDef& def);
 
 	void armShape(Shape* shape);
 	void disarmShape(Shape* shape);
 
 	//And callbacks for entities
 	std::function<void(ProjectileDef&)> addProj_;	
-	std::function<void(SideDef &def)> addSide_;
+	std::function<void(SideDef&)> addSide_;
 	//std::function<void(ShapeDef &def)> addShape_;
-
 	std::function<Shape*()> getControlled_;
 
 	//Called by update
@@ -106,7 +105,7 @@ public:
 		x *= rad;
 		y *= rad;
 
-		addEnemy(x, y);
+		addEnemy(b2Vec2(x, y));
 	}
 
 	//////SPRINT 3 SLINGING
@@ -136,9 +135,9 @@ private:
 	ContactListener contactListener_;
 	Bounds* bounds_;
 
-	b2Body* addDynamicBody(float x, float y);
-	b2Body* addStaticBody (float x, float y);
-	b2Body* addBulletBody (float x, float y);
+	b2Body* addDynamicBody(const b2Vec2& pos);
+	b2Body* addStaticBody (const b2Vec2& pos);
+	b2Body* addBulletBody (const b2Vec2& pos);
 
 	void popInside(Entity* ent);
 
