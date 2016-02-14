@@ -9,8 +9,9 @@ Log l;
 //inline float randFloat(float MIN, float MAX) { return MIN + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (MAX - MIN))); };
 
 Game::Game() : 
-	videoMode_(1280, 720, 32),
-	window_(videoMode_, "My Sides!", sf::Style::Titlebar, sf::ContextSettings(0u, 0u, 8u)),
+	videoMode_(720, 720, 32),
+	contextSettings_(24u, 8u, 8u),
+	window_(videoMode_, "My Sides!", sf::Style::Titlebar, contextSettings_),
 	mousein_(false),
 	quit_(false),
 	fullscreen_(false),
@@ -99,7 +100,7 @@ int Game::run()
 		accumulator += frameTime;
 		
 		//Update to number of physics steps
-		while (accumulator >= tickTime && !quit_)
+		if (accumulator >= tickTime && !quit_)
 		{
 			//Only update if the controller is connected
 			//if (checkController(tickTime))
@@ -215,6 +216,17 @@ void Game::handleInput(sf::Time dt)
 	//Space : Pause
 	if (key_.isKeyPressed(Key::Space)) { pause_ = !pause_; }
 
+	//F5 : Reset Level
+	if (key_.isKeyPressed(Key::F5)) 
+	{
+		world_->resetLevel();
+		camera_->setCenter(sf::Vector2f(0, 0));
+	}
+
+	if (key_.isKeyPressed(Key::X))
+	{
+		world_->bomb();
+	}
 
 	//Controller Control
 	world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
@@ -410,8 +422,14 @@ void Game::toggleFullscreen()
 	if (!fullscreen_)
 	{
 		sf::VideoMode fsmode = sf::VideoMode::getDesktopMode();
-		window_.create(fsmode, "My Sides!", sf::Style::Fullscreen, sf::ContextSettings(0u, 0u, 8u));
+		
+		float fsh = fsmode.height;
+		float fsw = fsmode.width;
+		float fswf = fsh / fsw;
 
+		window_.create(fsmode, "My Sides!", sf::Style::Fullscreen, contextSettings_);
+
+		camera_->setViewport(sf::FloatRect((1 - fswf) / 2, 0, fswf, 1));
 		camera_->updateBounds(sf::Vector2f(fsmode.width, fsmode.height));
 		window_.setMouseCursorVisible(false);
 
@@ -421,8 +439,9 @@ void Game::toggleFullscreen()
 
 	else if (fullscreen_)
 	{
-		window_.create(videoMode_, "My Sides!", sf::Style::Titlebar, sf::ContextSettings(0u, 0u, 8u));
+		window_.create(videoMode_, "My Sides!", sf::Style::Titlebar, contextSettings_);
 		
+		camera_->setViewport(sf::FloatRect(0, 0, 1, 1));
 		camera_->updateBounds(sf::Vector2f(videoMode_.width, videoMode_.height));
 		window_.setMouseCursorVisible(true);
 

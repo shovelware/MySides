@@ -54,6 +54,7 @@ private:
 	//Drawing
 	bool fullscreen_;
 	sf::VideoMode videoMode_;
+	sf::ContextSettings contextSettings_;
 	sf::RenderWindow window_;
 	GameDrawer* drawer_;
 
@@ -62,7 +63,6 @@ private:
 	XController con_;
 	
 	//Keyboard
-	void checkKeyBoard();
 	KeyInput key_;
 
 
