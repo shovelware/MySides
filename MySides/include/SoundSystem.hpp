@@ -38,7 +38,7 @@ public:
 
 
 private:
-	std::map<std::string, SoundEffect> sfx_;
+	std::map<std::string, SoundEffect*> sfx_;
 	std::map<std::string, std::string> bgm_;
 
 	float volMaster_;

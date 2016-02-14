@@ -34,8 +34,8 @@ void SoundSystem::playSFX(std::string name, sf::Vector2f position)
 {
 	if (checkSFX(name))
 	{
-		sfx_.at(name).setVolume(volSFX_);
-		sfx_.at(name).play(position);
+		sfx_.at(name)->setVolume(volSFX_);
+		sfx_.at(name)->play(position);
 	}
 }
 
@@ -73,8 +73,8 @@ void SoundSystem::addSFX(std::string name, std::string path, unsigned int voices
 {
 	if (!checkSFX(name))
 	{
-		sfx_.emplace(name, SoundEffect(path, voices));
-		sfx_.at(name).setMinDistance(100);
+		sfx_.emplace(name, new SoundEffect(path, voices));
+		sfx_.at(name)->setMinDistance(100);
 	}
 }
 
@@ -90,6 +90,7 @@ void SoundSystem::removeSFX(std::string name)
 {
 	if (checkSFX(name))
 	{
+		delete sfx_.at(name);
 		sfx_.erase(name);
 	}
 }
