@@ -32,7 +32,7 @@ void SoundSystem::setListener(sf::Vector2f position)
 
 void SoundSystem::playSFX(std::string name, sf::Vector2f position)
 {
-	if (checkSFX(name))
+	if (volSFX_ != 0 && checkSFX(name))
 	{
 		sfx_.at(name)->setVolume(volSFX_);
 		sfx_.at(name)->play(position);
@@ -41,7 +41,7 @@ void SoundSystem::playSFX(std::string name, sf::Vector2f position)
 
 void SoundSystem::playBGM(std::string name)
 {
-	if (checkBGM(name))
+	if (volBGM_ != 0 && checkBGM(name))
 	{
 		//If we match current, restart
 		if (currentBGMName_ == name)
@@ -61,9 +61,9 @@ void SoundSystem::pauseBGM()
 	playingBGM_.pause();
 }
 
-void SoundSystem::unpauseBGM()
+void SoundSystem::resumeBGM()
 {
-	if (playingBGM_.getStatus() == sf::SoundSource::Status::Paused)
+	if (volBGM_ != 0 &&playingBGM_.getStatus() == sf::SoundSource::Status::Paused)
 	{
 		playingBGM_.play();
 	}
@@ -103,10 +103,10 @@ void SoundSystem::removeBGM(std::string name)
 	}
 }
 
-float SoundSystem::getMasterVolume() { return volMaster_; }
-float SoundSystem::getSFXVolume() { return volSFX_; }
-float SoundSystem::getMusicVolume() { return volBGM_; }
-std::string SoundSystem::getNowPlaying() { return currentBGMName_; }
+float SoundSystem::getMasterVolume() const { return volMaster_; }
+float SoundSystem::getSFXVolume() const { return volSFX_; }
+float SoundSystem::getMusicVolume() const { return volBGM_; }
+std::string SoundSystem::getNowPlaying() const { return currentBGMName_; }
 
 void SoundSystem::setMasterVolume(float volume)
 {

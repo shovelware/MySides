@@ -101,7 +101,11 @@ public:
 	std::list<Projectile*>& getProjectiles();
 	std::list<Side*>& getSides();
 
+	//Update & Pause
 	void update(int dt);
+	void pause();
+	bool getPaused() const;
+	void resume();
 
 	////TEMP
 	void PutEnemy() 
@@ -136,6 +140,8 @@ private:
 	const int VELOCITY_ITERS = 6;
 	const int POSITION_ITERS = 2;
 	
+	bool pause_;
+
 	Player* player_;
 	std::list<Enemy*> shapes_;
 	std::list<Projectile*> projectiles_;
@@ -164,15 +170,6 @@ private:
 	//SFX & Music
 	sf::Vector2f B2toSF(const b2Vec2& vec, bool scale) const;
 	SoundSystem audio_;
-	//sf::Music bgm_;
-	//sf::SoundBuffer fireBuffer, spawnBuffer, dieBuffer, lossBuffer, dropBuffer, collectBuffer;
-	//sf::Sound fireSound, spawnSound, dieSound, lossSound, dropSound, collectSound;
-	//
-	////Translates sound from b2v2 to sfv3 audio
-	//void positionSound(sf::Sound& sound, b2Vec2 pos, bool scale);
-	//
-	////Translates a position from b2v2 to sfv3 listener
-	//void positionListener(b2Vec2 pos, bool scale);
 
 	//Just for fun
 	void randomiseCol(Entity* e);

@@ -12,7 +12,7 @@ Bounds::Bounds(b2Body* body, float radius) :
 	boundsDef_.userData = "bounds";
 
 	b2ChainShape chain;
-	fillChain(chain, radius, circlePoints);
+	fillChain(chain, radius, 3);
 	boundsDef_.shape = &chain;
 
 	//Add material properties to the fixture

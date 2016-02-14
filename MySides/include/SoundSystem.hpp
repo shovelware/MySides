@@ -18,7 +18,7 @@ public:
 	void playBGM(std::string name);
 	
 	void pauseBGM();
-	void unpauseBGM();
+	void resumeBGM();
 
 	void addSFX(std::string name, std::string path, unsigned int voices);
 	void addBGM(std::string name, std::string path);
@@ -26,11 +26,11 @@ public:
 	void removeSFX(std::string name);
 	void removeBGM(std::string name);
 
-	float getMasterVolume();
-	float getSFXVolume();
-	float getMusicVolume();
+	float getMasterVolume() const;
+	float getSFXVolume() const;
+	float getMusicVolume() const;
 
-	std::string getNowPlaying();
+	std::string getNowPlaying() const;
 
 	void setMasterVolume(float volume);
 	void setSFXVolume(float volume);
