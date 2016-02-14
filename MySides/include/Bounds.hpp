@@ -10,7 +10,8 @@ class Bounds : public Entity {
 public:
 	Bounds(b2Body* body, float radius);
 	void resize(float radius);
-	b2CircleShape* getShape();
+	b2CircleShape* getCircleShape();
+	b2ChainShape* getPoly();
 	float getRadius();
 	float getSideLength();
 

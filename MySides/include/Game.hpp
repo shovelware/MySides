@@ -56,6 +56,7 @@ private:
 	sf::VideoMode videoMode_;
 	sf::ContextSettings contextSettings_;
 	sf::RenderWindow window_;
+	sf::Color voidCol_;
 	GameDrawer* drawer_;
 
 	//This will be broken out into inputmanager

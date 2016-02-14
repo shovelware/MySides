@@ -1,11 +1,12 @@
 #include "GameWorld.hpp"
 
 //Constructor initialises Box2D World and boudaries
-GameWorld::GameWorld() : 
-	b2World(GRAVITY), 
+GameWorld::GameWorld() :
+	b2World(GRAVITY),
 	contactListener_(ContactListener()),
 	player_(nullptr),
-	controlled_(nullptr)
+	controlled_(nullptr),
+	pause_(false)
 {
 	SetContactListener(&contactListener_);
 
@@ -13,41 +14,16 @@ GameWorld::GameWorld() :
 
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
 	addSide_ = [this](SideDef& def) { addSide(def); };
+
+	audio_.addBGM("spriterip", "../assets/spriterip.ogg");
+
+	audio_.addSFX("fire", "../assets/fire.wav", 64);
+	audio_.addSFX("spawn", "../assets/spawn.wav", 16);
+	audio_.addSFX("die", "../assets/die.wav", 32);
+	audio_.addSFX("loss", "../assets/loss.wav", 1);
+	audio_.addSFX("drop", "../assets/drop.wav", 64);
+	audio_.addSFX("collect", "../assets/collect.wav", 32);
 	
-	bgm_.openFromFile("../assets/spriterip.ogg");
-	bgm_.setLoop(true);
-	bgm_.setVolume(7.5f);
-
-	fireBuffer.loadFromFile("../assets/fire.wav");
-	fireSound.setBuffer(fireBuffer);
-	fireSound.setMinDistance(100);
-	fireSound.setAttenuation(1);
-
-	spawnBuffer.loadFromFile("../assets/spawn.wav");
-	spawnSound.setBuffer(spawnBuffer);
-	spawnSound.setMinDistance(100);
-	spawnSound.setAttenuation(1);
-
-	dieBuffer.loadFromFile("../assets/die.wav");
-	dieSound.setBuffer(dieBuffer);
-	dieSound.setMinDistance(100);
-	dieSound.setAttenuation(1);
-
-	lossBuffer.loadFromFile("../assets/loss.wav");
-	lossSound.setBuffer(lossBuffer);
-	lossSound.setMinDistance(100);
-	lossSound.setAttenuation(1);
-
-	dropBuffer.loadFromFile("../assets/drop.wav");
-	dropSound.setBuffer(dropBuffer);
-	dropSound.setMinDistance(100);
-	dropSound.setAttenuation(1);
-
-	collectBuffer.loadFromFile("../assets/collect.wav");
-	collectSound.setBuffer(collectBuffer);
-	collectSound.setMinDistance(100);
-	collectSound.setAttenuation(1);
-
 	getControlled_ = std::bind(&GameWorld::getControlled, this);
 }
 
@@ -56,6 +32,11 @@ GameWorld::~GameWorld()
 	clearWorld();
 	delete player_;
 	delete bounds_;
+}
+
+sf::Vector2f GameWorld::B2toSF(const b2Vec2& vec, bool scale) const
+{
+	return sf::Vector2f(vec.x * (scale ? _SCALE_ : 1.f), vec.y * (scale ? _SCALE_ : 1.f));
 }
 
 //Returns true if the gameworld has a controlled entity
@@ -128,13 +109,16 @@ void GameWorld::popInside(Entity * ent)
 	//Bounds centre on origin so between is just pos
 	float rad = bounds_->getRadius();
 
-	b2Vec2 boundsEdge = ent->getPosition();
+	b2Vec2 position = ent->getPosition();
+	b2Vec2 boundsEdge = position;
 	boundsEdge.Normalize();
 	boundsEdge *= rad;
 
-	b2Vec2 between = ent->getPosition() - boundsEdge;
+	b2Vec2 between = position - boundsEdge;
 
-	float dist = ent->getPosition().Length();
+	float dist = position.Length();
+
+	bool inside = bounds_->getPoly()->TestPoint(bounds_->getBody()->GetTransform(), position);
 
 	if (dist > rad || dist < 0)
 	{
@@ -164,21 +148,6 @@ void GameWorld::spawnEnemy()
 		addEnemy(pos);
 	}
 }
-
-//Positions the passed sound relative to the player
-void GameWorld::positionSound(sf::Sound & sound, b2Vec2 pos, bool scale = true)
-{
-	sf::Vector3f sndPos(pos.x * (scale ? _SCALE_ : 1.f), pos.y * (scale ? _SCALE_ : 1.f), 0);
-	sound.setPosition(sndPos);
-}
-
-//Positions the listener at the player
-void GameWorld::positionListener(b2Vec2 pos, bool scale = true)
-{
-	sf::Vector3f lisPos(pos.x * (scale ? _SCALE_ : 1.f), pos.y * (scale ? _SCALE_ : 1.f), 0);
-	sf::Listener::setPosition(lisPos);
-}
-
 
 //Adds a player to the world 
 void GameWorld::addPlayer(const b2Vec2& pos, bool control)
@@ -250,8 +219,7 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 
 	added->arm(newWeap);
 
-	positionSound(spawnSound, added->getPosition());
-	spawnSound.play();
+	audio_.playSFX("spawn", B2toSF(pos, true));
 
 	enemies++;
 }
@@ -262,8 +230,7 @@ void GameWorld::addProjectile(const ProjectileDef& def)
 	projectiles_.push_back(new Projectile(addBulletBody(def.origin), def));
 
 	//Play fire sound at fired position
-	positionSound(fireSound, def.origin);
-	fireSound.play();
+	audio_.playSFX("fire", B2toSF(def.origin, true));
 }
 
 //Adds a side to game world via definition
@@ -271,8 +238,7 @@ void GameWorld::addSide(const SideDef& def)
 {
 	sides_.push_back(new Side(addDynamicBody(def.position), def));
 	
-	positionSound(dropSound, def.position);
-	dropSound.play();
+	audio_.playSFX("drop", B2toSF(def.position, true));
 
 	freesides++;
 }
@@ -288,9 +254,8 @@ void GameWorld::removePlayer()
 	if (player_ != nullptr)
 	{
 		//Play loss sound at position
-		positionSound(lossSound, b2Vec2_zero);
-		lossSound.play();
-		
+		audio_.playSFX("loss", B2toSF(player_->getPosition(), true));
+
 		DestroyBody(player_->getBody());
 
 		delete player_;
@@ -302,8 +267,7 @@ void GameWorld::removePlayer()
 void GameWorld::removeEnemy(std::list<Enemy*>::iterator& e)
 {
 	//Play death sound at position
-	positionSound(dieSound, (*e)->getPosition());
-	dieSound.play();
+	audio_.playSFX("die", B2toSF((*e)->getPosition(), true));
 
 	//Delete enemy
 	DestroyBody((*e)->getBody());
@@ -325,8 +289,7 @@ void GameWorld::removeProjectile(std::list<Projectile*>::iterator& p)
 //Removes side from the world and increments iterator, for use within loops
 void GameWorld::removeSide(std::list<Side*>::iterator & s)
 {
-	positionSound(collectSound, (*s)->getPosition());
-	collectSound.play();
+	audio_.playSFX("collect", B2toSF((*s)->getPosition(), true));
 
 	DestroyBody((*s)->getBody());
 	s = sides_.erase(s);
@@ -346,11 +309,11 @@ void GameWorld::resetLevel()
 	//Add a new player
 	addPlayer(b2Vec2_zero, true);
 
-	spawnSound.play();
+	audio_.playSFX("spawn", B2toSF(b2Vec2_zero, true));
 	spawns_ = 1;
 
 	//Restart bgm
-	bgm_.play();
+	audio_.playBGM("spriterip");
 
 	//Regenerate level somehow
 	hiSides = 0;
@@ -421,6 +384,7 @@ void GameWorld::bomb()
 void GameWorld::testBed()
 {
 	randomiseCol(bounds_);
+	audio_.pauseBGM();
 }
 
 //Returns the radius of the level bounds
@@ -501,100 +465,102 @@ std::list<Side*>& GameWorld::getSides() { return sides_; }
 //Update entity code and step the world
 void GameWorld::update(int dt)
 {
-	//Players update first
-	if (player_ != nullptr)
+	if (!pause_)
 	{
-		player_->update(dt);
-		popInside(player_);
-
-		positionListener(player_->getPosition());
-
-		////player_->setActive(true);//Debug invincible players
-		
-		//If we're not active
-		if (player_->getActive() == false)
+		//Players update first
+		if (player_ != nullptr)
 		{
-			removePlayer();
-		}
-	}
+			player_->update(dt);
+			popInside(player_);
 
-	//Update Shapes
-	if (shapes_.empty() == false)
-	{
-		for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
-		shapeIt != shapes_.end(); /*Don't increment here*/)
-		{
-			//Pull pointer from iter for readability
-			Enemy* shp = (*shapeIt);
+			audio_.setListener(B2toSF(player_->getPosition(), true));
 
-			shp->update(dt);
-			popInside(shp);
-			
-			//If we're not active, increment by deleting
-			if (shp->getActive() == false)
+			////player_->setActive(true);//Debug invincible players
+
+			//If we're not active
+			if (player_->getActive() == false)
 			{
-				removeEnemy(shapeIt);
+				removePlayer();
 			}
-
-			//Else just increment
-			else ++shapeIt;
 		}
-	}
 
-	//Update projectiles
-	if (projectiles_.empty() == false)
-	{
-		for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
+		//Update Shapes
+		if (shapes_.empty() == false)
+		{
+			for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
+			shapeIt != shapes_.end(); /*Don't increment here*/)
+			{
+				//Pull pointer from iter for readability
+				Enemy* shp = (*shapeIt);
+
+				shp->update(dt);
+				popInside(shp);
+
+				//If we're not active, increment by deleting
+				if (shp->getActive() == false)
+				{
+					removeEnemy(shapeIt);
+				}
+
+				//Else just increment
+				else ++shapeIt;
+			}
+		}
+
+		//Update projectiles
+		if (projectiles_.empty() == false)
+		{
+			for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
 			projIt != projectiles_.end(); /*Don't increment here*/)
-		{
-			//Pull pointer from it for readability
-			Projectile* prj = (*projIt);
-
-			prj->update(dt);
-			popInside(prj);
-
-			//If we're not active, increment by deleting
-			if (prj->getActive() == false)
 			{
-				removeProjectile(projIt);
-			}
+				//Pull pointer from it for readability
+				Projectile* prj = (*projIt);
 
-			//Else just increment
-			else ++projIt;
+				prj->update(dt);
+				popInside(prj);
+
+				//If we're not active, increment by deleting
+				if (prj->getActive() == false)
+				{
+					removeProjectile(projIt);
+				}
+
+				//Else just increment
+				else ++projIt;
+			}
 		}
-	}
 
-	//Update Sides
-	if (sides_.empty() == false)
-	{
-		for (std::list<Side*>::iterator sideIt = sides_.begin();
-		sideIt != sides_.end(); /*Don't increment here*/)
+		//Update Sides
+		if (sides_.empty() == false)
 		{
-			//Pull pointer
-			Side* sd = (*sideIt);
-
-			if (player_ != nullptr)
+			for (std::list<Side*>::iterator sideIt = sides_.begin();
+			sideIt != sides_.end(); /*Don't increment here*/)
 			{
-				b2Vec2 between = player_->getPosition() - sd->getPosition();
+				//Pull pointer
+				Side* sd = (*sideIt);
 
-				if (between.Length() < 7.5f)
-					sd->attract(between);
+				if (player_ != nullptr)
+				{
+					b2Vec2 between = player_->getPosition() - sd->getPosition();
+
+					if (between.Length() < 7.5f)
+						sd->attract(between);
+				}
+
+				popInside(sd);
+
+				//If we're not active, increment by deleting
+				if (sd->getActive() == false)
+				{
+					removeSide(sideIt);
+				}
+
+				//Else just increment
+				else ++sideIt;
 			}
-
-			popInside(sd);
-
-			//If we're not active, increment by deleting
-			if (sd->getActive() == false)
-			{
-				removeSide(sideIt);
-			}
-
-			//Else just increment
-			else ++sideIt;
 		}
-	}
 
-	////What a body has
+		////What a body has
 	//void* s = (GetBodyList()->GetUserData());
 	////Dynamic cast what body has
 	//Shape* dcs = static_cast<Shape*>(s);
@@ -606,36 +572,50 @@ void GameWorld::update(int dt)
 	////What shape should have
 	//b2Body* ab = GetBodyList();
 
-	//Basic difficulty ramp
-	timeInLevel_ += dt;
-	timeInLevel_ % UINT16_MAX;
+		//Basic difficulty ramp
+		timeInLevel_ += dt;
+		timeInLevel_ % UINT16_MAX;
 
-	if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_)
-	{
-		lastSpawn_ = timeInLevel_;
-		
-		//if we want to do less than double the enemy number
-		if (enemies < spawns_* 2)
+		if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_)
 		{
-			spawnEnemy();
-			spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
+			lastSpawn_ = timeInLevel_;
+
+			//if we want to do less than double the enemy number
+			if (enemies < spawns_ * 2)
+			{
+				spawnEnemy();
+				spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
+			}
+		}
+
+
+		Step(dt, VELOCITY_ITERS, POSITION_ITERS);
+
+		if (hasControlled())
+		{
+			hiSides = player_->getSidesCollected();
+			hiTime = timeInLevel_;
+
+			//2 minute time limit
+			if (timeInLevel_ >= maxTime * 1000)
+			{
+				removePlayer();
+			}
 		}
 	}
+}
 
+bool GameWorld::getPaused() const { return pause_; }
 
-	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
+void GameWorld::pause()
+{
+	pause_ = true;
+}
 
-	if (hasControlled())
-	{
-		hiSides = player_->getSidesCollected();
-		hiTime = timeInLevel_;
-	
-		//2 minute time limit
-		if (timeInLevel_ >= maxTime * 1000)
-		{
-			removePlayer();
-		}
-	}
+void GameWorld::resume() 
+{ 
+	pause_ = false; 
+	audio_.resumeBGM();
 }
 
 //Gets a pointer to the controlled shape, or null if there isn't one
