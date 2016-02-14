@@ -32,7 +32,7 @@
 #include "WeapRifle.hpp"
 #include "WeapShotgun.hpp"
 
-#include "SoundEffect.hpp"
+#include "SoundSystem.hpp"
 
 
 class GameWorld : protected b2World {
@@ -130,7 +130,6 @@ public:
 
 	/////Debug
 	void testBed();
-	SoundEffect sfx_;
 
 private:
 	const b2Vec2 GRAVITY = b2Vec2(0, 0);
@@ -163,15 +162,17 @@ private:
 	unsigned int timeInLevel_;
 
 	//SFX & Music
-	sf::Music bgm_;
-	sf::SoundBuffer fireBuffer, spawnBuffer, dieBuffer, lossBuffer, dropBuffer, collectBuffer;
-	sf::Sound fireSound, spawnSound, dieSound, lossSound, dropSound, collectSound;
-
-	//Translates sound from b2v2 to sfv3 audio
-	void positionSound(sf::Sound& sound, b2Vec2 pos, bool scale);
-
-	//Translates a position from b2v2 to sfv3 listener
-	void positionListener(b2Vec2 pos, bool scale);
+	sf::Vector2f B2toSF(const b2Vec2& vec, bool scale) const;
+	SoundSystem audio_;
+	//sf::Music bgm_;
+	//sf::SoundBuffer fireBuffer, spawnBuffer, dieBuffer, lossBuffer, dropBuffer, collectBuffer;
+	//sf::Sound fireSound, spawnSound, dieSound, lossSound, dropSound, collectSound;
+	//
+	////Translates sound from b2v2 to sfv3 audio
+	//void positionSound(sf::Sound& sound, b2Vec2 pos, bool scale);
+	//
+	////Translates a position from b2v2 to sfv3 listener
+	//void positionListener(b2Vec2 pos, bool scale);
 
 	//Just for fun
 	void randomiseCol(Entity* e);

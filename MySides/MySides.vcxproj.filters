@@ -114,6 +114,9 @@
     <ClCompile Include="src\SoundEffect.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
+    <ClCompile Include="src\SoundSystem.cpp">
+      <Filter>Source Files\System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">
@@ -198,6 +201,9 @@
       <Filter>Header Files\Game\Entity</Filter>
     </ClInclude>
     <ClInclude Include="include\SoundEffect.hpp">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SoundSystem.hpp">
       <Filter>Header Files\System</Filter>
     </ClInclude>
   </ItemGroup>

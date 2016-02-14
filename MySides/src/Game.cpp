@@ -367,14 +367,14 @@ bool Game::checkController(sf::Time dt)
 
 void Game::update(sf::Time dt)
 {
-
 	if (!pause_)
 	{
 		camera_->update(dt.asMilliseconds());
 		world_->update(dt.asMilliseconds());
 	}
-	
+
 	camera_->setTarget(world_->getControlled());
+
 
 	if (world_->hasControlled() == false && !pause_)
 	{

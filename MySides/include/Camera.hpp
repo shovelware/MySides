@@ -51,6 +51,7 @@ public:
 private:
 	Shape* target_;			//!< The target followed ship
 	sf::Vector2f screenSize_; //!< Keep a record of the screen size for resets
+	sf::Vector2f lastPos_;
 
 	float zoomFactor_; //!< The internal factor of the zoom
 	float zoomStep_; //!< Zoom step [0.25 == 25%]

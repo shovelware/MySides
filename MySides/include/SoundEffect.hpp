@@ -24,7 +24,7 @@ public:
 	void setMinDistance(float minDistance);
 
 private:
-	sf::SoundBuffer* buffer_;
+	sf::SoundBuffer buffer_;
 
 	unsigned int lastPlayed_;
 	const unsigned int voices_;

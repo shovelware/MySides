@@ -2,11 +2,10 @@
 
 SoundEffect::SoundEffect(std::string path, unsigned int voices) :
 	voices_(voices),
-	lastPlayed_(-1)
+	lastPlayed_(-1),
+	buffer_(sf::SoundBuffer())
 {
-	buffer_ = new sf::SoundBuffer();
-
-	if (!buffer_->loadFromFile(path))
+	if (!buffer_.loadFromFile(path))
 	{
 		std::cout << "Error loading sound" << endl;
 	}
@@ -15,13 +14,12 @@ SoundEffect::SoundEffect(std::string path, unsigned int voices) :
 	
 	for (int i = 0; i < voices_; ++i)
 	{
-		sounds_.push_back(sf::Sound(*buffer_));
+		sounds_.push_back(sf::Sound(buffer_));
 	}
 }
 
 SoundEffect::~SoundEffect()
 {
-	delete buffer_;
 }
 
 void SoundEffect::play(sf::Vector2f position)
@@ -33,6 +31,7 @@ void SoundEffect::play(sf::Vector2f position)
 
 	//Play the next free one
 	sounds_[lastPlayed_].setPosition(sf::Vector3f(position.x, position.y, 0));
+	sounds_[lastPlayed_].setRelativeToListener(false);
 	sounds_[lastPlayed_].play();
 }
 

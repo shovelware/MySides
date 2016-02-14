@@ -5,8 +5,7 @@ GameWorld::GameWorld() :
 	b2World(GRAVITY), 
 	contactListener_(ContactListener()),
 	player_(nullptr),
-	controlled_(nullptr),
-	sfx_("../assets/test.wav", 4)
+	controlled_(nullptr)
 {
 	SetContactListener(&contactListener_);
 
@@ -15,43 +14,49 @@ GameWorld::GameWorld() :
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
 	addSide_ = [this](SideDef& def) { addSide(def); };
 
-	bgm_.openFromFile("../assets/spriterip.ogg");
-	bgm_.setLoop(true);
-	bgm_.setVolume(7.5f);
+	audio_.addBGM("spriterip", "../assets/spriterip.ogg");
 
-	sfx_.setAttenuation(1);
-	sfx_.setMinDistance(100);
-	sfx_.setVolume(.5f);
-
-	fireBuffer.loadFromFile("../assets/fire.wav");
-	fireSound.setBuffer(fireBuffer);
-	fireSound.setMinDistance(100);
-	fireSound.setAttenuation(1);
-
-	spawnBuffer.loadFromFile("../assets/spawn.wav");
-	spawnSound.setBuffer(spawnBuffer);
-	spawnSound.setMinDistance(100);
-	spawnSound.setAttenuation(1);
-
-	dieBuffer.loadFromFile("../assets/die.wav");
-	dieSound.setBuffer(dieBuffer);
-	dieSound.setMinDistance(100);
-	dieSound.setAttenuation(1);
-
-	lossBuffer.loadFromFile("../assets/loss.wav");
-	lossSound.setBuffer(lossBuffer);
-	lossSound.setMinDistance(100);
-	lossSound.setAttenuation(1);
-
-	dropBuffer.loadFromFile("../assets/drop.wav");
-	dropSound.setBuffer(dropBuffer);
-	dropSound.setMinDistance(100);
-	dropSound.setAttenuation(1);
-
-	collectBuffer.loadFromFile("../assets/collect.wav");
-	collectSound.setBuffer(collectBuffer);
-	collectSound.setMinDistance(100);
-	collectSound.setAttenuation(1);
+	audio_.addSFX("fire", "../assets/fire.wav", 16);
+	audio_.addSFX("spawn", "../assets/spawn.wav", 16);
+	audio_.addSFX("die", "../assets/die.wav", 16);
+	audio_.addSFX("loss", "../assets/loss.wav", 1);
+	audio_.addSFX("drop", "../assets/drop.wav", 16);
+	audio_.addSFX("collect", "../assets/collect.wav", 16);
+	
+	//bgm_.openFromFile("../assets/spriterip.ogg");
+	//bgm_.setLoop(true);
+	//bgm_.setVolume(7.5f);
+	//
+	//fireBuffer.loadFromFile("../assets/fire.wav");
+	//fireSound.setBuffer(fireBuffer);
+	//fireSound.setMinDistance(100);
+	//fireSound.setAttenuation(1);
+	//
+	//
+	//spawnBuffer.loadFromFile("../assets/spawn.wav");
+	//spawnSound.setBuffer(spawnBuffer);
+	//spawnSound.setMinDistance(100);
+	//spawnSound.setAttenuation(1);
+	//
+	//dieBuffer.loadFromFile("../assets/die.wav");
+	//dieSound.setBuffer(dieBuffer);
+	//dieSound.setMinDistance(100);
+	//dieSound.setAttenuation(1);
+	//
+	//lossBuffer.loadFromFile("../assets/loss.wav");
+	//lossSound.setBuffer(lossBuffer);
+	//lossSound.setMinDistance(100);
+	//lossSound.setAttenuation(1);
+	//
+	//dropBuffer.loadFromFile("../assets/drop.wav");
+	//dropSound.setBuffer(dropBuffer);
+	//dropSound.setMinDistance(100);
+	//dropSound.setAttenuation(1);
+	//
+	//collectBuffer.loadFromFile("../assets/collect.wav");
+	//collectSound.setBuffer(collectBuffer);
+	//collectSound.setMinDistance(100);
+	//collectSound.setAttenuation(1);
 
 	getControlled_ = std::bind(&GameWorld::getControlled, this);
 }
@@ -61,6 +66,11 @@ GameWorld::~GameWorld()
 	clearWorld();
 	delete player_;
 	delete bounds_;
+}
+
+sf::Vector2f GameWorld::B2toSF(const b2Vec2& vec, bool scale) const
+{
+	return sf::Vector2f(vec.x * (scale ? _SCALE_ : 1.f), vec.y * (scale ? _SCALE_ : 1.f));
 }
 
 //Returns true if the gameworld has a controlled entity
@@ -171,18 +181,18 @@ void GameWorld::spawnEnemy()
 }
 
 //Positions the passed sound relative to the player
-void GameWorld::positionSound(sf::Sound & sound, b2Vec2 pos, bool scale = true)
-{
-	sf::Vector3f sndPos(pos.x * (scale ? _SCALE_ : 1.f), pos.y * (scale ? _SCALE_ : 1.f), 0);
-	sound.setPosition(sndPos);
-}
+//void GameWorld::positionSound(sf::Sound & sound, b2Vec2 pos, bool scale = true)
+//{
+//	sf::Vector3f sndPos(pos.x * (scale ? _SCALE_ : 1.f), pos.y * (scale ? _SCALE_ : 1.f), 0);
+//	sound.setPosition(sndPos);
+//}
 
 //Positions the listener at the player
-void GameWorld::positionListener(b2Vec2 pos, bool scale = true)
-{
-	sf::Vector3f lisPos(pos.x * (scale ? _SCALE_ : 1.f), pos.y * (scale ? _SCALE_ : 1.f), 0);
-	sf::Listener::setPosition(lisPos);
-}
+//void GameWorld::positionListener(b2Vec2 pos, bool scale = true)
+//{
+//	sf::Vector3f lisPos(pos.x * (scale ? _SCALE_ : 1.f), pos.y * (scale ? _SCALE_ : 1.f), 0);
+//	sf::Listener::setPosition(lisPos);
+//}
 
 
 //Adds a player to the world 
@@ -255,8 +265,7 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 
 	added->arm(newWeap);
 
-	positionSound(spawnSound, added->getPosition());
-	spawnSound.play();
+	audio_.playSFX("spawn", B2toSF(pos, true));
 
 	enemies++;
 }
@@ -267,10 +276,7 @@ void GameWorld::addProjectile(const ProjectileDef& def)
 	projectiles_.push_back(new Projectile(addBulletBody(def.origin), def));
 
 	//Play fire sound at fired position
-	positionSound(fireSound, def.origin);
-	fireSound.play();
-
-	sfx_.stopAll();
+	audio_.playSFX("fire", B2toSF(def.origin, true));
 }
 
 //Adds a side to game world via definition
@@ -278,8 +284,7 @@ void GameWorld::addSide(const SideDef& def)
 {
 	sides_.push_back(new Side(addDynamicBody(def.position), def));
 	
-	positionSound(dropSound, def.position);
-	dropSound.play();
+	audio_.playSFX("drop", B2toSF(def.position, true));
 
 	freesides++;
 }
@@ -295,9 +300,8 @@ void GameWorld::removePlayer()
 	if (player_ != nullptr)
 	{
 		//Play loss sound at position
-		positionSound(lossSound, b2Vec2_zero);
-		lossSound.play();
-		
+		audio_.playSFX("loss", B2toSF(player_->getPosition(), true));
+
 		DestroyBody(player_->getBody());
 
 		delete player_;
@@ -309,8 +313,7 @@ void GameWorld::removePlayer()
 void GameWorld::removeEnemy(std::list<Enemy*>::iterator& e)
 {
 	//Play death sound at position
-	positionSound(dieSound, (*e)->getPosition());
-	dieSound.play();
+	audio_.playSFX("die", B2toSF((*e)->getPosition(), true));
 
 	//Delete enemy
 	DestroyBody((*e)->getBody());
@@ -332,8 +335,7 @@ void GameWorld::removeProjectile(std::list<Projectile*>::iterator& p)
 //Removes side from the world and increments iterator, for use within loops
 void GameWorld::removeSide(std::list<Side*>::iterator & s)
 {
-	positionSound(collectSound, (*s)->getPosition());
-	collectSound.play();
+	audio_.playSFX("collect", B2toSF((*s)->getPosition(), true));
 
 	DestroyBody((*s)->getBody());
 	s = sides_.erase(s);
@@ -353,11 +355,11 @@ void GameWorld::resetLevel()
 	//Add a new player
 	addPlayer(b2Vec2_zero, true);
 
-	spawnSound.play();
+	audio_.playSFX("spawn", B2toSF(b2Vec2_zero, true));
 	spawns_ = 1;
 
 	//Restart bgm
-	bgm_.play();
+	audio_.playBGM("spriterip");
 
 	//Regenerate level somehow
 	hiSides = 0;
@@ -428,7 +430,7 @@ void GameWorld::bomb()
 void GameWorld::testBed()
 {
 	randomiseCol(bounds_);
-	sfx_.play(sf::Vector2f(randFloat(-1, 1), randFloat(-1, 1)));
+	audio_.pauseBGM();
 }
 
 //Returns the radius of the level bounds
@@ -515,7 +517,7 @@ void GameWorld::update(int dt)
 		player_->update(dt);
 		popInside(player_);
 
-		positionListener(player_->getPosition());
+		audio_.setListener(B2toSF(player_->getPosition(), true));
 
 		////player_->setActive(true);//Debug invincible players
 		

@@ -27,7 +27,7 @@ void Camera::clearTarget(bool savexf)
 {
 	if (savexf)
 	{
-		move_ += B2toSF(target_->getPosition());
+		move_ += lastPos_;
 	}
 
 	target_ = nullptr;
@@ -55,6 +55,8 @@ void Camera::update(int dt)
 	}
 
 	else setCenter(move_);
+
+	lastPos_ = getCenter();
 }
 
 void Camera::move(sf::Vector2f xf)
