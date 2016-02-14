@@ -26,8 +26,6 @@ void SoundEffect::play(sf::Vector2f position)
 {
 	//Increment last played sound
 	lastPlayed_ = (lastPlayed_ + 1) % voices_;
-	
-	std::cout << "playing" << std::to_string(lastPlayed_ + 1) <<  "/" << std::to_string(voices_) << std::endl;
 
 	//Play the next free one
 	sounds_[lastPlayed_].setPosition(sf::Vector3f(position.x, position.y, 0));

@@ -109,13 +109,16 @@ void GameWorld::popInside(Entity * ent)
 	//Bounds centre on origin so between is just pos
 	float rad = bounds_->getRadius();
 
-	b2Vec2 boundsEdge = ent->getPosition();
+	b2Vec2 position = ent->getPosition();
+	b2Vec2 boundsEdge = position;
 	boundsEdge.Normalize();
 	boundsEdge *= rad;
 
-	b2Vec2 between = ent->getPosition() - boundsEdge;
+	b2Vec2 between = position - boundsEdge;
 
-	float dist = ent->getPosition().Length();
+	float dist = position.Length();
+
+	bool inside = bounds_->getPoly()->TestPoint(bounds_->getBody()->GetTransform(), position);
 
 	if (dist > rad || dist < 0)
 	{

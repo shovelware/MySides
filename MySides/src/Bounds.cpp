@@ -82,7 +82,7 @@ void Bounds::resize(float radius)
 }
 
 //Returns the friction circle rather than bounds for testPoint
-b2CircleShape* Bounds::getShape()
+b2CircleShape* Bounds::getCircleShape()
 {
 	for (b2Fixture* fix = body_->GetFixtureList(); fix; fix = fix->GetNext())
 	{
@@ -91,6 +91,18 @@ b2CircleShape* Bounds::getShape()
 			return static_cast<b2CircleShape*>(fix->GetShape());
 		}
 	}
+}
+
+b2ChainShape* Bounds::getPoly()
+{
+	for (b2Fixture* fix = body_->GetFixtureList(); fix; fix = fix->GetNext())
+	{
+		if (fix->GetType() == b2Shape::Type::e_chain)
+		{
+			return static_cast<b2ChainShape*>(fix->GetShape());
+		}
+	}
+
 }
 
 //Gets radius of bounds
