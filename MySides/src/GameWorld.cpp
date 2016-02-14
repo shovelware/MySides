@@ -5,7 +5,8 @@ GameWorld::GameWorld() :
 	b2World(GRAVITY), 
 	contactListener_(ContactListener()),
 	player_(nullptr),
-	controlled_(nullptr)
+	controlled_(nullptr),
+	sfx_("../assets/test.wav", 4)
 {
 	SetContactListener(&contactListener_);
 
@@ -13,10 +14,14 @@ GameWorld::GameWorld() :
 
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
 	addSide_ = [this](SideDef& def) { addSide(def); };
-	
+
 	bgm_.openFromFile("../assets/spriterip.ogg");
 	bgm_.setLoop(true);
 	bgm_.setVolume(7.5f);
+
+	sfx_.setAttenuation(1);
+	sfx_.setMinDistance(100);
+	sfx_.setVolume(.5f);
 
 	fireBuffer.loadFromFile("../assets/fire.wav");
 	fireSound.setBuffer(fireBuffer);
@@ -264,6 +269,8 @@ void GameWorld::addProjectile(const ProjectileDef& def)
 	//Play fire sound at fired position
 	positionSound(fireSound, def.origin);
 	fireSound.play();
+
+	sfx_.stopAll();
 }
 
 //Adds a side to game world via definition
@@ -421,6 +428,7 @@ void GameWorld::bomb()
 void GameWorld::testBed()
 {
 	randomiseCol(bounds_);
+	sfx_.play(sf::Vector2f(randFloat(-1, 1), randFloat(-1, 1)));
 }
 
 //Returns the radius of the level bounds

@@ -32,6 +32,8 @@
 #include "WeapRifle.hpp"
 #include "WeapShotgun.hpp"
 
+#include "SoundEffect.hpp"
+
 
 class GameWorld : protected b2World {
 public:
@@ -128,9 +130,10 @@ public:
 
 	/////Debug
 	void testBed();
+	SoundEffect sfx_;
 
 private:
-	const b2Vec2 GRAVITY = b2Vec2(0, 0.1);
+	const b2Vec2 GRAVITY = b2Vec2(0, 0);
 	const int VELOCITY_ITERS = 6;
 	const int POSITION_ITERS = 2;
 	
@@ -169,7 +172,6 @@ private:
 
 	//Translates a position from b2v2 to sfv3 listener
 	void positionListener(b2Vec2 pos, bool scale);
-
 
 	//Just for fun
 	void randomiseCol(Entity* e);

@@ -15,7 +15,8 @@ Game::Game() :
 	mousein_(false),
 	quit_(false),
 	fullscreen_(false),
-	dd_(window_)
+	dd_(window_),
+	voidCol_(64,64,64)
 {
 }
 
@@ -390,7 +391,7 @@ void Game::update(sf::Time dt)
 
 void Game::render()
 {
-	window_.clear();
+	window_.clear(voidCol_);
 	//l.out(l.message, 'G', "Render");
 
 	window_.setView(*(camera_));
