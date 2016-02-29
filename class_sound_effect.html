@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>My Sides: Main Page</title>
+<title>My Sides: SoundEffect Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -48,8 +48,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -69,6 +69,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
+      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+    </ul>
+  </div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -81,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('index.html','');});
+$(document).ready(function(){initNavTree('class_sound_effect.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -99,15 +106,51 @@ $(document).ready(function(){initNavTree('index.html','');});
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="class_sound_effect-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">My Sides Documentation</div>  </div>
+<div class="title">SoundEffect Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p><a class="el" href="_sound_effect_8hpp_source.html">SoundEffect.hpp</a>.  
+ <a href="class_sound_effect.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_sound_effect_8hpp_source.html">SoundEffect.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a5223efa4bef4d3d23fad814c1ea4d658"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5223efa4bef4d3d23fad814c1ea4d658"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>SoundEffect</b> (std::string path, unsigned int voices)</td></tr>
+<tr class="separator:a5223efa4bef4d3d23fad814c1ea4d658"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72cb1f220267dab6d0abe38026a6018c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a72cb1f220267dab6d0abe38026a6018c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>play</b> (sf::Vector2f position)</td></tr>
+<tr class="separator:a72cb1f220267dab6d0abe38026a6018c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e44edb3505a64f788e74e3ce09f8d63"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0e44edb3505a64f788e74e3ce09f8d63"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>stopAll</b> ()</td></tr>
+<tr class="separator:a0e44edb3505a64f788e74e3ce09f8d63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7be7c7aa3763ffefbd422c56875ac281"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7be7c7aa3763ffefbd422c56875ac281"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setVolume</b> (float volume)</td></tr>
+<tr class="separator:a7be7c7aa3763ffefbd422c56875ac281"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f6268b5548226099fc4e885e5aaee38"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f6268b5548226099fc4e885e5aaee38"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setAttenuation</b> (float attenuation)</td></tr>
+<tr class="separator:a8f6268b5548226099fc4e885e5aaee38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a601df0cc2e6feb3194b37cded3a5eafe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a601df0cc2e6feb3194b37cded3a5eafe"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setMinDistance</b> (float minDistance)</td></tr>
+<tr class="separator:a601df0cc2e6feb3194b37cded3a5eafe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p><a class="el" href="_sound_effect_8hpp_source.html">SoundEffect.hpp</a>. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/<a class="el" href="_sound_effect_8hpp_source.html">SoundEffect.hpp</a></li>
+</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
+    <li class="navelem"><a class="el" href="class_sound_effect.html">SoundEffect</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>

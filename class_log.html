@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>My Sides: Main Page</title>
+<title>My Sides: Log Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -48,8 +48,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="annotated.html"><span>Classes</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -69,6 +69,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
+      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
+    </ul>
+  </div>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
   <div id="nav-tree">
@@ -81,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('index.html','');});
+$(document).ready(function(){initNavTree('class_log.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -99,15 +106,56 @@ $(document).ready(function(){initNavTree('index.html','');});
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="class_log-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">My Sides Documentation</div>  </div>
+<div class="title">Log Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:aa071ed354745dc5b798610181e5eeafa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa071ed354745dc5b798610181e5eeafa"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>messagetype</b> { <br />
+&#160;&#160;<b>fatal</b> = 'F', 
+<b>error</b> = 'E', 
+<b>warning</b> = 'W', 
+<b>message</b> = 'M', 
+<br />
+&#160;&#160;<b>logger</b> = 'I', 
+<b>priority</b> = '!'
+<br />
+ }</td></tr>
+<tr class="separator:aa071ed354745dc5b798610181e5eeafa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a115ea5ec3fe1e53e7a3e9d718585664a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a115ea5ec3fe1e53e7a3e9d718585664a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>out</b> (const char type, const char location, const char *output) const </td></tr>
+<tr class="separator:a115ea5ec3fe1e53e7a3e9d718585664a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecb0abcbd0289bbf8ef4eeeed20f5601"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aecb0abcbd0289bbf8ef4eeeed20f5601"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>newLine</b> () const </td></tr>
+<tr class="separator:aecb0abcbd0289bbf8ef4eeeed20f5601"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7dff3fa78202a459bbc7508fcc0663de"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7dff3fa78202a459bbc7508fcc0663de"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>separator</b> () const </td></tr>
+<tr class="separator:a7dff3fa78202a459bbc7508fcc0663de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9ea50e6d131c36bfffff242d75b2ee2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa9ea50e6d131c36bfffff242d75b2ee2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>typeEnable</b> (const char type, const char location)</td></tr>
+<tr class="separator:aa9ea50e6d131c36bfffff242d75b2ee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3925a25e278910264d29339ba0a76b44"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3925a25e278910264d29339ba0a76b44"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>typeDisable</b> (const char type, const char location)</td></tr>
+<tr class="separator:a3925a25e278910264d29339ba0a76b44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/<a class="el" href="_log_8hpp_source.html">Log.hpp</a></li>
+</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
+    <li class="navelem"><a class="el" href="class_log.html">Log</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
