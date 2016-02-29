@@ -8,9 +8,6 @@ var NAVTREE =
         [ "All", "functions.html", null ],
         [ "Functions", "functions_func.html", null ]
       ] ]
-    ] ],
-    [ "Files", null, [
-      [ "File List", "files.html", "files" ]
     ] ]
   ] ]
 ];
@@ -18,7 +15,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 ".html",
-"class_shape.html#abe0635fa450e3b24902905da5ee1ef2c"
+"class_side.html#a85a6db6355f0c399632bbd4d1be5a51a"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

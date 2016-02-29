@@ -7,6 +7,7 @@ var class_projectile_def =
     [ "ProjectileDef", "class_projectile_def.html#acdc9e180b7fb59695ba5ba82412401b0", null ],
     [ "ProjectileDef", "class_projectile_def.html#a8ef62fc2a1ffb49e0e30a1abbd3ab5cf", null ],
     [ "ProjectileDef", "class_projectile_def.html#afdd2ec1bd3e9bdf448064e5fa3d1b594", null ],
+    [ "bulletDef", "class_projectile_def.html#a1b661ddc5f57e378c16ea44dcc5a1a7d", null ],
     [ "isValid", "class_projectile_def.html#afa270f59d775fd4e9648cf178bf61863", null ],
     [ "bounce", "class_projectile_def.html#aa3fb72f1ce4067e1250a4d727e2fa9bb", null ],
     [ "colPrim", "class_projectile_def.html#adc7df849edff6e5a35a35349395e5e1b", null ],
