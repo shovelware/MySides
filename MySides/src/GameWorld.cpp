@@ -384,7 +384,7 @@ void GameWorld::bomb()
 void GameWorld::testBed()
 {
 	randomiseCol(bounds_);
-	audio_.pauseBGM();
+	//audio_.pauseBGM();
 }
 
 //Returns the radius of the level bounds
