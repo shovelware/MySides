@@ -10,12 +10,14 @@ GameWorld::GameWorld() :
 {
 	SetContactListener(&contactListener_);
 
-	bounds_ = new Bounds(addStaticBody(b2Vec2_zero), 32),
+	bounds_ = new Bounds(addStaticBody(b2Vec2_zero), 32);
 
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
 	addSide_ = [this](SideDef& def) { addSide(def); };
 
-	audio_.addBGM("spriterip", "../assets/spriterip.ogg");
+	//audio_.addBGM("spriterip", "../assets/spriterip.ogg");
+	audio_.addAFX("spriterip", "../assets/spriterip.ogg", 1, 0.2, 400, 1024);
+	audio_.addAFX("wind", "../assets/wind.ogg", 0, 1, 750, 1000);
 
 	audio_.addSFX("fire", "../assets/fire.wav", 64);
 	audio_.addSFX("spawn", "../assets/spawn.wav", 16);
@@ -313,8 +315,8 @@ void GameWorld::resetLevel()
 	spawns_ = 1;
 
 	//Restart bgm
-	audio_.playBGM("spriterip");
-
+	audio_.playAFX("spriterip");
+	audio_.playAFX("wind");
 	//Regenerate level somehow
 	hiSides = 0;
 	enemies = 0;
@@ -393,11 +395,12 @@ float GameWorld::getBoundsRadius()
 	return bounds_->getRadius();
 }
 
-//Resizes the bounds to the passed radius, [correcting for shapes outside](not yet)
+//Resizes the bounds to the passed radius
 void GameWorld::resizeBounds(float radius)
 {
 	if (radius < bounds_->getRadius())
 	{
+		//Gameworld's pop inside should
 		//correct for bodies outside radius
 	}
 
@@ -545,6 +548,7 @@ void GameWorld::update(int dt)
 
 					if (between.Length() < 7.5f)
 						sd->attract(between);
+					
 				}
 
 				popInside(sd);
@@ -576,16 +580,34 @@ void GameWorld::update(int dt)
 		timeInLevel_ += dt;
 		timeInLevel_ % UINT16_MAX;
 
-		if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_)
+		if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_ / 5)
 		{
-			lastSpawn_ = timeInLevel_;
-
-			//if we want to do less than double the enemy number
-			if (enemies < spawns_ * 2)
+			//VIDOE
+			static int i = 0;
+			int num = 32;
+			
+			if (i < num)
 			{
-				spawnEnemy();
-				spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
+				b2Vec2 pos(
+					-(cos((2 * M_PI) / num * i)),
+					-(sin((2 * M_PI) / num * i)));
+
+				pos *= 20.0f;
+				//addEnemy(pos);
 			}
+
+			i++;
+			//VIDEO
+
+			//lastSpawn_ = timeInLevel_;
+			//
+			////if we want to do less than double the enemy number
+			//if (enemies < spawns_ * 2)
+			//{
+			//	spawnEnemy();
+			//	spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
+			//}
+
 		}
 
 
@@ -637,6 +659,7 @@ void GameWorld::fire(b2Vec2 direction)
 	//If there's a direction to fire in
 	if (controlled_ != nullptr && (direction.x != 0 || direction.y != 0))
 	{
+		//Look in a direction
 		if (direction.Length() <= 0.75f)
 		{
 			controlled_->orient(direction);

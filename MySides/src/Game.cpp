@@ -340,9 +340,6 @@ void Game::handleInput(sf::Time dt)
 	}
 	
 	if (con_.checkLeftHairTrigger() &&
-		con_.checkDown(XINPUT_GAMEPAD_A) &&
-		con_.checkDown(XINPUT_GAMEPAD_B) &&
-		con_.checkDown(XINPUT_GAMEPAD_X) &&
 		con_.checkDown(XINPUT_GAMEPAD_Y))
 	{
 		world_->bomb();

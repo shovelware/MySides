@@ -155,30 +155,31 @@ void GameDrawer::drawBounds(Bounds* const b)
 		verts[i] = B2toSF(body->GetWorldPoint(shape->m_vertices[i]), true);
 	}
 
-	//Draw layered bounds below
+	//Copy of verts for inner circle drawing
 	sf::Vector2f* subVerts = new sf::Vector2f[count];
-
 	for (int i = 0; i < count; ++i)
 	{
 		subVerts[i] = verts[i];
 	}
+	int layers = 7;
 
-	int layers = 8;
-	for (int l = 0; l <= layers; ++l)
+	//Draw stuff
+	//Draw base polygon
+	drawPolygon(verts, count, pri, ter);
+
+	//Draw other layers, getting smaller
+	for (int l = 0; l <= layers - 1; ++l)
 	{
 		for (int v = 0; v < count; ++v)
 		{
-			subVerts[v] *= 0.8f;
+			subVerts[v] *= 0.9f;
 		}
 
-		drawPolygon(subVerts, count, tweakAlpha(blend(ter, l + 1, pri, layers - 2), l * 8), sec);
+		drawPolygon(subVerts, count, (blend(sec, l + 1, pri, layers - 2)), tweakAlpha(ter, l* 4), 0);
 	}
 
-
-	//Draw stuff
-	drawPolygon(verts, count, tweakAlpha(pri, 128), sec);
-
-	drawCircle(pos, 1, ter, pri);
+	//Centre circle
+	drawCircle(pos, 1, ter, pri, 0);
 
 	//Clean up
 	delete[] verts;

@@ -62,6 +62,7 @@ public:
 	int getHP() const;
 	unsigned int getHPMax() const;
 
+	bool canCollect() const;
 	int getSidesCollected() const;
 	float getSize() const;
 		
@@ -79,7 +80,7 @@ public:
 	void testBed();
 
 	//void draw(GameDrawer d); // override//override
-private:
+protected:
 	/*const*/ float maxVel_;//maximum velocity
 	/*const*/ float maxRot_;//maximum rotation
 
@@ -95,6 +96,9 @@ private:
 	//Side dropping
 	std::function<void(SideDef&)> sideCallback_;
 	void dropSide(b2Vec2 dir, float size);
+
+	//Side collecting
+	bool collector_;
 
 	//HP
 	int hp_;

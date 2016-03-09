@@ -103,8 +103,12 @@ bool Side::collide(Entity* other, b2Contact& contact)
 		//Make sure collision is with side
 		if (tagA == "side" || tagB == "side")
 		{
-			collect();
+			if (shape->canCollect())
+			{
+				collect();
+			}
 		}
+
 		handled = true;
 	}
 

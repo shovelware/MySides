@@ -46,6 +46,12 @@
     <Filter Include="Header Files\Game\Entity\Def">
       <UniqueIdentifier>{ab621d9e-a475-4cb8-b16e-f3ebc3796631}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Audio">
+      <UniqueIdentifier>{1e4d9115-6a6e-4502-8561-b01781d6b8e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Audio">
+      <UniqueIdentifier>{9875d0da-05c7-477b-9b54-8cb4dba03352}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entity.cpp">
@@ -112,10 +118,13 @@
       <Filter>Source Files\Game\Entity</Filter>
     </ClCompile>
     <ClCompile Include="src\SoundEffect.cpp">
-      <Filter>Source Files\System</Filter>
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
     <ClCompile Include="src\SoundSystem.cpp">
-      <Filter>Source Files\System</Filter>
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AmbientEffect.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -200,11 +209,14 @@
     <ClInclude Include="include\Enemy.hpp">
       <Filter>Header Files\Game\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="include\SoundEffect.hpp">
-      <Filter>Header Files\System</Filter>
-    </ClInclude>
     <ClInclude Include="include\SoundSystem.hpp">
-      <Filter>Header Files\System</Filter>
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SoundEffect.hpp">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AmbientEffect.hpp">
+      <Filter>Header Files\Audio</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

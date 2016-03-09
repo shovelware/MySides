@@ -1,4 +1,4 @@
-///SoundEffect.hpp
+// SoundEffect.hpp
 // Wrapper for sf::Sound and sf::SoundBuffer, provides one sfx with multiple voices
 
 #ifndef MS_SOUNDEFFECT

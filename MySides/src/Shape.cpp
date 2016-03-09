@@ -8,6 +8,7 @@ extern Log l;
 
 Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& callback) : 
 	Entity(body),
+	collector_(true),
 	weapon_(nullptr),
 	lastDamage_(b2Vec2_zero)
 {	
@@ -234,6 +235,11 @@ int Shape::getHP() const
 unsigned int Shape::getHPMax() const
 {
 	return hpMAX_;
+}
+
+bool Shape::canCollect() const
+{
+	return collector_;
 }
 
 int Shape::getSidesCollected() const
