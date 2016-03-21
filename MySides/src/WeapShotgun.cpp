@@ -7,6 +7,7 @@ Weapon::Shotgun::Shotgun(Shape* owner, std::function<void(ProjectileDef&)>& call
 	refireTime_ = 0;
 
 	pellets_ = 8;
+	id_ = "shotgun";
 }
 
 void Weapon::Shotgun::update(int dt)
@@ -16,6 +17,16 @@ void Weapon::Shotgun::update(int dt)
 	{
 		refireTime_ = (refireTime_ - dt >= 0 ? refireTime_ - dt : 0);
 	}
+}
+
+void Weapon::Shotgun::setRefireTime(int ms)
+{
+	refireTimeMax_ = (ms > 0 ? ms : refireTimeMax_);
+}
+
+void Weapon::Shotgun::setReloadTime(int ms)
+{
+	reloadTimeMAX_ = (ms > 0 ? ms : reloadTimeMAX_);
 }
 
 void Weapon::Shotgun::fire(b2Vec2 &heading)

@@ -14,7 +14,7 @@
 //!	@see	Projectile, ProjectileDef
 
 //!		Abstract Weapon interface that provides base functionality for
-//!		weapons such as colours, a trigger and updating.
+//!		weapons such as colours, a trigger for firing and time-based updates.
 
 class Shape;
 

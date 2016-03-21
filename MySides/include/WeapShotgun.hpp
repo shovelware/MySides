@@ -9,6 +9,10 @@ namespace Weapon {
 		Shotgun(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo);
 		bool canFire();
 		void update(int dt);
+
+		void setRefireTime(int ms);
+		void setReloadTime(int ms);
+
 	private:
 		void fire(b2Vec2 &heading);
 

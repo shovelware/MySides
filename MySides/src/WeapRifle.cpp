@@ -8,6 +8,8 @@
 
 		reloadTimeMAX_ = 5000;
 		reloadTime_ = 0;
+
+		id_ = "rifle";
 	}
 
 	void Weapon::Rifle::update(int dt)
@@ -28,6 +30,16 @@
 		{
 			refireTime_ = (refireTime_ - dt >= 0 ? refireTime_ - dt : 0);
 		}
+	}
+
+	void Weapon::Rifle::setRefireTime(int ms)
+	{
+		refireTimeMAX_ = (ms > 0 ? ms : refireTimeMAX_);
+	}
+
+	void Weapon::Rifle::setReloadTime(int ms)
+	{
+		reloadTimeMAX_ = (ms > 0 ? ms : reloadTimeMAX_);
 	}
 
 	void Weapon::Rifle::fire(b2Vec2 &heading)

@@ -15,16 +15,19 @@ namespace Weapon {
 
 		void update(int dt);
 
-		int refireTimeMAX_;
-		int reloadTimeMAX_;
+		void setRefireTime(int ms);
+		void setReloadTime(int ms);
+
 	private:
 		void fire(b2Vec2 &heading);
 
 		Magazine magazine_;
 
 		int refireTime_;
+		int refireTimeMAX_;
 
 		int reloadTime_;
+		int reloadTimeMAX_;
 	};
 }
 #endif

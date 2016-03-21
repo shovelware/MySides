@@ -36,5 +36,4 @@ Weapon::WeaponI::WeaponI(Shape* owner, std::function<void(ProjectileDef&)>& call
 	void Weapon::WeaponI::setSecondary(b2Color col) { output_.colSecn = col; }
 	void Weapon::WeaponI::setTertiary(b2Color col) { output_.colTert = col; }
 
-
 	std::string Weapon::WeaponI::getID() { return id_; }
