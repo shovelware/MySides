@@ -170,6 +170,13 @@ private:
 	//Timing
 	unsigned int timeInLevel_;
 
+	//Updating
+	void updatePlayer(int dt);
+	void updateEnemy(int dt);
+	void updateProjectile(int dt);
+	void updateSide(int dt);
+	void updateLevel(int dt);
+
 	//SFX & Music
 	sf::Vector2f B2toSF(const b2Vec2& vec, bool scale) const;
 	SoundSystem audio_;

@@ -492,148 +492,24 @@ void GameWorld::update(int dt)
 	if (!pause_)
 	{
 		//Players update first
-		if (player_ != nullptr)
-		{
-			player_->update(dt);
-			popInside(player_);
-
-			audio_.setListener(B2toSF(player_->getPosition(), true));
-
-			////player_->setActive(true);//Debug invincible players
-
-			//If we're not active
-			if (player_->getActive() == false)
-			{
-				removePlayer();
-			}
-		}
+		updatePlayer(dt);
 
 		//Update Shapes
-		if (shapes_.empty() == false)
-		{
-			for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
-			shapeIt != shapes_.end(); /*Don't increment here*/)
-			{
-				//Pull pointer from iter for readability
-				Enemy* shp = (*shapeIt);
-
-				shp->update(dt);
-				popInside(shp);
-
-				//If we're not active, increment by deleting
-				if (shp->getActive() == false)
-				{
-					removeEnemy(shapeIt);
-				}
-
-				//Else just increment
-				else ++shapeIt;
-			}
-		}
+		updateEnemy(dt);
 
 		//Update projectiles
-		if (projectiles_.empty() == false)
-		{
-			for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
-			projIt != projectiles_.end(); /*Don't increment here*/)
-			{
-				//Pull pointer from it for readability
-				Projectile* prj = (*projIt);
-
-				prj->update(dt);
-				popInside(prj);
-
-				//If we're not active, increment by deleting
-				if (prj->getActive() == false)
-				{
-					removeProjectile(projIt);
-				}
-
-				//Else just increment
-				else ++projIt;
-			}
-		}
+		updateProjectile(dt);
 
 		//Update Sides
-		if (sides_.empty() == false)
-		{
-			for (std::list<Side*>::iterator sideIt = sides_.begin();
-			sideIt != sides_.end(); /*Don't increment here*/)
-			{
-				//Pull pointer
-				Side* sd = (*sideIt);
+		updateSide(dt);
 
-				if (player_ != nullptr)
-				{
-					b2Vec2 between = player_->getPosition() - sd->getPosition();
+		//Update level
+		updateLevel(dt);
 
-					if (between.Length() < 7.5f)
-						sd->attract(between);
-					
-				}
-
-				popInside(sd);
-
-				//If we're not active, increment by deleting
-				if (sd->getActive() == false)
-				{
-					removeSide(sideIt);
-				}
-
-				//Else just increment
-				else ++sideIt;
-			}
-		}
-
-		////What a body has
-	//void* s = (GetBodyList()->GetUserData());
-	////Dynamic cast what body has
-	//Shape* dcs = static_cast<Shape*>(s);
-	////What body should have
-	//Shape* as = &*shapes_.begin();
-	//
-	////What shape has
-	//b2Body* b = shapes_.begin()->getBody();
-	////What shape should have
-	//b2Body* ab = GetBodyList();
-
-		//Basic difficulty ramp
-		timeInLevel_ += dt;
-		timeInLevel_ % UINT16_MAX;
-
-		if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_ / 5)
-		{
-			//VIDOE
-			//static int i = 0;
-			//int num = 32;
-			//
-			//if (i < num)
-			//{
-			//	b2Vec2 pos(
-			//		-(cos((2 * M_PI) / num * i)),
-			//		-(sin((2 * M_PI) / num * i)));
-			//
-			//	pos *= 15.0f;
-			//	addEnemy(pos);
-			//}
-			//
-			//i++;
-			//VIDEO
-
-			//lastSpawn_ = timeInLevel_;
-			//
-			////if we want to do less than double the enemy number
-			//if (enemies < spawns_ * 2)
-			//{
-			//	spawnEnemy();
-			//	spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
-			//}
-
-		}
-
-
+		//Step world
 		Step(dt, VELOCITY_ITERS, POSITION_ITERS);
-
+		
+		//Spr3
 		if (hasControlled())
 		{
 			hiSides = player_->getSidesCollected();
@@ -644,6 +520,127 @@ void GameWorld::update(int dt)
 			{
 				removePlayer();
 			}
+		}
+	}
+}
+
+void GameWorld::updatePlayer(int dt)
+{
+	if (player_ != nullptr)
+	{
+		player_->update(dt);
+		popInside(player_);
+
+		audio_.setListener(B2toSF(player_->getPosition(), true));
+
+		////player_->setActive(true);//Debug invincible players
+
+		//If we're not active
+		if (player_->getActive() == false)
+		{
+			removePlayer();
+		}
+	}
+}
+
+void GameWorld::updateEnemy(int dt)
+{
+	if (shapes_.empty() == false)
+	{
+		for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
+		shapeIt != shapes_.end(); /*Don't increment here*/)
+		{
+			//Pull pointer from iter for readability
+			Enemy* shp = (*shapeIt);
+
+			shp->update(dt);
+			popInside(shp);
+
+			//If we're not active, increment by deleting
+			if (shp->getActive() == false)
+			{
+				removeEnemy(shapeIt);
+			}
+
+			//Else just increment
+			else ++shapeIt;
+		}
+	}
+}
+
+void GameWorld::updateProjectile(int dt)
+{
+	if (projectiles_.empty() == false)
+	{
+		for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
+		projIt != projectiles_.end(); /*Don't increment here*/)
+		{
+			//Pull pointer from it for readability
+			Projectile* prj = (*projIt);
+
+			prj->update(dt);
+			popInside(prj);
+
+			//If we're not active, increment by deleting
+			if (prj->getActive() == false)
+			{
+				removeProjectile(projIt);
+			}
+
+			//Else just increment
+			else ++projIt;
+		}
+	}
+}
+
+void GameWorld::updateSide(int dt)
+{
+	if (sides_.empty() == false)
+	{
+		for (std::list<Side*>::iterator sideIt = sides_.begin();
+		sideIt != sides_.end(); /*Don't increment here*/)
+		{
+			//Pull pointer
+			Side* sd = (*sideIt);
+
+			//SIDE ATTRACTOR NEEDS REDUX
+			if (player_ != nullptr)
+			{
+				b2Vec2 between = player_->getPosition() - sd->getPosition();
+
+				if (between.Length() < 7.5f)
+					sd->attract(between);
+			}
+
+			popInside(sd);
+
+			//If we're not active, increment by deleting
+			if (sd->getActive() == false)
+			{
+				removeSide(sideIt);
+			}
+
+			//Else just increment
+			else ++sideIt;
+		}
+	}
+}
+
+void GameWorld::updateLevel(int dt)
+{
+	//Basic difficulty ramp
+	timeInLevel_ += dt;
+	timeInLevel_ % UINT16_MAX;
+
+	if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_ / 5)
+	{
+		lastSpawn_ = timeInLevel_;
+
+		//if we want to do less than double the enemy number
+		if (enemies < spawns_ * 2)
+		{
+			spawnEnemy();
+			spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
 		}
 	}
 }

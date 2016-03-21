@@ -345,13 +345,6 @@ void Game::handleInput(sf::Time dt)
 	{
 		world_->bomb();
 	}
-
-	if (!world_->getPlayer()->getWeaponReady())
-	{
-		con_.setVibrationR(40);
-	}
-
-	else con_.setVibrationR(0);
 }
 
 bool Game::checkController(sf::Time dt)
