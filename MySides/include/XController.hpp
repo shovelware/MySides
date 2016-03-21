@@ -86,10 +86,10 @@ public:
 
 	//Vibration
 	void setVibration(float left, float right);
-	void setLeftVibration(float vibe);
-	void setRightVibration(float vibe);
-	float getLeftVibration() const;
-	float getRightVibration() const;
+	void setVibrationL(float vibe);
+	void setVibrationR(float vibe);
+	float getVibrationL() const;
+	float getVibrationR() const;
 	void stopVibration();
 	
 

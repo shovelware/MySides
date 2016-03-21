@@ -262,7 +262,7 @@ void XController::setVibration(float left, float right)
 	setRightVibration(right);
 }
 
-void XController::setLeftVibration(float vibe)
+void XController::setVibrationL(float vibe)
 {
 	int leftv = fmax(0, fmin(vibe, 100));
 
@@ -272,7 +272,7 @@ void XController::setLeftVibration(float vibe)
 	vibration_.wLeftMotorSpeed = leftv <= VIBE_MAX ? leftv : VIBE_MAX;
 }
 
-void XController::setRightVibration(float vibe)
+void XController::setVibrationR(float vibe)
 {
 	int rightv = fmax(0, fmin(vibe, 100));
 
@@ -282,12 +282,12 @@ void XController::setRightVibration(float vibe)
 	vibration_.wRightMotorSpeed = rightv <= VIBE_MAX ? rightv : VIBE_MAX;
 }
 
-float XController::getLeftVibration() const
+float XController::getVibrationL() const
 {
 	return (vibration_.wLeftMotorSpeed / (float)VIBE_MAX) * 100.f;
 }
 
-float XController::getRightVibration() const
+float XController::getVibrationR() const
 {
 	return (vibration_.wRightMotorSpeed / (float)VIBE_MAX) * 100.f;
 }
