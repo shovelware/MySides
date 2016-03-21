@@ -1,6 +1,6 @@
 #include "WeapShotgun.hpp"
 
-Weapon::Shotgun::Shotgun(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo) :
+Weapon::Shotgun::Shotgun(Shape* owner, std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
 	WeaponI(owner, callback, ammo)
 {
 	refireTimeMax_ = 600;
@@ -31,29 +31,40 @@ void Weapon::Shotgun::setReloadTime(int ms)
 
 void Weapon::Shotgun::fire(b2Vec2 &heading)
 {
-	//Set up projectile
-	ProjectileDef newProj = ProjectileDef(output_);
-	newProj.origin = owner_->getPosition();
-	newProj.heading = heading;
-	newProj.owner = owner_;
+	//Set up vector
+	std::vector<ProjectileDef> pv;
+	pv.reserve(pellets_);
+	pv.emplace_back(output_);
+	std::vector<ProjectileDef>::iterator newProj = pv.begin();
+	b2Vec2 origin = owner_->getPosition();
 
-	//Fire centre
-	fireCallback_(newProj);
-
+	//Set up projectile (centre)
+	newProj->origin = origin;
+	newProj->heading = heading;
+	newProj->owner = owner_;
+	
+	//Set up other projectiles
 	b2Vec2 newDir = heading;
 	float rotation = atan2f(heading.y, heading.x);
 	float adjust = 0.f;
 
 	//Thor distributions later
-	for (int i = 0; i < pellets_; ++i)
+	for (int i = 1; i < pellets_; ++i)
 	{
+		pv.emplace_back(output_);
+		newProj = --pv.end();
+
+
 		adjust = randFloat(-0.2f, 0.2f);
 		newDir.x = cosf(rotation +adjust);
 		newDir.y = sinf(rotation +adjust);
 
-		newProj.heading = newDir;
-		fireCallback_(newProj);
+		newProj->origin = origin;
+		newProj->heading = newDir;
+		newProj->owner = owner_;
 	}
+
+	fireCallback_(pv, id_);
 
 	refireTime_ = refireTimeMax_;
 }

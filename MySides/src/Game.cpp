@@ -262,11 +262,13 @@ void Game::handleInput(sf::Time dt)
 		world_->getPlayer()->testBed();
 	}
 
-	//X : Orientation testing
-	if (con_.checkPressed(XINPUT_GAMEPAD_X))
+	//X : Vibration testing
+	if (con_.checkDown(XINPUT_GAMEPAD_X))
 	{
-		//world_->controlled()->orient(b2Vec2_zero);
+		con_.setLeftVibration(con_.checkLeftTrigger() * 100);
+		con_.setRightVibration(con_.checkRightTrigger() * 100);
 
+		std::cout << con_.getLeftVibration() << std::endl;
 		if (pause_)
 		{
 			world_->resetLevel();

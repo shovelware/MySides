@@ -1,7 +1,7 @@
 #include "WeapRifle.hpp"
-	Weapon::Rifle::Rifle(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo) :
+	Weapon::Rifle::Rifle(Shape* owner, std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
 		WeaponI(owner, callback, ammo),
-		magazine_(10000)
+		magazine_(30)
 	{
 		refireTimeMAX_ = 100;
 		refireTime_ = 0;
@@ -44,15 +44,19 @@
 
 	void Weapon::Rifle::fire(b2Vec2 &heading)
 	{
+		//Set up vector
+		std::vector<ProjectileDef> pv;
+		pv.emplace_back(output_);
+		std::vector<ProjectileDef>::iterator newProj = pv.begin();
+
 		//Set up projectile
-		ProjectileDef newProj = ProjectileDef(output_);
-		newProj.origin = owner_->getPosition();
-		newProj.heading = heading;
-		newProj.owner = owner_;
+		newProj->origin = owner_->getPosition();
+		newProj->heading = heading;
+		newProj->owner = owner_;
 
 		//Fire projectile
-		fireCallback_(newProj);
-
+		fireCallback_(pv, id_);
+		
 		//Reactions:
 		magazine_.remove();
 		refireTime_ = refireTimeMAX_;
@@ -69,7 +73,7 @@
 	{
 		bool ready = false;
 
-		//If we're not cycling AND we have ammo OR aren't reloading
+		//If we're not cycling AND we have ammo AND aren't reloading
 		if (refireTime_ <= 0 && !magazine_.checkEmpty() && reloadTime_ <= 0)
 		{
 			if (output_.isValid())

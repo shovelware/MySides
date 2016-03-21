@@ -10,7 +10,7 @@
 namespace Weapon {
 	class Rifle : public WeaponI {
 	public:
-		Rifle(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo);
+		Rifle(Shape* owner, std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
 		bool canFire();
 
 		void update(int dt);

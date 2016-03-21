@@ -14,12 +14,18 @@ GameWorld::GameWorld() :
 
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
 	addSide_ = [this](SideDef& def) { addSide(def); };
+	fireWeap_ = [this](std::vector<ProjectileDef>& defs, std::string id) { fireWeapon(defs, id); };
 
 	//audio_.addBGM("spriterip", "../assets/spriterip.ogg");
 	audio_.addAFX("spriterip", "../assets/spriterip.ogg", 1, 0.2, 400, 1024);
 	audio_.addAFX("wind", "../assets/wind.ogg", 0, 1, 750, 1000);
 
-	audio_.addSFX("fire", "../assets/fire.wav", 64);
+	//Weapon noises
+	audio_.addSFX("rifle", "../assets/nsnd/bullet.wav", 64);
+	audio_.addSFX("shotgun", "../assets/nsnd/shotty.wav", 32);
+
+
+
 	audio_.addSFX("spawn", "../assets/spawn.wav", 16);
 	audio_.addSFX("die", "../assets/die.wav", 32);
 	audio_.addSFX("loss", "../assets/loss.wav", 1);
@@ -179,7 +185,7 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		newDef.size = 0.1f;
 		newDef.bounce = 1.f;
 
-		player_->arm(new Weapon::Rifle(&*player_, addProj_, newDef));
+		player_->arm(new Weapon::Shotgun(&*player_, fireWeap_, newDef));
 	}
 
 }
@@ -212,12 +218,12 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 	
 	if (coinFlip())
 	{
-		newWeap = new Weapon::Shotgun(&*added, addProj_, newDef);
+		newWeap = new Weapon::Shotgun(&*added, fireWeap_, newDef);
 	}
 	
 	else
 	{
-		newWeap = new Weapon::Rifle(&*added, addProj_, newDef);
+		newWeap = new Weapon::Rifle(&*added, fireWeap_, newDef);
 	}
 
 	added->arm(newWeap);
@@ -234,6 +240,18 @@ void GameWorld::addProjectile(const ProjectileDef& def)
 
 	//Play fire sound at fired position
 	audio_.playSFX("fire", B2toSF(def.origin, true));
+}
+
+//Fire possibly many projectiles
+void GameWorld::fireWeapon(std::vector<ProjectileDef>& defs, std::string id)
+{
+	for (std::vector<ProjectileDef>::iterator iter = defs.begin(), end = defs.end(); iter != end; ++iter)
+	{
+		addProjectile((*iter));
+	}
+
+	//Play sound at fired position
+	audio_.playSFX(id, B2toSF(defs.begin()->origin, true));
 }
 
 //Adds a side to game world via definition

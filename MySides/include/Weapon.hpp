@@ -5,6 +5,7 @@
 #define MS_WEAPON_HPP
 
 #include <stdafx.h>
+#include <vector>
 #include <functional>
 
 #include "ProjectileDef.hpp"
@@ -34,18 +35,20 @@ namespace Weapon {
 		void setSecondary(b2Color col);	//!< Sets Secondary Colour
 		void setTertiary(b2Color col);	//!< Sets Tertiary Colour 
 
+		std::string getID();
+
 		virtual bool canFire() = 0;		//!< Checks if a Weapon can fire
 
 		virtual void update(int dt) = 0;	//!< Updates weapon
 
 	protected:
-		WeaponI(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo);
+		WeaponI(Shape* owner, std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
 
 		std::string id_;
 		Shape* owner_;
 
 		ProjectileDef output_;
-		std::function<void(ProjectileDef&)> fireCallback_;
+		std::function<void(std::vector<ProjectileDef>& defs, std::string id)> fireCallback_;
 
 		virtual void fire(b2Vec2 &heading) = 0;
 	};

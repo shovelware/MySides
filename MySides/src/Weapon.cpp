@@ -1,6 +1,6 @@
 #include "Weapon.hpp"
 
-Weapon::WeaponI::WeaponI(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo) :
+Weapon::WeaponI::WeaponI(Shape* owner, std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
 		owner_(owner),
 		fireCallback_(callback),
 		output_(ProjectileDef(ammo)),

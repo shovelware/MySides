@@ -56,8 +56,11 @@ public:
 	void armShape(Shape* shape);
 	void disarmShape(Shape* shape);
 
+	void fireWeapon(std::vector<ProjectileDef>& defs, std::string id);
+
 	//And callbacks for entities
 	std::function<void(ProjectileDef&)> addProj_;	
+	std::function<void(std::vector<ProjectileDef>&, std::string)> fireWeap_;
 	std::function<void(SideDef&)> addSide_;
 	//std::function<void(ShapeDef &def)> addShape_;
 	std::function<Shape*()> getControlled_;
