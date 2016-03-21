@@ -7,6 +7,8 @@ XController::XController() :
 	controllerId_(-1)
 {
 	initButtons();
+	vibration_.wLeftMotorSpeed = 0;
+	vibration_.wRightMotorSpeed = 0;
 }
 
 //Initialises the heldtimes map with all controller buttons
@@ -252,6 +254,57 @@ float XController::getThresholdRT() const { return thresholdRT_; }
 
 #pragma endregion
 
+#pragma region Vibration
+//Adds percentage vibration to the sides
+void XController::setVibration(float left, float right)
+{
+	setLeftVibration(left);
+	setRightVibration(right);
+}
+
+void XController::setLeftVibration(float vibe)
+{
+	int leftv = fmax(0, fmin(vibe, 100));
+
+	leftv *= (float)VIBE_MAX / 100.f;
+	leftv++;
+
+	vibration_.wLeftMotorSpeed = leftv <= VIBE_MAX ? leftv : VIBE_MAX;
+}
+
+void XController::setRightVibration(float vibe)
+{
+	int rightv = fmax(0, fmin(vibe, 100));
+
+	rightv *= (float)VIBE_MAX / 100.f;
+	rightv++;
+
+	vibration_.wRightMotorSpeed = rightv <= VIBE_MAX ? rightv : VIBE_MAX;
+}
+
+float XController::getLeftVibration() const
+{
+	return (vibration_.wLeftMotorSpeed / (float)VIBE_MAX) * 100.f;
+}
+
+float XController::getRightVibration() const
+{
+	return (vibration_.wRightMotorSpeed / (float)VIBE_MAX) * 100.f;
+}
+
+void XController::stopVibration()
+{
+	vibration_.wLeftMotorSpeed = 0;
+	vibration_.wRightMotorSpeed = 0;
+	vibrate();
+}
+
+void XController::vibrate()
+{
+	XInputSetState(controllerId_, &vibration_);
+}
+#pragma endregion
+
 //Checks connection, updates controller states, returns connection state
 //Negative time indicates rollover of held time tracking, but we still want input
 //Use Case: paused game, but still have menu control
@@ -344,6 +397,8 @@ bool XController::update(int milliseconds)
 		//Trigger update
 		leftTrigger_ = (float)curState_.Gamepad.bLeftTrigger / TRIGGER_MAX;
 		rightTrigger_ = (float)curState_.Gamepad.bRightTrigger / TRIGGER_MAX;
+
+		vibrate();
 
 		//Return update success, we're still connected
 		return true;

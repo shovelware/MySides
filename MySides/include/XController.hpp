@@ -84,6 +84,15 @@ public:
 	float getThresholdLT() const;
 	float getThresholdRT() const;
 
+	//Vibration
+	void setVibration(float left, float right);
+	void setLeftVibration(float vibe);
+	void setRightVibration(float vibe);
+	float getLeftVibration() const;
+	float getRightVibration() const;
+	void stopVibration();
+	
+
 	//Update
 	bool update(int milliseconds);
 
@@ -124,8 +133,10 @@ private:
 	float leftTrigger_, rightTrigger_;
 	const BYTE TRIGGER_MAX = 255;
 
+	void vibrate();
+	XINPUT_VIBRATION vibration_;
 	//unsigned short leftVibe, rightVibe;
-	//const unsigned short VIBE_MAX = USHRT_MAX;
+	const unsigned short VIBE_MAX = USHRT_MAX;
 
 	void initButtons();
 	bool checkConnection();
