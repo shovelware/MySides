@@ -21,6 +21,7 @@ const double DR = M_PI / 180;
 class Entity {
 public:
 	Entity(b2Body * body);
+	~Entity();
 
 	virtual void setPosition(b2Vec2 position);
 	virtual void setRotation(float amount);

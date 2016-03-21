@@ -66,12 +66,6 @@
     <ClCompile Include="src\Shape.cpp">
       <Filter>Source Files\Game\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="src\Drawer.cpp">
-      <Filter>Source Files\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameDrawer.cpp">
-      <Filter>Source Files\Render</Filter>
-    </ClCompile>
     <ClCompile Include="src\Bounds.cpp">
       <Filter>Source Files\Game\Entity</Filter>
     </ClCompile>
@@ -126,6 +120,12 @@
     <ClCompile Include="src\AmbientEffect.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameRenderer.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">
@@ -146,14 +146,8 @@
     <ClInclude Include="include\Shape.hpp">
       <Filter>Header Files\Game\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="include\Drawer.hpp">
-      <Filter>Header Files\Render</Filter>
-    </ClInclude>
     <ClInclude Include="include\Bounds.hpp">
       <Filter>Header Files\Game\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameDrawer.hpp">
-      <Filter>Header Files\Render</Filter>
     </ClInclude>
     <ClInclude Include="include\Projectile.hpp">
       <Filter>Header Files\Game\Entity</Filter>
@@ -217,6 +211,12 @@
     </ClInclude>
     <ClInclude Include="include\AmbientEffect.hpp">
       <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer.hpp">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameRenderer.hpp">
+      <Filter>Header Files\Render</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -174,12 +174,12 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		ProjectileDef newDef = ProjectileDef::bulletDef();
 		newDef.velScale = 1.f;
 		newDef.lifeTime = 3000;
-		newDef.damageScale = 4.f;
+		//newDef.damageScale = 4.f;
 		newDef.hpMAX = 1.f;
 		newDef.size = 0.1f;
 		newDef.bounce = 1.f;
 
-		player_->arm(new Weapon::Shotgun(&*player_, addProj_, newDef));
+		player_->arm(new Weapon::Rifle(&*player_, addProj_, newDef));
 	}
 
 }
@@ -189,7 +189,7 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 {
 	//Push the shape into the shape vector
 	//AND add body to world with function
-	ShapeDef enem = ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
+	ShapeDef enem = ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(8, 8) + 1));
 	//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
 	enem.size = .5f;
 	enem.speedScale = .5f;
@@ -203,9 +203,10 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 	Shape* added = *(--shapes_.end());
 
 	ProjectileDef newDef = ProjectileDef::bulletDef();
-	newDef.velScale = 0.5f;
+	newDef.velScale = randFloat(0.5, 4);
 	newDef.damageScale = 1.f;
-	newDef.size = 1;
+	newDef.size = randFloat(0.1, 2.f);
+	newDef.hpMAX = randFloat(1, 3);
 
 	Weapon::WeaponI* newWeap;
 	
@@ -294,6 +295,7 @@ void GameWorld::removeSide(std::list<Side*>::iterator & s)
 	audio_.playSFX("collect", B2toSF((*s)->getPosition(), true));
 
 	DestroyBody((*s)->getBody());
+	delete(*s);
 	s = sides_.erase(s);
 
 	freesides--;
@@ -315,8 +317,9 @@ void GameWorld::resetLevel()
 	spawns_ = 1;
 
 	//Restart bgm
-	audio_.playAFX("spriterip");
-	audio_.playAFX("wind");
+	//audio_.playAFX("spriterip");
+	//audio_.playAFX("wind");
+
 	//Regenerate level somehow
 	hiSides = 0;
 	enemies = 0;
@@ -583,20 +586,20 @@ void GameWorld::update(int dt)
 		if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_ / 5)
 		{
 			//VIDOE
-			static int i = 0;
-			int num = 32;
-			
-			if (i < num)
-			{
-				b2Vec2 pos(
-					-(cos((2 * M_PI) / num * i)),
-					-(sin((2 * M_PI) / num * i)));
-
-				pos *= 20.0f;
-				//addEnemy(pos);
-			}
-
-			i++;
+			//static int i = 0;
+			//int num = 32;
+			//
+			//if (i < num)
+			//{
+			//	b2Vec2 pos(
+			//		-(cos((2 * M_PI) / num * i)),
+			//		-(sin((2 * M_PI) / num * i)));
+			//
+			//	pos *= 15.0f;
+			//	addEnemy(pos);
+			//}
+			//
+			//i++;
 			//VIDEO
 
 			//lastSpawn_ = timeInLevel_;

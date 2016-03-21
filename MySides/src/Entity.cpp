@@ -13,6 +13,10 @@ void Entity::setPosition(b2Vec2 position)
 	body_->SetTransform(position, body_->GetTransform().q.GetAngle());
 }
 
+Entity::~Entity()
+{
+}
+
 //Sets the body's rotation to passed value
 void Entity::setRotation(float rotation)
 {

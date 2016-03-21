@@ -24,8 +24,8 @@
 #include "Camera.hpp"
 
 //Rendering
-#include "Drawer.hpp"
-#include "GameDrawer.hpp"
+#include "Renderer.hpp"
+#include "GameRenderer.hpp"
 
 //////Testing
 #include <sstream>
@@ -57,7 +57,7 @@ private:
 	sf::ContextSettings contextSettings_;
 	sf::RenderWindow window_;
 	sf::Color voidCol_;
-	GameDrawer* drawer_;
+	GameRenderer* render_;
 
 	//This will be broken out into inputmanager
 	bool checkController(sf::Time dt);

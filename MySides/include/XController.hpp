@@ -20,11 +20,18 @@
 #include <map>
 #include <iterator>
 
+//! @class	XController
+//! @brief	Detects and reports Xbox Controller input using XInput
+//! @see	https://katyscode.wordpress.com/2013/08/30/xinput-tutorial-part-1-adding-gamepad-support-to-your-windows-game/
+
+
+//!	
+//!
 class XController {
 public:
 	XController();
 
-	int getPort() const;
+	int getPort() const;	//!< Gets the port the controller is connected to
 
 	//Buttons
 	bool checkDown(WORD button) const;

@@ -52,7 +52,7 @@ int Game::run()
 	srand(static_cast <unsigned> (time(0)));
 	
 	//Drawing
-	drawer_ = new GameDrawer(window_, world_);
+	render_ = new GameRenderer(window_, world_);
 	
 	//Debugdraw
 	uint32 flags = 0;
@@ -133,7 +133,7 @@ int Game::run()
 
 	//Free resources
 	delete world_;
-	delete drawer_;
+	delete render_;
 	delete lptr;
 	delete camera_;
 
@@ -398,7 +398,7 @@ void Game::render()
 	//b2Shape* x = world_->controlled()->getVertices();
 	//b2Shape::Type y = x->GetType();
 	//world_->DrawDebugData();
-	drawer_->draw();
+	render_->render();
 	camera_->drawHUD();
 	camera_->drawSpr3(world_->maxTime - world_->getTimeInLevel(), world_->enemies, world_->freesides);
 

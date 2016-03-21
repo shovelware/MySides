@@ -1,8 +1,10 @@
 #include "Weapon.hpp"
-	Weapon::WeaponI::WeaponI(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo) :
+
+Weapon::WeaponI::WeaponI(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo) :
 		owner_(owner),
 		fireCallback_(callback),
-		output_(ProjectileDef(ammo))
+		output_(ProjectileDef(ammo)),
+		id_("weapon")
 	{
 
 	}
@@ -33,3 +35,6 @@
 	void Weapon::WeaponI::setPrimary(b2Color col) { output_.colPrim = col; }
 	void Weapon::WeaponI::setSecondary(b2Color col) { output_.colSecn = col; }
 	void Weapon::WeaponI::setTertiary(b2Color col) { output_.colTert = col; }
+
+
+	std::string Weapon::WeaponI::getID() { return id_; }

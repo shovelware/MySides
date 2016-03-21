@@ -134,11 +134,11 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\Enemy.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Game.cpp" />
-    <ClCompile Include="src\GameDrawer.cpp" />
+    <ClCompile Include="src\GameRenderer.cpp" />
     <ClCompile Include="src\GameWorld.cpp" />
     <ClCompile Include="src\KeyInput.cpp" />
     <ClCompile Include="src\MySides.cpp" />
-    <ClCompile Include="src\Drawer.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\SFMLDebugDraw.cpp" />
@@ -163,11 +163,11 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\Enemy.hpp" />
     <ClInclude Include="include\Entity.hpp" />
     <ClInclude Include="include\Game.hpp" />
-    <ClInclude Include="include\GameDrawer.hpp" />
+    <ClInclude Include="include\GameRenderer.hpp" />
     <ClInclude Include="include\GameWorld.hpp" />
     <ClInclude Include="include\KeyInput.hpp" />
     <ClInclude Include="include\Log.hpp" />
-    <ClInclude Include="include\Drawer.hpp" />
+    <ClInclude Include="include\Renderer.hpp" />
     <ClInclude Include="include\Magazine.hpp" />
     <ClInclude Include="include\Player.hpp" />
     <ClInclude Include="include\Projectile.hpp" />

@@ -5,21 +5,29 @@
 
 #include "SFML/Audio.hpp"
 
-
 //!	@class	AmbientEffect
-//!	@brief	An ambient sound based on sf::Music.
-//!			Scales volume between two factors based on distance to listener.
+//!	@brief	Scales volume between two factors based on distance to listener.
 //!	@see	SoundEffect
+
+//!		An ambient sound based on sf::Music.
+//!		The sound is played at nearFactor when distance =< nearDistance,
+//!		farFactor when distance >= farDistance,
+//!		and scales between the two in between.
 
 class AmbientEffect
 {
 public:
 	AmbientEffect(std::string path, float nearFactor, float farFactor, float nearDistance, float farDistance);
 
-	void updateFactor();						//!< Updates the volume factor based on listener's position
+	//!< Updates the volume factor based on listener's position
+	//! Pulls the listener from SFML audio system, then calculates blending between both factors
+	void updateFactor();
 
-	void setVolume(float volume);				//!< Sets the base volume of the sound. This will be affected by nearFactor_ and farFactor_.
-	void setPosition(sf::Vector2f position);	//!< Sets the position of the underlying sf::Music
+	//!< Sets the base volume of the sound. This will be affected by nearFactor_ and farFactor_.
+	void setVolume(float volume);				
+	
+	//!< Sets the position of the underlying sf::Music
+	void setPosition(sf::Vector2f position);	
 
 	void play();			//!< Plays the sound from the beginning
 	void pause();			//!< Pauses the sound
@@ -33,8 +41,8 @@ public:
 	float farDistance_;		//!< Far distance, in SFML units
 
 private:
-	float volume_;			//!< The base volume of the sound
-	sf::Music ambience_;	//!< The actual music object
+	float volume_;
+	sf::Music ambience_;
 };
 
 #endif

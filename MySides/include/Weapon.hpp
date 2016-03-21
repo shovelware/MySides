@@ -9,32 +9,41 @@
 
 #include "ProjectileDef.hpp"
 
+//!	@class	Weapon
+//!	@brief	Controls firing of projectiles
+//!	@see	Projectile, ProjectileDef
+
+//!		Abstract Weapon interface that provides base functionality for
+//!		weapons such as colours, a trigger and updating.
+
 class Shape;
 
 namespace Weapon {
 	class WeaponI {
 	public:
+		void setProjectile(ProjectileDef const &pd);	//!< Sets the passed Projectile to be the Weapon's output
+		void setOwner(Shape* owner);					//!< Sets the owner of the Weapon to be a passed Shape
 
-		void setProjectile(ProjectileDef const &pd);
-		void setOwner(Shape* owner);
+		void trigger(b2Vec2 &direction);				//!< Pulls the trigger on the weapon. The only exposed piece!
 
-		void trigger(b2Vec2 &direction);
+		b2Color getPrimary() const;		//!< Gets Primary Colour 
+		b2Color getSecondary() const;	//!< Gets Secondary Colour
+		b2Color getTertiary() const;	//!< Gets Tertiary Colour 
 
-		b2Color getPrimary() const;
-		b2Color getSecondary() const;
-		b2Color getTertiary() const;
+		void setPrimary(b2Color col);	//!< Sets Primary Colour 
+		void setSecondary(b2Color col);	//!< Sets Secondary Colour
+		void setTertiary(b2Color col);	//!< Sets Tertiary Colour 
 
-		void setPrimary(b2Color col);
-		void setSecondary(b2Color col);
-		void setTertiary(b2Color col);
+		virtual bool canFire() = 0;		//!< Checks if a Weapon can fire
 
-		virtual bool canFire() = 0;
-
-		virtual void update(int dt) = 0;
+		virtual void update(int dt) = 0;	//!< Updates weapon
 
 	protected:
 		WeaponI(Shape* owner, std::function<void(ProjectileDef&)>& callback, ProjectileDef const &ammo);
+
+		std::string id_;
 		Shape* owner_;
+
 		ProjectileDef output_;
 		std::function<void(ProjectileDef&)> fireCallback_;
 

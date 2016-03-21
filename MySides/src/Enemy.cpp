@@ -41,7 +41,7 @@ void Enemy::update(int milliseconds)
 	//	}
 	//}
 
-	fire(b2Vec2_zero + body_->GetPosition());
+	//fire(b2Vec2_zero + body_->GetPosition());
 }
 
 //Only deals with the effects of this collision on this entity
