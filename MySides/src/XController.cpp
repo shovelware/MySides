@@ -258,8 +258,8 @@ float XController::getThresholdRT() const { return thresholdRT_; }
 //Adds percentage vibration to the sides
 void XController::setVibration(float left, float right)
 {
-	setLeftVibration(left);
-	setRightVibration(right);
+	setVibrationL(left);
+	setVibrationR(right);
 }
 
 void XController::setVibrationL(float vibe)

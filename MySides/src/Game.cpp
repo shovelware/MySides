@@ -265,10 +265,9 @@ void Game::handleInput(sf::Time dt)
 	//X : Vibration testing
 	if (con_.checkDown(XINPUT_GAMEPAD_X))
 	{
-		con_.setLeftVibration(con_.checkLeftTrigger() * 100);
-		con_.setRightVibration(con_.checkRightTrigger() * 100);
+		con_.setVibrationL(con_.checkLeftTrigger() * 100);
+		con_.setVibrationR(con_.checkRightTrigger() * 100);
 
-		std::cout << con_.getLeftVibration() << std::endl;
 		if (pause_)
 		{
 			world_->resetLevel();
@@ -346,6 +345,13 @@ void Game::handleInput(sf::Time dt)
 	{
 		world_->bomb();
 	}
+
+	if (!world_->getPlayer()->getWeaponReady())
+	{
+		con_.setVibrationR(40);
+	}
+
+	else con_.setVibrationR(0);
 }
 
 bool Game::checkController(sf::Time dt)
