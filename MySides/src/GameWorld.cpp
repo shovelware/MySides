@@ -185,7 +185,10 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		newDef.size = 0.1f;
 		newDef.bounce = 1.f;
 
-		player_->arm(new Weapon::Shotgun(&*player_, fireWeap_, newDef));
+		weapons_.push_back(new Weapon::Shotgun(fireWeap_, newDef));
+		Weapon::WeaponI* newWeap = (*--weapons_.end());
+
+		player_->arm(newWeap);
 	}
 
 }
@@ -209,23 +212,24 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 	Shape* added = *(--shapes_.end());
 
 	ProjectileDef newDef = ProjectileDef::bulletDef();
-	newDef.velScale = randFloat(0.5, 4);
-	newDef.damageScale = 1.f;
-	newDef.size = randFloat(0.1, 2.f);
-	newDef.hpMAX = randFloat(1, 3);
+	newDef.velScale = 0.5f;
+	newDef.damageScale = 1;
+	newDef.size = 1.f;
+	newDef.hpMAX = 1;
 
 	Weapon::WeaponI* newWeap;
 	
 	if (coinFlip())
 	{
-		newWeap = new Weapon::Shotgun(&*added, fireWeap_, newDef);
+		weapons_.push_back(new Weapon::Shotgun(fireWeap_, newDef));
 	}
 	
 	else
 	{
-		newWeap = new Weapon::Rifle(&*added, fireWeap_, newDef);
+		weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
 	}
 
+	newWeap = (*--weapons_.end());
 	added->arm(newWeap);
 
 	audio_.playSFX("spawn", B2toSF(pos, true));
@@ -237,9 +241,6 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 void GameWorld::addProjectile(const ProjectileDef& def)
 {
 	projectiles_.push_back(new Projectile(addBulletBody(def.origin), def));
-
-	//Play fire sound at fired position
-	audio_.playSFX("fire", B2toSF(def.origin, true));
 }
 
 //Fire possibly many projectiles
@@ -319,6 +320,13 @@ void GameWorld::removeSide(std::list<Side*>::iterator & s)
 	freesides--;
 }
 
+//Removes weapon from list and increments iterator, for use in loops
+void GameWorld::removeWeapon(std::list<Weapon::WeaponI*>::iterator & w)
+{
+	delete *w;
+	w = weapons_.erase(w);
+}
+
 //Resets the level
 void GameWorld::resetLevel()
 {
@@ -377,6 +385,16 @@ void GameWorld::clearWorld()
 		}
 	}
 	sides_.clear();
+
+	if (weapons_.empty() == false)
+	{
+		for (std::list<Weapon::WeaponI*>::iterator w = weapons_.begin();
+		w != weapons_.end();)
+		{
+			removeWeapon(w);
+		}
+	}
+	weapons_.clear();
 }
 
 void GameWorld::bomb()
@@ -402,6 +420,16 @@ void GameWorld::bomb()
 		}
 	}
 
+}
+
+int GameWorld::getHapticL() const
+{
+	return leftHaptic_;
+}
+
+int GameWorld::getHapticR() const
+{
+	return rightHaptic_;
 }
 
 void GameWorld::testBed()
@@ -509,6 +537,9 @@ void GameWorld::update(int dt)
 		//Step world
 		Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 		
+		//Cleanup
+		cullWeapons();
+
 		//Spr3
 		if (hasControlled())
 		{
@@ -521,6 +552,9 @@ void GameWorld::update(int dt)
 				removePlayer();
 			}
 		}
+
+		leftHaptic_ = 0;
+		rightHaptic_ = rightHaptic_ - 5 >= 0 ? rightHaptic_ - 5 : 0;
 	}
 }
 
@@ -645,6 +679,28 @@ void GameWorld::updateLevel(int dt)
 	}
 }
 
+void GameWorld::cullWeapons()
+{
+	if (weapons_.empty() == false)
+	{
+		for (std::list<Weapon::WeaponI*>::iterator weapIt = weapons_.begin();
+		weapIt != weapons_.end(); /*Don't increment here*/)
+		{
+			//Pull pointer
+			Weapon::WeaponI* weap = (*weapIt);
+			
+			//If we're not active, increment by deleting
+			if (weap->getOwner() == nullptr)
+			{
+				removeWeapon(weapIt);
+			}
+
+			//Else just increment
+			else ++weapIt;
+		}
+	}
+}
+
 bool GameWorld::getPaused() const { return pause_; }
 
 void GameWorld::pause()
@@ -670,6 +726,7 @@ void GameWorld::move(b2Vec2 direction)
 	if (controlled_ != nullptr && (direction.x != 0 || direction.y != 0))
 	{
 		controlled_->move(direction);
+		leftHaptic_ = direction.Length() * 5;
 	}
 }
 void GameWorld::fire(b2Vec2 direction)
@@ -677,13 +734,26 @@ void GameWorld::fire(b2Vec2 direction)
 	//If there's a direction to fire in
 	if (controlled_ != nullptr && (direction.x != 0 || direction.y != 0))
 	{
+		bool canfire = controlled_->getWeaponReady();
+
 		//Look in a direction
 		if (direction.Length() <= 0.75f)
 		{
 			controlled_->orient(direction);
 		}
 
-		else controlled_->fire(direction);
+
+		else
+		{
+			controlled_->fire(direction);
+		}
+
+		bool hasfire = controlled_->getWeaponReady();
+		
+		if (canfire && !hasfire)
+		{
+			rightHaptic_ = 50;
+		}
 	}
 }
 

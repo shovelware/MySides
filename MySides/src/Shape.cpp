@@ -50,7 +50,7 @@ Shape::~Shape()
 {
 	if (weapon_ != nullptr)
 	{
-		delete weapon_;
+		weapon_->setOwner(nullptr);
 	}
 }
 
@@ -299,13 +299,14 @@ void Shape::arm(Weapon::WeaponI * weapon)
 	weapon_->setPrimary(colTert_);
 	weapon_->setSecondary(colSecn_);
 	weapon_->setTertiary(colSecn_);
+	weapon_->setOwner(this);
 }
 
 void Shape::disarm()
 {
 	if (weapon_ != nullptr)
 	{
-		delete weapon_;
+		weapon_->setOwner(nullptr);
 	}
 
 	weapon_ = nullptr;

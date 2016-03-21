@@ -6,7 +6,7 @@ namespace Weapon {
 	class Shotgun : public WeaponI
 	{
 	public:
-		Shotgun(Shape* owner, std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
+		Shotgun(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
 		bool canFire();
 		void update(int dt);
 

@@ -1,12 +1,20 @@
 #include "Weapon.hpp"
 
-Weapon::WeaponI::WeaponI(Shape* owner, std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
-		owner_(owner),
+Weapon::WeaponI::WeaponI(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
+		owner_(nullptr),
 		fireCallback_(callback),
 		output_(ProjectileDef(ammo)),
 		id_("weapon")
 	{
 
+	}
+
+	void Weapon::WeaponI::trigger(b2Vec2 & direction)
+	{
+		if (canFire())
+		{
+			fire(direction);
+		}
 	}
 
 	void Weapon::WeaponI::setProjectile(ProjectileDef const &pd)
@@ -19,13 +27,7 @@ Weapon::WeaponI::WeaponI(Shape* owner, std::function<void(std::vector<Projectile
 		owner_ = owner;
 	}
 
-	void Weapon::WeaponI::trigger(b2Vec2 & direction)
-	{
-		if (canFire())
-		{
-			fire(direction);
-		}
-	}
+	Shape* Weapon::WeaponI::getOwner() const { return owner_; }
 
 
 	b2Color Weapon::WeaponI::getPrimary() const { return output_.colPrim; }

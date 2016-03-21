@@ -22,10 +22,12 @@ class Shape;
 namespace Weapon {
 	class WeaponI {
 	public:
-		void setProjectile(ProjectileDef const &pd);	//!< Sets the passed Projectile to be the Weapon's output
-		void setOwner(Shape* owner);					//!< Sets the owner of the Weapon to be a passed Shape
+		void trigger(b2Vec2 &direction);	//!< Pulls the trigger on the weapon. The only exposed piece!
 
-		void trigger(b2Vec2 &direction);				//!< Pulls the trigger on the weapon. The only exposed piece!
+		void setProjectile(ProjectileDef const &pd);	//!< Sets the passed Projectile to be the Weapon's output
+
+		void setOwner(Shape* owner);	//!< Sets the owner of the Weapon to be a passed Shape
+		Shape* getOwner() const;		//!< Gets the owner of the weapon
 
 		b2Color getPrimary() const;		//!< Gets Primary Colour 
 		b2Color getSecondary() const;	//!< Gets Secondary Colour
@@ -42,7 +44,7 @@ namespace Weapon {
 		virtual void update(int dt) = 0;	//!< Updates weapon
 
 	protected:
-		WeaponI(Shape* owner, std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
+		WeaponI(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
 
 		std::string id_;
 		Shape* owner_;

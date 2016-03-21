@@ -1,7 +1,7 @@
 #include "WeapShotgun.hpp"
 
-Weapon::Shotgun::Shotgun(Shape* owner, std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
-	WeaponI(owner, callback, ammo)
+Weapon::Shotgun::Shotgun(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
+	WeaponI(callback, ammo)
 {
 	refireTimeMax_ = 600;
 	refireTime_ = 0;
@@ -54,8 +54,7 @@ void Weapon::Shotgun::fire(b2Vec2 &heading)
 		pv.emplace_back(output_);
 		newProj = --pv.end();
 
-
-		adjust = randFloat(-0.2f, 0.2f);
+		adjust = randFloat(-0.15f, 0.15f);
 		newDir.x = cosf(rotation +adjust);
 		newDir.y = sinf(rotation +adjust);
 

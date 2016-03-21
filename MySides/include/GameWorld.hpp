@@ -65,11 +65,12 @@ public:
 	//std::function<void(ShapeDef &def)> addShape_;
 	std::function<Shape*()> getControlled_;
 
-	//Called by update
+	//Called by updates
 	void removePlayer();
 	void removeEnemy(std::list<Enemy*>::iterator& e);
 	void removeProjectile(std::list<Projectile*>::iterator& p);
 	void removeSide(std::list<Side*>::iterator& s);
+	void removeWeapon(std::list<Weapon::WeaponI*>::iterator& w);
 
 	//void loadLevel();
 	//b2Vec2 randomPos(); //On a circle, in an arc, from centre, whatever, reuse code test stuff
@@ -110,6 +111,10 @@ public:
 	bool getPaused() const;
 	void resume();
 
+	//Haptic feedback
+	int getHapticL() const;
+	int getHapticR() const;
+
 	////TEMP
 	void PutEnemy() 
 	{
@@ -137,18 +142,20 @@ public:
 
 	/////Debug
 	void testBed();
-
 private:
 	const b2Vec2 GRAVITY = b2Vec2(0, 0);
 	const int VELOCITY_ITERS = 6;
 	const int POSITION_ITERS = 2;
 	
 	bool pause_;
+	int leftHaptic_;
+	int rightHaptic_;
 
 	Player* player_;
 	std::list<Enemy*> shapes_;
 	std::list<Projectile*> projectiles_;
 	std::list<Side*> sides_;
+	std::list<Weapon::WeaponI*> weapons_;
 
 	Shape* controlled_;
 	
@@ -176,6 +183,9 @@ private:
 	void updateProjectile(int dt);
 	void updateSide(int dt);
 	void updateLevel(int dt);
+	
+	//Cleanup
+	void cullWeapons();
 
 	//SFX & Music
 	sf::Vector2f B2toSF(const b2Vec2& vec, bool scale) const;

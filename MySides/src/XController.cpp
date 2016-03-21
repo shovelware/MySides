@@ -398,6 +398,7 @@ bool XController::update(int milliseconds)
 		leftTrigger_ = (float)curState_.Gamepad.bLeftTrigger / TRIGGER_MAX;
 		rightTrigger_ = (float)curState_.Gamepad.bRightTrigger / TRIGGER_MAX;
 
+		//Apply vibration
 		vibrate();
 
 		//Return update success, we're still connected

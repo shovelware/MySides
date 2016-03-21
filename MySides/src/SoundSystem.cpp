@@ -144,7 +144,7 @@ void SoundSystem::addSFX(std::string name, std::string path, unsigned int voices
 	if (!checkSFX(name))
 	{
 		sfx_.emplace(name, new SoundEffect(path, voices));
-		sfx_.at(name)->setMinDistance(16);
+		sfx_.at(name)->setMinDistance(64);
 	}
 }
 

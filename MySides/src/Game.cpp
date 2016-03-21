@@ -367,8 +367,15 @@ void Game::update(sf::Time dt)
 {
 	if (!pause_)
 	{
+		con_.setVibrationL(world_->getHapticL());
+		con_.setVibrationR(world_->getHapticR());
 		camera_->update(dt.asMilliseconds());
 		world_->update(dt.asMilliseconds());
+	}
+
+	else
+	{
+		con_.stopVibration();
 	}
 
 	camera_->setTarget(world_->getControlled());
