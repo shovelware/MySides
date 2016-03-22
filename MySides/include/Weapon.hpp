@@ -8,6 +8,8 @@
 #include <vector>
 #include <functional>
 
+#include <Box2D\Common\b2Draw.h>
+
 #include "ProjectileDef.hpp"
 
 //!	@class	Weapon

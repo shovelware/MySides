@@ -2,7 +2,7 @@
 #define MS_PROJDEF_H
 
 #include <stdafx.h>
-#include <Box2D\Box2D.h>
+#include <Box2D\Common\b2Math.h>
 
 class Entity;
 

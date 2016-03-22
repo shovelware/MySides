@@ -22,18 +22,21 @@
 #include "Projectile.hpp"
 #include "Side.hpp"
 
+
 #include "Player.hpp"
 #include "Enemy.hpp"
 
 #include "ShapeDef.hpp"
 #include "SideDef.hpp"
+#include "PickupDef.hpp"
+
+#include "Pickup.hpp"
 
 #include "Weapon.hpp"
 #include "WeapRifle.hpp"
 #include "WeapShotgun.hpp"
 
 #include "SoundSystem.hpp"
-
 
 class GameWorld : protected b2World {
 public:
@@ -52,6 +55,7 @@ public:
 	void addEnemy(const ShapeDef& def);
 	void addProjectile(const ProjectileDef& def);
 	void addSide(const SideDef& def);
+	void addPickup(const PickupDef& def);
 
 	void armShape(Shape* shape);
 	void disarmShape(Shape* shape);
@@ -71,6 +75,7 @@ public:
 	void removeProjectile(std::list<Projectile*>::iterator& p);
 	void removeSide(std::list<Side*>::iterator& s);
 	void removeWeapon(std::list<Weapon::WeaponI*>::iterator& w);
+	void removePickup(std::list<Pickup::PickupI*>::iterator& p);
 
 	//void loadLevel();
 	//b2Vec2 randomPos(); //On a circle, in an arc, from centre, whatever, reuse code test stuff
@@ -98,12 +103,13 @@ public:
 	void DrawDebugData();
 
 
-	//Return a reference to shapes, bounds, projectiles for drawing
+	//Return a reference to lists for drawing
 	Bounds* getBounds();
 	Shape* getPlayer();
 	std::list<Enemy*>& getShapes();
 	std::list<Projectile*>& getProjectiles();
 	std::list<Side*>& getSides();
+	std::list<Pickup::PickupI*>& getPickups();
 
 	//Update & Pause
 	void update(int dt);
@@ -156,6 +162,7 @@ private:
 	std::list<Projectile*> projectiles_;
 	std::list<Side*> sides_;
 	std::list<Weapon::WeaponI*> weapons_;
+	std::list<Pickup::PickupI*> pickups_;
 
 	Shape* controlled_;
 	
@@ -182,6 +189,7 @@ private:
 	void updateEnemy(int dt);
 	void updateProjectile(int dt);
 	void updateSide(int dt);
+	void updatePickup(int dt);
 	void updateLevel(int dt);
 	
 	//Cleanup

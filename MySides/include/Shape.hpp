@@ -14,6 +14,11 @@
 #include "Weapon.hpp"
 #include "SideDef.hpp"
 
+#define _USE_MATH_DEFINES
+#include "math.h"
+const double RD = 180 / M_PI;
+const double DR = M_PI / 180;
+
 namespace traits{
 	namespace speed 
 	{

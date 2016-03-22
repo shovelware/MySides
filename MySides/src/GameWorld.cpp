@@ -243,6 +243,39 @@ void GameWorld::addProjectile(const ProjectileDef& def)
 	projectiles_.push_back(new Projectile(addBulletBody(def.origin), def));
 }
 
+//Adds a side to game world via definition
+void GameWorld::addSide(const SideDef& def)
+{
+	sides_.push_back(new Side(addDynamicBody(def.position), def));
+	
+	audio_.playSFX("drop", B2toSF(def.position, true));
+
+	freesides++;
+}
+
+void GameWorld::addPickup(const PickupDef& def)
+{
+	switch (def.type)
+	{
+	case Pickup::Type::SIGHT:
+		//pickups_.push_back(new Pickup::Sight(addDynamicBody(position), def))
+		break;
+
+	case Pickup::Type::SHIELD:
+		//pickups_.push_back(new Pickup::Shield(addDynamicBody(position), def))
+		break;
+
+	case Pickup::Type::ATTRACT:
+		//pickups_.push_back(new Pickup::Attractor(addDynamicBody(position), def))
+		break;
+
+	case Pickup::Type::WEAPON:
+		break;
+	}
+
+	//audio_.playSFX(of some sort)
+}
+
 //Fire possibly many projectiles
 void GameWorld::fireWeapon(std::vector<ProjectileDef>& defs, std::string id)
 {
@@ -253,16 +286,6 @@ void GameWorld::fireWeapon(std::vector<ProjectileDef>& defs, std::string id)
 
 	//Play sound at fired position
 	audio_.playSFX(id, B2toSF(defs.begin()->origin, true));
-}
-
-//Adds a side to game world via definition
-void GameWorld::addSide(const SideDef& def)
-{
-	sides_.push_back(new Side(addDynamicBody(def.position), def));
-	
-	audio_.playSFX("drop", B2toSF(def.position, true));
-
-	freesides++;
 }
 
 //Removes the player from the game world
@@ -309,7 +332,7 @@ void GameWorld::removeProjectile(std::list<Projectile*>::iterator& p)
 }
 
 //Removes side from the world and increments iterator, for use within loops
-void GameWorld::removeSide(std::list<Side*>::iterator & s)
+void GameWorld::removeSide(std::list<Side*>::iterator& s)
 {
 	audio_.playSFX("collect", B2toSF((*s)->getPosition(), true));
 
@@ -321,10 +344,16 @@ void GameWorld::removeSide(std::list<Side*>::iterator & s)
 }
 
 //Removes weapon from list and increments iterator, for use in loops
-void GameWorld::removeWeapon(std::list<Weapon::WeaponI*>::iterator & w)
+void GameWorld::removeWeapon(std::list<Weapon::WeaponI*>::iterator& w)
 {
 	delete *w;
 	w = weapons_.erase(w);
+}
+
+void GameWorld::removePickup(std::list<Pickup::PickupI*>::iterator& p)
+{
+	delete *p;
+	p = pickups_.erase(p);
 }
 
 //Resets the level
@@ -395,6 +424,16 @@ void GameWorld::clearWorld()
 		}
 	}
 	weapons_.clear();
+
+	if (pickups_.empty() == false)
+	{
+		for (std::list<Pickup::PickupI*>::iterator p = pickups_.begin();
+		p != pickups_.end();)
+		{
+			removePickup(p);
+		}
+	}
+	pickups_.clear();
 }
 
 void GameWorld::bomb()
@@ -513,6 +552,7 @@ Shape* GameWorld::getPlayer() { return player_; }
 std::list<Enemy*>& GameWorld::getShapes() {	return shapes_; }
 std::list<Projectile*>& GameWorld::getProjectiles() { return projectiles_; }
 std::list<Side*>& GameWorld::getSides() { return sides_; }
+std::list<Pickup::PickupI*>& GameWorld::getPickups() { return pickups_; }
 
 //Update entity code and step the world
 void GameWorld::update(int dt)
@@ -656,6 +696,31 @@ void GameWorld::updateSide(int dt)
 
 			//Else just increment
 			else ++sideIt;
+		}
+	}
+}
+
+void GameWorld::updatePickup(int dt)
+{
+	if (pickups_.empty() == false)
+	{
+		for (std::list<Pickup::PickupI*>::iterator pickIt = pickups_.begin();
+		pickIt != pickups_.end(); /*Don't increment here*/)
+		{
+			//Pull pointer from it for readability
+			Pickup::PickupI* pick = (*pickIt);
+
+			pick->update(dt);
+			popInside(pick);
+
+			//If we're not owned and have been collected, we're done, increment by deleting
+			if (pick->getCollected() == true && pick->getOwner() == nullptr)
+			{
+				removePickup(pickIt);
+			}
+
+			//Else just increment
+			else ++pickIt;
 		}
 	}
 }

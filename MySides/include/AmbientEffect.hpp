@@ -17,16 +17,18 @@
 class AmbientEffect
 {
 public:
+	//! Test
 	AmbientEffect(std::string path, float nearFactor, float farFactor, float nearDistance, float farDistance);
 
-	//!< Updates the volume factor based on listener's position
+	//! Updates the volume factor based on listener's position
 	//! Pulls the listener from SFML audio system, then calculates blending between both factors
+	//!
 	void updateFactor();
 
-	//!< Sets the base volume of the sound. This will be affected by nearFactor_ and farFactor_.
+	//! Sets the base volume of the sound. This will be affected by nearFactor_ and farFactor_.
 	void setVolume(float volume);				
 	
-	//!< Sets the position of the underlying sf::Music
+	//! Sets the position of the underlying sf::Music
 	void setPosition(sf::Vector2f position);	
 
 	void play();			//!< Plays the sound from the beginning

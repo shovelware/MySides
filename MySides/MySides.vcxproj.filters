@@ -52,6 +52,12 @@
     <Filter Include="Source Files\Audio">
       <UniqueIdentifier>{9875d0da-05c7-477b-9b54-8cb4dba03352}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game\Entity\Pickup">
+      <UniqueIdentifier>{ad250c8d-0cca-44aa-9c0f-9a9a9daab75d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Pickup">
+      <UniqueIdentifier>{0692f418-456b-4bc1-877b-e6266736ab42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entity.cpp">
@@ -125,6 +131,9 @@
     </ClCompile>
     <ClCompile Include="src\GameRenderer.cpp">
       <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Pickup.cpp">
+      <Filter>Source Files\Game\Pickup</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -217,6 +226,12 @@
     </ClInclude>
     <ClInclude Include="include\GameRenderer.hpp">
       <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Pickup.hpp">
+      <Filter>Header Files\Game\Entity\Pickup</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PickupDef.hpp">
+      <Filter>Header Files\Game\Entity\Def</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

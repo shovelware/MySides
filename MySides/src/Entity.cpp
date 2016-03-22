@@ -83,12 +83,3 @@ bool Entity::collide(Entity * other, b2Contact& contact)
 {
 	return false;
 }
-
-////Gets points of body's first fixture, assumes polygon. Override if necessary
-//b2Shape& Entity::getVertices()
-//{
-//	b2PolygonShape* poly = (b2PolygonShape*)(body_->GetFixtureList()->GetShape());
-//	b2Shape* b = body_->GetFixtureList()->GetShape();
-//	
-//	return poly;
-//}

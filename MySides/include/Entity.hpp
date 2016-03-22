@@ -1,41 +1,33 @@
-// Entity.hpp
-// Base entity class, includes movement functions, body, active and alive status
-// Children: Shape, Projectile, Bounds Side, //Obstacle
-
 #ifndef MS_ENTITY_HPP
 #define MS_ENTITY_HPP
 
 #include <stdafx.h>
 #include <Box2D\Box2D.h>
 
-//#include "GameDrawer.hpp"
+//!	@class	Entity
+//!	@brief	Base Game Entity class
 
-//Forward declaration for collision
-
-//Using pi to convert deg <-> rad //DO I NEED THIS?
-#define _USE_MATH_DEFINES
-#include "math.h"
-const double RD = 180 / M_PI;
-const double DR = M_PI / 180;
+//!		Base class includes box2d body, active and alive status,
+//!		movement and rotation, collision hooks and colours.
 
 class Entity {
 public:
 	Entity(b2Body * body);
 	~Entity();
 
-	virtual void setPosition(b2Vec2 position);
-	virtual void setRotation(float amount);
+	virtual void setPosition(b2Vec2 position);	//!< Directly sets position of b2Body
+	virtual void setRotation(float amount);		//!< Directly sets rotation of b2Body
 
-	b2Vec2 getPosition() const;
-	float getRotation() const;
+	b2Vec2 getPosition() const;	//!< Gets position of b2Body
+	float getRotation() const;	//!< Gets rotation of b2Body
 
-	b2Body * getBody();
+	b2Body * getBody();	//!< Gets a pointer to attached b2Body
 
-	bool getAlive() const;
-	bool getActive() const;
+	bool getAlive() const;	//!< Gets alive status
+	bool getActive() const;	//!< Gets active status
 
-	void setAlive(bool a);
-	void setActive(bool a);
+	void setAlive(bool a);	//!< Sets alive status
+	void setActive(bool a);	//!< Sets active status
 
 	b2Color getPrimary() const;
 	b2Color getSecondary() const;
@@ -47,26 +39,17 @@ public:
 
 	virtual void kill();
 
-	virtual bool collide(Entity* other, b2Contact& contact);
-	
-	//virtual void draw(GameDrawer d) = 0;
-
-	/*b2Shape& getVertices();*/
-
+	virtual bool collide(Entity* other, b2Contact& contact); //!< Collision with other entities. 
 protected:
 	b2Body * body_;
 
 	bool alive_;
 	bool active_;
 
-	//Colors
 	b2Color colPrim_;
 	b2Color colSecn_;
 	b2Color colTert_;
 private:
 };
-
-//Entities know about children for collision handling
-//Ask Alex how to do this better
 
 #endif
