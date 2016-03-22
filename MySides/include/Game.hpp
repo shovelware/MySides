@@ -59,13 +59,12 @@ private:
 	sf::Color voidCol_;
 	GameRenderer* render_;
 
-	//This will be broken out into inputmanager
+	//Input management
 	bool checkController(sf::Time dt);
 	XController con_;
 	
 	//Keyboard
 	KeyInput key_;
-
 
 	//Game world 
 	GameWorld* world_;
@@ -75,6 +74,8 @@ private:
 
 	//DebugDraw
 	SFMLDebugDraw dd_;
+
+	bool haptics_;
 
 	//Testing
 

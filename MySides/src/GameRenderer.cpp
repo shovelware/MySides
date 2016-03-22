@@ -64,6 +64,12 @@ void GameRenderer::render()
 		drawShape(player);
 	}
 
+	std::list<Pickup::PickupI*>& pickups = world_->getPickups();
+	for (Pickup::PickupI* pic : pickups)
+	{
+		drawPickup(pic);
+	}
+
 }
 
 void GameRenderer::drawShape(Shape* const s)
@@ -165,7 +171,7 @@ void GameRenderer::drawBounds(Bounds* const b)
 
 	//Draw stuff
 	//Draw base polygon
-	drawPolygon(verts, count, pri, ter);
+	drawPolygon(verts, count, sec, ter);
 
 	//Draw other layers, getting smaller
 	for (int l = 0; l <= layers - 1; ++l)
@@ -175,11 +181,11 @@ void GameRenderer::drawBounds(Bounds* const b)
 			subVerts[v] *= 0.9f;
 		}
 
-		drawPolygon(subVerts, count, (blend(sec, l + 1, pri, layers - 2)), tweakAlpha(ter, l* 4), 0);
+		drawPolygon(subVerts, count, (blend(pri, l + 1, sec, layers - 2)), tweakAlpha(ter, l* 4), 0);
 	}
 
 	//Centre circle
-	drawCircle(pos, 1, ter, pri, 0);
+	drawCircle(pos, 1, ter, sec, 0);
 
 	//Clean up
 	delete[] verts;
@@ -238,6 +244,34 @@ void GameRenderer::drawSide(Side* const s)
 	drawLine(a, b, pri);
 	drawCircle(pos, thor::length(dir), tweakAlpha(pri, 16), tweakAlpha(sec, 32));
 	//drawCircle(pos, length, sec, pri, 0);
+}
+
+void GameRenderer::drawPickup(Pickup::PickupI * const p)
+{
+	//if (p->getCollected() == false)
+	{
+		b2Body* body = p->getBody();
+
+		sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
+		sf::Vector2f vel = B2toSF(body->GetLinearVelocity(), true);
+		vel *= (float)_SCALE_;
+
+		sf::Color pri = B2toSF(p->getPrimary());
+		sf::Color sec = B2toSF(p->getSecondary());
+		sf::Color ter = B2toSF(p->getTertiary());
+
+		//This will cause problems once projectiles stop being only circles
+		b2CircleShape* shape = static_cast<b2CircleShape*>(p->getBody()->GetFixtureList()->GetShape());
+		float rad = shape->m_radius * _SCALE_;
+
+		drawCircle(pos, rad, pri, sec);
+	}
+
+	//else
+	{
+		//Static cast to each type, then draw
+	}
+
 }
 
 /*GameRenderer::DrawShape(const &Shape s)

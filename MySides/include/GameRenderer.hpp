@@ -27,6 +27,7 @@ private:
 	void drawBounds(Bounds* const b);
 	void drawProjectile(Projectile* const p);
 	void drawSide(Side* const s);
+	void drawPickup(Pickup::PickupI* const p);
 };
 
 #endif

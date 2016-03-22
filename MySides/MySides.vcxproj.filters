@@ -135,6 +135,9 @@
     <ClCompile Include="src\Pickup.cpp">
       <Filter>Source Files\Game\Pickup</Filter>
     </ClCompile>
+    <ClCompile Include="src\Sight.cpp">
+      <Filter>Source Files\Game\Pickup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">
@@ -232,6 +235,9 @@
     </ClInclude>
     <ClInclude Include="include\PickupDef.hpp">
       <Filter>Header Files\Game\Entity\Def</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Sight.hpp">
+      <Filter>Header Files\Game\Entity\Pickup</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

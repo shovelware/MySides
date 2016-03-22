@@ -161,9 +161,13 @@ void GameWorld::spawnEnemy()
 void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 {
 	ShapeDef play = ShapeDef(pos, b2Vec2_zero, 5);
-	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
-	play.colSecn = b2Color(0.f, 1.f, 1.f);
-	play.colTert = b2Color(1.f, 0.f, 0.f);
+	//play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
+	//play.colSecn = b2Color(0.f, 1.f, 1.f);
+	//play.colTert = b2Color(1.f, 0.f, 0.f);
+
+	play.colPrim = b2Color(1.f, 0.f, 0.f);
+	play.colSecn = b2Color(0.f, 1.f, 0.f);
+	play.colTert = b2Color(0.f, 0.f, 1.f);
 
 	if (player_ != nullptr)
 	{
@@ -182,7 +186,7 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		newDef.lifeTime = 3000;
 		//newDef.damageScale = 4.f;
 		newDef.hpMAX = 1.f;
-		newDef.size = 0.1f;
+		newDef.size = 1.f;
 		newDef.bounce = 1.f;
 
 		weapons_.push_back(new Weapon::Shotgun(fireWeap_, newDef));
@@ -198,7 +202,7 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 {
 	//Push the shape into the shape vector
 	//AND add body to world with function
-	ShapeDef enem = ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(8, 8) + 1));
+	ShapeDef enem = ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
 	//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
 	enem.size = .5f;
 	enem.speedScale = .5f;
@@ -216,6 +220,7 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 	newDef.damageScale = 1;
 	newDef.size = 1.f;
 	newDef.hpMAX = 1;
+	newDef.lifeTime = 100;
 
 	Weapon::WeaponI* newWeap;
 	
@@ -257,19 +262,19 @@ void GameWorld::addPickup(const PickupDef& def)
 {
 	switch (def.type)
 	{
-	case Pickup::Type::SIGHT:
-		//pickups_.push_back(new Pickup::Sight(addDynamicBody(position), def))
+	case PickupDef::Type::SIGHT:
+		pickups_.push_back(new Pickup::Sight(addDynamicBody(def.position), def));
 		break;
 
-	case Pickup::Type::SHIELD:
-		//pickups_.push_back(new Pickup::Shield(addDynamicBody(position), def))
+	case PickupDef::Type::SHIELD:
+		//pickups_.push_back(new Pickup::Shield(addDynamicBody(def.position), def));
 		break;
 
-	case Pickup::Type::ATTRACT:
-		//pickups_.push_back(new Pickup::Attractor(addDynamicBody(position), def))
+	case PickupDef::Type::ATTRACT:
+		//pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), def))
 		break;
 
-	case Pickup::Type::WEAPON:
+	case PickupDef::Type::WEAPON:
 		break;
 	}
 
@@ -302,6 +307,7 @@ void GameWorld::removePlayer()
 		audio_.playSFX("loss", B2toSF(player_->getPosition(), true));
 
 		DestroyBody(player_->getBody());
+		cleanPickups(player_);
 
 		delete player_;
 		player_ = nullptr;
@@ -316,6 +322,8 @@ void GameWorld::removeEnemy(std::list<Enemy*>::iterator& e)
 
 	//Delete enemy
 	DestroyBody((*e)->getBody());
+	cleanPickups((*e));
+
 	delete (*e);
 	e = shapes_.erase(e);
 
@@ -352,6 +360,7 @@ void GameWorld::removeWeapon(std::list<Weapon::WeaponI*>::iterator& w)
 
 void GameWorld::removePickup(std::list<Pickup::PickupI*>::iterator& p)
 {
+	DestroyBody((*p)->getBody());
 	delete *p;
 	p = pickups_.erase(p);
 }
@@ -363,7 +372,7 @@ void GameWorld::resetLevel()
 	clearWorld();
 	timeInLevel_ = 0;
 	lastSpawn_ = 0;
-	spawnTime_ = 5000;
+	spawnTime_ = 15000;
 
 	//Add a new player
 	addPlayer(b2Vec2_zero, true);
@@ -473,8 +482,9 @@ int GameWorld::getHapticR() const
 
 void GameWorld::testBed()
 {
-	randomiseCol(bounds_);
-	//audio_.pauseBGM();
+	addPickup(PickupDef(PickupDef::Type::SIGHT, b2Vec2(0, 0), 10, 10, 5000));
+	
+	//randomiseCol(bounds_);
 }
 
 //Returns the radius of the level bounds
@@ -559,22 +569,13 @@ void GameWorld::update(int dt)
 {
 	if (!pause_)
 	{
-		//Players update first
 		updatePlayer(dt);
-
-		//Update Shapes
 		updateEnemy(dt);
-
-		//Update projectiles
 		updateProjectile(dt);
-
-		//Update Sides
 		updateSide(dt);
-
-		//Update level
+		updatePickup(dt);
 		updateLevel(dt);
 
-		//Step world
 		Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 		
 		//Cleanup
@@ -711,7 +712,12 @@ void GameWorld::updatePickup(int dt)
 			Pickup::PickupI* pick = (*pickIt);
 
 			pick->update(dt);
-			popInside(pick);
+			
+			//If we're a free pickup, keep us inside
+			if (pick->getCollected() == false)
+			{
+				popInside(pick);
+			}
 
 			//If we're not owned and have been collected, we're done, increment by deleting
 			if (pick->getCollected() == true && pick->getOwner() == nullptr)
@@ -762,6 +768,25 @@ void GameWorld::cullWeapons()
 
 			//Else just increment
 			else ++weapIt;
+		}
+	}
+}
+
+void GameWorld::cleanPickups(Shape* shape)
+{
+	if (pickups_.empty() == false)
+	{
+		for (std::list<Pickup::PickupI*>::iterator pickIt = pickups_.begin();
+		pickIt != pickups_.end(); /*Don't increment here*/)
+		{
+			Pickup::PickupI* pick = (*pickIt);
+
+			if (pick->getOwner() == shape)
+			{
+				pick->setOwner(nullptr);
+			}
+
+			++pickIt;
 		}
 	}
 }

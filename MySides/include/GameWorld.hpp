@@ -31,6 +31,7 @@
 #include "PickupDef.hpp"
 
 #include "Pickup.hpp"
+#include "Sight.hpp"
 
 #include "Weapon.hpp"
 #include "WeapRifle.hpp"
@@ -194,6 +195,7 @@ private:
 	
 	//Cleanup
 	void cullWeapons();
+	void cleanPickups(Shape* shape);
 
 	//SFX & Music
 	sf::Vector2f B2toSF(const b2Vec2& vec, bool scale) const;

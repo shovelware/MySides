@@ -16,7 +16,8 @@ Game::Game() :
 	quit_(false),
 	fullscreen_(false),
 	dd_(window_),
-	voidCol_(64,64,64)
+	voidCol_(64,64,64),
+	haptics_(true)
 {
 }
 
@@ -367,8 +368,12 @@ void Game::update(sf::Time dt)
 {
 	if (!pause_)
 	{
-		con_.setVibrationL(world_->getHapticL());
-		con_.setVibrationR(world_->getHapticR());
+		if (haptics_)
+		{
+			con_.setVibrationL(world_->getHapticL());
+			con_.setVibrationR(world_->getHapticR());
+		}
+
 		camera_->update(dt.asMilliseconds());
 		world_->update(dt.asMilliseconds());
 	}
@@ -405,8 +410,8 @@ void Game::render()
 
 	//b2Shape* x = world_->controlled()->getVertices();
 	//b2Shape::Type y = x->GetType();
-	//world_->DrawDebugData();
 	render_->render();
+	//world_->DrawDebugData();
 	camera_->drawHUD();
 	camera_->drawSpr3(world_->maxTime - world_->getTimeInLevel(), world_->enemies, world_->freesides);
 

@@ -28,9 +28,8 @@ Bounds::Bounds(b2Body* body, float radius) :
 	circ.m_radius = radius;
 	frictionDef_.shape = &circ;
 
-
-	colPrim_ = b2Color(.75f, .75f, .75f);
-	colSecn_ = b2Color(0.f, 1.f, 0.f);
+	colPrim_ = b2Color(0.f, 0.f, 0.5f);
+	colSecn_ = b2Color(.75f, .75f, .75f);
 	colTert_ = b2Color(0.f, 0.f, 0.f);
 
 	//Create and add fixture using body's factory

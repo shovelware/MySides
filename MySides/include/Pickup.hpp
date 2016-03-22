@@ -13,16 +13,9 @@
 
 namespace Pickup
 {
-	enum Type {
-		SIGHT,
-		SHIELD,
-		ATTRACT,
-		WEAPON
-	};
-
 	class PickupI : public Entity {
 	public:
-		virtual void update(int milliseconds) = 0;
+		virtual void update(int milliseconds);
 
 		void setOwner(Shape* o);
 
@@ -31,12 +24,14 @@ namespace Pickup
 
 
 	protected:
-		PickupI(b2Body* body);
+		PickupI(b2Body* body, int time);
 		virtual void onCollect() = 0;
 
 		Shape* owner_;
 
 		bool collected_;
+
+		int time_;
 	};
 }
 	

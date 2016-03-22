@@ -19,35 +19,6 @@
 const double RD = 180 / M_PI;
 const double DR = M_PI / 180;
 
-namespace traits{
-	namespace speed 
-	{
-		/*
-	SLOWEST
-	SLOWER
-	SLOW
-	NORMAL
-	FAST
-	FASTER
-	FASTEST
-	*/
-	}
-
-	enum type {
-		ANGLE,
-
-		TRI_ISO,
-		TRI_EQU,
-
-		SQU_EQU,
-		SQU_RHO,
-		SQU_REC,
-		SQU_TRA,
-
-		PEN_EQU
-	};
-}
-
 class Shape : public Entity {
 public:
 	Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& callback);
@@ -117,7 +88,6 @@ protected:
 	float size_;
 
 	int sides_; //Currency
-	//int type_; //Possibly type enum
 };
 
 #endif

@@ -145,6 +145,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\SFMLDebugDraw.cpp" />
     <ClCompile Include="src\Shape.cpp" />
     <ClCompile Include="src\Side.cpp" />
+    <ClCompile Include="src\Sight.cpp" />
     <ClCompile Include="src\SoundEffect.cpp" />
     <ClCompile Include="src\SoundSystem.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
@@ -180,6 +181,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\ShapeDef.hpp" />
     <ClInclude Include="include\Side.hpp" />
     <ClInclude Include="include\SideDef.hpp" />
+    <ClInclude Include="include\Sight.hpp" />
     <ClInclude Include="include\SoundEffect.hpp" />
     <ClInclude Include="include\SoundSystem.hpp" />
     <ClInclude Include="include\stdafx.h" />

@@ -22,8 +22,7 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 	shapeVertices_ = def.vertices;
 	
 	//Corrections
-	shapeVertices_ = (shapeVertices_ > 0 ? shapeVertices_ : 3);
-	shapeVertices_ = (shapeVertices_ < 9 ? shapeVertices_ : 8);
+	shapeVertices_ = fmax(3, fmin(shapeVertices_, 8));
 	vertices_ = shapeVertices_;
 
 	setPoly(vertices_, size_);

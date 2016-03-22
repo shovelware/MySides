@@ -4,15 +4,15 @@
 #include <stdafx.h>
 #include <Box2D\Common\b2Math.h>
 
+
+class PickupDef {
+public:
 enum Type {
 	SIGHT,
 	SHIELD,
 	ATTRACT,
 	WEAPON
 };
-
-class PickupDef {
-public:
 	PickupDef() :
 		type(Type::SHIELD),
 		position(b2Vec2_zero),
