@@ -19,10 +19,21 @@ void Pickup::Shield::onCollect()
 	b2FixtureDef def;
 	def.userData = "pickup";
 
-	def.density = 1.0f;
+	def.density = 0.f;
 	def.friction = 0.8f;
 	def.restitution = 1.f;
-	def.isSensor = true;
+	def.isSensor = false;
+
+	b2RevoluteJointDef rev;
+	rev.localAnchorA = b2Vec2(0, 0);
+	rev.localAnchorB = b2Vec2(0, 0);
+
+	rev.bodyA = body_;
+	rev.bodyB = owner_->getBody();
+
+	rev.collideConnected = false;
+
+	body_->GetWorld()->CreateJoint(&rev);
 
 	b2CircleShape shape;
 	shape.m_radius = radius_;
@@ -62,7 +73,10 @@ bool Pickup::Shield::collide(Entity* other, b2Contact& contact)
 			if (proj->getOwner() != owner_)
 			{
 				takeDamage(proj->getDamage());
+				std::cout << "dmg" << std::endl;
 			}
+
+			else contact.SetEnabled(false);
 		}
 
 		//Contacts for my projectiles, and all projectiles when not collected
@@ -107,6 +121,8 @@ void Pickup::Shield::update(int milliseconds)
 		if (hp_ <= 0)
 		{
 			owner_ = nullptr;
+			body_->GetFixtureList()->SetSensor(true);
+			body_->GetWorld()->DestroyJoint(body_->GetJointList()->joint);
 		}
 	}
 
