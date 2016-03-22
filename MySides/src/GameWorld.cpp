@@ -220,7 +220,7 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 	newDef.damageScale = 1;
 	newDef.size = 1.f;
 	newDef.hpMAX = 1;
-	newDef.lifeTime = 100;
+	//newDef.lifeTime = 100;
 
 	Weapon::WeaponI* newWeap;
 	
@@ -267,7 +267,7 @@ void GameWorld::addPickup(const PickupDef& def)
 		break;
 
 	case PickupDef::Type::SHIELD:
-		//pickups_.push_back(new Pickup::Shield(addDynamicBody(def.position), def));
+		pickups_.push_back(new Pickup::Shield(addDynamicBody(def.position), def));
 		break;
 
 	case PickupDef::Type::ATTRACT:
@@ -482,7 +482,7 @@ int GameWorld::getHapticR() const
 
 void GameWorld::testBed()
 {
-	addPickup(PickupDef(PickupDef::Type::SIGHT, b2Vec2(0, 0), 10, 10, 10000));
+	addPickup(PickupDef(PickupDef::Type::SHIELD, b2Vec2(0, 0), 10, 2.5, 10000));
 	
 	//randomiseCol(bounds_);
 }

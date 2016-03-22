@@ -58,17 +58,18 @@ void GameRenderer::render()
 		drawShape(shp);
 	}
 
+	Shape* player = world_->getPlayer();
+	if (player != nullptr)
+	{
+		drawShape(player);
+	}
+
 	std::list<Pickup::PickupI*>& pickups = world_->getPickups();
 	for (Pickup::PickupI* pic : pickups)
 	{
 		drawPickup(pic);
 	}
 
-	Shape* player = world_->getPlayer();
-	if (player != nullptr)
-	{
-		drawShape(player);
-	}
 }
 
 void GameRenderer::drawShape(Shape* const s)
@@ -282,6 +283,22 @@ void GameRenderer::drawPickup(Pickup::PickupI * const p)
 			//drawLine(beg, mid, pri);
 			//drawLine(mid, end, sec);
 			drawLine(beg, end, tweakAlpha(sec, 128));
+		}
+
+		if (Pickup::Shield* s = dynamic_cast<Pickup::Shield*>(p))
+		{
+			b2Body* body = p->getBody();
+
+			sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
+
+			sf::Color pri = B2toSF(p->getPrimary());
+			sf::Color sec = B2toSF(p->getSecondary());
+			sf::Color ter = B2toSF(p->getTertiary());
+
+			b2CircleShape* shape = static_cast<b2CircleShape*>(p->getBody()->GetFixtureList()->GetShape());
+			float rad = shape->m_radius * _SCALE_;
+
+			drawCircle(pos, rad, tweakAlpha(pri,128), tweakAlpha(sec, 128));
 		}
 	}
 
