@@ -5,19 +5,19 @@ Pickup::Sight::Sight(b2Body* body, const PickupDef& def) :
 	size_(def.size),
 	strength_(def.strength)
 {
-	//Body is initially made by pickup
+	//Body is initially made by pickup base class
 }
 
 void Pickup::Sight::onCollect()
 {
-	//remake box2d
-	collected_ = true;
+	body_->DestroyFixture(body_->GetFixtureList());
 
+	collected_ = true;
 }
 
 bool Pickup::Sight::collide(Entity* other, b2Contact& contact)
 {
-	//if !collected_ && shape:  owner = shape, oncollect;
+	
 	bool handled = false;
 
 	if (Shape* shape = dynamic_cast<Shape*>(other))
@@ -25,7 +25,6 @@ bool Pickup::Sight::collide(Entity* other, b2Contact& contact)
 		if (!collected_)
 		{
 			setOwner(shape);
-			onCollect();
 		}
 
 		handled = true;
@@ -66,10 +65,19 @@ bool Pickup::Sight::collide(Entity* other, b2Contact& contact)
 
 void Pickup::Sight::update(int milliseconds)
 {
+	//Do our collection stuff outside b2 step
+	if (owner_ != nullptr && collected_ == false)
+	{
+		onCollect();
+	}
+
 	if (collected_ == true)
 	{
 		setPosition(owner_->getPosition());
-		end_ = b2Vec2(0, 1);// *owner_->getRotation();
+
+		float angle = owner_->getBody()->GetAngle();
+
+		end_ = body_->GetPosition() + b2Vec2(sin(angle) * -size_, -cos(angle) * -size_);
 	}
 
 	Pickup::PickupI::update(milliseconds);

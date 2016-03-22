@@ -33,10 +33,10 @@ void Pickup::PickupI::update(int milliseconds)
 	if (collected_)
 	{
 		//Tick down
-		if (time_ != -1)
+		if (time_ > -1)
 		{
 			time_ = (time_ - milliseconds) >= 0 ? time_ - milliseconds : 0;
-			std::cout << time_ << std::endl;
+			//std::cout << time_ << std::endl;
 		}
 
 		//Deletion flag

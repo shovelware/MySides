@@ -147,7 +147,7 @@ void GameWorld::spawnEnemy()
 	for (int i = 0; i < spawns_; ++i)
 	{
 		b2Vec2 pos;
-		float rad = getBoundsRadius() * 0.7f;
+		float rad = getBoundsRadius() * 0.9f;
 		pos.y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
 		pos.x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
 
@@ -482,7 +482,7 @@ int GameWorld::getHapticR() const
 
 void GameWorld::testBed()
 {
-	addPickup(PickupDef(PickupDef::Type::SIGHT, b2Vec2(0, 0), 10, 10, 5000));
+	addPickup(PickupDef(PickupDef::Type::SIGHT, b2Vec2(0, 0), 10, 10, 10000));
 	
 	//randomiseCol(bounds_);
 }

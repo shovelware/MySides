@@ -58,18 +58,17 @@ void GameRenderer::render()
 		drawShape(shp);
 	}
 
-	Shape* player = world_->getPlayer();
-	if (player != nullptr)
-	{
-		drawShape(player);
-	}
-
 	std::list<Pickup::PickupI*>& pickups = world_->getPickups();
 	for (Pickup::PickupI* pic : pickups)
 	{
 		drawPickup(pic);
 	}
 
+	Shape* player = world_->getPlayer();
+	if (player != nullptr)
+	{
+		drawShape(player);
+	}
 }
 
 void GameRenderer::drawShape(Shape* const s)
@@ -248,28 +247,42 @@ void GameRenderer::drawSide(Side* const s)
 
 void GameRenderer::drawPickup(Pickup::PickupI * const p)
 {
-	//if (p->getCollected() == false)
+	if (p->getCollected() == false)
 	{
 		b2Body* body = p->getBody();
 
 		sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
-		sf::Vector2f vel = B2toSF(body->GetLinearVelocity(), true);
-		vel *= (float)_SCALE_;
 
 		sf::Color pri = B2toSF(p->getPrimary());
 		sf::Color sec = B2toSF(p->getSecondary());
 		sf::Color ter = B2toSF(p->getTertiary());
 
-		//This will cause problems once projectiles stop being only circles
 		b2CircleShape* shape = static_cast<b2CircleShape*>(p->getBody()->GetFixtureList()->GetShape());
 		float rad = shape->m_radius * _SCALE_;
 
 		drawCircle(pos, rad, pri, sec);
+		drawCircle(pos, rad / 2, sec, ter);
+		
 	}
 
-	//else
+	else
 	{
-		//Static cast to each type, then draw
+		if (Pickup::Sight* s = dynamic_cast<Pickup::Sight*>(p))
+		{
+			sf::Vector2f end = B2toSF(s->getEnd(), true);
+			sf::Vector2f beg = B2toSF(s->getOwner()->getPosition(), true);
+			sf::Vector2f mid = beg - end;
+
+			b2Body* body = p->getBody();
+
+			sf::Color pri = B2toSF(p->getPrimary());
+			sf::Color sec = B2toSF(p->getSecondary());
+			sf::Color ter = B2toSF(p->getTertiary());
+
+			//drawLine(beg, mid, pri);
+			//drawLine(mid, end, sec);
+			drawLine(beg, end, tweakAlpha(sec, 128));
+		}
 	}
 
 }
