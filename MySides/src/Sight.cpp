@@ -69,11 +69,19 @@ void Pickup::Sight::update(int milliseconds)
 
 	if (collected_ == true)
 	{
-		setPosition(owner_->getPosition());
+		if (owner_ != nullptr)
+		{
+			setPosition(owner_->getPosition());
 
-		float angle = owner_->getBody()->GetAngle();
+			float angle = owner_->getBody()->GetAngle();
 
-		end_ = body_->GetPosition() + b2Vec2(sin(angle) * -size_, -cos(angle) * -size_);
+			end_ = body_->GetPosition() + b2Vec2(sin(angle) * -size_, -cos(angle) * -size_);
+		}
+
+		else
+		{
+			time_ == 0;
+		}
 	}
 
 	//Deletion flag

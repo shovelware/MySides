@@ -130,13 +130,12 @@ void Pickup::Shield::update(int milliseconds)
 		else {
 			time_ == 0;
 		}
-
-		if (hp_ <= 0 || time_ == 0)
-		{
-			owner_ = nullptr;
-			body_->GetFixtureList()->SetSensor(true);
-			body_->GetWorld()->DestroyJoint(body_->GetJointList()->joint);
-		}
 	}
 
+	if (hp_ <= 0 || time_ == 0)
+	{
+		owner_ = nullptr;
+		body_->GetFixtureList()->SetSensor(true);
+		body_->GetWorld()->DestroyJoint(body_->GetJointList()->joint);
+	}
 }

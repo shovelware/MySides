@@ -24,8 +24,6 @@ GameWorld::GameWorld() :
 	audio_.addSFX("rifle", "../assets/nsnd/bullet.wav", 64);
 	audio_.addSFX("shotgun", "../assets/nsnd/shotty.wav", 32);
 
-
-
 	audio_.addSFX("spawn", "../assets/spawn.wav", 16);
 	audio_.addSFX("die", "../assets/die.wav", 32);
 	audio_.addSFX("loss", "../assets/loss.wav", 1);
@@ -175,8 +173,9 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		delete player_;
 	}
 
-	player_ = new Player(addDynamicBody(pos), play, addSide_);
-	
+	player_ = new Player(addDynamicBody(pos), play, addSide_);	
+	addPickup(PickupDef(PickupDef::Type::ATTRACT, pos, 10, 7.5, -1));
+
 	if (control)
 	{
 		//Set our control to the one we just put in
@@ -383,7 +382,7 @@ void GameWorld::resetLevel()
 
 	//Restart bgm
 	//audio_.playAFX("spriterip");
-	//audio_.playAFX("wind");
+	audio_.playAFX("wind");
 
 	//Regenerate level somehow
 	hiSides = 0;
@@ -483,8 +482,14 @@ int GameWorld::getHapticR() const
 
 void GameWorld::testBed()
 {
-	addPickup(PickupDef(PickupDef::Type::ATTRACT, b2Vec2(0, 0), 10, 7.5, 10000));
-	
+	static bool x = true;
+	if (x = false)
+	{
+		player_->kill();
+	}
+	addPickup(PickupDef(PickupDef::Type::SHIELD, b2Vec2(0, 0), 10, 2.5, -1));
+	addPickup(PickupDef(PickupDef::Type::SIGHT, b2Vec2(0, 0), 10, 10, -1));
+	x = false;
 	//randomiseCol(bounds_);
 }
 

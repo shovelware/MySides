@@ -83,22 +83,27 @@ void Pickup::Attractor::update(int milliseconds)
 
 	if (collected_ == true)
 	{
-		setPosition(owner_->getPosition());
-
-		for (b2ContactEdge* ed = body_->GetContactList(); ed != nullptr; ed = ed->next)
+		if (owner_ != nullptr)
 		{
-			Side* s = nullptr;
+			setPosition(owner_->getPosition());
 
-			if (ed->contact->GetFixtureA()->GetUserData() == "side")
-				s = static_cast<Side*>(ed->contact->GetFixtureA()->GetBody()->GetUserData());
+			for (b2ContactEdge* ed = body_->GetContactList(); ed != nullptr; ed = ed->next)
+			{
+				Side* s = nullptr;
+
+				if (ed->contact->GetFixtureA()->GetUserData() == "side")
+					s = static_cast<Side*>(ed->contact->GetFixtureA()->GetBody()->GetUserData());
 
 
-			else if (ed->contact->GetFixtureB()->GetUserData() == "side")
-				s = static_cast<Side*>(ed->contact->GetFixtureB()->GetBody()->GetUserData());
+				else if (ed->contact->GetFixtureB()->GetUserData() == "side")
+					s = static_cast<Side*>(ed->contact->GetFixtureB()->GetBody()->GetUserData());
 
-			if (s != nullptr)
-				s->attract(owner_->getPosition() - s->getPosition());
-		}		
+				if (s != nullptr)
+					s->attract(owner_->getPosition() - s->getPosition());
+			}
+		}
+
+		else time_ == 0;
 	}
 
 	//Deletion flag
