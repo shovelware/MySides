@@ -1,4 +1,8 @@
 #include "Sight.hpp"
+#include "Projectile.hpp"
+#include "Side.hpp"
+#include "Bounds.hpp"
+#include "Pickup.hpp"
 
 Pickup::Sight::Sight(b2Body* body, const PickupDef& def) :
 	Pickup::PickupI(body, def.time),
@@ -30,41 +34,33 @@ bool Pickup::Sight::collide(Entity* other, b2Contact& contact)
 		handled = true;
 	}
 
-	// else if (Projectile* proj = dynamic_cast<Projectile*>(other))
-	//{
-	//	if (proj->getOwner() != this)
-	//	{
-	//		takeDamage(proj->getDamage(), proj->getDirection());
-	//	}
-	//
-	//	else contact.SetEnabled(false);
-	//
-	//	handled = true;
-	//}
-	//
-	//else if (Side* side = dynamic_cast<Side*>(other))
-	//{
-	//	//char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
-	//	//char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
-	//	//
-	//	//if (tagA == "side" || tagB == "side")
-	//	//{
-	//	//	collect(side->getValue());
-	//	//}
-	//
-	//	handled = true;
-	//}
-	//
-	//else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
-	//{
-	//	handled = true;
-	//}
-	//
+	 else if (Projectile* proj = dynamic_cast<Projectile*>(other))
+	{
+		handled = true;
+	}
+	
+	else if (Side* side = dynamic_cast<Side*>(other))
+	{
+		handled = true;
+	}
+
+	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
+	{
+		handled = true;
+	}
+
+	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
+	{
+		handled = true;
+	}
+	
 	return handled;
 }
 
 void Pickup::Sight::update(int milliseconds)
 {
+	Pickup::PickupI::update(milliseconds);
+
 	//Do our collection stuff outside b2 step
 	if (owner_ != nullptr && collected_ == false)
 	{
@@ -80,7 +76,12 @@ void Pickup::Sight::update(int milliseconds)
 		end_ = body_->GetPosition() + b2Vec2(sin(angle) * -size_, -cos(angle) * -size_);
 	}
 
-	Pickup::PickupI::update(milliseconds);
+	//Deletion flag
+	if (time_ == 0)
+	{
+		owner_ = nullptr;
+	}
+
 }
 
 b2Vec2 Pickup::Sight::getEnd()

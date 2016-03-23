@@ -38,14 +38,7 @@ void Pickup::PickupI::update(int milliseconds)
 			time_ = (time_ - milliseconds) >= 0 ? time_ - milliseconds : 0;
 			//std::cout << time_ << std::endl;
 		}
-
-		//Deletion flag
-		if (time_ == 0)
-		{
-			owner_ = nullptr;
-		}
 	}
-
 	//Else just hang out
 }
 

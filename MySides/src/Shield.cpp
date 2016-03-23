@@ -1,6 +1,8 @@
 #include "Shield.hpp"
 #include "Projectile.hpp"
-
+#include "Side.hpp"
+#include "Bounds.hpp"
+#include "Pickup.hpp"
 
 Pickup::Shield::Shield(b2Body* body, const PickupDef& def) :
 	Pickup::PickupI(body, def.time),
@@ -20,17 +22,20 @@ void Pickup::Shield::onCollect()
 	def.userData = "pickup";
 
 	def.density = 0.f;
-	def.friction = 0.8f;
-	def.restitution = 1.f;
+	def.friction = 0.f;
+	def.restitution = 0.f;
 	def.isSensor = false;
 
+	body_->SetFixedRotation(false);
+	
 	b2RevoluteJointDef rev;
 	rev.localAnchorA = b2Vec2(0, 0);
 	rev.localAnchorB = b2Vec2(0, 0);
+	
 
 	rev.bodyA = body_;
 	rev.bodyB = owner_->getBody();
-
+	
 	rev.collideConnected = false;
 
 	body_->GetWorld()->CreateJoint(&rev);
@@ -73,10 +78,11 @@ bool Pickup::Shield::collide(Entity* other, b2Contact& contact)
 			if (proj->getOwner() != owner_)
 			{
 				takeDamage(proj->getDamage());
-				std::cout << "dmg" << std::endl;
 			}
 
-			else contact.SetEnabled(false);
+			else {
+				contact.SetEnabled(false);
+			}
 		}
 
 		//Contacts for my projectiles, and all projectiles when not collected
@@ -84,30 +90,29 @@ bool Pickup::Shield::collide(Entity* other, b2Contact& contact)
 	
 		handled = true;
 	}
-	//
-	//else if (Side* side = dynamic_cast<Side*>(other))
-	//{
-	//	//char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
-	//	//char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
-	//	//
-	//	//if (tagA == "side" || tagB == "side")
-	//	//{
-	//	//	collect(side->getValue());
-	//	//}
-	//
-	//	handled = true;
-	//}
-	//
-	//else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
-	//{
-	//	handled = true;
-	//}
-	//
+	
+	else if (Side* side = dynamic_cast<Side*>(other))
+	{
+		handled = true;
+	}
+
+	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
+	{
+		handled = true;
+	}
+
+	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
+	{
+		handled = true;
+	}
+	
 	return handled;
 }
 
 void Pickup::Shield::update(int milliseconds)
 {
+	Pickup::PickupI::update(milliseconds);
+
 	//Do our collection stuff outside b2 step
 	if (owner_ != nullptr && collected_ == false)
 	{
@@ -116,9 +121,17 @@ void Pickup::Shield::update(int milliseconds)
 
 	if (collected_ == true)
 	{
-		setPosition(owner_->getPosition());
+		if (owner_ != nullptr)
+		{
+			setPosition(owner_->getPosition());
+		}
 
-		if (hp_ <= 0)
+		//Edge case where projectile is in shield radius on collect and kills you
+		else {
+			time_ == 0;
+		}
+
+		if (hp_ <= 0 || time_ == 0)
 		{
 			owner_ = nullptr;
 			body_->GetFixtureList()->SetSensor(true);
@@ -126,5 +139,4 @@ void Pickup::Shield::update(int milliseconds)
 		}
 	}
 
-	Pickup::PickupI::update(milliseconds);
 }

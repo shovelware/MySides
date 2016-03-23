@@ -2,6 +2,7 @@
 #include "Bounds.hpp"
 #include "Projectile.hpp"
 #include "Side.hpp"
+#include "Pickup.hpp"
 
 Enemy::Enemy(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) : 
 	Shape(body, def, callback),
@@ -32,7 +33,7 @@ void Enemy::update(int milliseconds)
 		else if (between.Length() < 25 && (getHP() >= getHPMax() / 2))
 		{
 			//move(between);
-			fire(between);
+			//fire(between);
 		}
 	
 		else if (between.Length() < 10 * (getHPMax() - getHP()))
@@ -76,6 +77,11 @@ bool Enemy::collide(Entity * other, b2Contact& contact)
 		//	collect(side->getValue());
 		//}
 
+		handled = true;
+	}
+
+	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
+	{
 		handled = true;
 	}
 

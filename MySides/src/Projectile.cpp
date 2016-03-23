@@ -4,6 +4,8 @@
 #include "Shape.hpp"
 #include "Projectile.hpp"
 #include "Side.hpp"
+#include "Pickup.hpp"
+#include "Shield.hpp"
 
 Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 	Entity(body),
@@ -168,6 +170,28 @@ bool Projectile::collide(Entity * other, b2Contact& contact)
 	else if (Side* side = dynamic_cast<Side*>(other))
 	{
 		handled = true;
+	}
+
+	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
+	{
+
+		if (Pickup::Shield*  shield = dynamic_cast<Pickup::Shield*>(other))
+		{
+			if (shield->getOwner() != owner_)
+			{
+				takeDamage(10);
+			}
+
+			else
+			{
+				contact.SetEnabled(false);
+			}
+
+			handled = true;
+		
+		}
+
+		else handled = true;
 	}
 
 	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))

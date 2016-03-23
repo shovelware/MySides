@@ -272,7 +272,7 @@ void GameRenderer::drawPickup(Pickup::PickupI * const p)
 		{
 			sf::Vector2f end = B2toSF(s->getEnd(), true);
 			sf::Vector2f beg = B2toSF(s->getOwner()->getPosition(), true);
-			sf::Vector2f mid = beg - end;
+			sf::Vector2f mid = end - beg;
 
 			b2Body* body = p->getBody();
 
@@ -280,12 +280,12 @@ void GameRenderer::drawPickup(Pickup::PickupI * const p)
 			sf::Color sec = B2toSF(p->getSecondary());
 			sf::Color ter = B2toSF(p->getTertiary());
 
-			//drawLine(beg, mid, pri);
+			//drawLine(end, mid, pri);
 			//drawLine(mid, end, sec);
 			drawLine(beg, end, tweakAlpha(sec, 128));
 		}
 
-		if (Pickup::Shield* s = dynamic_cast<Pickup::Shield*>(p))
+		else if (Pickup::Shield* s = dynamic_cast<Pickup::Shield*>(p))
 		{
 			b2Body* body = p->getBody();
 

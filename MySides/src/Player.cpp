@@ -2,6 +2,7 @@
 #include "Bounds.hpp"
 #include "Projectile.hpp"
 #include "Side.hpp"
+#include "Pickup.hpp"
 
 Player::Player(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback) : 
 	Shape(body, def, callback)
@@ -40,6 +41,11 @@ bool Player::collide(Entity * other, b2Contact& contact)
 			collect(side->getValue());
 		}
 
+		handled = true;
+	}
+
+	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
+	{
 		handled = true;
 	}
 

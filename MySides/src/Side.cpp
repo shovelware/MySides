@@ -3,6 +3,7 @@
 #include "Bounds.hpp"
 #include "Shape.hpp"
 #include "Projectile.hpp"
+#include "Pickup.hpp"
 
 Side::Side(b2Body * body, const SideDef& def) : 
 	Entity(body), 
@@ -118,6 +119,11 @@ bool Side::collide(Entity* other, b2Contact& contact)
 	}
 
 	else if (Side* side = dynamic_cast<Side*>(other))
+	{
+		handled = true;
+	}
+
+	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
 	{
 		handled = true;
 	}

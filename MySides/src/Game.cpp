@@ -411,7 +411,7 @@ void Game::render()
 	//b2Shape* x = world_->controlled()->getVertices();
 	//b2Shape::Type y = x->GetType();
 	render_->render();
-	//world_->DrawDebugData();
+	world_->DrawDebugData();
 	camera_->drawHUD();
 	camera_->drawSpr3(world_->maxTime - world_->getTimeInLevel(), world_->enemies, world_->freesides);
 

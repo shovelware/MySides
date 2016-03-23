@@ -33,6 +33,7 @@
 #include "Pickup.hpp"
 #include "Sight.hpp"
 #include "Shield.hpp"
+#include "Attractor.hpp"
 
 #include "Weapon.hpp"
 #include "WeapRifle.hpp"

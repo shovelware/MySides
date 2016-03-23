@@ -137,6 +137,7 @@ void GameWorld::popInside(Entity * ent)
 
 		//Push inside
 		between *= 0.005f;
+		
 		ent->getBody()->ApplyForceToCenter(-between, true);
 	}
 }
@@ -189,7 +190,7 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		newDef.size = 1.f;
 		newDef.bounce = 1.f;
 
-		weapons_.push_back(new Weapon::Shotgun(fireWeap_, newDef));
+		weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
 		Weapon::WeaponI* newWeap = (*--weapons_.end());
 
 		player_->arm(newWeap);
@@ -271,7 +272,7 @@ void GameWorld::addPickup(const PickupDef& def)
 		break;
 
 	case PickupDef::Type::ATTRACT:
-		//pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), def))
+		pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), def));
 		break;
 
 	case PickupDef::Type::WEAPON:
@@ -482,7 +483,7 @@ int GameWorld::getHapticR() const
 
 void GameWorld::testBed()
 {
-	addPickup(PickupDef(PickupDef::Type::SHIELD, b2Vec2(0, 0), 10, 2.5, 10000));
+	addPickup(PickupDef(PickupDef::Type::ATTRACT, b2Vec2(0, 0), 10, 7.5, 10000));
 	
 	//randomiseCol(bounds_);
 }
@@ -677,15 +678,6 @@ void GameWorld::updateSide(int dt)
 		{
 			//Pull pointer
 			Side* sd = (*sideIt);
-
-			//SIDE ATTRACTOR NEEDS REDUX
-			if (player_ != nullptr)
-			{
-				b2Vec2 between = player_->getPosition() - sd->getPosition();
-
-				if (between.Length() < 7.5f)
-					sd->attract(between);
-			}
 
 			popInside(sd);
 
