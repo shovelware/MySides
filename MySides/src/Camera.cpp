@@ -12,6 +12,10 @@ Camera::Camera(sf::RenderTarget& target) :
 	font_(nullptr),
 	leanMax_(100)
 {
+	//Camera starts at 1.5f zoom
+	for (int i = 0; i < 10; ++i) {
+		zoomOut();
+	}
 }
 
 void Camera::setTarget(Shape * target)
@@ -75,13 +79,13 @@ void Camera::lean(sf::Vector2f xf)
 	//If it's neutral, tend back to center
 	if (thor::length(xf) < 1)
 	{
-		//Figuring out positive or negative and adjusting to + or -#
 		lean_.x *= 0.9;
 		lean_.y *= 0.9;
 	}
 
 	lean_ += xf;
 
+	//Stay within bounds
 	if (thor::length(lean_) > leanMax_)
 	{
 		lean_ = thor::unitVector(lean_) * leanMax_;
@@ -105,11 +109,6 @@ void Camera::zoomOut()
 	zoom(1 + zoomStep_);
 }
 
-void Camera::zoomSet(float mult)
-{
-	zoom(mult);
-}
-
 void Camera::zoomReset()
 {
 	zoomFactor_ = 1;
@@ -128,7 +127,7 @@ void Camera::drawHUD()
 	if (fnt)
 	{
 		//Zoom
-		drawText(std::string("Z: ") + std::to_string((int)getZoomPercent()),
+		drawText(std::string("Z: ") + std::to_string((float)getZoomPercent()),
 			sf::Vector2f(20, 58),
 			sf::Color::White
 			);
@@ -221,7 +220,7 @@ void Camera::drawOver(int sides, int time)
 
 float Camera::getZoomPercent() const
 {
-	return 200 - (zoomFactor_ * 100);
+	return zoomFactor_;// 200 - (zoomFactor_ * 100);
 }
 
 void Camera::updateBounds(sf::Vector2f newSize)

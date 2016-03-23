@@ -41,7 +41,6 @@ public:
 	//! Zoom controls for camera
 	void zoomIn();
 	void zoomOut();
-	void zoomSet(float mult);
 	void zoomReset();
 
 	//! HUD Drawing controls, both of these change render target for their duration
