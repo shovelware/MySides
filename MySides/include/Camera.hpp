@@ -31,8 +31,13 @@ public:
 	void update(int dt);
 
 	//! Move controls for the camera
-	void move(sf::Vector2f xf);	void moveReset();
+	void move(sf::Vector2f xf);	
+	void moveReset();
 
+	//! Lean controls for the camera
+	void lean(sf::Vector2f xf);
+	void leanReset();
+	
 	//! Zoom controls for camera
 	void zoomIn();
 	void zoomOut();
@@ -52,6 +57,9 @@ private:
 	Shape* target_;			//!< The target followed ship
 	sf::Vector2f screenSize_; //!< Keep a record of the screen size for resets
 	sf::Vector2f lastPos_;
+
+	sf::Vector2f lean_;
+	float leanMax_;
 
 	float zoomFactor_; //!< The internal factor of the zoom
 	float zoomStep_; //!< Zoom step [0.25 == 25%]

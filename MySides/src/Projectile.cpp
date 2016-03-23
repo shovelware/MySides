@@ -180,7 +180,6 @@ bool Projectile::collide(Entity * other, b2Contact& contact)
 			if (shield->getOwner() != owner_)
 			{
 				takeDamage(shield->getStrength());
-				std::cout << "OW" << std::endl;
 			}
 
 			handled = true;

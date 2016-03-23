@@ -233,6 +233,7 @@ void Game::handleInput(sf::Time dt)
 	//Controller Control
 	world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
 	world_->fire(b2Vec2(con_.checkRightX(), con_.checkRightY()));
+	camera_->lean(sf::Vector2f(con_.checkRightX() * 10, con_.checkRightY() * 10));
 
 	//world_->controlled()->rotate(con_.checkRightX() / 10);
 

@@ -33,7 +33,7 @@ void Enemy::update(int milliseconds)
 		else if (between.Length() < 25 && (getHP() >= getHPMax() / 2))
 		{
 			//move(between);
-			fire(between);
+			//fire(between);
 		}
 	
 		else if (between.Length() < 10 * (getHPMax() - getHP()))

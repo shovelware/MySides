@@ -9,7 +9,8 @@ Camera::Camera(sf::RenderTarget& target) :
 	radarPos_(screenSize_.x - radarSize_, radarSize_),
 	zoomFactor_(1),
 	zoomStep_(0.05f),
-	font_(nullptr)
+	font_(nullptr),
+	leanMax_(100)
 {
 }
 
@@ -51,7 +52,7 @@ void Camera::update(int dt)
 {
 	if (target_ != nullptr)
 	{
-		setCenter(B2toSF(target_->getPosition()) + move_);
+		setCenter(B2toSF(target_->getPosition()) + move_ + lean_);
 	}
 
 	else setCenter(move_);
@@ -67,6 +68,29 @@ void Camera::move(sf::Vector2f xf)
 void Camera::moveReset()
 {
 	move_ = sf::Vector2f(0, 0);
+}
+
+void Camera::lean(sf::Vector2f xf)
+{
+	//If it's neutral, tend back to center
+	if (thor::length(xf) < 1)
+	{
+		//Figuring out positive or negative and adjusting to + or -#
+		lean_.x *= 0.9;
+		lean_.y *= 0.9;
+	}
+
+	lean_ += xf;
+
+	if (thor::length(lean_) > leanMax_)
+	{
+		lean_ = thor::unitVector(lean_) * leanMax_;
+	}
+}
+
+void Camera::leanReset()
+{
+	lean_ = sf::Vector2f(0, 0);
 }
 
 void Camera::zoomIn()
