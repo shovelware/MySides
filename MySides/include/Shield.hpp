@@ -11,17 +11,14 @@ namespace Pickup {
 
 		void update(int milliseconds);
 
-		b2Vec2 getRadius();
+		float getStrength();
 
 		bool collide(Entity* other, b2Contact& contact);
 	private:
 		void onCollect();
 
-		void takeDamage(int damage);
-
 		float radius_;
-		float hpMAX_;
-		float hp_;
+		float strength_;
 	};
 }
 

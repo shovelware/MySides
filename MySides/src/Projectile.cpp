@@ -126,7 +126,7 @@ void Projectile::update(int milliseconds)
 {
 	lifeTime_ -= milliseconds;
 
-	if ((impacted_ && hp_ <= 0) || lifeTime_ <= 0 )
+	if ((impacted_ || hp_ <= 0) || lifeTime_ <= 0 )
 	{
 		alive_ = false;
 		active_ = false;		
@@ -179,16 +179,11 @@ bool Projectile::collide(Entity * other, b2Contact& contact)
 		{
 			if (shield->getOwner() != owner_)
 			{
-				takeDamage(10);
-			}
-
-			else
-			{
-				contact.SetEnabled(false);
+				takeDamage(shield->getStrength());
+				std::cout << "OW" << std::endl;
 			}
 
 			handled = true;
-		
 		}
 
 		else handled = true;

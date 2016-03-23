@@ -7,8 +7,7 @@
 Pickup::Shield::Shield(b2Body* body, const PickupDef& def) :
 	Pickup::PickupI(body, def.time),
 	radius_(def.size),
-	hpMAX_(def.strength),
-	hp_(def.strength)
+	strength_(def.strength)
 {
 	//Body is initially made by pickup base class
 }
@@ -24,7 +23,7 @@ void Pickup::Shield::onCollect()
 	def.density = 0.f;
 	def.friction = 0.f;
 	def.restitution = 0.f;
-	def.isSensor = false;
+	def.isSensor = true;
 
 	body_->SetFixedRotation(false);
 	
@@ -50,11 +49,6 @@ void Pickup::Shield::onCollect()
 	collected_ = true;
 }
 
-void Pickup::Shield::takeDamage(int damage)
-{
-	hp_ -= damage;
-}
-
 bool Pickup::Shield::collide(Entity* other, b2Contact& contact)
 {
 
@@ -77,7 +71,6 @@ bool Pickup::Shield::collide(Entity* other, b2Contact& contact)
 			//Enemy projectiles after collection
 			if (proj->getOwner() != owner_)
 			{
-				takeDamage(proj->getDamage());
 			}
 
 			else {
@@ -126,16 +119,21 @@ void Pickup::Shield::update(int milliseconds)
 			setPosition(owner_->getPosition());
 		}
 
-		//Edge case where projectile is in shield radius on collect and kills you
+		//Edge case where projectile is in shield radius on collect and kills you after pickup
 		else {
 			time_ == 0;
 		}
 	}
 
-	if (hp_ <= 0 || time_ == 0)
+	if (time_ == 0)
 	{
 		owner_ = nullptr;
 		body_->GetFixtureList()->SetSensor(true);
 		body_->GetWorld()->DestroyJoint(body_->GetJointList()->joint);
 	}
+}
+
+float Pickup::Shield::getStrength()
+{
+	return strength_;
 }
