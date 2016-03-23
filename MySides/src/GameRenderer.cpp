@@ -198,14 +198,34 @@ void GameRenderer::drawProjectile(Projectile* const p)
 	sf::Color sec = B2toSF(p->getSecondary());
 	sf::Color ter = B2toSF(p->getTertiary());
 	
-	//This will cause problems once projectiles stop being only circles
-	b2CircleShape* shape = static_cast<b2CircleShape*>(p->getBody()->GetFixtureList()->GetShape());
-	float rad = shape->m_radius * _SCALE_;
+	if (b2CircleShape* shape = dynamic_cast<b2CircleShape*>(p->getBody()->GetFixtureList()->GetShape()))
+	{
+		float rad = shape->m_radius * _SCALE_;
 
-	//Draw shape, vel, pos
-	drawLine(pos, pos - vel, ter);
-	drawCircle(pos, rad, pri, sec);
-	drawPoint(pos, ter);
+		//Draw shape, vel, pos
+		drawLine(pos, pos - vel, ter);
+		drawCircle(pos, rad, pri, sec);
+		drawPoint(pos, ter);
+	}
+
+	else if (b2PolygonShape* shape = dynamic_cast<b2PolygonShape*>(p->getBody()->GetFixtureList()->GetShape()))
+	{
+		int count = shape->GetVertexCount();
+
+		sf::Vector2f* verts = new sf::Vector2f[count];
+
+		for (int i = 0; i < count; ++i)
+		{
+
+			verts[i] = B2toSF(body->GetWorldPoint(shape->GetVertex(i)), true);
+		}
+
+		//drawLine(pos, pos - vel, ter);
+		drawPolygon(verts, count, pri, sec);
+		drawPoint(pos, ter);
+
+		delete[] verts;
+	}
 }
 
 void GameRenderer::drawSide(Side* const s)

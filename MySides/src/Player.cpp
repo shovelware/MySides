@@ -7,6 +7,7 @@
 Player::Player(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback) : 
 	Shape(body, def, callback)
 {
+	body_->GetFixtureList()->SetSensor(true);
 }
 
 //Only deals with the effects of this collision on this entity

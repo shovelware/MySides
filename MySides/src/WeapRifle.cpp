@@ -2,7 +2,7 @@
 
 Weapon::Rifle::Rifle(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
 	WeaponI(callback, ammo),
-	magazine_(30)
+	magazine_(3000)
 {
 	refireTimeMAX_ = 100;
 	refireTime_ = 0;

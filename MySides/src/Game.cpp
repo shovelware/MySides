@@ -17,7 +17,7 @@ Game::Game() :
 	fullscreen_(false),
 	dd_(window_),
 	voidCol_(64,64,64),
-	haptics_(true)
+	haptics_(false)
 {
 }
 

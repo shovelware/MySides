@@ -160,13 +160,10 @@ void GameWorld::spawnEnemy()
 void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 {
 	ShapeDef play = ShapeDef(pos, b2Vec2_zero, 5);
-	//play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
-	//play.colSecn = b2Color(0.f, 1.f, 1.f);
-	//play.colTert = b2Color(1.f, 0.f, 0.f);
-
-	play.colPrim = b2Color(1.f, 0.f, 0.f);
-	play.colSecn = b2Color(0.f, 1.f, 0.f);
-	play.colTert = b2Color(0.f, 0.f, 1.f);
+	
+	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
+	play.colSecn = b2Color(0.f, 1.f, 1.f);
+	play.colTert = b2Color(1.f, 0.f, 0.f);
 
 	if (player_ != nullptr)
 	{
@@ -181,12 +178,9 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		//Set our control to the one we just put in
 		controlled_ = player_;
 
-		ProjectileDef newDef = ProjectileDef::bulletDef();
-		newDef.velScale = 1.f;
+		ProjectileDef newDef = ProjectileDef::grenadeDef();
 		newDef.lifeTime = 3000;
 		//newDef.damageScale = 4.f;
-		newDef.hpMAX = 1.f;
-		newDef.size = 1.f;
 		newDef.bounce = 1.f;
 
 		weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
@@ -482,14 +476,86 @@ int GameWorld::getHapticR() const
 
 void GameWorld::testBed()
 {
-	static bool x = true;
-	if (x = false)
+	//EW
+	for (int i = 0; i < 8; ++i)
 	{
-		player_->kill();
+		ShapeDef enem = ShapeDef(b2Vec2(-20 + 5 * i, 15), b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
+		//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
+
+		ProjectileDef newDef = ProjectileDef::bulletDef();
+
+		switch (i)
+		{
+		case 0:
+			newDef = ProjectileDef::pelletDef();
+			enem.colPrim = b2Color(.75f, .75f, .75f);
+			enem.colSecn = b2Color(.5f, .5f, .5f);
+			enem.colTert = b2Color(.75f, .75f, .75f);
+			break;
+
+		case 1:
+			newDef = ProjectileDef::ninmilDef();
+			enem.colPrim = b2Color(1, .5f, 0);
+			enem.colSecn = b2Color(.75f, .25f, 0);
+			enem.colTert = b2Color(1, .5f, 0);
+			break;
+
+		case 2:
+			newDef = ProjectileDef::bulletDef();
+			enem.colPrim = b2Color(1, 1, 0);
+			enem.colSecn = b2Color(.75f, .75f, 0);
+			enem.colTert = b2Color(1, 1, 0);
+			break;
+
+		case 3:
+			newDef = ProjectileDef::dumdumDef();
+			enem.colPrim = b2Color(.5f, 0, .5f);
+			enem.colSecn = b2Color(.25f, 0, .25f);
+			enem.colTert = b2Color(.5f, 0, .5f);
+			break;
+
+		case 4:
+			newDef = ProjectileDef::cnnbllDef();
+			enem.colPrim = b2Color(0, 0, 0);
+			enem.colSecn = b2Color(.1f, .1f, .1f);
+			enem.colTert = b2Color(0, 0, 0);
+			break;
+			
+		case 5:
+			newDef = ProjectileDef::grenadeDef();
+			enem.colPrim = b2Color(0, 0.75f, 0);
+			enem.colSecn = b2Color(0, 0.5f, 0);
+			enem.colTert = b2Color(0, 0.75f, 0);
+			break;
+
+		case 6:
+			newDef = ProjectileDef::rocketDef();
+			enem.colPrim = b2Color(0.7f, 0, 0);
+			enem.colSecn = b2Color(0.5f, 0, 0);
+			enem.colTert = b2Color(0.7f, 0, 0);
+			break;
+
+		case 7:
+			newDef = ProjectileDef::pewpewDef();
+			enem.colPrim = b2Color(0, 0, 1);
+			enem.colSecn = b2Color(0, 0, .7f);
+			enem.colTert = b2Color(0, 0, 1);
+			break;
+		}
+
+		newDef.damageScale = 0;
+		newDef.lifeTime = 250;
+
+		Weapon::WeaponI* newWeap;
+
+		shapes_.push_back(new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_));
+		Shape* added = *(--shapes_.end());
+
+		weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
+		newWeap = (*--weapons_.end());
+
+		added->arm(newWeap);
 	}
-	addPickup(PickupDef(PickupDef::Type::SHIELD, b2Vec2(0, 0), 10, 2.5, -1));
-	addPickup(PickupDef(PickupDef::Type::SIGHT, b2Vec2(0, 0), 10, 10, -1));
-	x = false;
 	//randomiseCol(bounds_);
 }
 
@@ -580,7 +646,7 @@ void GameWorld::update(int dt)
 		updateProjectile(dt);
 		updateSide(dt);
 		updatePickup(dt);
-		updateLevel(dt);
+		//updateLevel(dt);
 
 		Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 		

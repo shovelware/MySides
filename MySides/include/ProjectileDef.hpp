@@ -13,6 +13,8 @@ public:
 		heading(b2Vec2_zero),
 		inVelocity(b2Vec2_zero),
 		velScale(1),
+		rect(false),
+		ghost(false),
 		bounce(0),
 		hpMAX(0),
 		size(0),
@@ -30,6 +32,8 @@ public:
 		heading(heading),
 		inVelocity(inVelocity),
 		velScale(1),
+		rect(false),
+		ghost(false),
 		bounce(0),
 		hpMAX(1),
 		size(1),
@@ -48,6 +52,8 @@ public:
 		inVelocity(b2Vec2_zero),
 		velScale(pd.velScale),
 		bounce(pd.bounce),
+		rect(pd.rect),
+		ghost(pd.ghost),
 		hpMAX(pd.hpMAX),
 		size(pd.size),
 		damageScale(pd.damageScale),
@@ -70,6 +76,8 @@ public:
 	//Velocity handled by projectile
 	float velScale;
 
+	bool rect;
+	bool ghost;
 	float bounce;
 
 	unsigned int hpMAX;
@@ -93,16 +101,104 @@ public:
 		ROCKET
 	};
 
+	static ProjectileDef pelletDef()
+	{
+		ProjectileDef pellet = ProjectileDef();
+		pellet.velScale = 1;
+		pellet.hpMAX = 1;
+		pellet.size = 0.25f;
+		pellet.damageScale = 0.5f;
+		pellet.lifeTime = 1000;
+
+		return pellet;
+	}
+
+	static ProjectileDef ninmilDef()
+	{
+		ProjectileDef ninmil = ProjectileDef();
+		ninmil.velScale = 1;
+		ninmil.hpMAX = 1;
+		ninmil.size = 0.5f;
+		ninmil.damageScale = 1;
+		ninmil.lifeTime = 1000;
+		
+		return ninmil;
+	}
+
 	static ProjectileDef bulletDef()
 	{
 		ProjectileDef bullet = ProjectileDef();		
 		bullet.velScale = 1;
 		bullet.hpMAX = 1;
 		bullet.size = 1;
-		bullet.damageScale = 1;
+		bullet.damageScale = 1.25f;
 		bullet.lifeTime = 1000;
 
 		return bullet;
+	}
+
+	static ProjectileDef dumdumDef()
+	{
+		ProjectileDef dumdum = ProjectileDef();
+		dumdum.velScale = 2;
+		dumdum.hpMAX = 2;
+		dumdum.size = 2.f;
+		dumdum.damageScale = 1.5f;
+		dumdum.lifeTime = 1000;
+
+		return dumdum;
+	}
+
+	static ProjectileDef cnnbllDef()
+	{
+		ProjectileDef cnnbll = ProjectileDef();
+		cnnbll.velScale = 3;
+		cnnbll.hpMAX = 1;
+		cnnbll.size = 3.f;
+		cnnbll.damageScale = 2.f;
+		cnnbll.lifeTime = 1000;
+
+		return cnnbll;
+	}
+
+	static ProjectileDef grenadeDef()
+	{
+		ProjectileDef grenade = ProjectileDef();
+		grenade.velScale = 1;
+		grenade.hpMAX = 1;
+		grenade.size = 1.f;
+		grenade.rect = true;
+		grenade.damageScale = 2.f;
+		grenade.lifeTime = 1000;
+
+		return grenade;
+	}
+
+	static ProjectileDef rocketDef()
+	{
+		ProjectileDef rocket = ProjectileDef();
+		rocket.velScale = 3;
+		rocket.hpMAX = 1;
+		rocket.size = 1.f;
+		rocket.rect = true;
+		rocket.damageScale = 1.f;
+		rocket.lifeTime = 1000;
+
+		return rocket;
+	}
+
+	static ProjectileDef pewpewDef()
+	{
+		ProjectileDef pewpew = ProjectileDef();
+		pewpew.velScale = 3;
+		pewpew.hpMAX = 3;
+		pewpew.size = .25f;
+		pewpew.rect = true;
+		pewpew.ghost = true;
+		pewpew.damageScale = 1.f;
+		pewpew.lifeTime = 1000;
+
+		return pewpew;
 	}
 
 	bool isValid() { return lifeTime >= 0; }

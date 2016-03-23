@@ -25,7 +25,8 @@ public:
 	bool collide(Entity* other, b2Contact& contact);
 
 private:
-	void setAsBullet(float size, float damageScale, float bounce);
+	void setAsCircle(float size, float damageScale, float bounce, bool ghost);
+	void setAsRect(float size, float damageScale, float bounce, bool ghost);
 
 	void addMaterial(b2FixtureDef& def, float bounce); //Abstract into entity?
 

@@ -17,7 +17,15 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 	owner_(def.owner), 
 	target_(def.target)
 {
-	setAsBullet(size_, def.damageScale, def.bounce);
+	if (!def.rect)
+	{
+		setAsCircle(size_, def.damageScale, def.bounce, def.ghost);
+	}
+
+	else
+	{
+		setAsRect(size_, def.damageScale, def.bounce, def.ghost);
+	}
 
 	//Do maths to orient body here
 	body_->SetTransform(def.origin, body_->GetAngle());
@@ -30,7 +38,7 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 	fire(def.velScale);
 }
 
-void Projectile::setAsBullet(float size, float damageScale = 1.f, float bounce = 0.f)
+void Projectile::setAsCircle(float size, float damageScale = 1.f, float bounce = 0.f, bool ghost = false)
 {
 	//Shape
 	b2CircleShape bullet;
@@ -42,6 +50,7 @@ void Projectile::setAsBullet(float size, float damageScale = 1.f, float bounce =
 
 	//Collision
 	fixtureDef.userData = "projectile";
+	fixtureDef.isSensor = ghost;
 	addMaterial(fixtureDef, bounce);
 
 	//Bind fixture
@@ -49,6 +58,30 @@ void Projectile::setAsBullet(float size, float damageScale = 1.f, float bounce =
 
 	//End box2d setup
 
+	speed_ = 0.000025f;
+	damage_ = 1 * damageScale;
+}
+
+void Projectile::setAsRect(float size, float damageScale = 1.f, float bounce = 0.f, bool ghost = false)
+{
+	//Shape
+	b2PolygonShape box;
+	box.SetAsBox(0.25f * size, 0.5f * size);
+
+	//Fixture
+	b2FixtureDef fixtureDef;
+	fixtureDef.shape = &box;
+
+	//Collision
+	fixtureDef.userData = "projectile";
+	fixtureDef.isSensor = ghost;
+	addMaterial(fixtureDef, bounce);
+
+	//Bind fixture
+	body_->CreateFixture(&fixtureDef);
+
+	//End box2d setup
+	body_->SetTransform(body_->GetPosition(), atan2f(-heading_.x, heading_.y));
 	speed_ = 0.000025f;
 	damage_ = 1 * damageScale;
 }
@@ -69,11 +102,12 @@ void Projectile::fire(float mult)
 
 		newVelocity *= speed_ * mult;
 
+		heading_ *= speed_ * mult;
+
 		//newVelocity.x = body_->GetMass() / (newVelocity.x > 0 ? newVelocity.x : 1);
 				
 		//(newVelocity.x != 0 ? newVelocity.x = body_->GetMass() / newVelocity.x : newVelocity.x);
 		//(newVelocity.y != 0 ? newVelocity.y = body_->GetMass() / newVelocity.y : newVelocity.y);
-
 		body_->ApplyForce(newVelocity, body_->GetWorldCenter(), true);
 		fired_ = true;
 	}
@@ -125,6 +159,11 @@ b2Vec2 Projectile::getDirection() const
 void Projectile::update(int milliseconds)
 {
 	lifeTime_ -= milliseconds;
+
+	if (fired_)
+	{
+		body_->ApplyForce(heading_, body_->GetWorldCenter(), true);
+	}
 
 	if ((impacted_ || hp_ <= 0) || lifeTime_ <= 0 )
 	{
