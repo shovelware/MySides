@@ -21,17 +21,19 @@ GameWorld::GameWorld() :
 	audio_.addAFX("wind", "../assets/wind.ogg", 0, 1, 750, 1000);
 
 	//Weapon noises
-	audio_.addSFX("rifle", "../assets/nsnd/bullet.wav", 64);
-	audio_.addSFX("shotgun", "../assets/nsnd/shotty.wav", 32);
+	audio_.addSFX("rifle", "../assets/nsnd/bullet.wav", 16);
+	audio_.addSFX("shotgun", "../assets/nsnd/shotty.wav", 16);
+	audio_.addSFX("coilgun", "../assets/nsnd/pew.wav", 16);
 
 	//Bomb
 	audio_.addSFX("bomb", "../assets/nsnd/boom.wav", 2);
 
-	audio_.addSFX("spawn", "../assets/spawn.wav", 16);
-	audio_.addSFX("die", "../assets/die.wav", 32);
+	//Oldies
+	audio_.addSFX("spawn", "../assets/spawn.wav", 8);
+	audio_.addSFX("die", "../assets/die.wav", 8);
 	audio_.addSFX("loss", "../assets/loss.wav", 1);
-	audio_.addSFX("drop", "../assets/drop.wav", 64);
-	audio_.addSFX("collect", "../assets/collect.wav", 32);
+	audio_.addSFX("drop", "../assets/drop.wav", 8);
+	audio_.addSFX("collect", "../assets/collect.wav", 8);
 	
 	getControlled_ = std::bind(&GameWorld::getControlled, this);
 }
@@ -174,19 +176,16 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 	}
 
 	player_ = new Player(addDynamicBody(pos), play, addSide_);	
-	addPickup(PickupDef(PickupDef::Type::ATTRACT, pos, 10, 7.5, -1));
+	addPickup(Pickup::Type::ATTRACT, pos, -1);
 
 	if (control)
 	{
 		//Set our control to the one we just put in
 		controlled_ = player_;
 
-		ProjectileDef newDef = ProjectileDef::cnnbllDef();
-		newDef.lifeTime = 3000;
-		//newDef.damageScale = 4.f;
-		newDef.bounce = 1.f;
+		ProjectileDef newDef = ProjectileDef::pewpewDef();
 
-		weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
+		weapons_.push_back(new Weapon::Coilgun(fireWeap_, newDef));
 		Weapon::WeaponI* newWeap = (*--weapons_.end());
 
 		player_->arm(newWeap);
@@ -255,23 +254,23 @@ void GameWorld::addSide(const SideDef& def)
 	freesides++;
 }
 
-void GameWorld::addPickup(const PickupDef& def)
+void GameWorld::addPickup(Pickup::Type type, b2Vec2 position, int time)
 {
-	switch (def.type)
+	switch (type)
 	{
-	case PickupDef::Type::SIGHT:
-		pickups_.push_back(new Pickup::Sight(addDynamicBody(def.position), def));
+	case Pickup::Type::SIGHT:
+		pickups_.push_back(new Pickup::Sight(addDynamicBody(position), time));
 		break;
 
-	case PickupDef::Type::SHIELD:
-		pickups_.push_back(new Pickup::Shield(addDynamicBody(def.position), def));
+	case Pickup::Type::SHIELD:
+		pickups_.push_back(new Pickup::Shield(addDynamicBody(position), time));
 		break;
 
-	case PickupDef::Type::ATTRACT:
-		pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), def));
+	case Pickup::Type::ATTRACT:
+		pickups_.push_back(new Pickup::Attractor(addDynamicBody(position), time));
 		break;
 
-	case PickupDef::Type::WEAPON:
+	case Pickup::Type::WEAPON:
 		break;
 	}
 
@@ -486,90 +485,6 @@ int GameWorld::getHapticL() const
 int GameWorld::getHapticR() const
 {
 	return rightHaptic_;
-}
-
-void GameWorld::testBed()
-{
-	//EW
-	for (int i = 0; i < 8; ++i)
-	{
-		ShapeDef enem = ShapeDef(b2Vec2(-20 + 5 * i, 15), b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
-		//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
-
-		ProjectileDef newDef = ProjectileDef::bulletDef();
-
-		switch (i)
-		{
-		case 0:
-			newDef = ProjectileDef::pelletDef();
-			enem.colPrim = b2Color(.75f, .75f, .75f);
-			enem.colSecn = b2Color(.5f, .5f, .5f);
-			enem.colTert = b2Color(.75f, .75f, .75f);
-			break;
-
-		case 1:
-			newDef = ProjectileDef::ninmilDef();
-			enem.colPrim = b2Color(1, .5f, 0);
-			enem.colSecn = b2Color(.75f, .25f, 0);
-			enem.colTert = b2Color(1, .5f, 0);
-			break;
-
-		case 2:
-			newDef = ProjectileDef::bulletDef();
-			enem.colPrim = b2Color(1, 1, 0);
-			enem.colSecn = b2Color(.75f, .75f, 0);
-			enem.colTert = b2Color(1, 1, 0);
-			break;
-
-		case 3:
-			newDef = ProjectileDef::dumdumDef();
-			enem.colPrim = b2Color(.5f, 0, .5f);
-			enem.colSecn = b2Color(.25f, 0, .25f);
-			enem.colTert = b2Color(.5f, 0, .5f);
-			break;
-
-		case 4:
-			newDef = ProjectileDef::cnnbllDef();
-			enem.colPrim = b2Color(0, 0, 0);
-			enem.colSecn = b2Color(.1f, .1f, .1f);
-			enem.colTert = b2Color(0, 0, 0);
-			break;
-			
-		case 5:
-			newDef = ProjectileDef::grenadeDef();
-			enem.colPrim = b2Color(0, 0.75f, 0);
-			enem.colSecn = b2Color(0, 0.5f, 0);
-			enem.colTert = b2Color(0, 0.75f, 0);
-			break;
-
-		case 6:
-			newDef = ProjectileDef::rocketDef();
-			enem.colPrim = b2Color(0.7f, 0, 0);
-			enem.colSecn = b2Color(0.5f, 0, 0);
-			enem.colTert = b2Color(0.7f, 0, 0);
-			break;
-
-		case 7:
-			newDef = ProjectileDef::pewpewDef();
-			enem.colPrim = b2Color(0, 0, 1);
-			enem.colSecn = b2Color(0, 0, .7f);
-			enem.colTert = b2Color(0, 0, 1);
-			break;
-		}
-
-		newDef.damageScale = 0;
-
-		Weapon::WeaponI* newWeap;
-
-		shapes_.push_back(new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_));
-		Shape* added = *(--shapes_.end());
-
-		weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
-		newWeap = (*--weapons_.end());
-
-		added->arm(newWeap);
-	}
-	//randomiseCol(bounds_);
 }
 
 //Returns the radius of the level bounds
@@ -939,21 +854,112 @@ void GameWorld::f5()
 {}
 
 void GameWorld::f6()
-{}
+{
+	addPickup(Pickup::Type::SIGHT, b2Vec2_zero, 20000);
+}
 
 void GameWorld::f7()
-{}
+{
+	addPickup(Pickup::Type::SHIELD, b2Vec2_zero, 20000);
+}
 
 void GameWorld::f8()
-{}
+{
+	randomiseCol(bounds_);
+}
 
 void GameWorld::f9()
 {
-	randomiseCol(bounds_);
+	if (player_ != nullptr)
+		randomiseCol(player_);
 }
 
 void GameWorld::f0()
 {
 	if (player_ != nullptr)
-		randomiseCol(player_);
+		player_->kill();
+}
+
+void GameWorld::testBed()
+{
+	//EW
+	for (int i = 0; i < 8; ++i)
+	{
+		ShapeDef enem = ShapeDef(b2Vec2(-20 + 5 * i, 15), b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
+		//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
+
+		ProjectileDef newDef = ProjectileDef::pewpewDef();
+
+		switch (i)
+		{
+		case 0:
+			newDef = ProjectileDef::pelletDef();
+			enem.colPrim = b2Color(.75f, .75f, .75f);
+			enem.colSecn = b2Color(.5f, .5f, .5f);
+			enem.colTert = b2Color(.75f, .75f, .75f);
+			break;
+
+		case 1:
+			newDef = ProjectileDef::ninmilDef();
+			enem.colPrim = b2Color(1, .5f, 0);
+			enem.colSecn = b2Color(.75f, .25f, 0);
+			enem.colTert = b2Color(1, .5f, 0);
+			break;
+
+		case 2:
+			newDef = ProjectileDef::bulletDef();
+			enem.colPrim = b2Color(1, 1, 0);
+			enem.colSecn = b2Color(.75f, .75f, 0);
+			enem.colTert = b2Color(1, 1, 0);
+			break;
+
+		case 3:
+			newDef = ProjectileDef::dumdumDef();
+			enem.colPrim = b2Color(.5f, 0, .5f);
+			enem.colSecn = b2Color(.25f, 0, .25f);
+			enem.colTert = b2Color(.5f, 0, .5f);
+			break;
+
+		case 4:
+			newDef = ProjectileDef::cnnbllDef();
+			enem.colPrim = b2Color(0, 0, 0);
+			enem.colSecn = b2Color(.1f, .1f, .1f);
+			enem.colTert = b2Color(0, 0, 0);
+			break;
+
+		case 5:
+			newDef = ProjectileDef::grenadeDef();
+			enem.colPrim = b2Color(0, 0.75f, 0);
+			enem.colSecn = b2Color(0, 0.5f, 0);
+			enem.colTert = b2Color(0, 0.75f, 0);
+			break;
+
+		case 6:
+			newDef = ProjectileDef::rocketDef();
+			enem.colPrim = b2Color(0.7f, 0, 0);
+			enem.colSecn = b2Color(0.5f, 0, 0);
+			enem.colTert = b2Color(0.7f, 0, 0);
+			break;
+
+		case 7:
+			newDef = ProjectileDef::pewpewDef();
+			enem.colPrim = b2Color(0, 0, 1);
+			enem.colSecn = b2Color(0, 0, .7f);
+			enem.colTert = b2Color(0, 0, 1);
+			break;
+		}
+
+		newDef.damageScale = 0;
+
+		Weapon::WeaponI* newWeap;
+
+		shapes_.push_back(new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_));
+		Shape* added = *(--shapes_.end());
+
+		weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
+		newWeap = (*--weapons_.end());
+
+		added->arm(newWeap);
+	}
+	//randomiseCol(bounds_);
 }

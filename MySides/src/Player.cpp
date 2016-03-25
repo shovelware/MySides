@@ -10,7 +10,6 @@ Player::Player(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callba
 	bombTime_(0),
 	bombRange_(15)
 {
-	body_->GetFixtureList()->SetSensor(true);
 }
 
 //Only deals with the effects of this collision on this entity

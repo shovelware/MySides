@@ -2,15 +2,12 @@
 #define MS_PICKATTRACT_HPP
 
 #include "Pickup.hpp"
-#include "PickupDef.hpp"
 #include "Side.hpp"
-
-#include <queue>
 
 namespace Pickup {
 	class Attractor : public PickupI {
 	public:
-		Attractor(b2Body* body, const PickupDef& def);
+		Attractor(b2Body* body,  int time);
 
 		void update(int milliseconds);
 
@@ -21,10 +18,6 @@ namespace Pickup {
 		void onCollect();
 
 		float radius_;
-		float strength_;
-
-		std::queue<Side*> sides_;
-
 	};
 }
 

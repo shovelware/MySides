@@ -28,7 +28,6 @@
 
 #include "ShapeDef.hpp"
 #include "SideDef.hpp"
-#include "PickupDef.hpp"
 
 #include "Pickup.hpp"
 #include "Sight.hpp"
@@ -38,6 +37,7 @@
 #include "Weapon.hpp"
 #include "WeapRifle.hpp"
 #include "WeapShotgun.hpp"
+#include "WeapCoil.hpp"
 
 #include "SoundSystem.hpp"
 
@@ -58,7 +58,7 @@ public:
 	void addEnemy(const ShapeDef& def);
 	void addProjectile(const ProjectileDef& def);
 	void addSide(const SideDef& def);
-	void addPickup(const PickupDef& def);
+	void addPickup(Pickup::Type type, b2Vec2 position, int time);
 
 	void armShape(Shape* shape);
 	void disarmShape(Shape* shape);

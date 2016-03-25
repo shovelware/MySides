@@ -144,6 +144,9 @@
     <ClCompile Include="src\Attractor.cpp">
       <Filter>Source Files\Game\Pickup</Filter>
     </ClCompile>
+    <ClCompile Include="src\WeapCoil.cpp">
+      <Filter>Source Files\Game\Weapon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">
@@ -239,9 +242,6 @@
     <ClInclude Include="include\Pickup.hpp">
       <Filter>Header Files\Game\Entity\Pickup</Filter>
     </ClInclude>
-    <ClInclude Include="include\PickupDef.hpp">
-      <Filter>Header Files\Game\Entity\Def</Filter>
-    </ClInclude>
     <ClInclude Include="include\Sight.hpp">
       <Filter>Header Files\Game\Entity\Pickup</Filter>
     </ClInclude>
@@ -250,6 +250,12 @@
     </ClInclude>
     <ClInclude Include="include\Attractor.hpp">
       <Filter>Header Files\Game\Entity\Pickup</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Battery.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WeapCoil.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

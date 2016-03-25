@@ -151,6 +151,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\SoundEffect.cpp" />
     <ClCompile Include="src\SoundSystem.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
+    <ClCompile Include="src\WeapCoil.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
     <ClCompile Include="src\WeapRifle.cpp" />
     <ClCompile Include="src\WeapShotgun.cpp" />
@@ -162,6 +163,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="CodePallet.h" />
     <ClInclude Include="include\AmbientEffect.hpp" />
     <ClInclude Include="include\Attractor.hpp" />
+    <ClInclude Include="include\Battery.hpp" />
     <ClInclude Include="include\Bounds.hpp" />
     <ClInclude Include="include\Camera.hpp" />
     <ClInclude Include="include\ContactListener.hpp" />
@@ -173,7 +175,6 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\KeyInput.hpp" />
     <ClInclude Include="include\Log.hpp" />
     <ClInclude Include="include\Pickup.hpp" />
-    <ClInclude Include="include\PickupDef.hpp" />
     <ClInclude Include="include\Renderer.hpp" />
     <ClInclude Include="include\Magazine.hpp" />
     <ClInclude Include="include\Player.hpp" />
@@ -190,6 +191,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\SoundSystem.hpp" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\targetver.h" />
+    <ClInclude Include="include\WeapCoil.hpp" />
     <ClInclude Include="include\Weapon.hpp" />
     <ClInclude Include="include\WeapRifle.hpp" />
     <ClInclude Include="include\WeapShotgun.hpp" />

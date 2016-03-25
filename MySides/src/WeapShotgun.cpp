@@ -39,7 +39,7 @@ void Weapon::Shotgun::fire(b2Vec2 &heading)
 	b2Vec2 origin = owner_->getPosition();
 
 	//Set up projectile (centre)
-	newProj->origin = origin;
+	newProj->origin = origin + heading;
 	newProj->heading = heading;
 	newProj->owner = owner_;
 	
@@ -58,7 +58,7 @@ void Weapon::Shotgun::fire(b2Vec2 &heading)
 		newDir.x = cosf(rotation +adjust);
 		newDir.y = sinf(rotation +adjust);
 
-		newProj->origin = origin;
+		newProj->origin = origin + newDir;
 		newProj->heading = newDir;
 		newProj->owner = owner_;
 	}

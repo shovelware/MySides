@@ -2,7 +2,7 @@
 
 Weapon::Rifle::Rifle(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
 	WeaponI(callback, ammo),
-	magazine_(3000)
+	magazine_(30)
 {
 	refireTimeMAX_ = 100;
 	refireTime_ = 0;
@@ -51,7 +51,7 @@ void Weapon::Rifle::fire(b2Vec2 &heading)
 	std::vector<ProjectileDef>::iterator newProj = pv.begin();
 
 	//Set up projectile
-	newProj->origin = owner_->getPosition();
+	newProj->origin = owner_->getPosition() + heading;
 	newProj->heading = heading;
 	newProj->owner = owner_;
 

@@ -3,10 +3,9 @@
 #include "Bounds.hpp"
 #include "Pickup.hpp"
 
-Pickup::Attractor::Attractor(b2Body* body, const PickupDef& def) :
-	Pickup::PickupI(body, def.time),
-	radius_(def.size),
-	strength_(def.strength)
+Pickup::Attractor::Attractor(b2Body* body, int time) :
+	Pickup::PickupI(body, time),
+	radius_(7.5f)
 {
 	//Body is initially made by pickup base class
 }

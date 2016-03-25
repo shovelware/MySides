@@ -13,6 +13,14 @@
 
 namespace Pickup
 {
+
+	enum Type {
+		SIGHT,
+		SHIELD,
+		ATTRACT,
+		WEAPON
+	};
+
 	class PickupI : public Entity {
 	public:
 		virtual void update(int milliseconds);

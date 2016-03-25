@@ -4,10 +4,9 @@
 #include "Bounds.hpp"
 #include "Pickup.hpp"
 
-Pickup::Shield::Shield(b2Body* body, const PickupDef& def) :
-	Pickup::PickupI(body, def.time),
-	radius_(def.size),
-	strength_(def.strength)
+Pickup::Shield::Shield(b2Body* body, int time) :
+	Pickup::PickupI(body, time),
+	strength_(5)
 {
 	//Body is initially made by pickup base class
 }
@@ -40,7 +39,7 @@ void Pickup::Shield::onCollect()
 	body_->GetWorld()->CreateJoint(&rev);
 
 	b2CircleShape shape;
-	shape.m_radius = radius_;
+	shape.m_radius = owner_->getSize() * 2.f;
 
 	def.shape = &shape;
 

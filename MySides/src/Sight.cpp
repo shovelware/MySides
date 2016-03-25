@@ -4,10 +4,9 @@
 #include "Bounds.hpp"
 #include "Pickup.hpp"
 
-Pickup::Sight::Sight(b2Body* body, const PickupDef& def) :
-	Pickup::PickupI(body, def.time),
-	size_(def.size),
-	strength_(def.strength)
+Pickup::Sight::Sight(b2Body* body, int time) :
+	Pickup::PickupI(body, time),
+	size_(10)
 {
 	//Body is initially made by pickup base class
 }

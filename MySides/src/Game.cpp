@@ -222,6 +222,7 @@ void Game::handleInput(sf::Time dt)
 	if (key_.isKeyPressed(Key::F5)) 
 	{
 		world_->resetLevel();
+		camera_->setTarget(world_->getPlayer());
 		camera_->setCenter(sf::Vector2f(0, 0));
 	}
 

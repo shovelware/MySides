@@ -96,19 +96,14 @@ public:
 	Entity* owner;
 	Entity* target;
 
-	static enum ProjType {
-		BULLET,
-		ROCKET
-	};
-
 	static ProjectileDef pelletDef()
 	{
 		ProjectileDef pellet = ProjectileDef();
 		pellet.velScale = 1;
 		pellet.hpMAX = 1;
 		pellet.size = 0.25f;
-		pellet.damageScale = 0.5f;
-		pellet.lifeTime = 250;
+		pellet.damageScale = 1;
+		pellet.lifeTime = 150;
 
 		return pellet;
 	}
@@ -144,7 +139,7 @@ public:
 		dumdum.hpMAX = 2;
 		dumdum.size = 2.f;
 		dumdum.damageScale = 1.5f;
-		dumdum.lifeTime = 1000;
+		dumdum.lifeTime = 1250;
 
 		return dumdum;
 	}
@@ -156,7 +151,7 @@ public:
 		cnnbll.hpMAX = 4;
 		cnnbll.size = 3.f;
 		cnnbll.damageScale = 2.f;
-		cnnbll.lifeTime = 1000;
+		cnnbll.lifeTime = 1500;
 
 		return cnnbll;
 	}
@@ -169,7 +164,7 @@ public:
 		grenade.size = 1.f;
 		grenade.rect = true;
 		grenade.damageScale = 2.f;
-		grenade.lifeTime = 3000;
+		grenade.lifeTime = 1250;
 
 		return grenade;
 	}
@@ -182,7 +177,7 @@ public:
 		rocket.size = 1.f;
 		rocket.rect = true;
 		rocket.damageScale = 1.f;
-		rocket.lifeTime = 1000;
+		rocket.lifeTime = 500;
 
 		return rocket;
 	}
@@ -191,12 +186,12 @@ public:
 	{
 		ProjectileDef pewpew = ProjectileDef();
 		pewpew.velScale = 2;
-		pewpew.hpMAX = 3;
+		pewpew.hpMAX = 2;
 		pewpew.size = .25f;
 		pewpew.rect = true;
 		pewpew.ghost = true;
 		pewpew.damageScale = 1.f;
-		pewpew.lifeTime = 1000;
+		pewpew.lifeTime = 500;
 
 		return pewpew;
 	}

@@ -2,12 +2,11 @@
 #define MS_PICKSHIELD_HPP
 
 #include "Pickup.hpp"
-#include "PickupDef.hpp"
 
 namespace Pickup {
 	class Shield : public PickupI {
 	public:
-		Shield(b2Body* body, const PickupDef& def);
+		Shield(b2Body* body, int time);
 
 		void update(int milliseconds);
 

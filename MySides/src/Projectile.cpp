@@ -82,7 +82,7 @@ void Projectile::setAsRect(float size, float damageScale = 1.f, float bounce = 0
 
 	//End box2d setup
 	body_->SetTransform(body_->GetPosition(), atan2f(-heading_.x, heading_.y));
-	speed_ = 0.00005f * size;
+	speed_ = 0.00025f / size;
 	damage_ = 1 * damageScale;
 }
 
@@ -162,10 +162,13 @@ void Projectile::update(int milliseconds)
 	{
 		//body_->ApplyForce(heading_, body_->GetWorldCenter(), true);
 	}
+	b2Vec2 vel = body_->GetLinearVelocity();
+
+	body_->SetTransform(body_->GetPosition(), atan2f(-vel.x, vel.y));
 
 	//std::cout << body_->GetLinearVelocity().Length();
 
-	if ( body_->GetLinearVelocity().Length() <= 0|| hp_ <= 0 || lifeTime_ <= 0)
+	if (vel.Length() <= 0|| hp_ <= 0 || lifeTime_ <= 0)
 	{
 		alive_ = false;
 		active_ = false;		
@@ -236,5 +239,3 @@ bool Projectile::collide(Entity * other, b2Contact& contact)
 
 	return handled;
 }
-
-
