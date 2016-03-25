@@ -25,7 +25,7 @@ public:
 	~Shape();
 
 	void move(b2Vec2 direction); //override
-	void orientedMove(b2Vec2 direction); //Thrusts from back and rotates towards direction
+	void orientedMove(b2Vec2 direction); //Thrusts and rotates towards direction
 	void stopMove();
 
 	void orient(b2Vec2 direction);

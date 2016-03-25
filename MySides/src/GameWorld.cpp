@@ -178,7 +178,7 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		//Set our control to the one we just put in
 		controlled_ = player_;
 
-		ProjectileDef newDef = ProjectileDef::grenadeDef();
+		ProjectileDef newDef = ProjectileDef::cnnbllDef();
 		newDef.lifeTime = 3000;
 		//newDef.damageScale = 4.f;
 		newDef.bounce = 1.f;
@@ -441,27 +441,37 @@ void GameWorld::clearWorld()
 
 void GameWorld::bomb()
 {
-	//Explode shapes
-	if (shapes_.empty() == false)
+	if (player_ != nullptr)
 	{
-		for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
-		shapeIt != shapes_.end(); ++shapeIt)
+		if (player_->getBombReady())
 		{
-			(*shapeIt)->explode();
+			float range = player_->getBombRange();
+			//Explode shapes
+			if (shapes_.empty() == false)
+			{
+				for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
+				shapeIt != shapes_.end(); ++shapeIt)
+				{
+					if (b2Distance((*shapeIt)->getPosition(), player_->getPosition()) < range)
+						(*shapeIt)->explode();
+				}
+			}
+
+			//Baleet projectiles
+
+			if (projectiles_.empty() == false)
+			{
+				for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
+				projIt != projectiles_.end(); ++projIt)
+				{
+					if (b2Distance((*projIt)->getPosition(), player_->getPosition()) < range)
+						(*projIt)->setActive(false);
+				}
+			}
+
+			player_->bomb();
 		}
 	}
-
-	//Baleet projectiles
-
-	if (projectiles_.empty() == false)
-	{
-		for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
-		projIt != projectiles_.end(); ++projIt)
-		{
-			(*projIt)->setActive(false);
-		}
-	}
-
 }
 
 int GameWorld::getHapticL() const
@@ -544,7 +554,6 @@ void GameWorld::testBed()
 		}
 
 		newDef.damageScale = 0;
-		newDef.lifeTime = 250;
 
 		Weapon::WeaponI* newWeap;
 

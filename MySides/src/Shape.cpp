@@ -204,20 +204,35 @@ void Shape::stopRotate()
 
 void Shape::takeDamage(int damage, b2Vec2 direction)
 {
-	hp_ -= damage;
 	lastDamage_ = direction;
 	lastDamage_.Normalize();
 
-	//Go back a shape if we can
-	if (hp_ <= 0 && vertices_ > 3)
+	for (int dmg = damage; dmg > 0; dmg--)
 	{
-		vertices_ = (vertices_ - 1 >= 2 ? vertices_ - 1 : 2);
-
-		if (vertices_ > 2)
+		//If we're down, go back a side
+		if (hp_ == 0)
 		{
-			hpMAX_ = vertices_;
-			hp_ = hpMAX_;
+			vertices_ = (vertices_ - 1 >= 2 ? vertices_ - 1 : 2);
+
+			if (vertices_ > 2)
+			{
+				hpMAX_ = vertices_;
+				hp_ = hpMAX_;
+			}
 		}
+
+		//Otherwise just take some hp
+		else 
+		{
+			if (vertices_ > 2)
+			{
+				hp_ -= 1;
+			}
+		}
+		
+		//We're dead, stop hurting
+		if (hp_ <= 0 & vertices_ <= 2)
+			break;
 	}
 }
 
@@ -255,7 +270,7 @@ void Shape::explode()
 {
 	b2PolygonShape* shape = static_cast<b2PolygonShape*>(body_->GetFixtureList()->GetShape());
 
-	for (int i = 0, count = vertices_; i < count; ++i)
+	for (int i = 0, count = shapeVertices_; i < count; ++i)
 	{
 
 		int a = i;
@@ -333,8 +348,16 @@ void Shape::update(int milliseconds)
 				weapon_->update(milliseconds);
 			}
 
+			//If we're at 0 health and can't go back, die
+			if (hp_ <= 0 && vertices_ <= 3)
+			{
+				explode();
+
+				alive_ = false;
+			}
+
 			//If our internal shape mismatches our displayed shape
-			if (vertices_ > 2 && vertices_ != shapeVertices_)
+			else if (vertices_ > 2 && vertices_ != shapeVertices_)
 			{
 				int diff = shapeVertices_ - vertices_;
 
@@ -356,19 +379,12 @@ void Shape::update(int milliseconds)
 			}
 
 			//If we have a bunch of sides and could go up
-			else if (sides_ >= 16 && vertices_ < 8)
+			if (sides_ >= 16 && vertices_ < 8)
 			{
 				sides_ -= 16;
 				vertices_ += 1;
 			}
 
-			//If we're a  0 health triangle, die
-			if (hp_ <= 0 && vertices_ <= 3)
-			{
-				explode();
-
-				alive_ = false;
-			}
 		}//End alive
 
 	else active_ = false;

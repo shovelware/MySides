@@ -4,8 +4,11 @@
 #include "Side.hpp"
 #include "Pickup.hpp"
 
-Player::Player(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback) : 
-	Shape(body, def, callback)
+Player::Player(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback) :
+	Shape(body, def, callback),
+	bombTimeMax_(30000),
+	bombTime_(0),
+	bombRange_(15)
 {
 	body_->GetFixtureList()->SetSensor(true);
 }
@@ -56,4 +59,18 @@ bool Player::collide(Entity * other, b2Contact& contact)
 	}
 
 	return handled;
+}
+
+float Player::getBombRange() const { return bombRange_; }
+bool Player::getBombReady() const { return bombTime_ == 0; }
+
+void Player::bomb()
+{
+	bombTime_ = bombTimeMax_;
+}
+
+void Player::update(int milliseconds)
+{
+	Shape::update(milliseconds);
+	bombTime_ = (bombTime_ - milliseconds >= 0 ? bombTime_ - milliseconds : 0);
 }

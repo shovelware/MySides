@@ -108,7 +108,7 @@ public:
 		pellet.hpMAX = 1;
 		pellet.size = 0.25f;
 		pellet.damageScale = 0.5f;
-		pellet.lifeTime = 1000;
+		pellet.lifeTime = 250;
 
 		return pellet;
 	}
@@ -120,7 +120,7 @@ public:
 		ninmil.hpMAX = 1;
 		ninmil.size = 0.5f;
 		ninmil.damageScale = 1;
-		ninmil.lifeTime = 1000;
+		ninmil.lifeTime = 500;
 		
 		return ninmil;
 	}
@@ -153,7 +153,7 @@ public:
 	{
 		ProjectileDef cnnbll = ProjectileDef();
 		cnnbll.velScale = 3;
-		cnnbll.hpMAX = 1;
+		cnnbll.hpMAX = 4;
 		cnnbll.size = 3.f;
 		cnnbll.damageScale = 2.f;
 		cnnbll.lifeTime = 1000;
@@ -169,7 +169,7 @@ public:
 		grenade.size = 1.f;
 		grenade.rect = true;
 		grenade.damageScale = 2.f;
-		grenade.lifeTime = 1000;
+		grenade.lifeTime = 3000;
 
 		return grenade;
 	}
@@ -190,7 +190,7 @@ public:
 	static ProjectileDef pewpewDef()
 	{
 		ProjectileDef pewpew = ProjectileDef();
-		pewpew.velScale = 3;
+		pewpew.velScale = 2;
 		pewpew.hpMAX = 3;
 		pewpew.size = .25f;
 		pewpew.rect = true;

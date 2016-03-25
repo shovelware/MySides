@@ -17,17 +17,17 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 	owner_(def.owner), 
 	target_(def.target)
 {
-	if (!def.rect)
-	{
-		setAsCircle(size_, def.damageScale, def.bounce, def.ghost);
-	}
-
-	else
+	if (def.rect)
 	{
 		setAsRect(size_, def.damageScale, def.bounce, def.ghost);
 	}
 
-	//Do maths to orient body here
+	else
+	{
+		setAsCircle(size_, def.damageScale, def.bounce, def.ghost);
+	}
+
+	//Do maths to orient body
 	body_->SetTransform(def.origin, body_->GetAngle());
 
 	//Set up colours
@@ -58,7 +58,7 @@ void Projectile::setAsCircle(float size, float damageScale = 1.f, float bounce =
 
 	//End box2d setup
 
-	speed_ = 0.000025f;
+	speed_ = 0.000025f * size;
 	damage_ = 1 * damageScale;
 }
 
@@ -66,7 +66,7 @@ void Projectile::setAsRect(float size, float damageScale = 1.f, float bounce = 0
 {
 	//Shape
 	b2PolygonShape box;
-	box.SetAsBox(0.25f * size, 0.5f * size);
+	box.SetAsBox(0.2f * size, 0.6f);
 
 	//Fixture
 	b2FixtureDef fixtureDef;
@@ -82,7 +82,7 @@ void Projectile::setAsRect(float size, float damageScale = 1.f, float bounce = 0
 
 	//End box2d setup
 	body_->SetTransform(body_->GetPosition(), atan2f(-heading_.x, heading_.y));
-	speed_ = 0.000025f;
+	speed_ = 0.00005f * size;
 	damage_ = 1 * damageScale;
 }
 
@@ -98,17 +98,15 @@ void Projectile::fire(float mult)
 	if (fired_ == false)
 	{
 		heading_.Normalize();
-		b2Vec2 newVelocity(heading_);
-
-		newVelocity *= speed_ * mult;
 
 		heading_ *= speed_ * mult;
-
+		
+		body_->SetLinearVelocity(heading_);
 		//newVelocity.x = body_->GetMass() / (newVelocity.x > 0 ? newVelocity.x : 1);
 				
 		//(newVelocity.x != 0 ? newVelocity.x = body_->GetMass() / newVelocity.x : newVelocity.x);
 		//(newVelocity.y != 0 ? newVelocity.y = body_->GetMass() / newVelocity.y : newVelocity.y);
-		body_->ApplyForce(newVelocity, body_->GetWorldCenter(), true);
+		body_->ApplyForce(heading_, body_->GetWorldCenter(), true);
 		fired_ = true;
 	}
 }
@@ -162,10 +160,12 @@ void Projectile::update(int milliseconds)
 
 	if (fired_)
 	{
-		body_->ApplyForce(heading_, body_->GetWorldCenter(), true);
+		//body_->ApplyForce(heading_, body_->GetWorldCenter(), true);
 	}
 
-	if ((impacted_ || hp_ <= 0) || lifeTime_ <= 0 )
+	//std::cout << body_->GetLinearVelocity().Length();
+
+	if ( body_->GetLinearVelocity().Length() <= 0|| hp_ <= 0 || lifeTime_ <= 0)
 	{
 		alive_ = false;
 		active_ = false;		
