@@ -151,6 +151,16 @@ public:
 
 	/////Debug
 	void testBed();
+	void f1();
+	void f2();
+	void f3();
+	void f4();
+	void f5();
+	void f6();
+	void f7();
+	void f8();
+	void f9();
+	void f0();
 private:
 	const b2Vec2 GRAVITY = b2Vec2(0, 0);
 	const int VELOCITY_ITERS = 6;

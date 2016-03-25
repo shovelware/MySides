@@ -225,10 +225,23 @@ void Game::handleInput(sf::Time dt)
 		camera_->setCenter(sf::Vector2f(0, 0));
 	}
 
+	//X : Bomb
 	if (key_.isKeyPressed(Key::X))
 	{
 		world_->bomb();
 	}
+
+	//1234567890 : Test functions
+	if (key_.isKeyPressed(Key::Num1)) { world_->f1(); }
+	if (key_.isKeyPressed(Key::Num2)) { world_->f2(); }
+	if (key_.isKeyPressed(Key::Num3)) { world_->f3(); }
+	if (key_.isKeyPressed(Key::Num4)) { world_->f4(); }
+	if (key_.isKeyPressed(Key::Num5)) { world_->f5(); }
+	if (key_.isKeyPressed(Key::Num6)) { world_->f6(); }
+	if (key_.isKeyPressed(Key::Num7)) { world_->f7(); }
+	if (key_.isKeyPressed(Key::Num8)) { world_->f8(); }
+	if (key_.isKeyPressed(Key::Num9)) { world_->f9(); }
+	if (key_.isKeyPressed(Key::Num0)) { world_->f0(); }
 
 	//Controller Control
 	world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));

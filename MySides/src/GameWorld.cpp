@@ -24,6 +24,9 @@ GameWorld::GameWorld() :
 	audio_.addSFX("rifle", "../assets/nsnd/bullet.wav", 64);
 	audio_.addSFX("shotgun", "../assets/nsnd/shotty.wav", 32);
 
+	//Bomb
+	audio_.addSFX("bomb", "../assets/nsnd/boom.wav", 2);
+
 	audio_.addSFX("spawn", "../assets/spawn.wav", 16);
 	audio_.addSFX("die", "../assets/die.wav", 32);
 	audio_.addSFX("loss", "../assets/loss.wav", 1);
@@ -469,6 +472,7 @@ void GameWorld::bomb()
 				}
 			}
 
+			audio_.playSFX("bomb", B2toSF(player_->getPosition(), true));
 			player_->bomb();
 		}
 	}
@@ -919,3 +923,37 @@ void GameWorld::fire(b2Vec2 direction)
 	}
 }
 
+void GameWorld::f1()
+{}
+
+void GameWorld::f2()
+{}
+
+void GameWorld::f3()
+{}
+
+void GameWorld::f4()
+{}
+
+void GameWorld::f5()
+{}
+
+void GameWorld::f6()
+{}
+
+void GameWorld::f7()
+{}
+
+void GameWorld::f8()
+{}
+
+void GameWorld::f9()
+{
+	randomiseCol(bounds_);
+}
+
+void GameWorld::f0()
+{
+	if (player_ != nullptr)
+		randomiseCol(player_);
+}
