@@ -16,6 +16,7 @@ public:
 		rect(false),
 		ghost(false),
 		bounce(0),
+		explode(0),
 		hpMAX(0),
 		size(0),
 		damageScale(1),
@@ -35,6 +36,7 @@ public:
 		rect(false),
 		ghost(false),
 		bounce(0),
+		explode(0),
 		hpMAX(1),
 		size(1),
 		damageScale(1),
@@ -51,9 +53,10 @@ public:
 		heading(b2Vec2_zero),
 		inVelocity(b2Vec2_zero),
 		velScale(pd.velScale),
-		bounce(pd.bounce),
 		rect(pd.rect),
 		ghost(pd.ghost),
+		bounce(pd.bounce),
+		explode(pd.explode),
 		hpMAX(pd.hpMAX),
 		size(pd.size),
 		damageScale(pd.damageScale),
@@ -79,6 +82,7 @@ public:
 	bool rect;
 	bool ghost;
 	float bounce;
+	int explode;
 
 	unsigned int hpMAX;
 	float size;
@@ -159,10 +163,11 @@ public:
 	static ProjectileDef grenadeDef()
 	{
 		ProjectileDef grenade = ProjectileDef();
-		grenade.velScale = 1;
+		grenade.velScale = 0.75f;
 		grenade.hpMAX = 1;
 		grenade.size = 1.f;
 		grenade.rect = true;
+		grenade.explode = 12;
 		grenade.damageScale = 2.f;
 		grenade.lifeTime = 1250;
 
@@ -176,6 +181,7 @@ public:
 		rocket.hpMAX = 1;
 		rocket.size = 1.f;
 		rocket.rect = true;
+		rocket.explode = 6;
 		rocket.damageScale = 1.f;
 		rocket.lifeTime = 500;
 

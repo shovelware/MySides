@@ -15,7 +15,8 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 	size_(def.size),
 	lifeTime_(def.lifeTime),
 	owner_(def.owner), 
-	target_(def.target)
+	target_(def.target),
+	explodeRes_(def.explode)
 {
 	if (def.rect)
 	{
@@ -128,6 +129,8 @@ int Projectile::getDamage() const
 {
 	return damage_;
 }
+
+int Projectile::getExplosionRes() const { return explodeRes_; }
 
 Entity * Projectile::getOwner()
 {

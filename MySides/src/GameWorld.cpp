@@ -22,8 +22,9 @@ GameWorld::GameWorld() :
 
 	//Weapon noises
 	audio_.addSFX("rifle", "../assets/nsnd/bullet.wav", 16);
-	audio_.addSFX("shotgun", "../assets/nsnd/shotty.wav", 16);
+	audio_.addSFX("shotgun", "../assets/nsnd/shotty.wav", 8);
 	audio_.addSFX("coilgun", "../assets/nsnd/pew.wav", 16);
+	audio_.addSFX("explosion", "../assets/nsnd/boom.wav", 4);
 
 	//Bomb
 	audio_.addSFX("bomb", "../assets/nsnd/boom.wav", 2);
@@ -277,6 +278,37 @@ void GameWorld::addPickup(Pickup::Type type, b2Vec2 position, int time)
 	//audio_.playSFX(of some sort)
 }
 
+void GameWorld::addExplosion(Projectile* src)
+{
+	ProjectileDef shrapDef = ProjectileDef::pelletDef();
+	shrapDef.colPrim = src->getPrimary();
+	shrapDef.colSecn = src->getSecondary();
+	shrapDef.colTert = src->getSecondary();
+
+	int explosionRes = src->getExplosionRes();
+
+	b2Vec2 pos = src->getPosition();
+	b2Vec2 dir(0, 0);
+	Entity* owner = src->getOwner();
+
+
+	for (int i = explosionRes; i > 0; --i)
+	{
+		dir.x = randFloat(-1, 1);
+		dir.y = randFloat(-1, 1);
+		dir.Normalize();
+
+		shrapDef.origin = pos;
+		shrapDef.heading = dir;
+		shrapDef.owner = owner;
+		shrapDef.lifeTime = 50;
+
+		addProjectile(shrapDef);
+	}
+
+	audio_.playSFX("explosion", B2toSF(pos, true));
+}
+
 //Fire possibly many projectiles
 void GameWorld::fireWeapon(std::vector<ProjectileDef>& defs, std::string id)
 {
@@ -329,6 +361,13 @@ void GameWorld::removeEnemy(std::list<Enemy*>::iterator& e)
 //Removes projectile from the world and increments iterator, for use within loops
 void GameWorld::removeProjectile(std::list<Projectile*>::iterator& p)
 {
+	//Explode if we need to
+	if ((*p)->getExplosionRes() > 0)
+	{
+		addExplosion((*p));
+	}
+
+
 	DestroyBody((*p)->getBody());
 	delete (*p);
 

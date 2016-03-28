@@ -60,6 +60,7 @@ public:
 	void addProjectile(const ProjectileDef& def);
 	void addSide(const SideDef& def);
 	void addPickup(Pickup::Type type, b2Vec2 position, int time);
+	void addExplosion(Projectile* src);
 
 	void armShape(Shape* shape);
 	void disarmShape(Shape* shape);

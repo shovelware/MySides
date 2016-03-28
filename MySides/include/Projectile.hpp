@@ -12,6 +12,7 @@ public:
 	void impact();
 	void takeDamage(unsigned int damage);
 	int getDamage() const;
+	int getExplosionRes() const;
 
 	Entity* getOwner();
 	void setOwner(Entity* o);
@@ -33,6 +34,7 @@ private:
 	float size_;
 	float speed_;
 	float damage_;
+	int explodeRes_;
 
 	Entity* owner_;
 	Entity* target_;
