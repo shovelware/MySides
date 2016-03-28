@@ -335,7 +335,6 @@ void Shape::fire(b2Vec2 direction)
 	}
 }
 
-
 void Shape::update(int milliseconds)
 {
 	if (active_)

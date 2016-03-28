@@ -185,7 +185,7 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 
 		ProjectileDef newDef = ProjectileDef::pewpewDef();
 
-		weapons_.push_back(new Weapon::Coilgun(fireWeap_, newDef));
+		weapons_.push_back(new Weapon::Pistol(fireWeap_, newDef));
 		Weapon::WeaponI* newWeap = (*--weapons_.end());
 
 		player_->arm(newWeap);

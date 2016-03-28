@@ -153,6 +153,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\WeapCoil.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
+    <ClCompile Include="src\WeapPistol.cpp" />
     <ClCompile Include="src\WeapRifle.cpp" />
     <ClCompile Include="src\WeapShotgun.cpp" />
     <ClCompile Include="src\XController.cpp">
@@ -193,6 +194,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\WeapCoil.hpp" />
     <ClInclude Include="include\Weapon.hpp" />
+    <ClInclude Include="include\WeapPistol.hpp" />
     <ClInclude Include="include\WeapRifle.hpp" />
     <ClInclude Include="include\WeapShotgun.hpp" />
     <ClInclude Include="include\XController.hpp">

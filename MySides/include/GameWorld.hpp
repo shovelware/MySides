@@ -38,6 +38,7 @@
 #include "WeapRifle.hpp"
 #include "WeapShotgun.hpp"
 #include "WeapCoil.hpp"
+#include "WeapPistol.hpp"
 
 #include "SoundSystem.hpp"
 
