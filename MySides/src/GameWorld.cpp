@@ -1042,6 +1042,9 @@ void GameWorld::testBed()
 		case 7:
 			newDef = ProjectileDef::pewpewDef();
 
+			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle->setID("pewpew");
+
 			enem.colPrim = b2Color(0, 0, 1);
 			enem.colSecn = b2Color(0, 0, .7f);
 			enem.colTert = b2Color(0, 0, 1);
