@@ -419,6 +419,7 @@ void GameWorld::resetLevel()
 	lastSpawn_ = 0;
 	spawnTime_ = 15000;
 
+	bounds_->setSecondary(b2Color(0, 0, 0, 1));
 	//Add a new player
 	addPlayer(b2Vec2_zero, true);
 
@@ -956,7 +957,7 @@ void GameWorld::testBed()
 			newDef = ProjectileDef::pelletDef();
 			delete newWeap;
 			newWeap = new Weapon::Shotgun(fireWeap_, newDef);
-
+			
 			enem.colPrim = b2Color(.75f, .75f, .75f);
 			enem.colSecn = b2Color(.5f, .5f, .5f);
 			enem.colTert = b2Color(.75f, .75f, .75f);
@@ -1006,9 +1007,9 @@ void GameWorld::testBed()
 			riffle->setMagSize(8);
 			riffle->setID("cannon");
 
-			enem.colPrim = b2Color(0, 0, 0);
+			enem.colPrim = b2Color(0.2f, 0.2f, 0.2f);
 			enem.colSecn = b2Color(.1f, .1f, .1f);
-			enem.colTert = b2Color(0, 0, 0);
+			enem.colTert = b2Color(0.2f, 0.2f, 0.2f);
 			break;
 
 		case 5:
@@ -1043,13 +1044,25 @@ void GameWorld::testBed()
 			newDef = ProjectileDef::pewpewDef();
 
 			riffle = static_cast<Weapon::Rifle*>(newWeap);
-			riffle->setID("pewpew");
+			riffle->setID("coilgun");
 
 			enem.colPrim = b2Color(0, 0, 1);
 			enem.colSecn = b2Color(0, 0, .7f);
 			enem.colTert = b2Color(0, 0, 1);
 			break;
 		}
+		if (i <= 4)
+		{
+			enem.position = b2Vec2(-10 + 5 * i, -7.5);
+			enem.heading = b2Vec2(0, -1);
+		}
+
+		else
+		{
+			enem.position = b2Vec2(-10+ 5 * (i - 4), 7.5);
+			enem.heading = b2Vec2(0, 1);
+		}
+
 
 		newDef.damageScale = 0;
 

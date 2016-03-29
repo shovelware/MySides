@@ -153,7 +153,7 @@ public:
 		ProjectileDef cnnbll = ProjectileDef();
 		cnnbll.velScale = 3;
 		cnnbll.hpMAX = 4;
-		cnnbll.size = 3.f;
+		cnnbll.size = 4.f;
 		cnnbll.damageScale = 2.f;
 		cnnbll.lifeTime = 1500;
 

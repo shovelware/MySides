@@ -303,11 +303,8 @@ void Game::handleInput(sf::Time dt)
 	}
 
 	//X : Vibration testing
-	if (con_.checkDown(XINPUT_GAMEPAD_X))
+	if (con_.checkPressed(XINPUT_GAMEPAD_X))
 	{
-		con_.setVibrationL(con_.checkLeftTrigger() * 100);
-		con_.setVibrationR(con_.checkRightTrigger() * 100);
-
 		if (pause_)
 		{
 			world_->resetLevel();
@@ -416,6 +413,7 @@ void Game::update(sf::Time dt)
 
 		camera_->update(dt.asMilliseconds());
 		world_->update(dt.asMilliseconds());
+		sf::Listener::setPosition(sf::Vector3f(camera_->getCenter().x, camera_->getCenter().y, 0));
 	}
 
 	else

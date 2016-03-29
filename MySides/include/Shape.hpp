@@ -29,6 +29,7 @@ public:
 	void stopMove();
 
 	void orient(b2Vec2 direction);
+	void snapOrient(b2Vec2 direction);
 	void stopRotate();
 	b2Vec2 getOrientation() const;
 

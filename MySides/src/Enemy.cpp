@@ -23,7 +23,7 @@ void Enemy::update(int milliseconds)
 		b2Vec2 ePos = getPosition();
 		b2Vec2 between = playerPos - ePos;
 	
-		orient(between);
+		//orient(between);
 	
 		if (between.Length() > 40 || between.Length() < 4.f)
 		{
@@ -43,7 +43,7 @@ void Enemy::update(int milliseconds)
 	}
 
 	//fire(b2Vec2_zero + body_->GetPosition());
-	trigger(b2Vec2(0, -1));
+	trigger(b2Vec2(0, 0));
 }
 
 //Only deals with the effects of this collision on this entity

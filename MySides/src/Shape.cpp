@@ -27,7 +27,7 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 
 	setPoly(vertices_, size_);
 
-	orient(def.heading); //Make snap to method later
+	snapOrient(def.heading); 
 
 	//Color data
 	colPrim_ = def.colPrim;
@@ -195,6 +195,15 @@ void Shape::orient(b2Vec2 direction)
 	float change = 20 * DR; //allow 20 degree rotation per time step
 	float newAngle = bodyAngle + std::min(change, std::max(-change, totalRotation));
 	body_->SetTransform(body_->GetPosition(), newAngle);
+}
+
+void Shape::snapOrient(b2Vec2 direction)
+{
+	float bodyAngle = body_->GetAngle();
+	float desiredAngle = atan2f(-direction.x, direction.y);
+
+	body_->SetTransform(body_->GetPosition(), desiredAngle);
+	body_->SetAngularVelocity(0);
 }
 
 void Shape::stopRotate()
