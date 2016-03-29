@@ -8,7 +8,7 @@ Weapon::Pistol::Pistol(std::function<void(std::vector<ProjectileDef>& defs, std:
 	idleTimeMAX_ = 50;
 	idleTime_ = 0;
 
-	reloadTimeMAX_ = 5000;
+	reloadTimeMAX_ = 2500;
 	reloadTime_ = 0;
 
 	id_ = "pistol";
@@ -16,6 +16,12 @@ Weapon::Pistol::Pistol(std::function<void(std::vector<ProjectileDef>& defs, std:
 
 void Weapon::Pistol::update(int dt)
 {
+	if (pin_ && cocked_)
+	{
+		fire(barrel_);
+		pin_ = false;
+	}
+
 	//If we're reloading, time down
 	if (reloadTime_ > 0)
 	{
@@ -28,7 +34,7 @@ void Weapon::Pistol::update(int dt)
 	}
 
 	// Else if we're cycling, time down
-	else if (idleTime_ > 0)
+	else if (!pin_ && idleTime_ > 0)
 	{
 		idleTime_ = (idleTime_ - dt >= 0 ? idleTime_ - dt : 0);
 	}
@@ -57,6 +63,7 @@ void Weapon::Pistol::fire(b2Vec2 &heading)
 	//Reactions:
 	magazine_.remove();
 	cocked_ = false;
+	idleTime_ = idleTimeMAX_;
 
 	//If we're empty, reload
 	if (magazine_.checkEmpty())
@@ -71,7 +78,7 @@ bool Weapon::Pistol::canFire()
 	bool ready = false;
 
 	//If we're not cycling AND we have ammo AND aren't reloading
-	if (cocked_ && !magazine_.checkEmpty() && reloadTime_ <= 0)
+	if (!magazine_.checkEmpty() && reloadTime_ <= 0)
 	{
 		if (output_.isValid())
 		{

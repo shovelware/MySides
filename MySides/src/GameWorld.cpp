@@ -21,10 +21,17 @@ GameWorld::GameWorld() :
 	audio_.addAFX("wind", "../assets/wind.ogg", 0, 1, 750, 1000);
 
 	//Weapon noises
-	audio_.addSFX("rifle", "../assets/nsnd/bullet.wav", 16);
 	audio_.addSFX("shotgun", "../assets/nsnd/shotty.wav", 8);
+	audio_.addSFX("pistol", "../assets/nsnd/sbullet.wav", 16);
+	audio_.addSFX("magnum", "../assets/nsnd/mbullet.wav", 16);
+	audio_.addSFX("rifle", "../assets/nsnd/bullet.wav", 16);
+	audio_.addSFX("cannon", "../assets/nsnd/cannon.wav", 8);
+
 	audio_.addSFX("coilgun", "../assets/nsnd/pew.wav", 16);
-	audio_.addSFX("explosion", "../assets/nsnd/boom.wav", 4);
+
+	audio_.addSFX("rocket", "../assets/nsnd/rock.wav", 8);
+	audio_.addSFX("grenade", "../assets/nsnd/gren.wav", 8);
+	audio_.addSFX("explosion", "../assets/nsnd/bom.wav", 8);
 
 	//Bomb
 	audio_.addSFX("bomb", "../assets/nsnd/boom.wav", 2);
@@ -184,7 +191,10 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		//Set our control to the one we just put in
 		controlled_ = player_;
 
-		ProjectileDef newDef = ProjectileDef::pewpewDef();
+		ProjectileDef newDef = ProjectileDef::ninmilDef();
+
+		newDef.damageScale = 4;
+
 
 		weapons_.push_back(new Weapon::Pistol(fireWeap_, newDef));
 		Weapon::WeaponI* newWeap = (*--weapons_.end());
@@ -480,42 +490,6 @@ void GameWorld::clearWorld()
 	pickups_.clear();
 }
 
-void GameWorld::bomb()
-{
-	if (player_ != nullptr)
-	{
-		if (player_->getBombReady())
-		{
-			float range = player_->getBombRange();
-			//Explode shapes
-			if (shapes_.empty() == false)
-			{
-				for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
-				shapeIt != shapes_.end(); ++shapeIt)
-				{
-					if (b2Distance((*shapeIt)->getPosition(), player_->getPosition()) < range)
-						(*shapeIt)->explode();
-				}
-			}
-
-			//Baleet projectiles
-
-			if (projectiles_.empty() == false)
-			{
-				for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
-				projIt != projectiles_.end(); ++projIt)
-				{
-					if (b2Distance((*projIt)->getPosition(), player_->getPosition()) < range)
-						(*projIt)->setActive(false);
-				}
-			}
-
-			audio_.playSFX("bomb", B2toSF(player_->getPosition(), true));
-			player_->bomb();
-		}
-	}
-}
-
 int GameWorld::getHapticL() const
 {
 	return leftHaptic_;
@@ -613,7 +587,7 @@ void GameWorld::update(int dt)
 		updateProjectile(dt);
 		updateSide(dt);
 		updatePickup(dt);
-		//updateLevel(dt);
+		updateLevel(dt);
 
 		Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 		
@@ -767,17 +741,17 @@ void GameWorld::updateLevel(int dt)
 	timeInLevel_ += dt;
 	timeInLevel_ % UINT16_MAX;
 
-	if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_ / 5)
-	{
-		lastSpawn_ = timeInLevel_;
-
-		//if we want to do less than double the enemy number
-		if (enemies < spawns_ * 2)
-		{
-			spawnEnemy();
-			spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
-		}
-	}
+	//if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_ / 5)
+	//{
+	//	lastSpawn_ = timeInLevel_;
+	//
+	//	//if we want to do less than double the enemy number
+	//	if (enemies < spawns_ * 2)
+	//	{
+	//		spawnEnemy();
+	//		spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
+	//	}
+	//}
 }
 
 void GameWorld::cullWeapons()
@@ -841,7 +815,7 @@ Shape * GameWorld::getControlled()
 }
 
 //Handlers for game intent: Move, Fire, Select, Triggers
-void GameWorld::move(b2Vec2 direction)
+void GameWorld::move(b2Vec2& direction)
 {
 	if (controlled_ != nullptr && (direction.x != 0 || direction.y != 0))
 	{
@@ -849,30 +823,73 @@ void GameWorld::move(b2Vec2 direction)
 		leftHaptic_ = direction.Length() * 5;
 	}
 }
-void GameWorld::fire(b2Vec2 direction)
+
+void GameWorld::look(b2Vec2& direction)
+{
+	if (controlled_ != nullptr && (direction.x != 0 || direction.y != 0))
+	{
+		controlled_->orient(direction);
+	}
+}
+
+void GameWorld::trigger(b2Vec2& direction)
 {
 	//If there's a direction to fire in
-	if (controlled_ != nullptr && (direction.x != 0 || direction.y != 0))
+	if (controlled_ != nullptr)
 	{
 		bool canfire = controlled_->getWeaponReady();
 
-		//Look in a direction
-		if (direction.Length() <= 0.75f)
-		{
-			controlled_->orient(direction);
-		}
-
-
-		else
-		{
-			controlled_->fire(direction);
-		}
+		controlled_->trigger(direction);
 
 		bool hasfire = controlled_->getWeaponReady();
 		
 		if (canfire && !hasfire)
 		{
 			rightHaptic_ = 50;
+		}
+	}
+}
+
+void GameWorld::release()
+{
+	if (controlled_ != nullptr)
+	{
+		controlled_->release();
+	}
+}
+
+void GameWorld::bomb()
+{
+	if (player_ != nullptr)
+	{
+		if (player_->getBombReady())
+		{
+			float range = player_->getBombRange();
+			//Explode shapes
+			if (shapes_.empty() == false)
+			{
+				for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
+				shapeIt != shapes_.end(); ++shapeIt)
+				{
+					if (b2Distance((*shapeIt)->getPosition(), player_->getPosition()) < range)
+						(*shapeIt)->explode();
+				}
+			}
+
+			//Baleet projectiles
+
+			if (projectiles_.empty() == false)
+			{
+				for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
+				projIt != projectiles_.end(); ++projIt)
+				{
+					if (b2Distance((*projIt)->getPosition(), player_->getPosition()) < range)
+						(*projIt)->setActive(false);
+				}
+			}
+
+			audio_.playSFX("bomb", B2toSF(player_->getPosition(), true));
+			player_->bomb();
 		}
 	}
 }
@@ -928,11 +945,18 @@ void GameWorld::testBed()
 		//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
 
 		ProjectileDef newDef = ProjectileDef::pewpewDef();
+		Weapon::WeaponI* newWeap;
+		weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
+		newWeap = (*--weapons_.end());
 
+		Weapon::Rifle* riffle;
 		switch (i)
 		{
 		case 0:
 			newDef = ProjectileDef::pelletDef();
+			delete newWeap;
+			newWeap = new Weapon::Shotgun(fireWeap_, newDef);
+
 			enem.colPrim = b2Color(.75f, .75f, .75f);
 			enem.colSecn = b2Color(.5f, .5f, .5f);
 			enem.colTert = b2Color(.75f, .75f, .75f);
@@ -940,6 +964,13 @@ void GameWorld::testBed()
 
 		case 1:
 			newDef = ProjectileDef::ninmilDef();
+
+			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle->setRefireTime(200);
+			riffle->setReloadTime(2500);
+			riffle->setMagSize(18);
+			riffle->setID("pistol");
+
 			enem.colPrim = b2Color(1, .5f, 0);
 			enem.colSecn = b2Color(.75f, .25f, 0);
 			enem.colTert = b2Color(1, .5f, 0);
@@ -954,6 +985,13 @@ void GameWorld::testBed()
 
 		case 3:
 			newDef = ProjectileDef::dumdumDef();
+
+			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle->setRefireTime(200);
+			riffle->setReloadTime(2500);
+			riffle->setMagSize(15);
+			riffle->setID("magnum");
+
 			enem.colPrim = b2Color(.5f, 0, .5f);
 			enem.colSecn = b2Color(.25f, 0, .25f);
 			enem.colTert = b2Color(.5f, 0, .5f);
@@ -961,6 +999,13 @@ void GameWorld::testBed()
 
 		case 4:
 			newDef = ProjectileDef::cnnbllDef();
+
+			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle->setRefireTime(1000);
+			riffle->setReloadTime(4000);
+			riffle->setMagSize(8);
+			riffle->setID("cannon");
+
 			enem.colPrim = b2Color(0, 0, 0);
 			enem.colSecn = b2Color(.1f, .1f, .1f);
 			enem.colTert = b2Color(0, 0, 0);
@@ -968,6 +1013,13 @@ void GameWorld::testBed()
 
 		case 5:
 			newDef = ProjectileDef::grenadeDef();
+
+			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle->setRefireTime(750);
+			riffle->setReloadTime(4000);
+			riffle->setMagSize(8);
+			riffle->setID("grenade");
+
 			enem.colPrim = b2Color(0, 0.75f, 0);
 			enem.colSecn = b2Color(0, 0.5f, 0);
 			enem.colTert = b2Color(0, 0.75f, 0);
@@ -975,6 +1027,13 @@ void GameWorld::testBed()
 
 		case 6:
 			newDef = ProjectileDef::rocketDef();
+
+			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle->setRefireTime(1000);
+			riffle->setReloadTime(4000);
+			riffle->setMagSize(4);
+			riffle->setID("rocket");
+
 			enem.colPrim = b2Color(0.7f, 0, 0);
 			enem.colSecn = b2Color(0.5f, 0, 0);
 			enem.colTert = b2Color(0.7f, 0, 0);
@@ -982,6 +1041,7 @@ void GameWorld::testBed()
 
 		case 7:
 			newDef = ProjectileDef::pewpewDef();
+
 			enem.colPrim = b2Color(0, 0, 1);
 			enem.colSecn = b2Color(0, 0, .7f);
 			enem.colTert = b2Color(0, 0, 1);
@@ -990,14 +1050,10 @@ void GameWorld::testBed()
 
 		newDef.damageScale = 0;
 
-		Weapon::WeaponI* newWeap;
-
 		shapes_.push_back(new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_));
 		Shape* added = *(--shapes_.end());
 
-		weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
-		newWeap = (*--weapons_.end());
-
+		newWeap->setProjectile(newDef);
 		added->arm(newWeap);
 	}
 	//randomiseCol(bounds_);

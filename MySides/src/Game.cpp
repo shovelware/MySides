@@ -178,7 +178,7 @@ void Game::processEvents()
 void Game::handleInput(sf::Time dt)
 {
 	//If the world has a controlled body
-	
+
 	//Keyboard backup controls		
 	//W,A,S,D : Movement
 	b2Vec2 mv(0, 0);
@@ -191,14 +191,19 @@ void Game::handleInput(sf::Time dt)
 
 	world_->move(mv);
 
-	//Arrows : Firing
+	//Arrows : Look
 	b2Vec2 fr(0, 0);
 	if (key_.isKeyDown(Key::Up)) { fr.y += -1; }
 	if (key_.isKeyDown(Key::Down)) { fr.y += 1; }
 	if (key_.isKeyDown(Key::Left)) { fr.x += -1; }
 	if (key_.isKeyDown(Key::Right)) { fr.x += 1; }
+	world_->look(fr);
 
-	world_->fire(fr);
+	//Space : Fire
+	if (key_.isKeyDown(Key::Space))
+	{
+		world_->trigger(fr);
+	}
 
 	//I,O,P : Camera controls
 	if (key_.isKeyDown(Key::I)) { camera_->zoomIn(); }
@@ -215,11 +220,11 @@ void Game::handleInput(sf::Time dt)
 	//Return : Fullscreen
 	if (key_.isKeyPressed(Key::Return)) { toggleFullscreen(); }
 
-	//Space : Pause
-	if (key_.isKeyPressed(Key::Space)) { pause_ = !pause_; }
+	//P : Pause
+	if (key_.isKeyPressed(Key::P)) { pause_ = !pause_; }
 
 	//F5 : Reset Level
-	if (key_.isKeyPressed(Key::F5)) 
+	if (key_.isKeyPressed(Key::F5))
 	{
 		world_->resetLevel();
 		camera_->setTarget(world_->getPlayer());
@@ -245,11 +250,30 @@ void Game::handleInput(sf::Time dt)
 	if (key_.isKeyPressed(Key::Num0)) { world_->f0(); }
 
 	//Controller Control
+	//LS : Move
 	world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
-	world_->fire(b2Vec2(con_.checkRightX(), con_.checkRightY()));
+
+	//RS : Look
+	world_->look(b2Vec2(con_.checkRightX(), con_.checkRightY()));
 	camera_->lean(sf::Vector2f(con_.checkRightX() * 10, con_.checkRightY() * 10));
 
-	//world_->controlled()->rotate(con_.checkRightX() / 10);
+	//RT : Trigger
+	if (con_.checkRightHairTrigger())
+	{
+		world_->trigger(b2Vec2(con_.checkRightX(), con_.checkRightY()));
+	}
+
+	//RT Released : Release Trigger
+	else
+	{
+		world_->release();
+	}
+
+	if (con_.checkLeftHairTrigger() &&
+		con_.checkDown(XINPUT_GAMEPAD_RIGHT_THUMB))
+	{
+		world_->bomb();
+	}
 
 	//A : Resize bounds
 	if (con_.checkPressed(XINPUT_GAMEPAD_A))
@@ -310,18 +334,26 @@ void Game::handleInput(sf::Time dt)
 		//}
 	}
 
-	//LB : 
-	if (con_.checkDown(XINPUT_GAMEPAD_LEFT_SHOULDER))
+	//LB + RB : Reset zoom
+	if (con_.checkDown(XINPUT_GAMEPAD_LEFT_SHOULDER) && con_.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER))
 	{
-		camera_->zoomOut();
+		camera_->zoomReset();
 	}
 
-	//RB : 
-	if (con_.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER))
+	else 
 	{
-		camera_->zoomIn();
-	}
+		//LB : 
+		if (con_.checkTimeHeld(XINPUT_GAMEPAD_LEFT_SHOULDER) > 75)
+		{
+			camera_->zoomOut();
+		}
 
+		//RB : 
+		if (con_.checkTimeHeld(XINPUT_GAMEPAD_RIGHT_SHOULDER) > 75)
+		{
+			camera_->zoomIn();
+		}
+	}
 	//LC : Fullscreen
 	if (con_.checkDown(XINPUT_GAMEPAD_LEFT_THUMB))
 	{
@@ -332,7 +364,6 @@ void Game::handleInput(sf::Time dt)
 	//RC : Reset zoom
 	if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
 	{
-		camera_->zoomReset();
 	}
 
 	//DPad :
@@ -354,12 +385,6 @@ void Game::handleInput(sf::Time dt)
 		{
 			quit_ = true;
 		}
-	}
-	
-	if (con_.checkLeftHairTrigger() &&
-		con_.checkDown(XINPUT_GAMEPAD_Y))
-	{
-		world_->bomb();
 	}
 }
 

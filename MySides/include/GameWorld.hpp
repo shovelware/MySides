@@ -96,8 +96,10 @@ public:
 	float getBoundsSide();
 
 	//Controlled manipulation
-	void move(b2Vec2 direction);
-	void fire(b2Vec2 direction);
+	void move(b2Vec2& direction);
+	void look(b2Vec2& direction);
+	void trigger(b2Vec2& direction);
+	void release();
 
 	//Legacy
 	void controlNextEnemy();
@@ -148,7 +150,7 @@ public:
 	int enemies;
 	int freesides;
 
-	int maxTime = 120;
+	int maxTime = 999;
 	int getTimeInLevel() { return timeInLevel_ / 1000; }
 
 	/////Debug

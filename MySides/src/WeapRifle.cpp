@@ -15,6 +15,11 @@ Weapon::Rifle::Rifle(std::function<void(std::vector<ProjectileDef>& defs, std::s
 
 void Weapon::Rifle::update(int dt)
 {
+	if (pin_)
+	{
+		fire(barrel_);
+	}
+
 	//If we're reloading, time down
 	if (reloadTime_ > 0)
 	{
@@ -43,8 +48,15 @@ void Weapon::Rifle::setReloadTime(int ms)
 	reloadTimeMAX_ = (ms > 0 ? ms : reloadTimeMAX_);
 }
 
+void Weapon::Rifle::setMagSize(int size, bool reload)
+{
+	magazine_.resize(size, reload);
+}
+
 void Weapon::Rifle::fire(b2Vec2 &heading)
 {
+	pin_ = false;
+
 	//Set up vector
 	std::vector<ProjectileDef> pv;
 	pv.emplace_back(output_);

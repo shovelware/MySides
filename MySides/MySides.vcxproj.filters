@@ -263,5 +263,8 @@
     <ClInclude Include="include\WeapPistol.hpp">
       <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="include\Armory.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

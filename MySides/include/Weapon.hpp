@@ -25,6 +25,7 @@ namespace Weapon {
 	class WeaponI {
 	public:
 		void trigger(b2Vec2 &direction);	//!< Pulls the trigger on the weapon. The only exposed piece!
+		void release();				//!< Releases the trigger, for weapons that need it
 
 		void setProjectile(ProjectileDef const &pd);	//!< Sets the passed Projectile to be the Weapon's output
 
@@ -39,11 +40,12 @@ namespace Weapon {
 		void setSecondary(b2Color col);	//!< Sets Secondary Colour
 		void setTertiary(b2Color col);	//!< Sets Tertiary Colour 
 
-		std::string getID();
+		void setID(std::string id);		//!< Sets a new id for the weapon
+		std::string getID();			//!< Gets the id of the weapon
 
 		virtual bool canFire() = 0;		//!< Checks if a Weapon can fire
 
-		virtual void update(int dt) = 0;	//!< Updates weapon
+		virtual void update(int dt) = 0;//!< Updates weapon
 
 	protected:
 		WeaponI(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
@@ -53,6 +55,9 @@ namespace Weapon {
 
 		ProjectileDef output_;
 		std::function<void(std::vector<ProjectileDef>& defs, std::string id)> fireCallback_;
+
+		bool pin_;
+		b2Vec2 barrel_;
 
 		virtual void fire(b2Vec2 &heading) = 0;
 	};

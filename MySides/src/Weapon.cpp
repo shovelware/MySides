@@ -1,10 +1,12 @@
 #include "Weapon.hpp"
 
 Weapon::WeaponI::WeaponI(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
-		owner_(nullptr),
-		fireCallback_(callback),
-		output_(ProjectileDef(ammo)),
-		id_("weapon")
+	owner_(nullptr),
+	fireCallback_(callback),
+	output_(ProjectileDef(ammo)),
+	id_("weapon"),
+	pin_(false),
+	barrel_(b2Vec2_zero)
 	{
 
 	}
@@ -13,8 +15,15 @@ Weapon::WeaponI::WeaponI(std::function<void(std::vector<ProjectileDef>& defs, st
 	{
 		if (canFire())
 		{
-			fire(direction);
+			//fire(direction);
+			barrel_ = direction;
+			pin_ = true;
 		}
+	}
+
+	void Weapon::WeaponI::release()
+	{
+		pin_ = false;
 	}
 
 	void Weapon::WeaponI::setProjectile(ProjectileDef const &pd)
@@ -29,7 +38,6 @@ Weapon::WeaponI::WeaponI(std::function<void(std::vector<ProjectileDef>& defs, st
 
 	Shape* Weapon::WeaponI::getOwner() const { return owner_; }
 
-
 	b2Color Weapon::WeaponI::getPrimary() const { return output_.colPrim; }
 	b2Color Weapon::WeaponI::getSecondary() const { return output_.colSecn; }
 	b2Color Weapon::WeaponI::getTertiary() const { return output_.colTert; }
@@ -37,5 +45,7 @@ Weapon::WeaponI::WeaponI(std::function<void(std::vector<ProjectileDef>& defs, st
 	void Weapon::WeaponI::setPrimary(b2Color col) { output_.colPrim = col; }
 	void Weapon::WeaponI::setSecondary(b2Color col) { output_.colSecn = col; }
 	void Weapon::WeaponI::setTertiary(b2Color col) { output_.colTert = col; }
+
+	void Weapon::WeaponI::setID(std::string id)	{ id_ = id;	}
 
 	std::string Weapon::WeaponI::getID() { return id_; }

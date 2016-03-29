@@ -17,6 +17,12 @@ Weapon::Coilgun::Coilgun(std::function<void(std::vector<ProjectileDef>& defs, st
 
 void Weapon::Coilgun::update(int dt)
 {
+	if (pin_)
+	{
+		fire(barrel_);
+		pin_ = false;
+	}
+
 	//If we're shooting, refire cool
 	if (refireTime_ > 0)
 	{

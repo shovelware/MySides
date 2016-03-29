@@ -163,6 +163,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
   <ItemGroup>
     <ClInclude Include="CodePallet.h" />
     <ClInclude Include="include\AmbientEffect.hpp" />
+    <ClInclude Include="include\Armory.hpp" />
     <ClInclude Include="include\Attractor.hpp" />
     <ClInclude Include="include\Battery.hpp" />
     <ClInclude Include="include\Bounds.hpp" />

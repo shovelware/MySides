@@ -30,6 +30,7 @@ public:
 
 	void orient(b2Vec2 direction);
 	void stopRotate();
+	b2Vec2 getOrientation() const;
 
 	void takeDamage(int damage, b2Vec2 direction);
 	void collect(int value);
@@ -49,7 +50,8 @@ public:
 	void disarm();
 	bool getArmed();
 	bool getWeaponReady();
-	void fire(b2Vec2 direction);
+	void trigger(b2Vec2& direction);
+	void release();
 	
 	void update(int milliseconds);
 

@@ -12,6 +12,12 @@ Weapon::Shotgun::Shotgun(std::function<void(std::vector<ProjectileDef>& defs, st
 
 void Weapon::Shotgun::update(int dt)
 {
+	if (pin_)
+	{
+		fire(barrel_);
+		pin_ = false;
+	}
+
 	// Else if we're cycling, time down
 	if (refireTime_ > 0)
 	{

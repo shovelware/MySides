@@ -17,6 +17,7 @@ namespace Weapon {
 
 		void setRefireTime(int ms);
 		void setReloadTime(int ms);
+		void setMagSize(int size, bool reload = false);
 
 	private:
 		void fire(b2Vec2 &heading);

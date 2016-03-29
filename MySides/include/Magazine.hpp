@@ -47,5 +47,18 @@ public:
 	{
 		return (count_ <= 0);
 	}
+
+	void resize(int newCount, bool reload = false)
+	{
+		if (newCount > 0)
+		{
+			countMAX_ = newCount;
+
+			if (reload)
+			{
+				count_ = countMAX_;
+			}
+		}
+	}
 };
 #endif

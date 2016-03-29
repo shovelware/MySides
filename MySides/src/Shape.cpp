@@ -199,7 +199,13 @@ void Shape::orient(b2Vec2 direction)
 
 void Shape::stopRotate()
 {
-	//body_->SetAngularVelocity(0);
+	body_->SetAngularVelocity(0);
+}
+
+b2Vec2 Shape::getOrientation() const
+{
+	float r = body_->GetAngle();
+	return b2Vec2(-sin(r), cos(r));
 }
 
 void Shape::takeDamage(int damage, b2Vec2 direction)
@@ -326,12 +332,27 @@ void Shape::disarm()
 	weapon_ = nullptr;
 }
 
-void Shape::fire(b2Vec2 direction)
+void Shape::trigger(b2Vec2& direction)
 {
-	orient(direction);
+	b2Vec2 dir = direction;
+
+	if (dir.Length() < 0.1f)
+	{
+		dir = getOrientation();
+	}
+
+	orient(dir);
 	if (weapon_ != nullptr)
 	{
-		weapon_->trigger(direction);
+		weapon_->trigger(dir);
+	}
+}
+
+void Shape::release()
+{
+	if (weapon_ != nullptr)
+	{
+		weapon_->release();
 	}
 }
 
