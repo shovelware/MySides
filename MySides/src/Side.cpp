@@ -85,7 +85,7 @@ void Side::attract(b2Vec2 dir)
 	dir.Normalize();
 	dir *= 0.002f;
 
-	if(body_->GetLinearVelocity().Length() < 0.01)
+	if(body_->GetLinearVelocity().Length() < 0.02)
 		body_->ApplyForceToCenter(dir, true);
 }
 

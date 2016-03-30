@@ -366,6 +366,38 @@ void Shape::release()
 	}
 }
 
+void Shape::reup()
+{
+	if (weapon_ != nullptr)
+	{
+		weapon_->reup();
+	}
+}
+
+int Shape::getWeaponBar()
+{
+	int bar = -1;
+
+	if (weapon_ != nullptr)
+	{
+		bar = weapon_->getBar();
+	}
+
+	return bar;
+}
+
+int Shape::getWeaponBarMAX()
+{
+	int max = -1;
+
+	if (weapon_ != nullptr)
+	{
+		max = weapon_->getBarMAX();
+	}
+
+	return max;
+}
+
 void Shape::update(int milliseconds)
 {
 	if (active_)

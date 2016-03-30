@@ -15,6 +15,11 @@ Weapon::Coilgun::Coilgun(std::function<void(std::vector<ProjectileDef>& defs, st
 	id_ = "coilgun";
 }
 
+void Weapon::Coilgun::reup()
+{
+	//No manual reload
+}
+
 void Weapon::Coilgun::update(int dt)
 {
 	if (pin_)
@@ -61,8 +66,8 @@ void Weapon::Coilgun::setBatterySize(int size, bool reload)
 	battery_.resize(size, reload);
 }
 
-float Weapon::Coilgun::getBar() const { return battery_.getCharge(); }
-float Weapon::Coilgun::getBarMAX() const { return battery_.getChargeMAX(); }
+int Weapon::Coilgun::getBar() const { return battery_.getCharge(); }
+int Weapon::Coilgun::getBarMAX() const { return battery_.getChargeMAX(); }
 
 void Weapon::Coilgun::fire(b2Vec2 & heading)
 {

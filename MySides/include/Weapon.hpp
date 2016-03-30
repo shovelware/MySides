@@ -25,9 +25,10 @@ namespace Weapon {
 	class WeaponI {
 	public:
 		void trigger(b2Vec2 &direction);	//!< Pulls the trigger on the weapon. The only exposed piece!
-		void release();				//!< Releases the trigger, for weapons that need it
+		void release();						//!< Releases the trigger, for weapons that need it
 
-		void setProjectile(ProjectileDef const &pd);	//!< Sets the passed Projectile to be the Weapon's output
+		virtual void reup() = 0;			//!< Manual reload, if available
+		void setProjectile(ProjectileDef const &pd);//!< Sets the passed Projectile to be the Weapon's output
 
 		void setOwner(Shape* owner);	//!< Sets the owner of the Weapon to be a passed Shape
 		Shape* getOwner() const;		//!< Gets the owner of the weapon
@@ -43,10 +44,10 @@ namespace Weapon {
 		void setID(std::string id);		//!< Sets a new id for the weapon
 		std::string getID();			//!< Gets the id of the weapon
 
-		virtual float getBarMAX() const = 0;	//!< Max of status bar
-		virtual float getBar() const = 0;		//!< Current fill of status bar
+		virtual int getBarMAX() const = 0;	//!< Max of status bar
+		virtual int getBar() const = 0;		//!< Current fill of status bar
 
-		virtual bool canFire() const = 0;		//!< Checks if a Weapon can fire
+		virtual bool canFire() const = 0;	//!< Checks if a Weapon can fire
 
 		virtual void update(int dt) = 0;	//!< Updates weapon
 

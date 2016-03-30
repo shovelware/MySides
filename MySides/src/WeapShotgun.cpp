@@ -7,13 +7,21 @@ Weapon::Shotgun::Shotgun(std::function<void(std::vector<ProjectileDef>& defs, st
 	refireTimeMax_ = 600;
 	refireTime_ = 0;
 
-	reloadTimeMAX_ = 1000;
+	reloadTimeMAX_ = 1250;
 	reloadTime_ = 0;
 
 	pellets_ = 8;
 	spread_ = 0.15f;
 
 	id_ = "shotgun";
+}
+
+void Weapon::Shotgun::reup()
+{
+	if (reloadTime_ <= 0)
+	{
+		reloadTime_ = reloadTimeMAX_;
+	}
 }
 
 void Weapon::Shotgun::update(int dt)
@@ -73,8 +81,8 @@ void Weapon::Shotgun::setSpread(float spread)
 	spread_ = (spread >= 0 ? spread : spread_);
 }
 
-float Weapon::Shotgun::getBar() const { return magazine_.getCount(); }
-float Weapon::Shotgun::getBarMAX() const { return magazine_.getCountMAX(); }
+int Weapon::Shotgun::getBar() const { return magazine_.getCount(); }
+int Weapon::Shotgun::getBarMAX() const { return magazine_.getCountMAX(); }
 
 void Weapon::Shotgun::fire(b2Vec2 &heading)
 {

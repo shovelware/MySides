@@ -13,6 +13,7 @@
 class Camera : public sf::View {
 public:
 	Camera(sf::RenderTarget& target);
+	~Camera();
 
 	/*
 	* \brief Sets the follow target.

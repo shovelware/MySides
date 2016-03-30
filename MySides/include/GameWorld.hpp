@@ -96,6 +96,7 @@ public:
 	void look(b2Vec2& direction);
 	void trigger(b2Vec2& direction);
 	void release();
+	void reup();
 
 	//Legacy
 	void controlNextEnemy();
@@ -120,7 +121,7 @@ public:
 	bool getPaused() const;
 	void resume();
 
-	//Haptic feedback
+	//Haptic feedback passbacks
 	int getHapticL() const;
 	int getHapticR() const;
 

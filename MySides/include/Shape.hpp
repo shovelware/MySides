@@ -48,12 +48,15 @@ public:
 
 	//New weapons system
 	void arm(Weapon::WeaponI* weapon);
-	Weapon::WeaponI* getWeapon() const;//???
 	void disarm();
 	bool getArmed();
+	Weapon::WeaponI* getWeapon() const;//???
 	bool getWeaponReady();
 	void trigger(b2Vec2& direction);
 	void release();
+	void reup();
+	int getWeaponBar();
+	int getWeaponBarMAX();
 	
 	void update(int milliseconds);
 

@@ -98,7 +98,12 @@ void Pickup::Attractor::update(int milliseconds)
 					s = static_cast<Side*>(ed->contact->GetFixtureB()->GetBody()->GetUserData());
 
 				if (s != nullptr)
-					s->attract(owner_->getPosition() - s->getPosition());
+				{
+					if (b2Distance(body_->GetPosition(), s->getPosition()) < radius_)
+					{
+						s->attract(owner_->getPosition() - s->getPosition());
+					}
+				}
 			}
 		}
 

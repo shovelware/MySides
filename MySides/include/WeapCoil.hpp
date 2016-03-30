@@ -11,6 +11,7 @@ namespace Weapon {
 	
 		bool canFire();
 
+		void reup();
 		void update(int dt);
 
 		void setRefireTime(int ms);
@@ -18,8 +19,8 @@ namespace Weapon {
 		void setFireCharge(int charge);
 		void setBatterySize(int size, bool recharge = false);
 
-		float getBar() const;
-		float getBarMAX() const;
+		int getBar() const;
+		int getBarMAX() const;
 	private:
 		void fire(b2Vec2 &heading);
 

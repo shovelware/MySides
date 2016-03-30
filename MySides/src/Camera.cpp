@@ -18,6 +18,14 @@ Camera::Camera(sf::RenderTarget& target) :
 	}
 }
 
+Camera::~Camera()
+{
+	if (font_ != nullptr)
+	{
+		delete font_;
+	}
+}
+
 void Camera::setTarget(Shape * target)
 {
 	target_ = target;
@@ -42,7 +50,7 @@ void Camera::loadFont(std::string filename)
 {
 	sf::Font* fnt = new sf::Font();
 
-	if (fnt->loadFromFile("../Assets/" + filename));
+	if (fnt->loadFromFile("../Assets/" + filename))
 	{
 		//If we load successfully, assign font
 		font_ = fnt;
@@ -50,6 +58,8 @@ void Camera::loadFont(std::string filename)
 		text_ = sf::Text("", *font_);
 		text_.setCharacterSize(50);
 	}
+
+	else delete fnt;
 }
 
 void Camera::update(int dt)
@@ -177,7 +187,7 @@ void Camera::drawPause()
 
 	drawTextAligned("START / A : CONTINUE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 2.f, sf::Color(64, 64, 64));
 	drawTextAligned("SELECT : QUIT", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 3.f, sf::Color(64, 64, 64));
-	drawTextAligned("X : RESTART", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 4.f, sf::Color(64, 64, 64));
+	drawTextAligned("Y : RESTART", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 4.f, sf::Color(64, 64, 64));
 
 	drawTextAligned("LS : MOVE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 6.f, sf::Color::Cyan);
 	drawTextAligned("RS : FIRE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 7.f, sf::Color::Cyan);
@@ -212,7 +222,7 @@ void Camera::drawOver(int sides, int time)
 	drawTextAligned("SIDES: " + std::to_string(sides), sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 2.f, sf::Color::Green);
 	drawTextAligned("TIME: " + std::to_string(time / 1000) + "s", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 3.f, sf::Color::Cyan);
 
-	drawTextAligned("X : RESTART", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 5.f, sf::Color::Black);
+	drawTextAligned("Y : RESTART", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 5.f, sf::Color::Black);
 	drawTextAligned("SELECT : QUIT", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 6.f, sf::Color::Black);
 
 	rentrg_.setView(*this);

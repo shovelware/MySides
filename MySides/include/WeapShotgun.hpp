@@ -10,6 +10,8 @@ namespace Weapon {
 	public:
 		Shotgun(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
 		bool canFire() const;
+
+		void reup();
 		void update(int dt);
 
 		void setRefireTime(int ms);
@@ -18,9 +20,8 @@ namespace Weapon {
 		void setPellets(int pellets);
 		void setSpread(float spread);
 
-		float getBar() const;
-		float getBarMAX() const;
-
+		int getBar() const;
+		int getBarMAX() const;
 	private:
 		void fire(b2Vec2 &heading);
 

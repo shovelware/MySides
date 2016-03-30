@@ -201,7 +201,6 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		newDef.damage = 4;
 		newDef.velScale = 1;
 
-
 		weapons_.push_back(new Weapon::Shotgun(fireWeap_, newDef));
 		Weapon::WeaponI* newWeap = (*--weapons_.end());
 		Weapon::Shotgun* shotz = static_cast<Weapon::Shotgun*>(newWeap);
@@ -209,7 +208,6 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 
 		player_->arm(newWeap);
 	}
-
 }
 
 //Adds a basic enemy to the world
@@ -887,6 +885,14 @@ void GameWorld::release()
 	if (controlled_ != nullptr)
 	{
 		controlled_->release();
+	}
+}
+
+void GameWorld::reup()
+{
+	if (controlled_ != nullptr)
+	{
+		controlled_->reup();
 	}
 }
 

@@ -181,7 +181,7 @@ public:
 		rocket.hpMAX = 1;
 		rocket.width = 2.f;
 		rocket.height = 3.f;
-		rocket.shrapnel = 20;
+		rocket.shrapnel = 8;
 		rocket.damage = 1.f;
 		rocket.lifeTime = 500;
 

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Game.hpp"
 
 //Globally accessible logger, usage: extern Log l;
@@ -17,7 +16,11 @@ Game::Game() :
 	fullscreen_(false),
 	dd_(window_),
 	voidCol_(64,64,64),
-	haptics_(false)
+	haptics_(false),
+	renderDD_(false),
+	renderGAME_(true),
+	renderCAM_(false),
+	renderHUD_(true)
 {
 }
 
@@ -43,6 +46,9 @@ int Game::run()
 	world_ = new GameWorld();
 	camera_ = new Camera(window_);
 	camera_->loadFont("game_over.ttf");
+
+	hud_ = new HUD(window_, world_);
+	hud_->loadFont("game_over.ttf");
 
 	//Start fullscreen
 	//toggleFullscreen();
@@ -137,6 +143,7 @@ int Game::run()
 	delete render_;
 	delete lptr;
 	delete camera_;
+	delete hud_;
 
 	return EXIT_SUCCESS;
 
@@ -177,8 +184,6 @@ void Game::processEvents()
 
 void Game::handleInput(sf::Time dt)
 {
-	//If the world has a controlled body
-
 	//Keyboard backup controls		
 	//W,A,S,D : Movement
 	b2Vec2 mv(0, 0);
@@ -249,6 +254,30 @@ void Game::handleInput(sf::Time dt)
 	if (key_.isKeyPressed(Key::Num9)) { world_->f9(); }
 	if (key_.isKeyPressed(Key::Num0)) { world_->f0(); }
 
+	//Debug controls
+	if (key_.isKeyDown(Key::BackSpace))
+	{
+		if (key_.isKeyPressed(Key::Comma))
+		{
+			renderDD_ = !renderDD_;
+		}
+
+		if (key_.isKeyPressed(Key::Period))
+		{
+			renderGAME_ = !renderGAME_;
+		}
+
+		if (key_.isKeyPressed(Key::Slash))
+		{
+			renderHUD_ = !renderHUD_;
+		}
+
+		if (key_.isKeyPressed(Key::SemiColon))
+		{
+			renderCAM_ = !renderCAM_;
+		}
+	}
+
 	//Controller Control
 	//LS : Move
 	world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
@@ -263,19 +292,20 @@ void Game::handleInput(sf::Time dt)
 		world_->trigger(b2Vec2(con_.checkRightX(), con_.checkRightY()));
 	}
 
-	//RT Released : Release Trigger
-	else
+	//RT && Space Released : Release Trigger
+	else if (!con_.checkRightHairTrigger() && key_.isKeyUp(Key::Space))
 	{
 		world_->release();
 	}
 
+	//LT + RC : Bomb
 	if (con_.checkLeftHairTrigger() &&
 		con_.checkDown(XINPUT_GAMEPAD_RIGHT_THUMB))
 	{
 		world_->bomb();
 	}
 
-	//A : Resize bounds
+	//A : Testing in world/resume
 	if (con_.checkPressed(XINPUT_GAMEPAD_A))
 	{
 		//float base = 32;
@@ -296,25 +326,27 @@ void Game::handleInput(sf::Time dt)
 		}
 	}
 
-	//B : Testing func in player
+	//B : Testing in player
 	if (con_.checkPressed(XINPUT_GAMEPAD_B))
 	{
 		world_->getPlayer()->testBed();
 	}
 
-	//X : Vibration testing
+	//X : Reup
 	if (con_.checkPressed(XINPUT_GAMEPAD_X))
+	{
+		world_->reup();
+	}
+
+	//Y: Restart
+	if (con_.checkPressed(XINPUT_GAMEPAD_Y))
 	{
 		if (pause_)
 		{
 			world_->resetLevel();
 			camera_->setCenter(sf::Vector2f(0, 0));
 		}
-	}
 
-	//Y: Spawn enemy
-	if (con_.checkPressed(XINPUT_GAMEPAD_Y))
-	{
 		//float lt = (con_.checkLeftTrigger() > 0 ? con_.checkLeftTrigger() : 0.1f);
 		//int spawn = lt * 10;
 		//
@@ -351,14 +383,13 @@ void Game::handleInput(sf::Time dt)
 			camera_->zoomIn();
 		}
 	}
-	//LC : Fullscreen
+
+	//LC :
 	if (con_.checkDown(XINPUT_GAMEPAD_LEFT_THUMB))
 	{
-		world_->testBed();
-		world_->getPlayer()->testBed();
 	}
 
-	//RC : Reset zoom
+	//RC :
 	if (con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
 	{
 	}
@@ -439,20 +470,34 @@ void Game::update(sf::Time dt)
 
 void Game::render()
 {
+	//Clear and set to camera
 	window_.clear(voidCol_);
-	//l.out(l.message, 'G', "Render");
-
 	window_.setView(*(camera_));
 
-	//Render stuff
+	//Render gameworld
+	if (renderGAME_) { render_->render(); }
 
-	//b2Shape* x = world_->controlled()->getVertices();
-	//b2Shape::Type y = x->GetType();
-	render_->render();
-	//world_->DrawDebugData();
-	camera_->drawHUD();
-	camera_->drawSpr3(world_->maxTime - world_->getTimeInLevel(), world_->enemies, world_->freesides);
+	//Debug render
+	if (renderDD_) { world_->DrawDebugData(); }
 
+	//Camera extras
+	if (renderCAM_)
+	{
+		camera_->drawHUD();
+		camera_->drawSpr3(world_->maxTime - world_->getTimeInLevel(), world_->enemies, world_->freesides);
+	}
+
+	//Draw HUD
+	window_.setView(window_.getDefaultView());
+	if (renderHUD_)
+	{
+		hud_->drawLevelStatus(sf::FloatRect(20, 20, 100, 40));
+		hud_->drawShapeStatus(sf::FloatRect(280, 20, 100, 40));
+		hud_->drawSideStatus(sf::FloatRect(20, 680, 680, 20));
+		hud_->drawWeaponStatus(sf::FloatRect(600, 20, 100, 40));
+	}
+
+	//Draw pause menu
 	if (pause_)
 	{
 		if (world_->hasControlled())

@@ -55,7 +55,7 @@
     <Filter Include="Header Files\Game\Entity\Pickup">
       <UniqueIdentifier>{ad250c8d-0cca-44aa-9c0f-9a9a9daab75d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\Pickup">
+    <Filter Include="Source Files\Game\Entity\Pickup">
       <UniqueIdentifier>{0692f418-456b-4bc1-877b-e6266736ab42}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -133,16 +133,16 @@
       <Filter>Source Files\Render</Filter>
     </ClCompile>
     <ClCompile Include="src\Pickup.cpp">
-      <Filter>Source Files\Game\Pickup</Filter>
+      <Filter>Source Files\Game\Entity\Pickup</Filter>
     </ClCompile>
     <ClCompile Include="src\Sight.cpp">
-      <Filter>Source Files\Game\Pickup</Filter>
+      <Filter>Source Files\Game\Entity\Pickup</Filter>
     </ClCompile>
     <ClCompile Include="src\Shield.cpp">
-      <Filter>Source Files\Game\Pickup</Filter>
+      <Filter>Source Files\Game\Entity\Pickup</Filter>
     </ClCompile>
     <ClCompile Include="src\Attractor.cpp">
-      <Filter>Source Files\Game\Pickup</Filter>
+      <Filter>Source Files\Game\Entity\Pickup</Filter>
     </ClCompile>
     <ClCompile Include="src\WeapCoil.cpp">
       <Filter>Source Files\Game\Weapon</Filter>
@@ -152,6 +152,9 @@
     </ClCompile>
     <ClCompile Include="src\Armory.cpp">
       <Filter>Source Files\Game\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HUD.cpp">
+      <Filter>Source Files\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -268,6 +271,9 @@
     </ClInclude>
     <ClInclude Include="include\Armory.hpp">
       <Filter>Header Files\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HUD.hpp">
+      <Filter>Header Files\Render</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

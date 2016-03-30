@@ -26,6 +26,7 @@
 //Rendering
 #include "Renderer.hpp"
 #include "GameRenderer.hpp"
+#include "HUD.hpp"
 
 //////Testing
 #include <sstream>
@@ -72,8 +73,15 @@ private:
 	//Camera
 	Camera* camera_;
 
+	//HUD
+	HUD* hud_;
+
 	//DebugDraw
 	SFMLDebugDraw dd_;
+	bool renderDD_;
+	bool renderGAME_;
+	bool renderHUD_;
+	bool renderCAM_;
 
 	bool haptics_;
 

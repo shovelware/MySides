@@ -14,6 +14,14 @@ Weapon::Pistol::Pistol(std::function<void(std::vector<ProjectileDef>& defs, std:
 	id_ = "pistol";
 }
 
+void Weapon::Pistol::reup()
+{
+	if (reloadTime_ <= 0)
+	{
+		reloadTime_ = reloadTimeMAX_;
+	}
+}
+
 void Weapon::Pistol::update(int dt)
 {
 	if (pin_ && cocked_)
@@ -60,8 +68,8 @@ void Weapon::Pistol::setMagSize(int size, bool reload)
 	magazine_.resize(size, reload);
 }
 
-float Weapon::Pistol::getBar() const { return magazine_.getCount(); }
-float Weapon::Pistol::getBarMAX() const { return magazine_.getCountMAX(); }
+int Weapon::Pistol::getBar() const { return magazine_.getCount(); }
+int Weapon::Pistol::getBarMAX() const { return magazine_.getCountMAX(); }
 
 void Weapon::Pistol::fire(b2Vec2 &heading)
 {

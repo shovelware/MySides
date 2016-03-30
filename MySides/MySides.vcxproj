@@ -138,6 +138,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameRenderer.cpp" />
     <ClCompile Include="src\GameWorld.cpp" />
+    <ClCompile Include="src\HUD.cpp" />
     <ClCompile Include="src\KeyInput.cpp" />
     <ClCompile Include="src\MySides.cpp" />
     <ClCompile Include="src\Pickup.cpp" />
@@ -175,6 +176,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\Game.hpp" />
     <ClInclude Include="include\GameRenderer.hpp" />
     <ClInclude Include="include\GameWorld.hpp" />
+    <ClInclude Include="include\HUD.hpp" />
     <ClInclude Include="include\KeyInput.hpp" />
     <ClInclude Include="include\Log.hpp" />
     <ClInclude Include="include\Pickup.hpp" />

@@ -11,14 +11,15 @@ namespace Weapon {
 		
 		bool canFire() const;
 
+		void reup();
 		void update(int dt);
 
 		void setResetTime(int ms);
 		void setReloadTime(int ms);
 		void setMagSize(int size, bool reload = false);
 
-		float getBar() const;
-		float getBarMAX() const;
+		int getBar() const;
+		int getBarMAX() const;
 	private:
 		void fire(b2Vec2 &heading);
 
