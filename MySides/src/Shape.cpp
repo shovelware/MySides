@@ -33,7 +33,8 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 	maxVel_ = 0.025f * (def.speedScale >= 0.5f ? def.speedScale : 0.5f); // max velocity in m/s // * size provisionally til we make an actual calculation
 	maxRot_ = 0.0001f;
 
-	hpMAX_ = def.hpMAX;
+	hpScale_ = def.hpScale;
+	hpMAX_ = def.hpMAX * hpScale_;
 	hp_ = hpMAX_;
 	sides_ = 0;
 }
@@ -227,7 +228,7 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 
 			if (vertices_ > 2)
 			{
-				hpMAX_ = vertices_;
+				hpMAX_ = vertices_ * hpScale_;
 				hp_ = hpMAX_;
 			}
 		}
@@ -437,7 +438,7 @@ void Shape::update(int milliseconds)
 				//Correct mismatch
 				setPoly(vertices_, size_);
 
-				hpMAX_ = vertices_;
+				hpMAX_ = vertices_ * hpScale_;
 				hp_ = hpMAX_;
 			}
 

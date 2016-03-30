@@ -51,6 +51,11 @@ public:
 		{
 			countMAX_ = newCount;
 
+			if (count_ > newCount)
+			{
+				count_ = newCount;
+			}
+
 			if (reload)
 			{
 				count_ = countMAX_;

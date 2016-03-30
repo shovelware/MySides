@@ -14,6 +14,7 @@ public:
 		heading(b2Vec2_zero),
 		inVelocity(b2Vec2_zero),
 		velScale(1),
+		oneHit(false),
 		ghost(false),
 		bounce(0),
 		shrapnel(0),
@@ -34,6 +35,7 @@ public:
 		heading(heading),
 		inVelocity(inVelocity),
 		velScale(1),
+		oneHit(false),
 		ghost(false),
 		bounce(0),
 		shrapnel(0),
@@ -53,6 +55,7 @@ public:
 		origin(b2Vec2_zero),
 		heading(b2Vec2_zero),
 		inVelocity(b2Vec2_zero),
+		oneHit(pd.oneHit),
 		velScale(pd.velScale),
 		ghost(pd.ghost),
 		bounce(pd.bounce),
@@ -80,6 +83,7 @@ public:
 	//Velocity handled by projectile
 	float velScale;
 
+	bool oneHit;
 	bool ghost;
 	float bounce;
 	int shrapnel;
@@ -164,6 +168,7 @@ public:
 	{
 		ProjectileDef grenade = ProjectileDef();
 		grenade.velScale = 1.f;
+		grenade.oneHit = true;
 		grenade.hpMAX = 1;
 		grenade.width = 1.75f;
 		grenade.height = 1.75f;
@@ -178,6 +183,7 @@ public:
 	{
 		ProjectileDef rocket = ProjectileDef();
 		rocket.velScale = 2.f;
+		rocket.oneHit = true;
 		rocket.hpMAX = 1;
 		rocket.width = 2.f;
 		rocket.height = 3.f;

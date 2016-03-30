@@ -9,7 +9,8 @@
 
 Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 	Entity(body),
-	fired_(false), impacted_(false),
+	fired_(false),
+	oneHit_(def.oneHit),
 	origin_(def.origin), heading_(def.heading),
 	maxHP_(def.hpMAX), hp_(def.hpMAX),
 	damage_(def.damage),
@@ -111,14 +112,6 @@ void Projectile::fire(float mult)
 	}
 }
 
-void Projectile::impact()
-{
-	if (impacted_ == false)
-	{
-		impacted_ = true;
-	}
-}
-
 void Projectile::takeDamage(unsigned int damage)
 {
 	hp_ -= damage;
@@ -170,7 +163,7 @@ void Projectile::update(int milliseconds)
 
 	//std::cout << body_->GetLinearVelocity().Length();
 
-	if (vel.Length() <= 0|| hp_ <= 0 || lifeTime_ <= 0)
+	if (vel.Length() <= 0 || hp_ <= 0 || lifeTime_ <= 0)
 	{
 		alive_ = false;
 		active_ = false;		
@@ -186,8 +179,16 @@ bool Projectile::collide(Entity * other, b2Contact& contact)
 		//Projectiles do not hurt their owner
 		if (owner_ != shape)
 		{
-			impact();
-			takeDamage(1);
+			//Onehit projectiles die on hit
+			if (oneHit_)
+			{
+				active_ = false;
+			}
+
+			else
+			{
+				takeDamage(1);
+			}
 		}
 
 		else contact.SetEnabled(false);
@@ -200,7 +201,6 @@ bool Projectile::collide(Entity * other, b2Contact& contact)
 		//Only collide if we're not friends
 		if (owner_ != proj->getOwner())
 		{
-			impact();
 			takeDamage(proj->getDamage());
 			//Maybe set contact to false so stronger proj continues?
 		}
@@ -234,8 +234,7 @@ bool Projectile::collide(Entity * other, b2Contact& contact)
 
 	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
 	{
-		impact();
-		takeDamage(4);
+		takeDamage(2);
 		handled = true;
 	}
 

@@ -13,8 +13,10 @@
 //Ideally weapons should be this but effort
 //#include "WeapAutoMag.hpp"
 //#include "WeapSemiMag.hpp"
+//#include "WeapScatMag.hpp"
 //#include "WeapAutoBat.hpp"
 //#include "WeapSemiBat.hpp"
+//#include "WeapScatBat.hpp"
 
 namespace Weapon {
 	class Armory {
@@ -34,21 +36,21 @@ namespace Weapon {
 			WeaponI* getRailgun(int level, int projLevel = 0);
 
 			//Projectiles
-			ProjectileDef getPellet(int level);
 			//ProjectileDef getShrapnel(Projectile& proj);
+			ProjectileDef getShrapnel(int level = 0);
 
-			ProjectileDef getNinMil(int level);
-			ProjectileDef getBullet(int level);
-			ProjectileDef getDumDum(int level);
-			ProjectileDef getCannonball(int level);
+			ProjectileDef getPellet(int level = 0);
+			ProjectileDef getNinMil(int level = 0);
+			ProjectileDef getBullet(int level = 0);
+			ProjectileDef getDumDum(int level= 0);
+			ProjectileDef getCannonball(int level = 0);
 
-			ProjectileDef getGrenade(int level);
-			ProjectileDef getRocket(int level);
-			ProjectileDef getLaser(int level);
-			ProjectileDef getSlug(int level);
+			ProjectileDef getGrenade(int level = 0);
+			ProjectileDef getRocket(int level = 0);
+			ProjectileDef getLaser(int level = 0);
+			ProjectileDef getSlug(int level = 0);
 
 		private:
-
 			std::function<void(std::vector<ProjectileDef>& defs, std::string id)> fireCallback_;
 	};
 }

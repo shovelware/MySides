@@ -86,6 +86,7 @@ protected:
 	//HP
 	int hp_;
 	unsigned int hpMAX_;
+	int hpScale_;
 	
 	//New firing logic
 	Weapon::WeaponI* weapon_;

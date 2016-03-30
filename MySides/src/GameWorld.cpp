@@ -193,7 +193,7 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		controlled_ = player_;
 
 		ProjectileDef newDef = ProjectileDef::grenadeDef();
-
+		
 		newDef.width *= 0.9f;
 		newDef.height *= 0.9f;
 		newDef.bounce = 0.5f;
@@ -203,8 +203,8 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 
 		weapons_.push_back(new Weapon::Shotgun(fireWeap_, newDef));
 		Weapon::WeaponI* newWeap = (*--weapons_.end());
-		Weapon::Shotgun* shotz = static_cast<Weapon::Shotgun*>(newWeap);
-		shotz->setSpread(0.5f);
+		//Weapon::Shotgun* shotz = static_cast<Weapon::Shotgun*>(newWeap);
+		//shotz->setSpread(0.5f);
 
 		player_->arm(newWeap);
 	}
@@ -307,7 +307,7 @@ void GameWorld::addPickup(Pickup::Type type, b2Vec2 position, int time)
 
 void GameWorld::addExplosion(Projectile* src)
 {
-	ProjectileDef shrapDef = ProjectileDef::pelletDef();
+	ProjectileDef shrapDef = armory_.getShrapnel();
 	shrapDef.colPrim = src->getSecondary();
 	shrapDef.colSecn = src->getSecondary();
 	shrapDef.colTert = src->getPrimary();
@@ -329,7 +329,7 @@ void GameWorld::addExplosion(Projectile* src)
 		shrapDef.origin = pos;
 		shrapDef.heading = dir;
 		shrapDef.owner = owner;
-		shrapDef.lifeTime = 50;
+		//shrapDef.lifeTime = 50;
 
 		addProjectile(shrapDef);
 	}
@@ -844,7 +844,7 @@ Shape * GameWorld::getControlled()
 	return controlled_;
 }
 
-//Handlers for game intent: Move, Fire, Select, Triggers
+//Handlers for game intent: Move, Fire, Trigger, release, reload
 void GameWorld::move(b2Vec2& direction)
 {
 	if (controlled_ != nullptr && (direction.x != 0 || direction.y != 0))
@@ -955,8 +955,10 @@ void GameWorld::f1()
 		shapes_.push_back(new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_));
 		Shape* added = *(--shapes_.end());
 
-		weapons_.push_back(armory_.getShotgun(0, i));
+		weapons_.push_back(armory_.getShotgun(i));
 		newWeap = (*--weapons_.end());
+		Weapon::Shotgun* shotz = static_cast<Weapon::Shotgun*>(newWeap);
+		shotz->setMagSize(10000);
 
 		added->arm(newWeap);
 	}
@@ -976,16 +978,23 @@ void GameWorld::f5()
 
 void GameWorld::f6()
 {
-	addPickup(Pickup::Type::SIGHT, b2Vec2_zero, 20000);
+	
 }
 
 void GameWorld::f7()
 {
-	addPickup(Pickup::Type::SHIELD, b2Vec2_zero, 20000);
+	static int x = 0;
+	player_->disarm();
+	armShape(player_, armory_.getShotgun(x, x));
+	x++;
+	std::cout << x << std::endl;
+
 }
 
 void GameWorld::f8()
 {
+	addPickup(Pickup::Type::SHIELD, b2Vec2(-10, 0), 20000);
+	addPickup(Pickup::Type::SIGHT, b2Vec2(10, 0), 20000);
 }
 
 void GameWorld::f9()

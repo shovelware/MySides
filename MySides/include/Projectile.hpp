@@ -9,7 +9,7 @@ public:
 	Projectile(b2Body* body, const ProjectileDef& def);
 
 	void fire(float mult);
-	void impact();
+
 	void takeDamage(unsigned int damage);
 	int getDamage() const;
 	int getShrapnel() const;
@@ -44,7 +44,7 @@ private:
 	int lifeTime_;
 
 	bool fired_;
-	bool impacted_;
+	bool oneHit_;
 
 	//Bullets have hp
 	//Could take 1 for every impact

@@ -16,7 +16,7 @@ namespace Weapon {
 
 		void setRefireTime(int ms);
 		void setReloadTime(int ms);
-		void setMagSize(int size, bool reload);
+		void setMagSize(int size, bool reload = false);
 		void setPellets(int pellets);
 		void setSpread(float spread);
 

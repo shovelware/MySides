@@ -39,6 +39,11 @@ public:
 		{
 			chargeMAX_ = size;
 
+			if (charge_ > size)
+			{
+				charge_ = size;
+			}
+
 			if (reload)
 			{
 				charge_ = chargeMAX_;
