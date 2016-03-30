@@ -48,6 +48,7 @@ public:
 
 	//New weapons system
 	void arm(Weapon::WeaponI* weapon);
+	Weapon::WeaponI* getWeapon() const;//???
 	void disarm();
 	bool getArmed();
 	bool getWeaponReady();

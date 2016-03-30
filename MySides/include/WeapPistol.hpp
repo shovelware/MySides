@@ -9,18 +9,23 @@ namespace Weapon {
 	public:
 		Pistol(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
 		
-		bool canFire();
+		bool canFire() const;
 
 		void update(int dt);
 
-		void resizeMag(int size);
+		void setResetTime(int ms);
+		void setReloadTime(int ms);
+		void setMagSize(int size, bool reload = false);
+
+		float getBar() const;
+		float getBarMAX() const;
 	private:
 		void fire(b2Vec2 &heading);
 
 		Magazine magazine_;
 
-		int idleTime_;
-		int idleTimeMAX_;
+		int resetTime_;
+		int resetTimeMAX_;
 
 		int reloadTime_;
 		int reloadTimeMAX_;

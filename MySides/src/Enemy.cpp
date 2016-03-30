@@ -43,7 +43,15 @@ void Enemy::update(int milliseconds)
 	}
 
 	//fire(b2Vec2_zero + body_->GetPosition());
-	trigger(b2Vec2(0, 0));
+	if (getWeaponReady())
+	{
+		trigger(b2Vec2(0, 0));
+	}
+
+	else
+	{
+		release();
+	}
 }
 
 //Only deals with the effects of this collision on this entity
@@ -70,14 +78,16 @@ bool Enemy::collide(Entity * other, b2Contact& contact)
 
 	else if (Side* side = dynamic_cast<Side*>(other))
 	{
-		//char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
-		//char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
-		//
-		//if (tagA == "side" || tagB == "side")
-		//{
-		//	collect(side->getValue());
-		//}
-
+		if (collector_)
+		{
+			char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
+			char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
+			
+			if (tagA == "side" || tagB == "side")
+			{
+				collect(side->getValue());
+			}
+		}
 		handled = true;
 	}
 

@@ -5,8 +5,8 @@ Weapon::Pistol::Pistol(std::function<void(std::vector<ProjectileDef>& defs, std:
 	magazine_(18),
 	cocked_(false)
 {
-	idleTimeMAX_ = 50;
-	idleTime_ = 0;
+	resetTimeMAX_ = 50;
+	resetTime_ = 0;
 
 	reloadTimeMAX_ = 2500;
 	reloadTime_ = 0;
@@ -34,16 +34,34 @@ void Weapon::Pistol::update(int dt)
 	}
 
 	// Else if we're cycling, time down
-	else if (!pin_ && idleTime_ > 0)
+	else if (!pin_ && resetTime_ > 0)
 	{
-		idleTime_ = (idleTime_ - dt >= 0 ? idleTime_ - dt : 0);
+		resetTime_ = (resetTime_ - dt >= 0 ? resetTime_ - dt : 0);
 	}
 
-	if (idleTime_ == 0)
+	if (resetTime_ == 0)
 	{
 		cocked_ = true;
 	}
 }
+
+void Weapon::Pistol::setResetTime(int ms)
+{
+	reloadTimeMAX_ = (ms > 0 ? ms : reloadTimeMAX_);
+}
+
+void Weapon::Pistol::setReloadTime(int ms)
+{
+	reloadTimeMAX_ = (ms > 0 ? ms : reloadTimeMAX_);
+}
+
+void Weapon::Pistol::setMagSize(int size, bool reload)
+{
+	magazine_.resize(size, reload);
+}
+
+float Weapon::Pistol::getBar() const { return magazine_.getCount(); }
+float Weapon::Pistol::getBarMAX() const { return magazine_.getCountMAX(); }
 
 void Weapon::Pistol::fire(b2Vec2 &heading)
 {
@@ -63,7 +81,7 @@ void Weapon::Pistol::fire(b2Vec2 &heading)
 	//Reactions:
 	magazine_.remove();
 	cocked_ = false;
-	idleTime_ = idleTimeMAX_;
+	resetTime_ = resetTimeMAX_;
 
 	//If we're empty, reload
 	if (magazine_.checkEmpty())
@@ -73,7 +91,7 @@ void Weapon::Pistol::fire(b2Vec2 &heading)
 	}
 }
 
-bool Weapon::Pistol::canFire()
+bool Weapon::Pistol::canFire() const
 {
 	bool ready = false;
 

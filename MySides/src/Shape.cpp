@@ -1,11 +1,5 @@
 #include "Shape.hpp"
 
-///
-#include <sstream>
-#include "Log.hpp"
-extern Log l;
-///
-
 Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& callback) : 
 	Entity(body),
 	collector_(true),
@@ -222,11 +216,13 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 	lastDamage_ = direction;
 	lastDamage_.Normalize();
 
-	for (int dmg = damage; dmg > 0; dmg--)
+	for (int dmg = damage; dmg > 0; --dmg)
 	{
-		//If we're down, go back a side
-		if (hp_ == 0)
+		//If we're about to go down, go back a side
+		if (hp_ == 1)
 		{
+			hp_ -= 1;
+
 			vertices_ = (vertices_ - 1 >= 2 ? vertices_ - 1 : 2);
 
 			if (vertices_ > 2)
@@ -237,7 +233,7 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 		}
 
 		//Otherwise just take some hp
-		else 
+		else
 		{
 			if (vertices_ > 2)
 			{
@@ -246,7 +242,7 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 		}
 		
 		//We're dead, stop hurting
-		if (hp_ <= 0 & vertices_ <= 2)
+		if (vertices_ < 3 && hp_ <= 0)
 			break;
 	}
 }
@@ -329,6 +325,11 @@ void Shape::arm(Weapon::WeaponI * weapon)
 	weapon_->setSecondary(colSecn_);
 	weapon_->setTertiary(colSecn_);
 	weapon_->setOwner(this);
+}
+
+Weapon::WeaponI * Shape::getWeapon() const
+{
+	return weapon_;
 }
 
 void Shape::disarm()

@@ -43,9 +43,12 @@ namespace Weapon {
 		void setID(std::string id);		//!< Sets a new id for the weapon
 		std::string getID();			//!< Gets the id of the weapon
 
-		virtual bool canFire() = 0;		//!< Checks if a Weapon can fire
+		virtual float getBarMAX() const = 0;	//!< Max of status bar
+		virtual float getBar() const = 0;		//!< Current fill of status bar
 
-		virtual void update(int dt) = 0;//!< Updates weapon
+		virtual bool canFire() const = 0;		//!< Checks if a Weapon can fire
+
+		virtual void update(int dt) = 0;	//!< Updates weapon
 
 	protected:
 		WeaponI(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);

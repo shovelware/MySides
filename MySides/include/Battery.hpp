@@ -5,14 +5,18 @@ class Battery {
 private:
 	int charge_;
 	int chargeMAX_;
-	int chargeIncrement_;
-	
+
 public:
 	Battery(int capacity) :
 		chargeMAX_(capacity),
 		charge_(capacity)
 	{}
 
+	void recharge(int charge)
+	{
+		charge_ = charge_ + charge <= chargeMAX_ ? charge_ + charge : chargeMAX_;
+	}
+	
 	bool discharge(int charge)
 	{
 		if (charge <= charge_)
@@ -24,17 +28,26 @@ public:
 		else return false;
 	}
 
-	void recharge(int charge)
-	{
-		charge_ = charge_ + charge <= chargeMAX_ ? charge_ + charge : chargeMAX_;
-	}
-
 	void refill()
 	{
 		charge_ = chargeMAX_;
 	}
 
+	void resize(int size, bool reload)
+	{
+		if (size > 0)
+		{
+			chargeMAX_ = size;
+
+			if (reload)
+			{
+				charge_ = chargeMAX_;
+			}
+		}
+	}
+
 	int getCharge() const { return charge_; }
+	int getChargeMAX() const { return chargeMAX_; }
 	int getPercent() const { return ((float)charge_ / (float)chargeMAX_) * 100.f; }
 	bool checkFull() const { return charge_ == chargeMAX_; }
 	bool checkEmpty() const { return charge_ == 0; }

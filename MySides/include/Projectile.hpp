@@ -12,7 +12,7 @@ public:
 	void impact();
 	void takeDamage(unsigned int damage);
 	int getDamage() const;
-	int getExplosionRes() const;
+	int getShrapnel() const;
 
 	Entity* getOwner();
 	void setOwner(Entity* o);
@@ -26,15 +26,15 @@ public:
 	bool collide(Entity* other, b2Contact& contact);
 
 private:
-	void setAsCircle(float size, float damageScale, float bounce, bool ghost);
-	void setAsRect(float size, float damageScale, float bounce, bool ghost);
+	void setAsCircle(b2Vec2 size, float bounce, bool ghost);
+	void setAsRect(b2Vec2 size, float bounce, bool ghost);
 
 	void addMaterial(b2FixtureDef& def, float bounce); //Abstract into entity?
 
-	float size_;
+	b2Vec2 size_;
 	float speed_;
 	float damage_;
-	int explodeRes_;
+	int shrapnel_;
 
 	Entity* owner_;
 	Entity* target_;

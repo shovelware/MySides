@@ -12,20 +12,21 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 	fired_(false), impacted_(false),
 	origin_(def.origin), heading_(def.heading),
 	maxHP_(def.hpMAX), hp_(def.hpMAX),
-	size_(def.size),
+	damage_(def.damage),
+	size_(def.width, def.height),
 	lifeTime_(def.lifeTime),
 	owner_(def.owner), 
 	target_(def.target),
-	explodeRes_(def.explode)
+	shrapnel_(def.shrapnel)
 {
-	if (def.rect)
+	if (def.height > 0)
 	{
-		setAsRect(size_, def.damageScale, def.bounce, def.ghost);
+		setAsRect(size_, def.bounce, def.ghost);
 	}
 
 	else
 	{
-		setAsCircle(size_, def.damageScale, def.bounce, def.ghost);
+		setAsCircle(size_, def.bounce, def.ghost);
 	}
 
 	//Do maths to orient body
@@ -39,11 +40,11 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 	fire(def.velScale);
 }
 
-void Projectile::setAsCircle(float size, float damageScale = 1.f, float bounce = 0.f, bool ghost = false)
+void Projectile::setAsCircle(b2Vec2 size, float bounce = 0.f, bool ghost = false)
 {
 	//Shape
 	b2CircleShape bullet;
-	bullet.m_radius = (0.1f * size);
+	bullet.m_radius = (0.1f * size.x);
 
 	//Fixture
 	b2FixtureDef fixtureDef;
@@ -59,15 +60,14 @@ void Projectile::setAsCircle(float size, float damageScale = 1.f, float bounce =
 
 	//End box2d setup
 
-	speed_ = 0.000025f * size;
-	damage_ = 1 * damageScale;
+	speed_ = 0.000025f * size.x;
 }
 
-void Projectile::setAsRect(float size, float damageScale = 1.f, float bounce = 0.f, bool ghost = false)
+void Projectile::setAsRect(b2Vec2 size, float bounce = 0.f, bool ghost = false)
 {
 	//Shape
 	b2PolygonShape box;
-	box.SetAsBox(0.2f * size, 0.6f);
+	box.SetAsBox(0.1f * size.x, 0.1f * size.y);
 
 	//Fixture
 	b2FixtureDef fixtureDef;
@@ -83,8 +83,7 @@ void Projectile::setAsRect(float size, float damageScale = 1.f, float bounce = 0
 
 	//End box2d setup
 	body_->SetTransform(body_->GetPosition(), atan2f(-heading_.x, heading_.y));
-	speed_ = 0.00025f / size;
-	damage_ = 1 * damageScale;
+	speed_ = 0.00025f / (size.x * size.y);
 }
 
 void Projectile::addMaterial(b2FixtureDef & def, float bounce)
@@ -130,7 +129,7 @@ int Projectile::getDamage() const
 	return damage_;
 }
 
-int Projectile::getExplosionRes() const { return explodeRes_; }
+int Projectile::getShrapnel() const { return shrapnel_; }
 
 Entity * Projectile::getOwner()
 {

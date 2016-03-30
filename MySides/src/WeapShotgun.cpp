@@ -1,12 +1,18 @@
 #include "WeapShotgun.hpp"
 
 Weapon::Shotgun::Shotgun(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
-	WeaponI(callback, ammo)
+	WeaponI(callback, ammo),
+	magazine_(8)
 {
 	refireTimeMax_ = 600;
 	refireTime_ = 0;
 
+	reloadTimeMAX_ = 1000;
+	reloadTime_ = 0;
+
 	pellets_ = 8;
+	spread_ = 0.15f;
+
 	id_ = "shotgun";
 }
 
@@ -23,6 +29,23 @@ void Weapon::Shotgun::update(int dt)
 	{
 		refireTime_ = (refireTime_ - dt >= 0 ? refireTime_ - dt : 0);
 	}
+
+	//Else If we're not cycling, reload
+	else if (reloadTime_ > 0)
+	{
+		reloadTime_ = (reloadTime_ - dt >= 0 ? reloadTime_ - dt : 0);
+
+		if (reloadTime_ <= 0)
+		{
+			magazine_.add();
+
+			if (!magazine_.checkFull())
+			{
+				//Subsequent reloads take half the time
+				reloadTime_ = reloadTimeMAX_ / 2;
+			}
+		}
+	}
 }
 
 void Weapon::Shotgun::setRefireTime(int ms)
@@ -34,6 +57,24 @@ void Weapon::Shotgun::setReloadTime(int ms)
 {
 	reloadTimeMAX_ = (ms > 0 ? ms : reloadTimeMAX_);
 }
+
+void Weapon::Shotgun::setMagSize(int size, bool reload)
+{
+	magazine_.resize(size, reload);
+}
+
+void Weapon::Shotgun::setPellets(int pellets)
+{
+	pellets_ = (pellets > 0 ? pellets : pellets_);
+}
+
+void Weapon::Shotgun::setSpread(float spread)
+{
+	spread_ = (spread >= 0 ? spread : spread_);
+}
+
+float Weapon::Shotgun::getBar() const { return magazine_.getCount(); }
+float Weapon::Shotgun::getBarMAX() const { return magazine_.getCountMAX(); }
 
 void Weapon::Shotgun::fire(b2Vec2 &heading)
 {
@@ -60,7 +101,7 @@ void Weapon::Shotgun::fire(b2Vec2 &heading)
 		pv.emplace_back(output_);
 		newProj = --pv.end();
 
-		adjust = randFloat(-0.15f, 0.15f);
+		adjust = randFloat(-spread_, spread_);
 		newDir.x = cosf(rotation +adjust);
 		newDir.y = sinf(rotation +adjust);
 
@@ -69,16 +110,26 @@ void Weapon::Shotgun::fire(b2Vec2 &heading)
 		newProj->owner = owner_;
 	}
 
+	//Fire projectiles
 	fireCallback_(pv, id_);
-
+	
+	//Reactions
+	magazine_.remove();
 	refireTime_ = refireTimeMax_;
+	reloadTime_ = reloadTimeMAX_;
+
+	if (magazine_.checkEmpty())
+	{
+		refireTime_ = 0;
+		reloadTime_ = reloadTimeMAX_;
+	}
 }
 
-bool Weapon::Shotgun::canFire()
+bool Weapon::Shotgun::canFire() const
 {
 	bool ready = false;
 
-	if (refireTime_ <= 0)
+	if (!magazine_.checkEmpty() &&refireTime_ <= 0)
 	{
 		if (output_.isValid())
 		{

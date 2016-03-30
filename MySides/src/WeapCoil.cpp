@@ -9,8 +9,8 @@ Weapon::Coilgun::Coilgun(std::function<void(std::vector<ProjectileDef>& defs, st
 
 	fireCharge_ = 30;
 
-	chargeTime_ = 0;
-	chargeTimeMAX_ = 500;
+	rechargeTime_ = 0;
+	rechargeTimeMAX_ = 500;
 
 	id_ = "coilgun";
 }
@@ -32,14 +32,37 @@ void Weapon::Coilgun::update(int dt)
 	//Otherwise start charging
 	else
 	{
-		if (chargeTime_ > 0)
+		if (rechargeTime_ > 0)
 		{
-			chargeTime_ = (chargeTime_ - dt >= 0 ? chargeTime_ - dt : 0);
+			rechargeTime_ = (rechargeTime_ - dt >= 0 ? rechargeTime_ - dt : 0);
 		}
 
 		else battery_.recharge(fireCharge_ / 2);
 	}
 }
+
+void Weapon::Coilgun::setRefireTime(int ms)
+{
+	refireTimeMAX_ = (ms > 0 ? ms : refireTimeMAX_);
+}
+
+void Weapon::Coilgun::setRechargeTime(int ms)
+{
+	rechargeTimeMAX_ = (ms > 0 ? ms : rechargeTimeMAX_);
+}
+
+void Weapon::Coilgun::setFireCharge(int charge)
+{
+	fireCharge_ = (charge >= 0 ? charge : fireCharge_);
+}
+
+void Weapon::Coilgun::setBatterySize(int size, bool reload)
+{
+	battery_.resize(size, reload);
+}
+
+float Weapon::Coilgun::getBar() const { return battery_.getCharge(); }
+float Weapon::Coilgun::getBarMAX() const { return battery_.getChargeMAX(); }
 
 void Weapon::Coilgun::fire(b2Vec2 & heading)
 {
@@ -58,7 +81,7 @@ void Weapon::Coilgun::fire(b2Vec2 & heading)
 
 	//Reactions:
 	refireTime_ = refireTimeMAX_ * (2 - (battery_.getPercent() / 100.f)) ;
-	chargeTime_ = chargeTimeMAX_;
+	rechargeTime_ = rechargeTimeMAX_;
 	battery_.discharge(fireCharge_);
 }
 

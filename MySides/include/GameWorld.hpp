@@ -34,11 +34,7 @@
 #include "Shield.hpp"
 #include "Attractor.hpp"
 
-#include "Weapon.hpp"
-#include "WeapRifle.hpp"
-#include "WeapShotgun.hpp"
-#include "WeapCoil.hpp"
-#include "WeapPistol.hpp"
+#include "Armory.hpp"
 
 #include "SoundSystem.hpp"
 
@@ -56,13 +52,13 @@ public:
 
 	//Spawning works off definitions
 	void addPlayer(const ShapeDef& def);
-	void addEnemy(const ShapeDef& def);
+	void addEnemy(const ShapeDef& def, Weapon::WeaponI* weapon = nullptr);
 	void addProjectile(const ProjectileDef& def);
 	void addSide(const SideDef& def);
 	void addPickup(Pickup::Type type, b2Vec2 position, int time);
 	void addExplosion(Projectile* src);
 
-	void armShape(Shape* shape);
+	void armShape(Shape* shape, Weapon::WeaponI* weapon);
 	void disarmShape(Shape* shape);
 
 	void fireWeapon(std::vector<ProjectileDef>& defs, std::string id);
@@ -166,30 +162,38 @@ public:
 	void f9();
 	void f0();
 private:
+	//B2 stuff
 	const b2Vec2 GRAVITY = b2Vec2(0, 0);
 	const int VELOCITY_ITERS = 6;
 	const int POSITION_ITERS = 2;
+	ContactListener contactListener_;
 	
+	//Passthroughs
 	bool pause_;
 	int leftHaptic_;
 	int rightHaptic_;
-
+	
+	//Entities
 	Player* player_;
+	Bounds* bounds_;
 	std::list<Enemy*> shapes_;
 	std::list<Projectile*> projectiles_;
 	std::list<Side*> sides_;
 	std::list<Weapon::WeaponI*> weapons_;
 	std::list<Pickup::PickupI*> pickups_;
 
-	Shape* controlled_;
+	//Weapons
+	Weapon::Armory armory_;
 	
-	ContactListener contactListener_;
-	Bounds* bounds_;
+	//Controlled shape pointer
+	Shape* controlled_;
 
+	//Body creation
 	b2Body* addDynamicBody(const b2Vec2& pos);
 	b2Body* addStaticBody (const b2Vec2& pos);
 	b2Body* addBulletBody (const b2Vec2& pos);
 
+	//Keep inside bounds
 	void popInside(Entity* ent);
 
 	//AI spawning
@@ -219,7 +223,6 @@ private:
 
 	//Just for fun
 	void randomiseCol(Entity* e);
-
 };
 
 #endif

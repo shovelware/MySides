@@ -3,6 +3,7 @@
 
 #include <stdafx.h>
 #include <Box2D\Common\b2Math.h>
+#include <Box2D\Common\b2Draw.h>
 
 class Entity;
 
@@ -13,13 +14,13 @@ public:
 		heading(b2Vec2_zero),
 		inVelocity(b2Vec2_zero),
 		velScale(1),
-		rect(false),
 		ghost(false),
 		bounce(0),
-		explode(0),
+		shrapnel(0),
 		hpMAX(0),
-		size(0),
-		damageScale(1),
+		width(0),
+		height(0),
+		damage(1),
 		lifeTime(0),
 		colPrim(b2Color(.75f, .75f, 0.f)),
 		colSecn(b2Color(.75f, .75f, 0.f)),
@@ -33,13 +34,13 @@ public:
 		heading(heading),
 		inVelocity(inVelocity),
 		velScale(1),
-		rect(false),
 		ghost(false),
 		bounce(0),
-		explode(0),
+		shrapnel(0),
 		hpMAX(1),
-		size(1),
-		damageScale(1),
+		width(1),
+		height(0),
+		damage(1),
 		lifeTime(1000),
 		colPrim(b2Color(.75f, .75f, 0.f)),
 		colSecn(b2Color(.75f, .75f, 0.f)),
@@ -53,13 +54,13 @@ public:
 		heading(b2Vec2_zero),
 		inVelocity(b2Vec2_zero),
 		velScale(pd.velScale),
-		rect(pd.rect),
 		ghost(pd.ghost),
 		bounce(pd.bounce),
-		explode(pd.explode),
+		shrapnel(pd.shrapnel),
 		hpMAX(pd.hpMAX),
-		size(pd.size),
-		damageScale(pd.damageScale),
+		width(pd.width),
+		height(pd.height),
+		damage(pd.damage),
 		lifeTime(pd.lifeTime),
 		colPrim(pd.colPrim),
 		colSecn(pd.colSecn),
@@ -79,16 +80,15 @@ public:
 	//Velocity handled by projectile
 	float velScale;
 
-	bool rect;
 	bool ghost;
 	float bounce;
-	int explode;
+	int shrapnel;
 
 	unsigned int hpMAX;
-	float size;
+	float width;
+	float height;
 
-	float damageScale;
-
+	int damage;
 	int lifeTime;
 
 	//Colours
@@ -105,8 +105,8 @@ public:
 		ProjectileDef pellet = ProjectileDef();
 		pellet.velScale = 1;
 		pellet.hpMAX = 1;
-		pellet.size = 0.25f;
-		pellet.damageScale = 1;
+		pellet.width = 0.25f;
+		pellet.damage = 1;
 		pellet.lifeTime = 150;
 
 		return pellet;
@@ -117,8 +117,8 @@ public:
 		ProjectileDef ninmil = ProjectileDef();
 		ninmil.velScale = 1;
 		ninmil.hpMAX = 1;
-		ninmil.size = 0.5f;
-		ninmil.damageScale = 1;
+		ninmil.width = 0.5f;
+		ninmil.damage = 1;
 		ninmil.lifeTime = 500;
 		
 		return ninmil;
@@ -129,8 +129,8 @@ public:
 		ProjectileDef bullet = ProjectileDef();		
 		bullet.velScale = 1;
 		bullet.hpMAX = 1;
-		bullet.size = 1;
-		bullet.damageScale = 1.25f;
+		bullet.width = 1;
+		bullet.damage = 1.25f;
 		bullet.lifeTime = 1000;
 
 		return bullet;
@@ -141,8 +141,8 @@ public:
 		ProjectileDef dumdum = ProjectileDef();
 		dumdum.velScale = 2;
 		dumdum.hpMAX = 2;
-		dumdum.size = 2.f;
-		dumdum.damageScale = 1.5f;
+		dumdum.width = 2.f;
+		dumdum.damage = 1.5f;
 		dumdum.lifeTime = 1250;
 
 		return dumdum;
@@ -153,8 +153,8 @@ public:
 		ProjectileDef cnnbll = ProjectileDef();
 		cnnbll.velScale = 3;
 		cnnbll.hpMAX = 4;
-		cnnbll.size = 4.f;
-		cnnbll.damageScale = 2.f;
+		cnnbll.width = 4.f;
+		cnnbll.damage = 2.f;
 		cnnbll.lifeTime = 1500;
 
 		return cnnbll;
@@ -163,13 +163,13 @@ public:
 	static ProjectileDef grenadeDef()
 	{
 		ProjectileDef grenade = ProjectileDef();
-		grenade.velScale = 0.75f;
+		grenade.velScale = 1.f;
 		grenade.hpMAX = 1;
-		grenade.size = 1.f;
-		grenade.rect = true;
-		grenade.explode = 12;
-		grenade.damageScale = 2.f;
-		grenade.lifeTime = 1250;
+		grenade.width = 1.75f;
+		grenade.height = 1.75f;
+		grenade.shrapnel = 12;
+		grenade.damage = 1.f;
+		grenade.lifeTime = 1000;
 
 		return grenade;
 	}
@@ -177,12 +177,12 @@ public:
 	static ProjectileDef rocketDef()
 	{
 		ProjectileDef rocket = ProjectileDef();
-		rocket.velScale = 3;
+		rocket.velScale = 2.f;
 		rocket.hpMAX = 1;
-		rocket.size = 1.f;
-		rocket.rect = true;
-		rocket.explode = 6;
-		rocket.damageScale = 1.f;
+		rocket.width = 2.f;
+		rocket.height = 3.f;
+		rocket.shrapnel = 20;
+		rocket.damage = 1.f;
 		rocket.lifeTime = 500;
 
 		return rocket;
@@ -191,18 +191,18 @@ public:
 	static ProjectileDef pewpewDef()
 	{
 		ProjectileDef pewpew = ProjectileDef();
-		pewpew.velScale = 2;
+		pewpew.velScale = 1.5f;
 		pewpew.hpMAX = 2;
-		pewpew.size = .25f;
-		pewpew.rect = true;
+		pewpew.width = .5f;
+		pewpew.height = 6.f;
 		pewpew.ghost = true;
-		pewpew.damageScale = 1.f;
+		pewpew.damage = 1.f;
 		pewpew.lifeTime = 500;
 
 		return pewpew;
 	}
 
-	bool isValid() { return lifeTime >= 0; }
+	bool isValid() const { return lifeTime >= 0; }
 };
 
 #endif

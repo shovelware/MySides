@@ -11,7 +11,8 @@ namespace Weapon {
 	class Rifle : public WeaponI {
 	public:
 		Rifle(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
-		bool canFire();
+		
+		bool canFire() const;
 
 		void update(int dt);
 
@@ -19,6 +20,8 @@ namespace Weapon {
 		void setReloadTime(int ms);
 		void setMagSize(int size, bool reload = false);
 
+		float getBar() const;
+		float getBarMAX() const;
 	private:
 		void fire(b2Vec2 &heading);
 

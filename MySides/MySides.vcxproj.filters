@@ -150,6 +150,9 @@
     <ClCompile Include="src\WeapPistol.cpp">
       <Filter>Source Files\Game\Weapon</Filter>
     </ClCompile>
+    <ClCompile Include="src\Armory.cpp">
+      <Filter>Source Files\Game\Weapon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">

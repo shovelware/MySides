@@ -1,9 +1,10 @@
 #include "GameWorld.hpp"
 
-//Constructor initialises Box2D World and boudaries
+//Constructor initialises Box2D World, boundaries, armory
 GameWorld::GameWorld() :
 	b2World(GRAVITY),
 	contactListener_(ContactListener()),
+	armory_([this](std::vector<ProjectileDef>& defs, std::string id) { fireWeapon(defs, id); }),
 	player_(nullptr),
 	controlled_(nullptr),
 	pause_(false)
@@ -191,13 +192,20 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		//Set our control to the one we just put in
 		controlled_ = player_;
 
-		ProjectileDef newDef = ProjectileDef::ninmilDef();
+		ProjectileDef newDef = ProjectileDef::grenadeDef();
 
-		newDef.damageScale = 4;
+		newDef.width *= 0.9f;
+		newDef.height *= 0.9f;
+		newDef.bounce = 0.5f;
+		newDef.hpMAX = 2;
+		newDef.damage = 4;
+		newDef.velScale = 1;
 
 
-		weapons_.push_back(new Weapon::Pistol(fireWeap_, newDef));
+		weapons_.push_back(new Weapon::Shotgun(fireWeap_, newDef));
 		Weapon::WeaponI* newWeap = (*--weapons_.end());
+		Weapon::Shotgun* shotz = static_cast<Weapon::Shotgun*>(newWeap);
+		shotz->setSpread(0.5f);
 
 		player_->arm(newWeap);
 	}
@@ -224,8 +232,8 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 
 	ProjectileDef newDef = ProjectileDef::bulletDef();
 	newDef.velScale = 0.5f;
-	newDef.damageScale = 1;
-	newDef.size = 1.f;
+	newDef.damage = 1;
+	newDef.width = 1.f;
 	newDef.hpMAX = 1;
 	//newDef.lifeTime = 100;
 
@@ -247,6 +255,17 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 	audio_.playSFX("spawn", B2toSF(pos, true));
 
 	enemies++;
+}
+
+void GameWorld::addEnemy(const ShapeDef & def, Weapon::WeaponI * weapon)
+{
+	shapes_.push_back(new Enemy(addDynamicBody(def.position), def, addSide_, getControlled_));
+	
+	//p. sure this is broke
+	if (weapon != nullptr)
+	{
+		armShape((*--shapes_.end()), weapon);
+	}
 }
 
 //Adds a projectile to the world via definition
@@ -291,11 +310,12 @@ void GameWorld::addPickup(Pickup::Type type, b2Vec2 position, int time)
 void GameWorld::addExplosion(Projectile* src)
 {
 	ProjectileDef shrapDef = ProjectileDef::pelletDef();
-	shrapDef.colPrim = src->getPrimary();
+	shrapDef.colPrim = src->getSecondary();
 	shrapDef.colSecn = src->getSecondary();
-	shrapDef.colTert = src->getSecondary();
+	shrapDef.colTert = src->getPrimary();
+	shrapDef.damage = src->getDamage();
 
-	int explosionRes = src->getExplosionRes();
+	int explosionRes = src->getShrapnel();
 
 	b2Vec2 pos = src->getPosition();
 	b2Vec2 dir(0, 0);
@@ -317,6 +337,17 @@ void GameWorld::addExplosion(Projectile* src)
 	}
 
 	audio_.playSFX("explosion", B2toSF(pos, true));
+}
+
+void GameWorld::armShape(Shape * shape, Weapon::WeaponI * weapon)
+{
+	weapons_.push_back(weapon);
+	shape->arm(weapon);
+}
+
+void GameWorld::disarmShape(Shape * shape)
+{
+	shape->disarm();
 }
 
 //Fire possibly many projectiles
@@ -372,7 +403,7 @@ void GameWorld::removeEnemy(std::list<Enemy*>::iterator& e)
 void GameWorld::removeProjectile(std::list<Projectile*>::iterator& p)
 {
 	//Explode if we need to
-	if ((*p)->getExplosionRes() > 0)
+	if ((*p)->getShrapnel() > 0)
 	{
 		addExplosion((*p));
 	}
@@ -896,7 +927,34 @@ void GameWorld::bomb()
 }
 
 void GameWorld::f1()
-{}
+{
+	//Testing projectile levels
+	for (int i = 0; i < 8; ++i)
+	{
+		ShapeDef enem = ShapeDef(b2Vec2(-20 + 5 * i, 15), b2Vec2(0, -1), i);
+		
+		float e =  1 - i * (1 / 8.f);
+		float s =  1 - i * (1 / 16.f);
+		float t =  1 - i * (1 / 32.f);
+
+		enem.colPrim = b2Color(e, e, e);
+		enem.colSecn = b2Color(s, s, s);
+		enem.colTert = b2Color(t, t, t);
+
+		ProjectileDef newDef = armory_.getPellet(i);
+		newDef.damage = 0;
+
+		Weapon::WeaponI* newWeap;
+
+		shapes_.push_back(new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_));
+		Shape* added = *(--shapes_.end());
+
+		weapons_.push_back(armory_.getShotgun(0, i));
+		newWeap = (*--weapons_.end());
+
+		added->arm(newWeap);
+	}
+}
 
 void GameWorld::f2()
 {}
@@ -922,7 +980,6 @@ void GameWorld::f7()
 
 void GameWorld::f8()
 {
-	randomiseCol(bounds_);
 }
 
 void GameWorld::f9()
@@ -934,7 +991,7 @@ void GameWorld::f9()
 void GameWorld::f0()
 {
 	if (player_ != nullptr)
-		player_->kill();
+		player_->collect(999);
 }
 
 void GameWorld::testBed()
@@ -1064,7 +1121,7 @@ void GameWorld::testBed()
 		}
 
 
-		newDef.damageScale = 0;
+		newDef.damage = 0;
 
 		shapes_.push_back(new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_));
 		Shape* added = *(--shapes_.end());

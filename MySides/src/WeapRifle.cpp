@@ -53,6 +53,9 @@ void Weapon::Rifle::setMagSize(int size, bool reload)
 	magazine_.resize(size, reload);
 }
 
+float Weapon::Rifle::getBar() const { return magazine_.getCount(); }
+float Weapon::Rifle::getBarMAX() const { return magazine_.getCountMAX(); }
+
 void Weapon::Rifle::fire(b2Vec2 &heading)
 {
 	pin_ = false;
@@ -82,7 +85,7 @@ void Weapon::Rifle::fire(b2Vec2 &heading)
 	}
 }
 
-bool Weapon::Rifle::canFire()
+bool Weapon::Rifle::canFire() const
 {
 	bool ready = false;
 
