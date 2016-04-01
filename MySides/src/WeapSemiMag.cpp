@@ -1,20 +1,33 @@
-#include "WeapPistol.hpp"
+#include "WeapSemiMag.hpp"
 
-Weapon::Pistol::Pistol(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
+Weapon::SemiMag::SemiMag(fireFunc& callback, ProjectileDef const &ammo) :
 	WeaponI(callback, ammo),
 	magazine_(18),
+	resetTime_(0),
+	reloadTime_(0),
 	cocked_(false)
 {
 	resetTimeMAX_ = 50;
-	resetTime_ = 0;
 
 	reloadTimeMAX_ = 2500;
-	reloadTime_ = 0;
 
 	id_ = "pistol";
 }
 
-void Weapon::Pistol::reup()
+Weapon::SemiMag::SemiMag(fireFunc& callback, ProjectileDef const &ammo,
+	int magSize, int resetTime, int reloadTime) :
+	WeaponI(callback, ammo),
+	magazine_(magSize),
+	resetTime_(0),
+	resetTimeMAX_(resetTime),
+	reloadTime_(0),
+	reloadTimeMAX_(reloadTime),
+	cocked_(false)
+{
+	id_ = "pistol";
+}
+
+void Weapon::SemiMag::reup()
 {
 	if (reloadTime_ <= 0)
 	{
@@ -22,7 +35,7 @@ void Weapon::Pistol::reup()
 	}
 }
 
-void Weapon::Pistol::update(int dt)
+void Weapon::SemiMag::update(int dt)
 {
 	//If we're reloading, time down
 	if (reloadTime_ > 0)
@@ -53,25 +66,25 @@ void Weapon::Pistol::update(int dt)
 	}
 }
 
-void Weapon::Pistol::setResetTime(int ms)
-{
-	resetTimeMAX_ = (ms > 0 ? ms : resetTimeMAX_);
-}
-
-void Weapon::Pistol::setReloadTime(int ms)
-{
-	reloadTimeMAX_ = (ms > 0 ? ms : reloadTimeMAX_);
-}
-
-void Weapon::Pistol::setMagSize(int size, bool reload)
+void Weapon::SemiMag::setMagSize(int size, bool reload)
 {
 	magazine_.resize(size, reload);
 }
 
-int Weapon::Pistol::getBar() const { return magazine_.getCount(); }
-int Weapon::Pistol::getBarMAX() const { return magazine_.getCountMAX(); }
+void Weapon::SemiMag::setResetTime(int ms)
+{
+	resetTimeMAX_ = (ms > 0 ? ms : resetTimeMAX_);
+}
 
-void Weapon::Pistol::fire(b2Vec2 &heading)
+void Weapon::SemiMag::setReloadTime(int ms)
+{
+	reloadTimeMAX_ = (ms > 0 ? ms : reloadTimeMAX_);
+}
+
+int Weapon::SemiMag::getBar() const { return magazine_.getCount(); }
+int Weapon::SemiMag::getBarMAX() const { return magazine_.getCountMAX(); }
+
+void Weapon::SemiMag::fire(b2Vec2 &heading)
 {
 	//Set up vector
 	std::vector<ProjectileDef> pv;
@@ -100,7 +113,7 @@ void Weapon::Pistol::fire(b2Vec2 &heading)
 	}
 }
 
-bool Weapon::Pistol::canFire() const
+bool Weapon::SemiMag::canFire() const
 {
 	bool ready = false;
 

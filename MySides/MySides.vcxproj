@@ -154,11 +154,11 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\SoundEffect.cpp" />
     <ClCompile Include="src\SoundSystem.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
-    <ClCompile Include="src\WeapCoil.cpp" />
+    <ClCompile Include="src\WeapAutoBat.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
-    <ClCompile Include="src\WeapPistol.cpp" />
-    <ClCompile Include="src\WeapRifle.cpp" />
-    <ClCompile Include="src\WeapShotgun.cpp" />
+    <ClCompile Include="src\WeapSemiMag.cpp" />
+    <ClCompile Include="src\WeapAutoMag.cpp" />
+    <ClCompile Include="src\WeapSpreadMag.cpp" />
     <ClCompile Include="src\XController.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
@@ -198,11 +198,11 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\SoundSystem.hpp" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\targetver.h" />
-    <ClInclude Include="include\WeapCoil.hpp" />
+    <ClInclude Include="include\WeapAutoBat.hpp" />
     <ClInclude Include="include\Weapon.hpp" />
-    <ClInclude Include="include\WeapPistol.hpp" />
-    <ClInclude Include="include\WeapRifle.hpp" />
-    <ClInclude Include="include\WeapShotgun.hpp" />
+    <ClInclude Include="include\WeapSemiMag.hpp" />
+    <ClInclude Include="include\WeapAutoMag.hpp" />
+    <ClInclude Include="include\WeapSpreadMag.hpp" />
     <ClInclude Include="include\XController.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>

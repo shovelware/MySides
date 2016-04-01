@@ -145,20 +145,33 @@ void Shape::move(b2Vec2 direction)
 			direction.Normalize();
 		}
 	}
-
+	
 	//Get the body's velocity
 	b2Vec2 vel = body_->GetLinearVelocity();
 
-	//Set desired velocity (respecting max velocity)
-	b2Vec2 desiredVel = direction;
-	desiredVel *= maxVel_;
+	//If we're going at a reasonable speed
+	if (vel.Length() < maxVel_)
+	{//Set desired velocity (respecting max velocity)
+		b2Vec2 desiredVel = direction;
+		desiredVel *= maxVel_;
 
-	//Get the difference in current and desired
-	b2Vec2 velChange = desiredVel - vel;
+		//Get the difference in current and desired
+		b2Vec2 velChange = desiredVel - vel;
 
-	//Apply appropriate impulse
-	b2Vec2 impulse = body_->GetMass() * velChange;
-	body_->ApplyLinearImpulse(impulse, body_->GetWorldCenter(), true);
+		//Apply appropriate impulse
+		b2Vec2 impulse = body_->GetMass() * velChange;
+		body_->ApplyLinearImpulse(impulse, body_->GetWorldCenter(), true);
+	}
+
+	//If we're getting knocked about, brake
+	else
+	{
+		b2Vec2 reverse = body_->GetLinearVelocity();
+		reverse.Normalize();
+		reverse *= -maxVel_ * 0.5f;
+
+		body_->ApplyLinearImpulse(reverse, body_->GetWorldCenter(), true);
+	}
 
 	//l.out(l.message, 'P', "Player move");
 }

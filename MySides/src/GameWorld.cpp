@@ -4,7 +4,6 @@
 GameWorld::GameWorld() :
 	b2World(GRAVITY),
 	contactListener_(ContactListener()),
-	armory_([this](std::vector<ProjectileDef>& defs, std::string id) { fireWeapon(defs, id); }),
 	player_(nullptr),
 	controlled_(nullptr),
 	pause_(false)
@@ -16,6 +15,9 @@ GameWorld::GameWorld() :
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
 	addSide_ = [this](SideDef& def) { addSide(def); };
 	fireWeap_ = [this](std::vector<ProjectileDef>& defs, std::string id) { fireWeapon(defs, id); };
+
+	//armory
+	armory_ = new Weapon::Armory(fireWeap_);
 
 	//audio_.addBGM("spriterip", "../assets/spriterip.ogg");
 	audio_.addAFX("spriterip", "../assets/spriterip.ogg", 1, 0.2, 400, 1024);
@@ -50,6 +52,7 @@ GameWorld::GameWorld() :
 GameWorld::~GameWorld()
 {
 	clearWorld();
+	delete armory_;
 	delete player_;
 	delete bounds_;
 }
@@ -173,7 +176,7 @@ void GameWorld::spawnEnemy()
 //Adds a player to the world 
 void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 {
-	ShapeDef play = ShapeDef(pos, b2Vec2_zero, 5);
+	ShapeDef play = ShapeDef(pos, b2Vec2(0, -1), 5);
 	
 	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
 	play.colSecn = b2Color(0.f, 1.f, 1.f);
@@ -192,7 +195,7 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		//Set our control to the one we just put in
 		controlled_ = player_;
 
-		ProjectileDef newDef = ProjectileDef::grenadeDef();
+		ProjectileDef newDef = armory_->getGrenade();
 		
 		newDef.width *= 0.9f;
 		newDef.height *= 0.9f;
@@ -202,7 +205,7 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		newDef.damage = 4;
 		newDef.velScale = 1;
 
-		weapons_.push_back(new Weapon::Pistol(fireWeap_, newDef));
+		weapons_.push_back(new Weapon::SemiMag(fireWeap_, newDef));
 		Weapon::WeaponI* newWeap = (*--weapons_.end());
 
 
@@ -229,7 +232,7 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 
 	Shape* added = *(--shapes_.end());
 
-	ProjectileDef newDef = ProjectileDef::bulletDef();
+	ProjectileDef newDef = armory_->getBullet();
 	newDef.velScale = 0.5f;
 	newDef.damage = 1;
 	newDef.width = 1.f;
@@ -306,10 +309,10 @@ void GameWorld::addPickup(Pickup::Type type, b2Vec2 position, int time)
 	//audio_.playSFX(of some sort)
 }
 
-void GameWorld::addExplosion(Projectile* src)
+void GameWorld::addShrapnel(Projectile* src)
 {
 	std::pair<int, int> shrapnel = src->getShrapnel();
-	std::pair<float, float> explosion = src->getExplosion();
+	std::pair<float, float> explosion = src->getForce();
 	b2Vec2 pos = src->getPosition();
 
 
@@ -319,7 +322,7 @@ void GameWorld::addExplosion(Projectile* src)
 		b2Vec2 dir(0, 0);
 		Entity* owner = src->getOwner();
 
-		ProjectileDef shrapDef = armory_.getShrapnel(shrapnel.second);
+		ProjectileDef shrapDef = armory_->getShrapnel(shrapnel.second);
 		shrapDef.colPrim = src->getSecondary();
 		shrapDef.colSecn = src->getSecondary();
 		shrapDef.colTert = src->getPrimary();
@@ -410,16 +413,17 @@ void GameWorld::removeEnemy(Enemy* e)
 //Removes projectile from the world and increments iterator, for use within loops
 void GameWorld::removeProjectile(Projectile* p)
 {
-	//Explode if we need to
+	//Shrapnel if we need to
 	if (p->getShrapnel().first != 0)
 	{
-		addExplosion(p);
+		addShrapnel(p);
 	}
 
-	std::pair<float, float> explosion = p->getExplosion();
-	if (explosion.first != 0 && explosion.second != 0)
+	//If we need to explode
+	std::pair<float, float> force = p->getForce();
+	if (force.first != 0 && force.second != 0)
 	{
-		addForce(p->getPosition(), explosion.first, explosion.second, 50);
+		addForce(p->getPosition(), force.first, force.second, 25);
 	}
 
 	DestroyBody(p->getBody());
@@ -1012,20 +1016,19 @@ void GameWorld::f1()
 		enem.colSecn = b2Color(s, s, s);
 		enem.colTert = b2Color(t, t, t);
 
-		ProjectileDef newDef = armory_.getPellet(i);
+		ProjectileDef newDef = armory_->getPellet(i);
 		newDef.damage = 0;
 
+		Enemy* added = new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_);
+
 		Weapon::WeaponI* newWeap;
-
-		shapes_.push_back(new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_));
-		Shape* added = *(--shapes_.end());
-
-		weapons_.push_back(armory_.getShotgun(i));
-		newWeap = (*--weapons_.end());
-		Weapon::Shotgun* shotz = static_cast<Weapon::Shotgun*>(newWeap);
+		newWeap = armory_->getShotgun(i);
+		Weapon::SpreadMag* shotz = static_cast<Weapon::SpreadMag*>(newWeap);
 		shotz->setMagSize(10000);
+		weapons_.push_back(newWeap);
 
-		added->arm(newWeap);
+		armShape(added, newWeap);
+		shapes_.push_back(added);
 	}
 }
 
@@ -1052,7 +1055,7 @@ void GameWorld::f7()
 	player_->disarm();
 	x = ++x % 9;
 	std::cout << x << std::endl;
-	armShape(player_, armory_.getShotgun(x, x));
+	armShape(player_, armory_->getShotgun(x, x));
 
 }
 
@@ -1082,17 +1085,14 @@ void GameWorld::testBed()
 		ShapeDef enem = ShapeDef(b2Vec2(-20 + 5 * i, 15), b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
 		//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
 
-		ProjectileDef newDef = ProjectileDef::pewpewDef();
-		Weapon::WeaponI* newWeap;
-		weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
-		newWeap = (*--weapons_.end());
+		ProjectileDef newDef = armory_->getLaser();
+		Weapon::WeaponI* newWeap = new Weapon::AutoMag(fireWeap_, newDef);
 
-		Weapon::Rifle* riffle;
+		Weapon::AutoMag* riffle;
 		switch (i)
 		{
 		case 0:
-			newDef = ProjectileDef::pelletDef();
-			newWeap = new Weapon::Shotgun(fireWeap_, newDef);
+			newWeap = armory_->getShotgun(0);
 			
 			enem.colPrim = b2Color(.75f, .75f, .75f);
 			enem.colSecn = b2Color(.5f, .5f, .5f);
@@ -1100,9 +1100,9 @@ void GameWorld::testBed()
 			break;
 
 		case 1:
-			newDef = ProjectileDef::ninmilDef();
+			newDef = armory_->getNinMil();
 
-			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle = static_cast<Weapon::AutoMag*>(newWeap);
 			riffle->setRefireTime(200);
 			riffle->setReloadTime(2500);
 			riffle->setMagSize(18);
@@ -1114,16 +1114,16 @@ void GameWorld::testBed()
 			break;
 
 		case 2:
-			newDef = ProjectileDef::bulletDef();
+			newDef = armory_->getBullet();
 			enem.colPrim = b2Color(1, 1, 0);
 			enem.colSecn = b2Color(.75f, .75f, 0);
 			enem.colTert = b2Color(1, 1, 0);
 			break;
 
 		case 3:
-			newDef = ProjectileDef::dumdumDef();
+			newDef = armory_->getDumDum();
 
-			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle = static_cast<Weapon::AutoMag*>(newWeap);
 			riffle->setRefireTime(200);
 			riffle->setReloadTime(2500);
 			riffle->setMagSize(15);
@@ -1135,9 +1135,9 @@ void GameWorld::testBed()
 			break;
 
 		case 4:
-			newDef = ProjectileDef::cnnbllDef();
+			newDef = armory_->getCannonball();
 
-			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle = static_cast<Weapon::AutoMag*>(newWeap);
 			riffle->setRefireTime(1000);
 			riffle->setReloadTime(4000);
 			riffle->setMagSize(8);
@@ -1149,9 +1149,9 @@ void GameWorld::testBed()
 			break;
 
 		case 5:
-			newDef = ProjectileDef::grenadeDef();
+			newDef = armory_->getGrenade();
 
-			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle = static_cast<Weapon::AutoMag*>(newWeap);
 			riffle->setRefireTime(750);
 			riffle->setReloadTime(4000);
 			riffle->setMagSize(8);
@@ -1163,9 +1163,9 @@ void GameWorld::testBed()
 			break;
 
 		case 6:
-			newDef = ProjectileDef::rocketDef();
+			newDef = armory_->getRocket();
 
-			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle = static_cast<Weapon::AutoMag*>(newWeap);
 			riffle->setRefireTime(1000);
 			riffle->setReloadTime(4000);
 			riffle->setMagSize(4);
@@ -1177,9 +1177,9 @@ void GameWorld::testBed()
 			break;
 
 		case 7:
-			newDef = ProjectileDef::pewpewDef();
+			newDef = armory_->getLaser();
 
-			riffle = static_cast<Weapon::Rifle*>(newWeap);
+			riffle = static_cast<Weapon::AutoMag*>(newWeap);
 			riffle->setID("coilgun");
 
 			enem.colPrim = b2Color(0, 0, 1);
@@ -1206,7 +1206,7 @@ void GameWorld::testBed()
 		Shape* added = *(--shapes_.end());
 
 		newWeap->setProjectile(newDef);
-		added->arm(newWeap);
+		armShape(added, newWeap);
 	}
 	//randomiseCol(bounds_);
 }

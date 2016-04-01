@@ -19,7 +19,7 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 	owner_(def.owner), 
 	target_(def.target),
 	penetration_(def.penetration),
-	explosion_(std::make_pair(def.explosion.first, def.explosion.second)),
+	force_(std::make_pair(def.force.first, def.force.second)),
 	shrapnel_(std::make_pair(def.shrapnel.first, def.shrapnel.second))
 {
 	if (def.height > 0)
@@ -126,7 +126,7 @@ int Projectile::getDamage() const
 	return damage_;
 }
 
-std::pair<float, float> Projectile::getExplosion() const { return explosion_; }
+std::pair<float, float> Projectile::getForce() const { return force_; }
 
 std::pair<int, int> Projectile::getShrapnel() const { return shrapnel_; }
 

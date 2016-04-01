@@ -5,18 +5,19 @@
 #include "Magazine.hpp"
 
 namespace Weapon {
-	class Shotgun : public WeaponI
-	{
+	class SpreadMag : public WeaponI {
 	public:
-		Shotgun(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
+		SpreadMag(fireFunc& callback, ProjectileDef const &ammo);
+		SpreadMag(fireFunc& callback, ProjectileDef const &ammo, int magSize, int resetTime, int reloadTime, int pellets, float spread);
 		bool canFire() const;
 
 		void reup();
 		void update(int dt);
 
+		void setMagSize(int size, bool reload = false);
+
 		void setResetTime(int ms);
 		void setReloadTime(int ms);
-		void setMagSize(int size, bool reload = false);
 		void setPellets(int pellets);
 		void setSpread(float spread);
 
@@ -28,7 +29,7 @@ namespace Weapon {
 		Magazine magazine_;
 
 		int resetTime_;
-		int resetTimeMax_;
+		int resetTimeMAX_;
 
 		int reloadTime_;
 		int reloadTimeMAX_;

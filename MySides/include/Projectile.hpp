@@ -12,7 +12,7 @@ public:
 
 	void takeDamage(unsigned int damage);
 	int getDamage() const;
-	std::pair<float, float> getExplosion() const;
+	std::pair<float, float> getForce() const;
 	std::pair<int, int> getShrapnel() const;
 
 	Entity* getOwner();
@@ -36,7 +36,7 @@ private:
 	float speed_;
 	float damage_;
 	int penetration_;
-	std::pair<float, float> explosion_;
+	std::pair<float, float> force_;
 	std::pair<int, int> shrapnel_;
 
 	Entity* owner_;

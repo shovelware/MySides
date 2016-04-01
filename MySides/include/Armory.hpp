@@ -5,18 +5,12 @@
 
 #include "Weapon.hpp"
 
-#include "WeapPistol.hpp"
-#include "WeapRifle.hpp"
-#include "WeapCoil.hpp"
-#include "WeapShotgun.hpp"
-
-//Ideally weapons should be this but effort
-//#include "WeapAutoMag.hpp"
-//#include "WeapSemiMag.hpp"
-//#include "WeapScatMag.hpp"
-//#include "WeapAutoBat.hpp"
+#include "WeapSemiMag.hpp"
+#include "WeapAutoMag.hpp"
+#include "WeapSpreadMag.hpp"
+#include "WeapAutoBat.hpp"
 //#include "WeapSemiBat.hpp"
-//#include "WeapScatBat.hpp"
+//#include "WeapSpreadBat.hpp"
 
 namespace Weapon {
 	class Armory {

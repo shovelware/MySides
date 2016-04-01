@@ -17,11 +17,13 @@
 //!	@see	Projectile, ProjectileDef
 
 //!		Abstract Weapon interface that provides base functionality for
-//!		weapons such as colours, a trigger for firing and time-based updates.
+//!		weapons such as colours, a trigger for firing, reloads and time-based updates.
 
 class Shape;
 
 namespace Weapon {
+	typedef std::function<void(std::vector<ProjectileDef>& defs, std::string id)> fireFunc;
+
 	class WeaponI {
 	public:
 		void trigger(b2Vec2 &direction);	//!< Pulls the trigger on the weapon. The only exposed piece!
@@ -52,13 +54,13 @@ namespace Weapon {
 		virtual void update(int dt) = 0;	//!< Updates weapon
 
 	protected:
-		WeaponI(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
+		WeaponI(fireFunc& callback, ProjectileDef const &ammo);
 
 		std::string id_;
 		Shape* owner_;
 
 		ProjectileDef output_;
-		std::function<void(std::vector<ProjectileDef>& defs, std::string id)> fireCallback_;
+		fireFunc fireCallback_;
 
 		bool pin_;
 		b2Vec2 barrel_;

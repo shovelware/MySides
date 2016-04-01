@@ -56,7 +56,7 @@ public:
 	void addProjectile(const ProjectileDef& def);
 	void addSide(const SideDef& def);
 	void addPickup(Pickup::Type type, b2Vec2 position, int time);
-	void addExplosion(Projectile* src);
+	void addShrapnel(Projectile* src);
 	void addForce(b2Vec2 pos, float force, float radius, int time);
 
 	//Called by updates
@@ -194,7 +194,7 @@ private:
 	std::list<Force*> forces_;
 
 	//Weapons
-	Weapon::Armory armory_;
+	Weapon::Armory* armory_;
 	
 	//Controlled shape pointer
 	Shape* controlled_;

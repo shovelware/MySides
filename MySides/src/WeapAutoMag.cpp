@@ -1,8 +1,10 @@
-#include "WeapRifle.hpp"
+#include "WeapAutoMag.hpp"
 
-Weapon::Rifle::Rifle(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
+Weapon::AutoMag::AutoMag(fireFunc& callback, ProjectileDef const &ammo) :
 	WeaponI(callback, ammo),
-	magazine_(30)
+	magazine_(30),
+	refireTime_(0),
+	reloadTime_(0)
 {
 	refireTimeMAX_ = 100;
 	refireTime_ = 0;
@@ -13,7 +15,19 @@ Weapon::Rifle::Rifle(std::function<void(std::vector<ProjectileDef>& defs, std::s
 	id_ = "rifle";
 }
 
-void Weapon::Rifle::reup()
+Weapon::AutoMag::AutoMag(fireFunc & callback, ProjectileDef const & ammo,
+	int magSize, int refireTime, int reloadTime) :
+	WeaponI(callback, ammo),
+	magazine_(magSize),
+	refireTime_(0),
+	refireTimeMAX_(refireTime),
+	reloadTime_(0),
+	reloadTimeMAX_(reloadTime)
+{
+	id_ = "rifle";
+}
+
+void Weapon::AutoMag::reup()
 {
 	if (reloadTime_ <= 0)
 	{
@@ -21,7 +35,7 @@ void Weapon::Rifle::reup()
 	}
 }
 
-void Weapon::Rifle::update(int dt)
+void Weapon::AutoMag::update(int dt)
 {
 	if (pin_)
 	{
@@ -46,25 +60,25 @@ void Weapon::Rifle::update(int dt)
 	}
 }
 
-void Weapon::Rifle::setRefireTime(int ms)
-{
-	refireTimeMAX_ = (ms > 0 ? ms : refireTimeMAX_);
-}
-
-void Weapon::Rifle::setReloadTime(int ms)
-{
-	reloadTimeMAX_ = (ms > 0 ? ms : reloadTimeMAX_);
-}
-
-void Weapon::Rifle::setMagSize(int size, bool reload)
+void Weapon::AutoMag::setMagSize(int size, bool reload)
 {
 	magazine_.resize(size, reload);
 }
 
-int Weapon::Rifle::getBar() const { return magazine_.getCount(); }
-int Weapon::Rifle::getBarMAX() const { return magazine_.getCountMAX(); }
+void Weapon::AutoMag::setRefireTime(int ms)
+{
+	refireTimeMAX_ = (ms > 0 ? ms : refireTimeMAX_);
+}
 
-void Weapon::Rifle::fire(b2Vec2 &heading)
+void Weapon::AutoMag::setReloadTime(int ms)
+{
+	reloadTimeMAX_ = (ms > 0 ? ms : reloadTimeMAX_);
+}
+
+int Weapon::AutoMag::getBar() const { return magazine_.getCount(); }
+int Weapon::AutoMag::getBarMAX() const { return magazine_.getCountMAX(); }
+
+void Weapon::AutoMag::fire(b2Vec2 &heading)
 {
 	pin_ = false;
 
@@ -93,7 +107,7 @@ void Weapon::Rifle::fire(b2Vec2 &heading)
 	}
 }
 
-bool Weapon::Rifle::canFire() const
+bool Weapon::AutoMag::canFire() const
 {
 	bool ready = false;
 

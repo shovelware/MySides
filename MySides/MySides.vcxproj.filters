@@ -105,12 +105,6 @@
     <ClCompile Include="src\Weapon.cpp">
       <Filter>Source Files\Game\Weapon</Filter>
     </ClCompile>
-    <ClCompile Include="src\WeapRifle.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WeapShotgun.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
-    </ClCompile>
     <ClCompile Include="src\Enemy.cpp">
       <Filter>Source Files\Game\Entity</Filter>
     </ClCompile>
@@ -144,12 +138,6 @@
     <ClCompile Include="src\Attractor.cpp">
       <Filter>Source Files\Game\Entity\Pickup</Filter>
     </ClCompile>
-    <ClCompile Include="src\WeapCoil.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WeapPistol.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
-    </ClCompile>
     <ClCompile Include="src\Armory.cpp">
       <Filter>Source Files\Game\Weapon</Filter>
     </ClCompile>
@@ -158,6 +146,18 @@
     </ClCompile>
     <ClCompile Include="src\Force.cpp">
       <Filter>Source Files\Game\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeapSemiMag.cpp">
+      <Filter>Source Files\Game\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeapAutoMag.cpp">
+      <Filter>Source Files\Game\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeapAutoBat.cpp">
+      <Filter>Source Files\Game\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeapSpreadMag.cpp">
+      <Filter>Source Files\Game\Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -212,12 +212,6 @@
     <ClInclude Include="include\Weapon.hpp">
       <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
-    <ClInclude Include="include\WeapRifle.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
-    </ClInclude>
-    <ClInclude Include="include\WeapShotgun.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
-    </ClInclude>
     <ClInclude Include="include\Magazine.hpp">
       <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
@@ -266,12 +260,6 @@
     <ClInclude Include="include\Battery.hpp">
       <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
-    <ClInclude Include="include\WeapCoil.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
-    </ClInclude>
-    <ClInclude Include="include\WeapPistol.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
-    </ClInclude>
     <ClInclude Include="include\Armory.hpp">
       <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
@@ -280,6 +268,18 @@
     </ClInclude>
     <ClInclude Include="include\Force.hpp">
       <Filter>Header Files\Game\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WeapSemiMag.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WeapAutoMag.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WeapAutoBat.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WeapSpreadMag.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

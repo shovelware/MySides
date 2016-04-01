@@ -1,25 +1,27 @@
 //Rifle
 //Concrete weapon, fires a set number of rounds and reloads
 
-#ifndef MS_WRIFLE_HPP
-#define MS_WRIFLE_HPP
+#ifndef MS_WAUTOMAG_HPP
+#define MS_WAUTOMAG_HPP
 
 #include "Weapon.hpp"
 #include "Magazine.hpp"
 
 namespace Weapon {
-	class Rifle : public WeaponI {
+	class AutoMag : public WeaponI {
 	public:
-		Rifle(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
+		AutoMag(fireFunc& callback, ProjectileDef const &ammo);
+		AutoMag(fireFunc& callback, ProjectileDef const &ammo, int magSize, int refireTime, int reloadTime);
 		
 		bool canFire() const;
 
 		void reup();
 		void update(int dt);
 
+		void setMagSize(int size, bool reload = false);
+
 		void setRefireTime(int ms);
 		void setReloadTime(int ms);
-		void setMagSize(int size, bool reload = false);
 
 		int getBar() const;
 		int getBarMAX() const;

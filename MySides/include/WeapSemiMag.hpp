@@ -1,22 +1,24 @@
-#ifndef MS_WPISTOL_HPP
-#define MS_WPISTOL_HPP
+#ifndef MS_WSEMIMAG_HPP
+#define MS_WSEMIMAG_HPP
 
 #include "Weapon.hpp"
 #include "Magazine.hpp"
 
 namespace Weapon {
-	class Pistol : public WeaponI {
+	class SemiMag : public WeaponI {
 	public:
-		Pistol(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
-		
+		SemiMag(fireFunc& callback, ProjectileDef const &ammo);
+		SemiMag(fireFunc& callback, ProjectileDef const &ammo, int magSize, int resetTime, int reloadTime);
+
 		bool canFire() const;
 
 		void reup();
 		void update(int dt);
 
+		void setMagSize(int size, bool reload = false);
+
 		void setResetTime(int ms);
 		void setReloadTime(int ms);
-		void setMagSize(int size, bool reload = false);
 
 		int getBar() const;
 		int getBarMAX() const;

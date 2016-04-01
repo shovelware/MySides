@@ -85,6 +85,11 @@ ProjectileDef Weapon::Armory::getNinMil(int level)
 {
 	//L0 : Default
 	ProjectileDef ninmil = ProjectileDef();
+	ninmil.velScale = 1;
+	ninmil.hpMAX = 1;
+	ninmil.width = 0.5f;
+	ninmil.damage = 1;
+	ninmil.lifeTime = 500;
 
 	//L1 : 
 	if (level > 0) {}
@@ -116,7 +121,12 @@ ProjectileDef Weapon::Armory::getNinMil(int level)
 ProjectileDef Weapon::Armory::getBullet(int level)
 {
 	//L0 : Default
-	ProjectileDef ninmil = ProjectileDef();
+	ProjectileDef bullet = ProjectileDef();
+	bullet.velScale = 1;
+	bullet.hpMAX = 1;
+	bullet.width = 1;
+	bullet.damage = 1.25f;
+	bullet.lifeTime = 1000;
 
 	//L1 : 
 	if (level > 0) {}
@@ -142,13 +152,18 @@ ProjectileDef Weapon::Armory::getBullet(int level)
 	//L8 :
 	if (level > 7) {}
 
-	return ninmil;
+	return bullet;
 }
 
 ProjectileDef Weapon::Armory::getDumDum(int level)
 {
 	//L0 : Default
-	ProjectileDef ninmil = ProjectileDef();
+	ProjectileDef dumdum = ProjectileDef();
+	dumdum.velScale = 2;
+	dumdum.hpMAX = 2;
+	dumdum.width = 2.f;
+	dumdum.damage = 1.5f;
+	dumdum.lifeTime = 1250;
 
 	//L1 : 
 	if (level > 0) {}
@@ -174,13 +189,19 @@ ProjectileDef Weapon::Armory::getDumDum(int level)
 	//L8 :
 	if (level > 7) {}
 
-	return ninmil;
+	return dumdum;
 }
 
 ProjectileDef Weapon::Armory::getCannonball(int level)
 {
 	//L0 : Default
-	ProjectileDef ninmil = ProjectileDef();
+	ProjectileDef ball = ProjectileDef();
+	ball.velScale = 3;
+	ball.hpMAX = 4;
+	ball.width = 4.f;
+	ball.damage = 2.f;
+	ball.lifeTime = 1500;
+
 
 	//L1 : 
 	if (level > 0) {}
@@ -206,13 +227,24 @@ ProjectileDef Weapon::Armory::getCannonball(int level)
 	//L8 :
 	if (level > 7) {}
 
-	return ninmil;
+	return ball;
 }
 
 ProjectileDef Weapon::Armory::getGrenade(int level)
 {
 	//L0 : Default
-	ProjectileDef ninmil = ProjectileDef();
+	ProjectileDef grenade = ProjectileDef();
+	grenade.velScale = 1.f;
+	grenade.oneHit = true;
+	grenade.hpMAX = 1;
+	grenade.force.first = 0.25f;
+	grenade.force.second = 2.f;
+	grenade.width = 1.75f;
+	grenade.height = 1.75f;
+	grenade.shrapnel.first = 1;
+	grenade.shrapnel.second = 4;
+	grenade.damage = 1.f;
+	grenade.lifeTime = 1000;
 
 	//L1 : 
 	if (level > 0) {}
@@ -238,13 +270,21 @@ ProjectileDef Weapon::Armory::getGrenade(int level)
 	//L8 :
 	if (level > 7) {}
 
-	return ninmil;
+	return grenade;
 }
 
 ProjectileDef Weapon::Armory::getRocket(int level)
 {
 	//L0 : Default
-	ProjectileDef ninmil = ProjectileDef();
+	ProjectileDef rocket = ProjectileDef();
+	rocket.velScale = 2.f;
+	rocket.oneHit = true;
+	rocket.hpMAX = 1;
+	rocket.width = 2.f;
+	rocket.height = 3.f;
+	rocket.shrapnel.first = 8;
+	rocket.damage = 1.f;
+	rocket.lifeTime = 500;
 
 	//L1 : 
 	if (level > 0) {}
@@ -270,13 +310,20 @@ ProjectileDef Weapon::Armory::getRocket(int level)
 	//L8 :
 	if (level > 7) {}
 
-	return ninmil;
+	return rocket;
 }
 
 ProjectileDef Weapon::Armory::getLaser(int level)
 {
 	//L0 : Default
-	ProjectileDef ninmil = ProjectileDef();
+	ProjectileDef laser = ProjectileDef();
+	laser.velScale = 1.5f;
+	laser.hpMAX = 1;
+	laser.width = .5f;
+	laser.height = 6.f;
+	laser.penetration = 3;
+	laser.damage = 1.f;
+	laser.lifeTime = 500;
 
 	//L1 : 
 	if (level > 0) {}
@@ -302,7 +349,7 @@ ProjectileDef Weapon::Armory::getLaser(int level)
 	//L8 :
 	if (level > 7) {}
 
-	return ninmil;
+	return laser;
 }
 
 ProjectileDef Weapon::Armory::getSlug(int level)
@@ -340,7 +387,7 @@ ProjectileDef Weapon::Armory::getSlug(int level)
 Weapon::WeaponI* Weapon::Armory::getShotgun(int level, int projLevel)
 {
 	//L0 : Default
-	Weapon::Shotgun* shotty = new Weapon::Shotgun(fireCallback_, getPellet(projLevel));
+	Weapon::SpreadMag* shotty = new Weapon::SpreadMag(fireCallback_, getPellet(projLevel));
 	//Base on creation: //Reset = 300 //Reload = 1250 //Pellets = 8; //Spread =  .15f; //MagSize(8)
 	shotty->setMagSize(8);
 	shotty->setResetTime(400);

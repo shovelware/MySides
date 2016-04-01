@@ -1,23 +1,25 @@
-#ifndef MS_WCOIL_HPP
-#define MS_WCOIL_HPP
+#ifndef MS_WAUTOBAT_HPP
+#define MS_WAUTOBAT_HPP
 
 #include "Weapon.hpp"
 #include "Battery.hpp"
 
 namespace Weapon {
-	class Coilgun : public WeaponI {
+	class AutoBat : public WeaponI {
 	public:
-		Coilgun(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
-	
+		AutoBat(fireFunc& callback, ProjectileDef const &ammo);
+		AutoBat(fireFunc& callback, ProjectileDef const & ammo, int batterySize, int refireTime, int rechargeTime, int fireCharge);
+
 		bool canFire() const;
 
 		void reup();
 		void update(int dt);
 
+		void setBatterySize(int size, bool recharge = false);
+
 		void setRefireTime(int ms);
 		void setRechargeTime(int ms);
 		void setFireCharge(int charge);
-		void setBatterySize(int size, bool recharge = false);
 
 		int getBar() const;
 		int getBarMAX() const;

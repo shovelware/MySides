@@ -41,7 +41,7 @@ bool Force::collide(Entity* other, b2Contact& contact, std::string tag)
 	{
 		b2Vec2 dir = other->getPosition() - body_->GetPosition();
 		dir.Normalize();
-		dir *= force_;
+		dir *= 0.01 * force_;
 
 		other->getBody()->ApplyForceToCenter(dir, true);
 	}

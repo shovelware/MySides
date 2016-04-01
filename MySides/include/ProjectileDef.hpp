@@ -17,7 +17,7 @@ public:
 		oneHit(false),
 		bounce(0),
 		penetration(0),
-		explosion(std::make_pair(0.f, 0.f)),
+		force(std::make_pair(0.f, 0.f)),
 		shrapnel(std::make_pair(0, 0)),
 		hpMAX(0),
 		width(0),
@@ -39,7 +39,7 @@ public:
 		oneHit(false),
 		bounce(0),
 		penetration(0),
-		explosion(std::make_pair(0.f, 0.f)),
+		force(std::make_pair(0.f, 0.f)),
 		shrapnel(std::make_pair(0, 0)),
 		hpMAX(1),
 		width(1),
@@ -61,7 +61,7 @@ public:
 		velScale(pd.velScale),
 		bounce(pd.bounce),
 		penetration(pd.penetration),
-		explosion(pd.explosion),
+		force(pd.force),
 		shrapnel(pd.shrapnel),
 		hpMAX(pd.hpMAX),
 		width(pd.width),
@@ -89,7 +89,7 @@ public:
 	bool oneHit;
 	float bounce;
 	int penetration;
-	std::pair<float, float> explosion; //! < force, radius 
+	std::pair<float, float> force; //! < force, radius 
 	std::pair<int, int> shrapnel;	//! < number, level
 
 	unsigned int hpMAX;
@@ -107,112 +107,6 @@ public:
 	//Not copied
 	Entity* owner;
 	Entity* target;
-
-	static ProjectileDef pelletDef()
-	{
-		ProjectileDef pellet = ProjectileDef();
-		pellet.velScale = 1;
-		pellet.hpMAX = 1;
-		pellet.width = 0.25f;
-		pellet.damage = 1;
-		pellet.lifeTime = 150;
-
-		return pellet;
-	}
-
-	static ProjectileDef ninmilDef()
-	{
-		ProjectileDef ninmil = ProjectileDef();
-		ninmil.velScale = 1;
-		ninmil.hpMAX = 1;
-		ninmil.width = 0.5f;
-		ninmil.damage = 1;
-		ninmil.lifeTime = 500;
-		
-		return ninmil;
-	}
-
-	static ProjectileDef bulletDef()
-	{
-		ProjectileDef bullet = ProjectileDef();		
-		bullet.velScale = 1;
-		bullet.hpMAX = 1;
-		bullet.width = 1;
-		bullet.damage = 1.25f;
-		bullet.lifeTime = 1000;
-
-		return bullet;
-	}
-
-	static ProjectileDef dumdumDef()
-	{
-		ProjectileDef dumdum = ProjectileDef();
-		dumdum.velScale = 2;
-		dumdum.hpMAX = 2;
-		dumdum.width = 2.f;
-		dumdum.damage = 1.5f;
-		dumdum.lifeTime = 1250;
-
-		return dumdum;
-	}
-
-	static ProjectileDef cnnbllDef()
-	{
-		ProjectileDef cnnbll = ProjectileDef();
-		cnnbll.velScale = 3;
-		cnnbll.hpMAX = 4;
-		cnnbll.width = 4.f;
-		cnnbll.damage = 2.f;
-		cnnbll.lifeTime = 1500;
-
-		return cnnbll;
-	}
-
-	static ProjectileDef grenadeDef()
-	{
-		ProjectileDef grenade = ProjectileDef();
-		grenade.velScale = 1.f;
-		grenade.oneHit = true;
-		grenade.hpMAX = 1;
-		grenade.explosion.first = 10;
-		grenade.explosion.second = 2;
-		grenade.width = 1.75f;
-		grenade.height = 1.75f;
-		grenade.shrapnel.first = 12;
-		grenade.damage = 1.f;
-		grenade.lifeTime = 1000;
-
-		return grenade;
-	}
-
-	static ProjectileDef rocketDef()
-	{
-		ProjectileDef rocket = ProjectileDef();
-		rocket.velScale = 2.f;
-		rocket.oneHit = true;
-		rocket.hpMAX = 1;
-		rocket.width = 2.f;
-		rocket.height = 3.f;
-		rocket.shrapnel.first = 8;
-		rocket.damage = 1.f;
-		rocket.lifeTime = 500;
-
-		return rocket;
-	}
-
-	static ProjectileDef pewpewDef()
-	{
-		ProjectileDef pewpew = ProjectileDef();
-		pewpew.velScale = 1.5f;
-		pewpew.hpMAX = 1;
-		pewpew.width = .5f;
-		pewpew.height = 6.f;
-		pewpew.penetration = 3;
-		pewpew.damage = 1.f;
-		pewpew.lifeTime = 500;
-
-		return pewpew;
-	}
 
 	bool isValid() const { return lifeTime >= 0; }
 };
