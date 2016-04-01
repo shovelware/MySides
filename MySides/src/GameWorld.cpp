@@ -15,6 +15,7 @@ GameWorld::GameWorld() :
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
 	addSide_ = [this](SideDef& def) { addSide(def); };
 	fireWeap_ = [this](std::vector<ProjectileDef>& defs, std::string id) { fireWeapon(defs, id); };
+	addForce_ = [this](b2Vec2 pos, float force, float radius, int time) { addForce(pos, force, radius, time); };
 
 	//armory
 	armory_ = new Weapon::Armory(fireWeap_);
@@ -31,6 +32,7 @@ GameWorld::GameWorld() :
 	audio_.addSFX("cannon", "../assets/nsnd/cannon.wav", 8);
 
 	audio_.addSFX("coilgun", "../assets/nsnd/pew.wav", 16);
+	audio_.addSFX("railgun", "../assets/nsnd/bwump.wav", 8);
 
 	audio_.addSFX("rocket", "../assets/nsnd/rock.wav", 8);
 	audio_.addSFX("grenade", "../assets/nsnd/gren.wav", 8);
@@ -198,7 +200,7 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		ProjectileDef newDef = armory_->getSlug();
 	
 
-		weapons_.push_back(new Weapon::SemiBat(fireWeap_, newDef, 200, 32, 64));
+		weapons_.push_back(new Weapon::SemiBat(fireWeap_, newDef));// , 500, 32, 64));
 		Weapon::WeaponI* newWeap = (*--weapons_.end());
 
 

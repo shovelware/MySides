@@ -75,11 +75,6 @@ public:
 	//Add multiple projectiles
 	void fireWeapon(std::vector<ProjectileDef>& defs, std::string id);
 
-	//And callbacks for entities
-	std::function<void(ProjectileDef&)> addProj_;	
-	std::function<void(std::vector<ProjectileDef>&, std::string)> fireWeap_;
-	std::function<void(SideDef&)> addSide_;
-	//std::function<void(ShapeDef &def)> addShape_;
 	std::function<Shape*()> getControlled_;
 
 
@@ -183,6 +178,13 @@ private:
 	int leftHaptic_;
 	int rightHaptic_;
 	
+	//And callbacks for entities
+	std::function<void(ProjectileDef&)> addProj_;
+	std::function<void(std::vector<ProjectileDef>&, std::string)> fireWeap_;
+	std::function<void(SideDef&)> addSide_;
+	std::function<void(b2Vec2 pos, float force, float radius, int time)> addForce_;
+	//std::function<void(ShapeDef &def)> addShape_;
+
 	//Entities
 	Player* player_;
 	Bounds* bounds_;

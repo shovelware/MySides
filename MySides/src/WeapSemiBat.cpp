@@ -65,7 +65,7 @@ void Weapon::SemiBat::update(int dt)
 			battery_.discharge(dischargeAmount_);
 		}
 
-		if (battery_.getPercent() == 0)
+		if (!pin_ && battery_.getPercent() == 0)
 		{
 			primed_ = true;
 		}

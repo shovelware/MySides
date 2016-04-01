@@ -362,7 +362,7 @@ ProjectileDef Weapon::Armory::getSlug(int level)
 	slug.force.first = 4.f;
 	slug.force.second = 1.f;
 	slug.hpMAX = 1;
-	slug.penetration = 1;
+	slug.penetration = 0;
 	slug.damage = 8;
 	slug.velScale = 1.f;
 	slug.lifeTime = 3000;
