@@ -13,7 +13,7 @@ Weapon::WeaponI::WeaponI(fireFunc& callback, ProjectileDef const &ammo) :
 
 	void Weapon::WeaponI::trigger(b2Vec2 & direction)
 	{
-		if (canFire())
+		if (canTrigger())
 		{
 			//fire(direction);
 			barrel_ = direction;

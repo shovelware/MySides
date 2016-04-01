@@ -4,12 +4,11 @@ Weapon::SemiMag::SemiMag(fireFunc& callback, ProjectileDef const &ammo) :
 	WeaponI(callback, ammo),
 	magazine_(18),
 	resetTime_(0),
+	resetTimeMAX_ (50),
 	reloadTime_(0),
+	reloadTimeMAX_(2500),
 	cocked_(false)
 {
-	resetTimeMAX_ = 50;
-
-	reloadTimeMAX_ = 2500;
 
 	id_ = "pistol";
 }
@@ -62,7 +61,20 @@ void Weapon::SemiMag::update(int dt)
 	if (pin_ && cocked_)
 	{
 		fire(barrel_);
+
+		//Reactions:
 		pin_ = false;
+		cocked_ = false;
+		magazine_.remove();
+		resetTime_ = resetTimeMAX_;
+
+		//If we're empty, reload
+		if (magazine_.checkEmpty())
+		{
+			cocked_ = true;
+			resetTime_ = 0;
+			reloadTime_ = reloadTimeMAX_;
+		}
 	}
 }
 
@@ -98,22 +110,9 @@ void Weapon::SemiMag::fire(b2Vec2 &heading)
 
 	//Fire projectile
 	fireCallback_(pv, id_);
-
-	//Reactions:
-	magazine_.remove();
-	cocked_ = false;
-	resetTime_ = resetTimeMAX_;
-
-	//If we're empty, reload
-	if (magazine_.checkEmpty())
-	{
-		cocked_ = true;
-		resetTime_ = 0;
-		reloadTime_ = reloadTimeMAX_;
-	}
 }
 
-bool Weapon::SemiMag::canFire() const
+bool Weapon::SemiMag::canTrigger() const
 {
 	bool ready = false;
 

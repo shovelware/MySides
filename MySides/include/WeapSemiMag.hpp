@@ -10,7 +10,7 @@ namespace Weapon {
 		SemiMag(fireFunc& callback, ProjectileDef const &ammo);
 		SemiMag(fireFunc& callback, ProjectileDef const &ammo, int magSize, int resetTime, int reloadTime);
 
-		bool canFire() const;
+		bool canTrigger() const;
 
 		void reup();
 		void update(int dt);

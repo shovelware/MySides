@@ -9,7 +9,7 @@
 #include "WeapAutoMag.hpp"
 #include "WeapSpreadMag.hpp"
 #include "WeapAutoBat.hpp"
-//#include "WeapSemiBat.hpp"
+#include "WeapSemiBat.hpp"
 //#include "WeapSpreadBat.hpp"
 
 namespace Weapon {

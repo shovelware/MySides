@@ -21,7 +21,7 @@ ProjectileDef Weapon::Armory::getShrapnel(int level)
 	if (level > 0) {}
 
 	//L2 : Lifetime+
-	if (level > 1) { shard.lifeTime = 25; }
+	if (level > 1) { shard.lifeTime = 40; }
 
 	//L3 : Speed+
 	if (level > 2) { shard.velScale = 0.75f; }
@@ -241,9 +241,9 @@ ProjectileDef Weapon::Armory::getGrenade(int level)
 	grenade.force.second = 2.f;
 	grenade.width = 1.75f;
 	grenade.height = 1.75f;
-	grenade.shrapnel.first = 1;
+	grenade.shrapnel.first = 12;
 	grenade.shrapnel.second = 4;
-	grenade.damage = 1.f;
+	grenade.damage = 1;
 	grenade.lifeTime = 1000;
 
 	//L1 : 
@@ -357,6 +357,15 @@ ProjectileDef Weapon::Armory::getSlug(int level)
 	//L0 : Default
 	ProjectileDef slug = ProjectileDef();
 
+	slug.width = .8f;
+	slug.height = 1.6f;
+	slug.force.first = 4.f;
+	slug.force.second = 1.f;
+	slug.hpMAX = 1;
+	slug.penetration = 1;
+	slug.damage = 8;
+	slug.velScale = 1.f;
+	slug.lifeTime = 3000;
 	//L1 : 
 	if (level > 0) {}
 

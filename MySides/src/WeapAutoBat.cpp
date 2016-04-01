@@ -4,11 +4,10 @@ Weapon::AutoBat::AutoBat(fireFunc& callback, ProjectileDef const &ammo) :
 	WeaponI(callback, ammo),
 	battery_(2000),
 	refireTime_(0),
-	rechargeTime_(0)
+	refireTimeMAX_(100),
+	rechargeTime_(0),
+	rechargeTimeMAX_(500)
 {
-	refireTimeMAX_ = 100;
-
-	rechargeTimeMAX_ = 500;
 
 	fireCharge_ = 30;
 
@@ -35,13 +34,7 @@ void Weapon::AutoBat::reup()
 
 void Weapon::AutoBat::update(int dt)
 {
-	if (pin_)
-	{
-		fire(barrel_);
-		pin_ = false;
-	}
-
-	//If we're shooting, refire cool
+	//If we're shooting, cycle
 	if (refireTime_ > 0)
 	{
 		refireTime_ = (refireTime_ - dt >= 0 ? refireTime_ - dt : 0);
@@ -56,6 +49,18 @@ void Weapon::AutoBat::update(int dt)
 		}
 
 		else battery_.recharge(fireCharge_ / 2);
+	}
+
+	//Fire if we can
+	if (pin_)
+	{
+		fire(barrel_);
+
+		//Reactions:
+		pin_ = false;
+		refireTime_ = refireTimeMAX_ * (2 - (battery_.getPercent() / 100.f));
+		rechargeTime_ = rechargeTimeMAX_;
+		battery_.discharge(fireCharge_);
 	}
 }
 
@@ -96,14 +101,9 @@ void Weapon::AutoBat::fire(b2Vec2 & heading)
 
 	//Fire projectile
 	fireCallback_(pv, id_);
-
-	//Reactions:
-	refireTime_ = refireTimeMAX_ * (2 - (battery_.getPercent() / 100.f)) ;
-	rechargeTime_ = rechargeTimeMAX_;
-	battery_.discharge(fireCharge_);
 }
 
-bool Weapon::AutoBat::canFire() const
+bool Weapon::AutoBat::canTrigger() const
 {
 	bool ready = false;
 
@@ -114,5 +114,6 @@ bool Weapon::AutoBat::canFire() const
 			ready = true;
 		}
 	}
+
 	return ready;
 }

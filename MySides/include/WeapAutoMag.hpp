@@ -13,7 +13,7 @@ namespace Weapon {
 		AutoMag(fireFunc& callback, ProjectileDef const &ammo);
 		AutoMag(fireFunc& callback, ProjectileDef const &ammo, int magSize, int refireTime, int reloadTime);
 		
-		bool canFire() const;
+		bool canTrigger() const;
 
 		void reup();
 		void update(int dt);

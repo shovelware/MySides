@@ -37,11 +37,6 @@ void Weapon::AutoMag::reup()
 
 void Weapon::AutoMag::update(int dt)
 {
-	if (pin_)
-	{
-		fire(barrel_);
-	}
-
 	//If we're reloading, time down
 	if (reloadTime_ > 0)
 	{
@@ -57,6 +52,23 @@ void Weapon::AutoMag::update(int dt)
 	else if (refireTime_ > 0)
 	{
 		refireTime_ = (refireTime_ - dt >= 0 ? refireTime_ - dt : 0);
+	}
+
+	//Fire if we can
+	if (pin_)
+	{
+		fire(barrel_);
+
+		//Reactions:
+		magazine_.remove();
+		refireTime_ = refireTimeMAX_;
+
+		//If we're empty, reload
+		if (magazine_.checkEmpty())
+		{
+			refireTime_ = 0;
+			reloadTime_ = reloadTimeMAX_;
+		}
 	}
 }
 
@@ -94,20 +106,9 @@ void Weapon::AutoMag::fire(b2Vec2 &heading)
 
 	//Fire projectile
 	fireCallback_(pv, id_);
-	
-	//Reactions:
-	magazine_.remove();
-	refireTime_ = refireTimeMAX_;
-
-	//If we're empty, reload
-	if (magazine_.checkEmpty())
-	{
-		refireTime_ = 0;
-		reloadTime_ = reloadTimeMAX_;
-	}
 }
 
-bool Weapon::AutoMag::canFire() const
+bool Weapon::AutoMag::canTrigger() const
 {
 	bool ready = false;
 

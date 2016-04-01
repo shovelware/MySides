@@ -156,6 +156,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\WeapAutoBat.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
+    <ClCompile Include="src\WeapSemiBat.cpp" />
     <ClCompile Include="src\WeapSemiMag.cpp" />
     <ClCompile Include="src\WeapAutoMag.cpp" />
     <ClCompile Include="src\WeapSpreadMag.cpp" />
@@ -200,6 +201,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\WeapAutoBat.hpp" />
     <ClInclude Include="include\Weapon.hpp" />
+    <ClInclude Include="include\WeapSemiBat.hpp" />
     <ClInclude Include="include\WeapSemiMag.hpp" />
     <ClInclude Include="include\WeapAutoMag.hpp" />
     <ClInclude Include="include\WeapSpreadMag.hpp" />

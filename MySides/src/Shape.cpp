@@ -319,7 +319,7 @@ bool Shape::getWeaponReady()
 	
 	if (weapon_ != nullptr)
 	{
-		ready = weapon_->canFire();
+		ready = weapon_->canTrigger();
 	}
 
 	return ready;

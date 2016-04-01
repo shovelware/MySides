@@ -49,7 +49,8 @@ namespace Weapon {
 		virtual int getBarMAX() const = 0;	//!< Max of status bar
 		virtual int getBar() const = 0;		//!< Current fill of status bar
 
-		virtual bool canFire() const = 0;	//!< Checks if a Weapon can fire
+		//virtual bool canFire() const = 0		//!< Checks if a Weapon can fire
+		virtual bool canTrigger() const = 0;	//!< Checks if a Weapon can trigger
 
 		virtual void update(int dt) = 0;	//!< Updates weapon
 

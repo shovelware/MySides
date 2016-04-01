@@ -25,7 +25,11 @@ public:
 			return true;
 		}
 
-		else return false;
+		else
+		{
+			charge_ = 0;
+			return false;
+		}
 	}
 
 	void refill()

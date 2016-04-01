@@ -4,16 +4,13 @@ Weapon::SpreadMag::SpreadMag(fireFunc& callback, ProjectileDef const &ammo) :
 	WeaponI(callback, ammo),
 	magazine_(8),
 	resetTime_(0),
+	resetTimeMAX_(300),
 	reloadTime_(0),
-	cocked_(false)
+	reloadTimeMAX_(1250),
+	pellets_(8),
+	spread_(0.15f),
+	pumped_(false)
 {
-	resetTimeMAX_ = 300;
-
-	reloadTimeMAX_ = 1250;
-
-	pellets_ = 8;
-	spread_ = 0.15f;
-
 	id_ = "shotgun";
 }
 
@@ -27,7 +24,7 @@ Weapon::SpreadMag::SpreadMag(fireFunc & callback, ProjectileDef const & ammo,
 	reloadTimeMAX_(reloadTime),
 	pellets_(pellets),
 	spread_(spread),
-	cocked_(false)
+	pumped_(false)
 {
 }
 
@@ -41,7 +38,7 @@ void Weapon::SpreadMag::reup()
 
 void Weapon::SpreadMag::update(int dt)
 {
-	//Else If we're not cycling, reload
+	//If we're reloading, keep doing it
 	if (reloadTime_ > 0)
 	{
 		reloadTime_ = (reloadTime_ - dt >= 0 ? reloadTime_ - dt : 0);
@@ -58,7 +55,7 @@ void Weapon::SpreadMag::update(int dt)
 		}
 	}
 
-	// If we're cycling, time down
+	//If we're cycling, time down
 	if (!pin_ && resetTime_ > 0)
 	{
 		resetTime_ = (resetTime_ - dt >= 0 ? resetTime_ - dt : 0);
@@ -66,13 +63,25 @@ void Weapon::SpreadMag::update(int dt)
 
 	if (resetTime_ == 0)
 	{
-		cocked_ = true;
+		pumped_ = true;
 	}
 
-	if (pin_ && cocked_)
+	//Fire if we can
+	if (pin_ && pumped_)
 	{
 		fire(barrel_);
+
+		//Reactions
 		pin_ = false;
+		pumped_ = false;
+		magazine_.remove();
+		resetTime_ = resetTimeMAX_;
+		reloadTime_ = 0;
+
+		if (magazine_.checkEmpty())
+		{
+			reloadTime_ = reloadTimeMAX_;
+		}
 	}
 }
 
@@ -140,22 +149,9 @@ void Weapon::SpreadMag::fire(b2Vec2 &heading)
 
 	//Fire projectiles
 	fireCallback_(pv, id_);
-	
-	//Reactions
-	magazine_.remove();
-	cocked_ = false;
-	resetTime_ = resetTimeMAX_;
-	reloadTime_ = 0;
-
-	if (magazine_.checkEmpty())
-	{
-		cocked_ = true;
-		resetTime_ = 0;
-		reloadTime_ = reloadTimeMAX_;
-	}
 }
 
-bool Weapon::SpreadMag::canFire() const
+bool Weapon::SpreadMag::canTrigger() const
 {
 	bool ready = false;
 

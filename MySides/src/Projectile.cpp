@@ -86,7 +86,7 @@ void Projectile::setAsRect(b2Vec2 size, float bounce = 0.f, bool ghost = false)
 
 	//End box2d setup
 	body_->SetTransform(body_->GetPosition(), atan2f(-heading_.x, heading_.y));
-	speed_ = 0.00025f / (size.x * size.y);
+	speed_ = 0.00025f * (size.x * size.y);
 }
 
 void Projectile::addMaterial(b2FixtureDef & def, float bounce)

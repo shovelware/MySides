@@ -195,17 +195,10 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		//Set our control to the one we just put in
 		controlled_ = player_;
 
-		ProjectileDef newDef = armory_->getGrenade();
-		
-		newDef.width *= 0.9f;
-		newDef.height *= 0.9f;
-		//newDef.bounce = 0.5f;
-		newDef.oneHit = true;
-		newDef.hpMAX = 2;
-		newDef.damage = 4;
-		newDef.velScale = 1;
+		ProjectileDef newDef = armory_->getSlug();
+	
 
-		weapons_.push_back(new Weapon::SemiMag(fireWeap_, newDef));
+		weapons_.push_back(new Weapon::SemiBat(fireWeap_, newDef, 200, 32, 64));
 		Weapon::WeaponI* newWeap = (*--weapons_.end());
 
 
@@ -423,7 +416,7 @@ void GameWorld::removeProjectile(Projectile* p)
 	std::pair<float, float> force = p->getForce();
 	if (force.first != 0 && force.second != 0)
 	{
-		addForce(p->getPosition(), force.first, force.second, 25);
+		addForce(p->getPosition(), force.first, force.second, 50);
 	}
 
 	DestroyBody(p->getBody());
