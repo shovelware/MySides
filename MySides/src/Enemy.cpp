@@ -4,11 +4,11 @@
 #include "Side.hpp"
 #include "Pickup.hpp"
 
-Enemy::Enemy(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) : 
+Enemy::Enemy(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) :
 	Shape(body, def, callback),
-	getPlayer_(player)
+	getPlayer_(player),
+	collector_(false)
 {
-	collector_ = false;
 }
 
 void Enemy::update(int milliseconds)
@@ -54,18 +54,20 @@ void Enemy::update(int milliseconds)
 	}
 }
 
+void Enemy::setCollector(bool collect)
+{
+	collector_ = collect;
+}
+
 //Only deals with the effects of this collision on this entity
-bool Enemy::collide(Entity * other, b2Contact& contact)
+bool Enemy::collide(Entity * other, b2Contact& contact, std::string tag)
 {
 	bool handled = false;
 
-	if (Shape* shape = dynamic_cast<Shape*>(other))
+	if (tag == "projectile")
 	{
-		handled = true;
-	}
+		Projectile* proj = static_cast<Projectile*>(other);
 
-	else if (Projectile* proj = dynamic_cast<Projectile*>(other))
-	{
 		if (proj->getOwner() != this)
 		{
 			takeDamage(proj->getDamage(), proj->getDirection());
@@ -76,30 +78,23 @@ bool Enemy::collide(Entity * other, b2Contact& contact)
 		handled = true;
 	}
 
-	else if (Side* side = dynamic_cast<Side*>(other))
+	else if (tag == "side")
 	{
 		if (collector_)
 		{
 			char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
 			char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
-			
+
 			if (tagA == "side" || tagB == "side")
 			{
+				Side* side = static_cast<Side*>(other);
 				collect(side->getValue());
+				side->collect();
 			}
 		}
 		handled = true;
 	}
 
-	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
-	{
-		handled = true;
-	}
 
 	return handled;
 }

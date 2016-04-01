@@ -11,10 +11,13 @@ public:
 	Enemy(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player);
 
 	void update(int milliseconds);
+	void setCollector(bool collect);
 
-	bool collide(Entity* other, b2Contact& contact);
+	bool collide(Entity* other, b2Contact& contact, std::string tag);
 
 private:
+	bool collector_;
+
 	static std::list<Enemy*> others_; //Provision for swarming
 
 	std::function<Shape*()>& getPlayer_;

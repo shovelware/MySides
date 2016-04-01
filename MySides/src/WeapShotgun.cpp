@@ -2,10 +2,11 @@
 
 Weapon::Shotgun::Shotgun(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo) :
 	WeaponI(callback, ammo),
-	magazine_(8)
+	magazine_(8),
+	cocked_(false)
 {
-	refireTimeMax_ = 600;
-	refireTime_ = 0;
+	resetTimeMax_ = 300;
+	resetTime_ = 0;
 
 	reloadTimeMAX_ = 1250;
 	reloadTime_ = 0;
@@ -26,20 +27,8 @@ void Weapon::Shotgun::reup()
 
 void Weapon::Shotgun::update(int dt)
 {
-	if (pin_)
-	{
-		fire(barrel_);
-		pin_ = false;
-	}
-
-	// Else if we're cycling, time down
-	if (refireTime_ > 0)
-	{
-		refireTime_ = (refireTime_ - dt >= 0 ? refireTime_ - dt : 0);
-	}
-
 	//Else If we're not cycling, reload
-	else if (reloadTime_ > 0)
+	if (reloadTime_ > 0)
 	{
 		reloadTime_ = (reloadTime_ - dt >= 0 ? reloadTime_ - dt : 0);
 
@@ -54,11 +43,28 @@ void Weapon::Shotgun::update(int dt)
 			}
 		}
 	}
+
+	// If we're cycling, time down
+	if (!pin_ && resetTime_ > 0)
+	{
+		resetTime_ = (resetTime_ - dt >= 0 ? resetTime_ - dt : 0);
+	}
+
+	if (resetTime_ == 0)
+	{
+		cocked_ = true;
+	}
+
+	if (pin_ && cocked_)
+	{
+		fire(barrel_);
+		pin_ = false;
+	}
 }
 
-void Weapon::Shotgun::setRefireTime(int ms)
+void Weapon::Shotgun::setResetTime(int ms)
 {
-	refireTimeMax_ = (ms > 0 ? ms : refireTimeMax_);
+	resetTimeMax_ = (ms > 0 ? ms : resetTimeMax_);
 }
 
 void Weapon::Shotgun::setReloadTime(int ms)
@@ -123,12 +129,14 @@ void Weapon::Shotgun::fire(b2Vec2 &heading)
 	
 	//Reactions
 	magazine_.remove();
-	refireTime_ = refireTimeMax_;
-	reloadTime_ = reloadTimeMAX_;
+	cocked_ = false;
+	resetTime_ = resetTimeMax_;
+	reloadTime_ = 0;
 
 	if (magazine_.checkEmpty())
 	{
-		refireTime_ = 0;
+		cocked_ = true;
+		resetTime_ = 0;
 		reloadTime_ = reloadTimeMAX_;
 	}
 }
@@ -137,7 +145,7 @@ bool Weapon::Shotgun::canFire() const
 {
 	bool ready = false;
 
-	if (!magazine_.checkEmpty() &&refireTime_ <= 0)
+	if (!magazine_.checkEmpty())
 	{
 		if (output_.isValid())
 		{

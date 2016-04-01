@@ -18,16 +18,18 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 	lifeTime_(def.lifeTime),
 	owner_(def.owner), 
 	target_(def.target),
-	shrapnel_(def.shrapnel)
+	penetration_(def.penetration),
+	explosion_(std::make_pair(def.explosion.first, def.explosion.second)),
+	shrapnel_(std::make_pair(def.shrapnel.first, def.shrapnel.second))
 {
 	if (def.height > 0)
 	{
-		setAsRect(size_, def.bounce, def.ghost);
+		setAsRect(size_, def.bounce, def.penetration);
 	}
 
 	else
 	{
-		setAsCircle(size_, def.bounce, def.ghost);
+		setAsCircle(size_, def.bounce, def.penetration);
 	}
 
 	//Do maths to orient body
@@ -49,19 +51,19 @@ void Projectile::setAsCircle(b2Vec2 size, float bounce = 0.f, bool ghost = false
 
 	//Fixture
 	b2FixtureDef fixtureDef;
+	fixtureDef.isSensor = (penetration_ > 0);
 	fixtureDef.shape = &bullet;
 
 	//Collision
 	fixtureDef.userData = "projectile";
-	fixtureDef.isSensor = ghost;
 	addMaterial(fixtureDef, bounce);
 
 	//Bind fixture
 	body_->CreateFixture(&fixtureDef);
 
 	//End box2d setup
-
-	speed_ = 0.000025f * size.x;
+	 
+	speed_ = 0.00025f * M_PI * size.x * size.x;
 }
 
 void Projectile::setAsRect(b2Vec2 size, float bounce = 0.f, bool ghost = false)
@@ -72,11 +74,11 @@ void Projectile::setAsRect(b2Vec2 size, float bounce = 0.f, bool ghost = false)
 
 	//Fixture
 	b2FixtureDef fixtureDef;
+	fixtureDef.isSensor = (penetration_ > 0);
 	fixtureDef.shape = &box;
 
 	//Collision
 	fixtureDef.userData = "projectile";
-	fixtureDef.isSensor = ghost;
 	addMaterial(fixtureDef, bounce);
 
 	//Bind fixture
@@ -115,6 +117,8 @@ void Projectile::fire(float mult)
 void Projectile::takeDamage(unsigned int damage)
 {
 	hp_ -= damage;
+	if (hp_ < 0)
+		active_ = false;
 }
 
 int Projectile::getDamage() const
@@ -122,7 +126,9 @@ int Projectile::getDamage() const
 	return damage_;
 }
 
-int Projectile::getShrapnel() const { return shrapnel_; }
+std::pair<float, float> Projectile::getExplosion() const { return explosion_; }
+
+std::pair<int, int> Projectile::getShrapnel() const { return shrapnel_; }
 
 Entity * Projectile::getOwner()
 {
@@ -159,6 +165,10 @@ void Projectile::update(int milliseconds)
 	}
 	b2Vec2 vel = body_->GetLinearVelocity();
 
+	if (penetration_ < 0)
+	{
+		body_->GetFixtureList()->SetSensor(false);
+	}
 	body_->SetTransform(body_->GetPosition(), atan2f(-vel.x, vel.y));
 
 	//std::cout << body_->GetLinearVelocity().Length();
@@ -170,24 +180,36 @@ void Projectile::update(int milliseconds)
 	}
 }
 
-bool Projectile::collide(Entity * other, b2Contact& contact)
+bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 {
 	bool handled = false;
 
-	if (Shape* shape = dynamic_cast<Shape*>(other))////
+	if (tag == "shape")////
 	{
+		Shape* shape = static_cast<Shape*>(other);
 		//Projectiles do not hurt their owner
 		if (owner_ != shape)
 		{
-			//Onehit projectiles die on hit
+			//Onehit projectiles die on hit, precedence over all
 			if (oneHit_)
 			{
 				active_ = false;
 			}
 
-			else
+			//If we can't penetrate
+			if (penetration_-- < 0)
 			{
 				takeDamage(1);
+				
+				if (size_.y > 0)
+				{
+					b2Vec2 vel = body_->GetLinearVelocity();
+					vel *= (0.1* size_.x * size_.y);
+
+					body_->SetLinearVelocity(vel);
+
+				}
+
 			}
 		}
 
@@ -196,43 +218,54 @@ bool Projectile::collide(Entity * other, b2Contact& contact)
 		handled = true;
 	}
 
-	else if (Projectile* proj = dynamic_cast<Projectile*>(other))
+	else if (tag == "projectile")
 	{
-		//Only collide if we're not friends
+		Projectile* proj = static_cast<Projectile*>(other);
+		//If we're not friends
 		if (owner_ != proj->getOwner())
 		{
-			takeDamage(proj->getDamage());
+			//If we can't penetrate
+			if (--penetration_ < 0)
+			{
+				takeDamage(proj->getDamage());
+			}
+
+
 			//Maybe set contact to false so stronger proj continues?
 		}
 
-		//Projectiles with same owner do not interact
+		//Else we must have same owner, do not interact
 		else contact.SetEnabled(false);
 
 		handled = true;
 	}
 
-	else if (Side* side = dynamic_cast<Side*>(other))
+	else if (tag == "shield")
 	{
+		Pickup::Shield* shield = static_cast<Pickup::Shield*>(other);
+
+		//If we don't own the shield
+		if (shield->getOwner() != owner_)
+		{
+			//Penetrate if we can
+			if (penetration_ > 0)
+			{
+				//Shields block more pen
+				penetration_ -= shield->getStrength();
+			}
+		
+			//if (contact.IsEnabled())
+			//{
+			//	b2Vec2 back = body_->GetLinearVelocity();
+			//	back *= -0.5;
+			//	body_->SetLinearVelocity(back);
+			//}
+		}
+		
 		handled = true;
 	}
 
-	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
-	{
-
-		if (Pickup::Shield*  shield = dynamic_cast<Pickup::Shield*>(other))
-		{
-			if (shield->getOwner() != owner_)
-			{
-				takeDamage(shield->getStrength());
-			}
-
-			handled = true;
-		}
-
-		else handled = true;
-	}
-
-	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
+	else if (tag == "bounds")
 	{
 		takeDamage(2);
 		handled = true;

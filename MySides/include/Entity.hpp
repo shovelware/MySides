@@ -29,6 +29,7 @@ public:
 	void setAlive(bool a);	//!< Sets alive status
 	void setActive(bool a);	//!< Sets active status
 
+
 	b2Color getPrimary() const;
 	b2Color getSecondary() const;
 	b2Color getTertiary() const;
@@ -39,7 +40,7 @@ public:
 
 	virtual void kill();
 
-	virtual bool collide(Entity* other, b2Contact& contact); //!< Collision with other entities. 
+	virtual bool collide(Entity* other, b2Contact& contact, std::string tag); //!< Collision with other entities. 
 protected:
 	b2Body * body_;
 

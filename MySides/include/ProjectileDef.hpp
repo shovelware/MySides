@@ -15,9 +15,10 @@ public:
 		inVelocity(b2Vec2_zero),
 		velScale(1),
 		oneHit(false),
-		ghost(false),
 		bounce(0),
-		shrapnel(0),
+		penetration(0),
+		explosion(std::make_pair(0.f, 0.f)),
+		shrapnel(std::make_pair(0, 0)),
 		hpMAX(0),
 		width(0),
 		height(0),
@@ -36,9 +37,10 @@ public:
 		inVelocity(inVelocity),
 		velScale(1),
 		oneHit(false),
-		ghost(false),
 		bounce(0),
-		shrapnel(0),
+		penetration(0),
+		explosion(std::make_pair(0.f, 0.f)),
+		shrapnel(std::make_pair(0, 0)),
 		hpMAX(1),
 		width(1),
 		height(0),
@@ -57,8 +59,9 @@ public:
 		inVelocity(b2Vec2_zero),
 		oneHit(pd.oneHit),
 		velScale(pd.velScale),
-		ghost(pd.ghost),
 		bounce(pd.bounce),
+		penetration(pd.penetration),
+		explosion(pd.explosion),
 		shrapnel(pd.shrapnel),
 		hpMAX(pd.hpMAX),
 		width(pd.width),
@@ -84,9 +87,10 @@ public:
 	float velScale;
 
 	bool oneHit;
-	bool ghost;
 	float bounce;
-	int shrapnel;
+	int penetration;
+	std::pair<float, float> explosion; //! < force, radius 
+	std::pair<int, int> shrapnel;	//! < number, level
 
 	unsigned int hpMAX;
 	float width;
@@ -170,9 +174,11 @@ public:
 		grenade.velScale = 1.f;
 		grenade.oneHit = true;
 		grenade.hpMAX = 1;
+		grenade.explosion.first = 10;
+		grenade.explosion.second = 2;
 		grenade.width = 1.75f;
 		grenade.height = 1.75f;
-		grenade.shrapnel = 12;
+		grenade.shrapnel.first = 12;
 		grenade.damage = 1.f;
 		grenade.lifeTime = 1000;
 
@@ -187,7 +193,7 @@ public:
 		rocket.hpMAX = 1;
 		rocket.width = 2.f;
 		rocket.height = 3.f;
-		rocket.shrapnel = 8;
+		rocket.shrapnel.first = 8;
 		rocket.damage = 1.f;
 		rocket.lifeTime = 500;
 
@@ -198,10 +204,10 @@ public:
 	{
 		ProjectileDef pewpew = ProjectileDef();
 		pewpew.velScale = 1.5f;
-		pewpew.hpMAX = 2;
+		pewpew.hpMAX = 1;
 		pewpew.width = .5f;
 		pewpew.height = 6.f;
-		pewpew.ghost = true;
+		pewpew.penetration = 3;
 		pewpew.damage = 1.f;
 		pewpew.lifeTime = 500;
 

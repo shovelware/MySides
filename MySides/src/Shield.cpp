@@ -6,7 +6,7 @@
 
 Pickup::Shield::Shield(b2Body* body, int time) :
 	Pickup::PickupI(body, time),
-	strength_(5)
+	strength_(4)
 {
 	//Body is initially made by pickup base class
 }
@@ -17,12 +17,12 @@ void Pickup::Shield::onCollect()
 
 	//Usual box2d setup
 	b2FixtureDef def;
-	def.userData = "pickup";
+	def.userData = "shield";
 
 	def.density = 0.f;
 	def.friction = 0.f;
 	def.restitution = 0.f;
-	def.isSensor = true;
+	def.isSensor = false;
 
 	body_->SetFixedRotation(false);
 	
@@ -48,28 +48,31 @@ void Pickup::Shield::onCollect()
 	collected_ = true;
 }
 
-bool Pickup::Shield::collide(Entity* other, b2Contact& contact)
+bool Pickup::Shield::collide(Entity* other, b2Contact& contact, std::string tag)
 {
 
 	bool handled = false;
 
-	if (Shape* shape = dynamic_cast<Shape*>(other))
+	if (tag == "shape")
 	{
 		if (!collected_)
 		{
+			Shape* shape = dynamic_cast<Shape*>(other);
 			setOwner(shape);
 		}
 
 		handled = true;
 	}
 
-	else if (Projectile* proj = dynamic_cast<Projectile*>(other))
+	else if (tag == "projectile")
 	{
 		if (collected_)
 		{
+			Projectile* proj = dynamic_cast<Projectile*>(other);
 			//Enemy projectiles after collection
 			if (proj->getOwner() != owner_)
 			{
+				int x = 4;
 			}
 
 			else {
@@ -80,21 +83,6 @@ bool Pickup::Shield::collide(Entity* other, b2Contact& contact)
 		//Contacts for my projectiles, and all projectiles when not collected
 		else contact.SetEnabled(false);
 	
-		handled = true;
-	}
-	
-	else if (Side* side = dynamic_cast<Side*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
-	{
 		handled = true;
 	}
 	
@@ -115,7 +103,7 @@ void Pickup::Shield::update(int milliseconds)
 	{
 		if (owner_ != nullptr)
 		{
-			setPosition(owner_->getPosition());
+			//setPosition(owner_->getPosition());
 		}
 
 		//Edge case where projectile is in shield radius on collect and kills you after pickup

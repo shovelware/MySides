@@ -21,7 +21,7 @@
 #include "Shape.hpp"
 #include "Projectile.hpp"
 #include "Side.hpp"
-
+#include "Force.hpp"
 
 #include "Player.hpp"
 #include "Enemy.hpp"
@@ -57,10 +57,22 @@ public:
 	void addSide(const SideDef& def);
 	void addPickup(Pickup::Type type, b2Vec2 position, int time);
 	void addExplosion(Projectile* src);
+	void addForce(b2Vec2 pos, float force, float radius, int time);
 
+	//Called by updates
+	void removePlayer();
+	void removeEnemy(Enemy* e);
+	void removeProjectile(Projectile* p);
+	void removeSide(Side* s);
+	void removeWeapon(Weapon::WeaponI* w);
+	void removePickup(Pickup::PickupI* p);
+	void removeForce(Force* f);
+
+	//Weapon handling
 	void armShape(Shape* shape, Weapon::WeaponI* weapon);
 	void disarmShape(Shape* shape);
-
+	
+	//Add multiple projectiles
 	void fireWeapon(std::vector<ProjectileDef>& defs, std::string id);
 
 	//And callbacks for entities
@@ -70,13 +82,6 @@ public:
 	//std::function<void(ShapeDef &def)> addShape_;
 	std::function<Shape*()> getControlled_;
 
-	//Called by updates
-	void removePlayer();
-	void removeEnemy(std::list<Enemy*>::iterator& e);
-	void removeProjectile(std::list<Projectile*>::iterator& p);
-	void removeSide(std::list<Side*>::iterator& s);
-	void removeWeapon(std::list<Weapon::WeaponI*>::iterator& w);
-	void removePickup(std::list<Pickup::PickupI*>::iterator& p);
 
 	//void loadLevel();
 	//b2Vec2 randomPos(); //On a circle, in an arc, from centre, whatever, reuse code test stuff
@@ -114,6 +119,7 @@ public:
 	std::list<Projectile*>& getProjectiles();
 	std::list<Side*>& getSides();
 	std::list<Pickup::PickupI*>& getPickups();
+	
 
 	//Update & Pause
 	void update(int dt);
@@ -129,13 +135,16 @@ public:
 	void PutEnemy() 
 	{
 		float x, y, rad = getBoundsRadius() * 0.7f;
-		y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
-		x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
+		//y = -(cos((2 * M_PI) * 64 / randFloat(0, 64)));
+		//x = -(sin((2 * M_PI) * 64 / randFloat(0, 64)));
+		x = randFloat(-0.25f, 0.25f);
+		y = randFloat(-1, 0);
 
-		x *= rad;
-		y *= rad;
+		b2Vec2 pos(x, y);
+		pos.Normalize();
+		pos *= randFloat(10, rad);
 
-		addEnemy(b2Vec2(x, y));
+		addEnemy(pos);
 	}
 
 	//////SPRINT 3 SLINGING
@@ -182,6 +191,7 @@ private:
 	std::list<Side*> sides_;
 	std::list<Weapon::WeaponI*> weapons_;
 	std::list<Pickup::PickupI*> pickups_;
+	std::list<Force*> forces_;
 
 	//Weapons
 	Weapon::Armory armory_;
@@ -213,7 +223,8 @@ private:
 	void updateSide(int dt);
 	void updatePickup(int dt);
 	void updateLevel(int dt);
-	
+	void updateForce(int dt);
+
 	//Cleanup
 	void cullWeapons();
 	void cleanPickups(Shape* shape);

@@ -79,7 +79,7 @@ void Entity::kill()
 	alive_ = false;
 }
 
-bool Entity::collide(Entity * other, b2Contact& contact)
+bool Entity::collide(Entity * other, b2Contact& contact, std::string tag)
 {
 	return false;
 }

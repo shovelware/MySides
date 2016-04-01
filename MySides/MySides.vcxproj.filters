@@ -156,6 +156,9 @@
     <ClCompile Include="src\HUD.cpp">
       <Filter>Source Files\Render</Filter>
     </ClCompile>
+    <ClCompile Include="src\Force.cpp">
+      <Filter>Source Files\Game\Entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">
@@ -274,6 +277,9 @@
     </ClInclude>
     <ClInclude Include="include\HUD.hpp">
       <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Force.hpp">
+      <Filter>Header Files\Game\Entity</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

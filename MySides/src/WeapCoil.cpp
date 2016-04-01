@@ -90,7 +90,7 @@ void Weapon::Coilgun::fire(b2Vec2 & heading)
 	battery_.discharge(fireCharge_);
 }
 
-bool Weapon::Coilgun::canFire()
+bool Weapon::Coilgun::canFire() const
 {
 	bool ready = false;
 

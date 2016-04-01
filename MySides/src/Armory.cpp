@@ -51,11 +51,11 @@ ProjectileDef Weapon::Armory::getPellet(int level)
 	pellet.velScale = 1.f;
 	pellet.hpMAX = 1;
 	pellet.width = 0.25f;
-	pellet.damage = 2;
+	pellet.damage = 4;
 	pellet.lifeTime = 150;
 
 	//L1 : Damage+
-	if (level > 0) { pellet.damage = 4; }
+	if (level > 0) { pellet.damage = 6; }
 
 	//L2 : Life+
 	if (level > 1) { pellet.lifeTime = 200; }
@@ -67,7 +67,7 @@ ProjectileDef Weapon::Armory::getPellet(int level)
 	if (level > 3) { pellet.hpMAX = 2; }
 
 	//L5 : Damage++
-	if (level > 4) { pellet.damage = 6; }
+	if (level > 4) { pellet.damage = 8; }
 
 	//L6 : Bounce+
 	if (level > 5) { pellet.bounce = 0.5f; }
@@ -341,9 +341,9 @@ Weapon::WeaponI* Weapon::Armory::getShotgun(int level, int projLevel)
 {
 	//L0 : Default
 	Weapon::Shotgun* shotty = new Weapon::Shotgun(fireCallback_, getPellet(projLevel));
-	//Base on creation: //Refire = 600 //Reload = 1250 //Pellets = 8; //Spread =  .15f; //MagSize(8)
+	//Base on creation: //Reset = 300 //Reload = 1250 //Pellets = 8; //Spread =  .15f; //MagSize(8)
 	shotty->setMagSize(8);
-	shotty->setRefireTime(750);
+	shotty->setResetTime(400);
 	shotty->setReloadTime(1500);
 	shotty->setPellets(6);
 	shotty->setSpread(.3f);
@@ -355,7 +355,7 @@ Weapon::WeaponI* Weapon::Armory::getShotgun(int level, int projLevel)
 	if (level > 1) { shotty->setSpread(.2f); }
 
 	//L3 : RefireTime-
-	if (level > 2) { shotty->setRefireTime(600); }
+	if (level > 2) { shotty->setResetTime(200); }
 
 	//L4 : Mag+
 	if (level > 3) { shotty->setMagSize(12, true); }
@@ -367,7 +367,7 @@ Weapon::WeaponI* Weapon::Armory::getShotgun(int level, int projLevel)
 	if (level > 5) { shotty->setSpread(.15f); }
 
 	//L7 : RefireTime-
-	if (level > 6) { shotty->setRefireTime(400); }
+	if (level > 6) { shotty->setResetTime(100); }
 
 	//L8 : Mag+
 	if (level > 7) { shotty->setMagSize(16, true); }

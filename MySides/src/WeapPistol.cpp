@@ -24,12 +24,6 @@ void Weapon::Pistol::reup()
 
 void Weapon::Pistol::update(int dt)
 {
-	if (pin_ && cocked_)
-	{
-		fire(barrel_);
-		pin_ = false;
-	}
-
 	//If we're reloading, time down
 	if (reloadTime_ > 0)
 	{
@@ -41,8 +35,8 @@ void Weapon::Pistol::update(int dt)
 		}
 	}
 
-	// Else if we're cycling, time down
-	else if (!pin_ && resetTime_ > 0)
+	// If we're cycling, time down
+	if (!pin_ && resetTime_ > 0)
 	{
 		resetTime_ = (resetTime_ - dt >= 0 ? resetTime_ - dt : 0);
 	}
@@ -51,11 +45,17 @@ void Weapon::Pistol::update(int dt)
 	{
 		cocked_ = true;
 	}
+
+	if (pin_ && cocked_)
+	{
+		fire(barrel_);
+		pin_ = false;
+	}
 }
 
 void Weapon::Pistol::setResetTime(int ms)
 {
-	reloadTimeMAX_ = (ms > 0 ? ms : reloadTimeMAX_);
+	resetTimeMAX_ = (ms > 0 ? ms : resetTimeMAX_);
 }
 
 void Weapon::Pistol::setReloadTime(int ms)
@@ -95,6 +95,7 @@ void Weapon::Pistol::fire(b2Vec2 &heading)
 	if (magazine_.checkEmpty())
 	{
 		cocked_ = true;
+		resetTime_ = 0;
 		reloadTime_ = reloadTimeMAX_;
 	}
 }

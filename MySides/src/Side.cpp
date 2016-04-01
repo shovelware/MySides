@@ -1,10 +1,5 @@
 #include "Side.hpp"
 
-#include "Bounds.hpp"
-#include "Shape.hpp"
-#include "Projectile.hpp"
-#include "Pickup.hpp"
-
 Side::Side(b2Body * body, const SideDef& def) : 
 	Entity(body), 
 	length_(def.length),
@@ -80,57 +75,13 @@ b2Vec2 Side::getHeading()
 	return heading_;
 }
 
-void Side::attract(b2Vec2 dir)
-{
-	dir.Normalize();
-	dir *= 0.002f;
-
-	if(body_->GetLinearVelocity().Length() < 0.02)
-		body_->ApplyForceToCenter(dir, true);
-}
-
-bool Side::collide(Entity* other, b2Contact& contact)
+bool Side::collide(Entity* other, b2Contact& contact, std::string tag)
 {
 	bool handled = false;
 
-	if (Shape* shape = dynamic_cast<Shape*>(other))
+	if (tag == "projectile")
 	{
-		//If we're a player
-		//Or maybe other things can collect stuff?
-
-		char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
-		char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
-
-		//Make sure collision is with side
-		if (tagA == "side" || tagB == "side")
-		{
-			if (shape->canCollect())
-			{
-				collect();
-			}
-		}
-
-		handled = true;
-	}
-
-	else if (Projectile* proj = dynamic_cast<Projectile*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Side* side = dynamic_cast<Side*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
-	{
-		handled = true;
+		body_->ApplyAngularImpulse(other->getBody()->GetLinearVelocity().Length(), true);
 	}
 
 	return handled;

@@ -9,7 +9,7 @@ namespace Weapon {
 	public:
 		Coilgun(std::function<void(std::vector<ProjectileDef>& defs, std::string id)>& callback, ProjectileDef const &ammo);
 	
-		bool canFire();
+		bool canFire() const;
 
 		void reup();
 		void update(int dt);

@@ -14,7 +14,7 @@ namespace Weapon {
 		void reup();
 		void update(int dt);
 
-		void setRefireTime(int ms);
+		void setResetTime(int ms);
 		void setReloadTime(int ms);
 		void setMagSize(int size, bool reload = false);
 		void setPellets(int pellets);
@@ -27,11 +27,13 @@ namespace Weapon {
 
 		Magazine magazine_;
 
-		int refireTime_;
-		int refireTimeMax_;
+		int resetTime_;
+		int resetTimeMax_;
 
 		int reloadTime_;
 		int reloadTimeMAX_;
+
+		bool cocked_;
 
 		int pellets_;
 		float spread_;

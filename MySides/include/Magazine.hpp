@@ -45,6 +45,11 @@ public:
 		count_ = countMAX_;
 	}
 	
+	void empty()
+	{
+		count_ = 0;
+	}
+
 	void resize(int newCount, bool reload = false)
 	{
 		if (newCount > 0)

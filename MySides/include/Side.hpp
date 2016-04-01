@@ -14,10 +14,8 @@ public:
 
 	b2Vec2 getHeading();
 
-	void attract(b2Vec2 dir);
-
 	//Do we need an update function?
-	bool collide(Entity* other, b2Contact& contact);
+	bool collide(Entity* other, b2Contact& contact, std::string tag);
 
 private:
 	b2Vec2 heading_;

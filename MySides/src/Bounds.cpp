@@ -1,9 +1,5 @@
 #include "Bounds.hpp"
 
-#include "Shape.hpp"
-#include "Projectile.hpp"
-#include "Side.hpp"
-
 Bounds::Bounds(b2Body* body, float radius) : 
 	Entity(body), 
 	radius_(radius)
@@ -51,12 +47,13 @@ void Bounds::fillChain(b2ChainShape &c, float radius, int points)
 	delete[] verts;
 }
 
-void Bounds::resize(float radius)
+void Bounds::resize(float radius, int points)
 {
 	//Set new radius
-	if (radius_ != radius)
+	if (radius_ != radius || points_ != points)
 	{
 		radius_ = radius;
+		points_ = points;
 
 		//Clear the fixture list
 		for (b2Fixture* fix = body_->GetFixtureList(); fix; fix = body_->GetFixtureList())
@@ -66,7 +63,7 @@ void Bounds::resize(float radius)
 
 		//Remake the chain and replace in fixture definition
 		b2ChainShape chain;
-		fillChain(chain, radius_, circlePoints);
+		fillChain(chain, radius_, points);
 		boundsDef_.shape = &chain;
 
 		//Resize circle and replace in fixture definition
@@ -113,12 +110,12 @@ float Bounds::getRadius()
 float Bounds::getSideLength()
 {
 	//a^2 = b^2 + c^2 -2bc cosA
-	float rhs = (radius_ * radius_) + (radius_ * radius_) - (2 * radius_ * radius_) * cos(2 * M_PI / circlePoints);
+	float rhs = (radius_ * radius_) + (radius_ * radius_) - (2 * radius_ * radius_) * cos(2 * M_PI / points_);
 
 	return sqrt(rhs);
 }
 
-bool Bounds::collide(Entity * other, b2Contact& contact)
+bool Bounds::collide(Entity * other, b2Contact& contact, std::string tag)
 {
 	return true;
 }

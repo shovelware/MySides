@@ -2,14 +2,12 @@
 
 Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& callback) : 
 	Entity(body),
-	collector_(true),
 	weapon_(nullptr),
 	lastDamage_(b2Vec2_zero)
 {	
 	//Collision
 	shapeFixDef_.userData = "shape";
 	addMaterial(shapeFixDef_);
-
 
 	//Local storing of def items
 	size_ = def.size;
@@ -261,11 +259,6 @@ int Shape::getHP() const
 unsigned int Shape::getHPMax() const
 {
 	return hpMAX_;
-}
-
-bool Shape::canCollect() const
-{
-	return collector_;
 }
 
 int Shape::getSidesCollected() const

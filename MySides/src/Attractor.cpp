@@ -15,12 +15,24 @@ void Pickup::Attractor::onCollect()
 	body_->DestroyFixture(body_->GetFixtureList());
 
 	b2FixtureDef def;
-	def.userData = "pickup";
+	def.userData = "attractor";
 
 	def.density = 0.f;
 	def.friction = 0.f;
 	def.restitution = 0.f;
 	def.isSensor = true;
+
+	b2RevoluteJointDef rev;
+	rev.localAnchorA = b2Vec2(0, 0);
+	rev.localAnchorB = b2Vec2(0, 0);
+
+
+	rev.bodyA = body_;
+	rev.bodyB = owner_->getBody();
+
+	rev.collideConnected = false;
+
+	body_->GetWorld()->CreateJoint(&rev);
 
 	b2CircleShape shape;
 	shape.m_radius = radius_;
@@ -32,38 +44,19 @@ void Pickup::Attractor::onCollect()
 	collected_ = true;
 }
 
-bool Pickup::Attractor::collide(Entity* other, b2Contact& contact)
+bool Pickup::Attractor::collide(Entity* other, b2Contact& contact, std::string tag)
 {
 
 	bool handled = false;
 
-	if (Shape* shape = dynamic_cast<Shape*>(other))
+	if (tag == "shape")
 	{
 		if (!collected_)
 		{
+			Shape* shape = dynamic_cast<Shape*>(other);
 			setOwner(shape);
 		}
 
-		handled = true;
-	}
-
-	else if (Projectile* proj = dynamic_cast<Projectile*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Side* side = dynamic_cast<Side*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
-	{
 		handled = true;
 	}
 
@@ -84,24 +77,29 @@ void Pickup::Attractor::update(int milliseconds)
 	{
 		if (owner_ != nullptr)
 		{
-			setPosition(owner_->getPosition());
+			//setPosition(owner_->getPosition());
 
 			for (b2ContactEdge* ed = body_->GetContactList(); ed != nullptr; ed = ed->next)
 			{
-				Side* s = nullptr;
+				b2Body* s = nullptr;
 
 				if (ed->contact->GetFixtureA()->GetUserData() == "side")
-					s = static_cast<Side*>(ed->contact->GetFixtureA()->GetBody()->GetUserData());
+					s = ed->contact->GetFixtureA()->GetBody();
 
 
 				else if (ed->contact->GetFixtureB()->GetUserData() == "side")
-					s = static_cast<Side*>(ed->contact->GetFixtureB()->GetBody()->GetUserData());
+					s = ed->contact->GetFixtureB()->GetBody();
 
 				if (s != nullptr)
 				{
-					if (b2Distance(body_->GetPosition(), s->getPosition()) < radius_)
+					b2Vec2 dir = body_->GetPosition() - s->GetPosition();
+					if (dir.Length() < radius_)
 					{
-						s->attract(owner_->getPosition() - s->getPosition());
+						dir.Normalize();
+						dir *= 0.002f;
+
+						if (s->GetLinearVelocity().Length() < 0.02)
+							s->ApplyForceToCenter(dir, true);
 					}
 				}
 			}
@@ -114,6 +112,7 @@ void Pickup::Attractor::update(int milliseconds)
 	if (time_ == 0)
 	{
 		owner_ = nullptr;
+		body_->GetWorld()->DestroyJoint(body_->GetJointList()->joint);
 	}
 }
 

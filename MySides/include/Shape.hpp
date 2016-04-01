@@ -43,7 +43,7 @@ public:
 	bool canCollect() const;
 	int getSidesCollected() const;
 	float getSize() const;
-		
+	
 	void explode();
 
 	//New weapons system
@@ -80,22 +80,20 @@ protected:
 	std::function<void(SideDef&)> sideCallback_;
 	void dropSide(b2Vec2 dir, float size);
 
-	//Side collecting
-	bool collector_;
-
 	//HP
 	int hp_;
 	unsigned int hpMAX_;
 	int hpScale_;
 	
-	//New firing logic
+	//Weapon
 	Weapon::WeaponI* weapon_;
 
+	//Body tracking
 	int shapeVertices_;
 	int vertices_;
 	float size_;
 
-	int sides_; //Currency
+	int sides_; //!< Currency
 };
 
 #endif

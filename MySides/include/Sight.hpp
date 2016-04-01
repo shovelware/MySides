@@ -12,7 +12,7 @@ namespace Pickup {
 
 		b2Vec2 getEnd();
 
-		bool collide(Entity* other, b2Contact& contact);
+		bool collide(Entity* other, b2Contact& contact, std::string tag);
 	private:
 		void onCollect();
 

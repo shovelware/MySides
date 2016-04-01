@@ -33,6 +33,8 @@ public:
 		charge_ = chargeMAX_;
 	}
 
+	void empty() { charge_ = 0; }
+
 	void resize(int size, bool reload)
 	{
 		if (size > 0)

@@ -27,16 +27,16 @@ void ContactListener::BeginContact(b2Contact * contact)
 		bool handledA = false, handledB = false;
 
 		//Each entity handles it's own collision
-		handledA = entA->collide(entB, *contact);
-		handledB = entB->collide(entA, *contact);
+		handledA = entA->collide(entB, *contact, tagB);
+		handledB = entB->collide(entA, *contact, tagA);
 
-		if (!(handledA && handledB))
-		{
-			std::cout << 
-				"UNSOLVED COLLISION: " << 
-				(handledA ? "1 " : "0 ") << tagA << " " <<
-				(handledB ? "1 " : "0 ") << tagB << std::endl;
-		}
+		//if (!(handledA && handledB))
+		//{
+		//	std::cout << 
+		//		"UNSOLVED COLLISION: " << 
+		//		(handledA ? "1 " : "0 ") << tagA << " " <<
+		//		(handledB ? "1 " : "0 ") << tagB << std::endl;
+		//}
 	}
 }
 

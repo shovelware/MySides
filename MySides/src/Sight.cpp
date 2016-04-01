@@ -18,41 +18,32 @@ void Pickup::Sight::onCollect()
 	collected_ = true;
 }
 
-bool Pickup::Sight::collide(Entity* other, b2Contact& contact)
+bool Pickup::Sight::collide(Entity* other, b2Contact& contact, std::string tag)
 {
-	
 	bool handled = false;
 
-	if (Shape* shape = dynamic_cast<Shape*>(other))
+	if (tag == "shape")
 	{
+		Shape* shape = dynamic_cast<Shape*>(other);
+
 		if (!collected_)
 		{
 			setOwner(shape);
 		}
 
+		else
+		{
+			if (shape != owner_)
+			{
+				//We've hit an enemy
+				//There's no body here for this though
+				//hyuk
+			}
+		}
+
 		handled = true;
 	}
 
-	 else if (Projectile* proj = dynamic_cast<Projectile*>(other))
-	{
-		handled = true;
-	}
-	
-	else if (Side* side = dynamic_cast<Side*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Pickup::PickupI* pickup = dynamic_cast<Pickup::PickupI*>(other))
-	{
-		handled = true;
-	}
-
-	else if (Bounds* bounds = dynamic_cast<Bounds*>(other))
-	{
-		handled = true;
-	}
-	
 	return handled;
 }
 

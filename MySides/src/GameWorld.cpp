@@ -196,15 +196,15 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 		
 		newDef.width *= 0.9f;
 		newDef.height *= 0.9f;
-		newDef.bounce = 0.5f;
+		//newDef.bounce = 0.5f;
+		newDef.oneHit = true;
 		newDef.hpMAX = 2;
 		newDef.damage = 4;
 		newDef.velScale = 1;
 
-		weapons_.push_back(new Weapon::Shotgun(fireWeap_, newDef));
+		weapons_.push_back(new Weapon::Pistol(fireWeap_, newDef));
 		Weapon::WeaponI* newWeap = (*--weapons_.end());
-		//Weapon::Shotgun* shotz = static_cast<Weapon::Shotgun*>(newWeap);
-		//shotz->setSpread(0.5f);
+
 
 		player_->arm(newWeap);
 	}
@@ -219,6 +219,7 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 	//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
 	enem.size = .5f;
 	enem.speedScale = .5f;
+	enem.hpScale = 5;
 
 	enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
 	enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
@@ -235,20 +236,20 @@ void GameWorld::addEnemy(const b2Vec2& pos)
 	newDef.hpMAX = 1;
 	//newDef.lifeTime = 100;
 
-	Weapon::WeaponI* newWeap;
-	
-	if (coinFlip())
-	{
-		weapons_.push_back(new Weapon::Shotgun(fireWeap_, newDef));
-	}
-	
-	else
-	{
-		weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
-	}
-
-	newWeap = (*--weapons_.end());
-	added->arm(newWeap);
+	//Weapon::WeaponI* newWeap;
+	//
+	//if (coinFlip())
+	//{
+	//	weapons_.push_back(new Weapon::Shotgun(fireWeap_, newDef));
+	//}
+	//
+	//else
+	//{
+	//	weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
+	//}
+	//
+	//newWeap = (*--weapons_.end());
+	//added->arm(newWeap);
 
 	audio_.playSFX("spawn", B2toSF(pos, true));
 
@@ -307,34 +308,44 @@ void GameWorld::addPickup(Pickup::Type type, b2Vec2 position, int time)
 
 void GameWorld::addExplosion(Projectile* src)
 {
-	ProjectileDef shrapDef = armory_.getShrapnel();
-	shrapDef.colPrim = src->getSecondary();
-	shrapDef.colSecn = src->getSecondary();
-	shrapDef.colTert = src->getPrimary();
-	shrapDef.damage = src->getDamage();
-
-	int explosionRes = src->getShrapnel();
-
+	std::pair<int, int> shrapnel = src->getShrapnel();
+	std::pair<float, float> explosion = src->getExplosion();
 	b2Vec2 pos = src->getPosition();
-	b2Vec2 dir(0, 0);
-	Entity* owner = src->getOwner();
 
 
-	for (int i = explosionRes; i > 0; --i)
+	if (shrapnel.first > 0)
 	{
-		dir.x = randFloat(-1, 1);
-		dir.y = randFloat(-1, 1);
-		dir.Normalize();
+		b2Vec2 pos = src->getPosition();
+		b2Vec2 dir(0, 0);
+		Entity* owner = src->getOwner();
 
-		shrapDef.origin = pos;
-		shrapDef.heading = dir;
-		shrapDef.owner = owner;
-		//shrapDef.lifeTime = 50;
+		ProjectileDef shrapDef = armory_.getShrapnel(shrapnel.second);
+		shrapDef.colPrim = src->getSecondary();
+		shrapDef.colSecn = src->getSecondary();
+		shrapDef.colTert = src->getPrimary();
+		shrapDef.damage = src->getDamage();
+		
+		for (int i = shrapnel.first; i > 0; --i)
+		{
+			dir.x = randFloat(-1, 1);
+			dir.y = randFloat(-1, 1);
+			dir.Normalize();
 
-		addProjectile(shrapDef);
+			shrapDef.origin = pos;
+			shrapDef.heading = dir;
+			shrapDef.owner = owner;
+			//shrapDef.lifeTime = 50;
+
+			addProjectile(shrapDef);
+		}
 	}
 
 	audio_.playSFX("explosion", B2toSF(pos, true));
+}
+
+void GameWorld::addForce(b2Vec2 pos, float force, float radius, int lifetime)
+{
+	forces_.push_back(new Force(addStaticBody(pos), force, radius, lifetime));
 }
 
 void GameWorld::armShape(Shape * shape, Weapon::WeaponI * weapon)
@@ -373,8 +384,8 @@ void GameWorld::removePlayer()
 		//Play loss sound at position
 		audio_.playSFX("loss", B2toSF(player_->getPosition(), true));
 
-		DestroyBody(player_->getBody());
 		cleanPickups(player_);
+		DestroyBody(player_->getBody());
 
 		delete player_;
 		player_ = nullptr;
@@ -382,61 +393,64 @@ void GameWorld::removePlayer()
 }
 
 //Removes enemy from the world and increments iterator, for use within loops
-void GameWorld::removeEnemy(std::list<Enemy*>::iterator& e)
+void GameWorld::removeEnemy(Enemy* e)
 {
 	//Play death sound at position
-	audio_.playSFX("die", B2toSF((*e)->getPosition(), true));
+	audio_.playSFX("die", B2toSF(e->getPosition(), true));
 
 	//Delete enemy
-	DestroyBody((*e)->getBody());
-	cleanPickups((*e));
+	DestroyBody(e->getBody());
+	cleanPickups(e);
 
-	delete (*e);
-	e = shapes_.erase(e);
+	delete e;
 
 	enemies--;
 }
 
 //Removes projectile from the world and increments iterator, for use within loops
-void GameWorld::removeProjectile(std::list<Projectile*>::iterator& p)
+void GameWorld::removeProjectile(Projectile* p)
 {
 	//Explode if we need to
-	if ((*p)->getShrapnel() > 0)
+	if (p->getShrapnel().first != 0)
 	{
-		addExplosion((*p));
+		addExplosion(p);
 	}
 
+	std::pair<float, float> explosion = p->getExplosion();
+	if (explosion.first != 0 && explosion.second != 0)
+	{
+		addForce(p->getPosition(), explosion.first, explosion.second, 50);
+	}
 
-	DestroyBody((*p)->getBody());
-	delete (*p);
-
-	p = projectiles_.erase(p);
+	DestroyBody(p->getBody());
+	delete p;
 }
 
 //Removes side from the world and increments iterator, for use within loops
-void GameWorld::removeSide(std::list<Side*>::iterator& s)
+void GameWorld::removeSide(Side* s)
 {
-	audio_.playSFX("collect", B2toSF((*s)->getPosition(), true));
-
-	DestroyBody((*s)->getBody());
-	delete(*s);
-	s = sides_.erase(s);
+	DestroyBody(s->getBody());
+	delete s;
 
 	freesides--;
 }
 
 //Removes weapon from list and increments iterator, for use in loops
-void GameWorld::removeWeapon(std::list<Weapon::WeaponI*>::iterator& w)
+void GameWorld::removeWeapon(Weapon::WeaponI* w)
 {
-	delete *w;
-	w = weapons_.erase(w);
+	delete w;
 }
 
-void GameWorld::removePickup(std::list<Pickup::PickupI*>::iterator& p)
+void GameWorld::removePickup(Pickup::PickupI* p)
 {
-	DestroyBody((*p)->getBody());
-	delete *p;
-	p = pickups_.erase(p);
+	DestroyBody(p->getBody());
+	delete p;
+}
+
+void GameWorld::removeForce(Force* f)
+{
+	DestroyBody(f->getBody());
+	delete f;
 }
 
 //Resets the level
@@ -472,9 +486,9 @@ void GameWorld::clearWorld()
 	if (shapes_.empty() == false)
 	{
 		for (std::list<Enemy*>::iterator e = shapes_.begin();
-		e != shapes_.end(); /*Don't increment here*/)
+		e != shapes_.end(); e = shapes_.erase(e))
 		{
-			removeEnemy(e);
+			removeEnemy((*e));
 		}
 	}
 	shapes_.clear();
@@ -482,9 +496,9 @@ void GameWorld::clearWorld()
 	if (projectiles_.empty() == false)
 	{
 		for (std::list<Projectile*>::iterator p = projectiles_.begin();
-		p != projectiles_.end(); /*Don't increment here*/)
+		p != projectiles_.end(); p = projectiles_.erase(p))
 		{
-			removeProjectile(p);
+			removeProjectile((*p));
 		}
 	}
 	projectiles_.clear();
@@ -492,9 +506,10 @@ void GameWorld::clearWorld()
 	if (sides_.empty() == false)
 	{
 		for (std::list<Side*>::iterator s = sides_.begin();
-		s != sides_.end(); /*Don't increment here*/)
+		s != sides_.end(); s = sides_.erase(s))
 		{
-			removeSide(s);
+			removeSide((*s));
+			
 		}
 	}
 	sides_.clear();
@@ -502,9 +517,9 @@ void GameWorld::clearWorld()
 	if (weapons_.empty() == false)
 	{
 		for (std::list<Weapon::WeaponI*>::iterator w = weapons_.begin();
-		w != weapons_.end();)
+		w != weapons_.end(); w = weapons_.erase(w))
 		{
-			removeWeapon(w);
+			removeWeapon((*w));
 		}
 	}
 	weapons_.clear();
@@ -512,12 +527,22 @@ void GameWorld::clearWorld()
 	if (pickups_.empty() == false)
 	{
 		for (std::list<Pickup::PickupI*>::iterator p = pickups_.begin();
-		p != pickups_.end();)
+		p != pickups_.end(); p = pickups_.erase(p))
 		{
-			removePickup(p);
+			removePickup((*p));
 		}
 	}
 	pickups_.clear();
+
+	if (forces_.empty() == false)
+	{
+		for (std::list<Force*>::iterator f = forces_.begin();
+		f != forces_.end(); f = forces_.erase(f))
+		{
+			removeForce((*f));
+		}
+	}
+	forces_.clear();
 }
 
 int GameWorld::getHapticL() const
@@ -617,10 +642,17 @@ void GameWorld::update(int dt)
 		updateProjectile(dt);
 		updateSide(dt);
 		updatePickup(dt);
+		updateForce(dt);
 		updateLevel(dt);
 
 		Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 		
+		//Sound
+		if (player_->getCollected())
+		{
+			audio_.playSFX("collect", B2toSF(player_->getPosition(), true));
+		}
+
 		//Cleanup
 		cullWeapons();
 
@@ -677,7 +709,8 @@ void GameWorld::updateEnemy(int dt)
 			//If we're not active, increment by deleting
 			if (shp->getActive() == false)
 			{
-				removeEnemy(shapeIt);
+				removeEnemy(shp);
+				shapeIt = shapes_.erase(shapeIt);
 			}
 
 			//Else just increment
@@ -702,7 +735,9 @@ void GameWorld::updateProjectile(int dt)
 			//If we're not active, increment by deleting
 			if (prj->getActive() == false)
 			{
-				removeProjectile(projIt);
+				removeProjectile(prj);
+
+				projIt = projectiles_.erase(projIt);
 			}
 
 			//Else just increment
@@ -726,7 +761,9 @@ void GameWorld::updateSide(int dt)
 			//If we're not active, increment by deleting
 			if (sd->getActive() == false)
 			{
-				removeSide(sideIt);
+				removeSide(sd);
+
+				sideIt = sides_.erase(sideIt);
 			}
 
 			//Else just increment
@@ -756,12 +793,38 @@ void GameWorld::updatePickup(int dt)
 			//If we're not owned and have been collected, we're done, increment by deleting
 			if (pick->getCollected() == true && pick->getOwner() == nullptr)
 			{
-				removePickup(pickIt);
+				removePickup(pick);
+
+				pickIt = pickups_.erase(pickIt);
 			}
 
 			//Else just increment
 			else ++pickIt;
 		}
+	}
+}
+
+void GameWorld::updateForce(int dt)
+{
+	if (forces_.empty() == false)
+	{
+		for (std::list<Force*>::iterator forceIt = forces_.begin();
+		forceIt != forces_.end(); /*Don't increment here*/)
+		{
+			Force* force = (*forceIt);
+
+			force->update(dt);
+
+			if (force->getActive() == false)
+			{
+				removeForce(force);
+
+				forceIt = forces_.erase(forceIt);
+			}
+
+			else ++forceIt;
+		}
+
 	}
 }
 
@@ -797,7 +860,9 @@ void GameWorld::cullWeapons()
 			//If we're not active, increment by deleting
 			if (weap->getOwner() == nullptr)
 			{
-				removeWeapon(weapIt);
+				removeWeapon(weap);
+
+				weapIt = weapons_.erase(weapIt);
 			}
 
 			//Else just increment
@@ -983,11 +1048,11 @@ void GameWorld::f6()
 
 void GameWorld::f7()
 {
-	static int x = 0;
+	static int x = -1;
 	player_->disarm();
-	armShape(player_, armory_.getShotgun(x, x));
-	x++;
+	x = ++x % 9;
 	std::cout << x << std::endl;
+	armShape(player_, armory_.getShotgun(x, x));
 
 }
 
@@ -1027,7 +1092,6 @@ void GameWorld::testBed()
 		{
 		case 0:
 			newDef = ProjectileDef::pelletDef();
-			delete newWeap;
 			newWeap = new Weapon::Shotgun(fireWeap_, newDef);
 			
 			enem.colPrim = b2Color(.75f, .75f, .75f);
