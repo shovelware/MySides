@@ -29,6 +29,7 @@ Camera::~Camera()
 void Camera::setTarget(Shape * target)
 {
 	target_ = target;
+	moveReset();
 }
 
 Shape * Camera::getTarget()
@@ -84,10 +85,11 @@ void Camera::moveReset()
 	move_ = sf::Vector2f(0, 0);
 }
 
-void Camera::lean(sf::Vector2f xf)
+void Camera::lean(sf::Vector2f xf, bool force)
 {
+
 	//If it's neutral, tend back to center
-	if (thor::length(xf) < 1)
+	if (!force && thor::length(xf) < 1)
 	{
 		lean_.x *= 0.9;
 		lean_.y *= 0.9;
@@ -96,7 +98,7 @@ void Camera::lean(sf::Vector2f xf)
 	lean_ += xf;
 
 	//Stay within bounds
-	if (thor::length(lean_) > leanMax_)
+	if (!force && thor::length(lean_) > leanMax_)
 	{
 		lean_ = thor::unitVector(lean_) * leanMax_;
 	}

@@ -1,22 +1,19 @@
 #include "WeapAutoBat.hpp"
 			
-Weapon::AutoBat::AutoBat(fireFunc& callback, ProjectileDef const &ammo) :
-	WeaponI(callback, ammo),
+Weapon::AutoBat::AutoBat(fireFunc& callback, ProjectileDef const &ammo, std::string id) :
+	WeaponI(callback, ammo, id),
 	battery_(2000),
 	refireTime_(0),
 	refireTimeMAX_(100),
 	rechargeTime_(0),
-	rechargeTimeMAX_(500)
+	rechargeTimeMAX_(500),
+	fireCharge_(30)
 {
-
-	fireCharge_ = 30;
-
-	id_ = "coilgun";
 }
 
-Weapon::AutoBat::AutoBat(fireFunc & callback, ProjectileDef const & ammo, 
+Weapon::AutoBat::AutoBat(fireFunc & callback, ProjectileDef const & ammo, std::string id,
 	int batterySize, int refireTime, int rechargeTime, int fireCharge) :
-	WeaponI(callback, ammo),
+	WeaponI(callback, ammo, id),
 	battery_(batterySize),
 	refireTime_(0),
 	refireTimeMAX_(refireTime),
@@ -24,20 +21,27 @@ Weapon::AutoBat::AutoBat(fireFunc & callback, ProjectileDef const & ammo,
 	rechargeTimeMAX_(rechargeTime),
 	fireCharge_(fireCharge)
 {
-	id_ = "coilgun";
 }
 
-void Weapon::AutoBat::reup()
+void Weapon::AutoBat::reup(bool instant)
 {
+	if (instant == false);
 	//No manual reload
+
+	else
+	{
+		battery_.refill();
+		rechargeTime_ = 0;
+		refireTime_ = 0;
+	}
 }
 
-void Weapon::AutoBat::update(int dt)
+void Weapon::AutoBat::update(int ms)
 {
 	//If we're shooting, cycle
 	if (refireTime_ > 0)
 	{
-		refireTime_ = (refireTime_ - dt >= 0 ? refireTime_ - dt : 0);
+		refireTime_ = (refireTime_ - ms >= 0 ? refireTime_ - ms : 0);
 	}
 
 	//Otherwise start charging
@@ -45,14 +49,14 @@ void Weapon::AutoBat::update(int dt)
 	{
 		if (rechargeTime_ > 0)
 		{
-			rechargeTime_ = (rechargeTime_ - dt >= 0 ? rechargeTime_ - dt : 0);
+			rechargeTime_ = (rechargeTime_ - ms >= 0 ? rechargeTime_ - ms : 0);
 		}
 
 		else battery_.recharge(fireCharge_ / 2);
 	}
 
 	//Fire if we can
-	if (pin_)
+	if (pin_ && battery_.getCharge() <= fireCharge_)
 	{
 		fire(barrel_);
 
@@ -101,6 +105,16 @@ void Weapon::AutoBat::fire(b2Vec2 & heading)
 
 	//Fire projectile
 	fireCallback_(pv, id_);
+}
+
+bool Weapon::AutoBat::isUpping() const
+{
+	return (battery_.checkFull() == false && rechargeTime_ <=0);
+}
+
+bool Weapon::AutoBat::canFire() const
+{
+	return (output_.isValid() && battery_.getCharge() <= fireCharge_);
 }
 
 bool Weapon::AutoBat::canTrigger() const

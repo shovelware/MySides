@@ -4,9 +4,9 @@
 #include "Bounds.hpp"
 #include "Pickup.hpp"
 
-Pickup::Sight::Sight(b2Body* body, int time) :
+Pickup::Sight::Sight(b2Body* body, int time, float length) :
 	Pickup::PickupI(body, time),
-	size_(10)
+	length_(length > 0.f? length : 10.f)
 {
 	//Body is initially made by pickup base class
 }
@@ -65,7 +65,7 @@ void Pickup::Sight::update(int milliseconds)
 
 			float angle = owner_->getBody()->GetAngle();
 
-			end_ = body_->GetPosition() + b2Vec2(sin(angle) * -size_, -cos(angle) * -size_);
+			end_ = body_->GetPosition() + b2Vec2(sin(angle) * -length_, -cos(angle) * -length_);
 		}
 
 		else

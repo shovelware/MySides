@@ -159,6 +159,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\WeapSemiBat.cpp" />
     <ClCompile Include="src\WeapSemiMag.cpp" />
     <ClCompile Include="src\WeapAutoMag.cpp" />
+    <ClCompile Include="src\WeapSpreadBat.cpp" />
     <ClCompile Include="src\WeapSpreadMag.cpp" />
     <ClCompile Include="src\XController.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -204,6 +205,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\WeapSemiBat.hpp" />
     <ClInclude Include="include\WeapSemiMag.hpp" />
     <ClInclude Include="include\WeapAutoMag.hpp" />
+    <ClInclude Include="include\WeapSpreadBat.hpp" />
     <ClInclude Include="include\WeapSpreadMag.hpp" />
     <ClInclude Include="include\XController.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>

@@ -257,24 +257,49 @@ void Game::handleInput(sf::Time dt)
 	//Debug controls
 	if (key_.isKeyDown(Key::BackSpace))
 	{
+		// < : Render debugDraw
 		if (key_.isKeyPressed(Key::Comma))
 		{
 			renderDD_ = !renderDD_;
 		}
-
+		
+		// > : Render Graphics
 		if (key_.isKeyPressed(Key::Period))
 		{
 			renderGAME_ = !renderGAME_;
 		}
 
+		// ? : Render HUD 
 		if (key_.isKeyPressed(Key::Slash))
 		{
 			renderHUD_ = !renderHUD_;
 		}
 
+		// : : Render Camera Info
 		if (key_.isKeyPressed(Key::SemiColon))
 		{
 			renderCAM_ = !renderCAM_;
+		}
+
+		// RShift : Advance one step
+		if (key_.isKeyPressed(Key::RShift))
+		{
+			update(sf::Time(sf::seconds(_TICKTIME_)), true);
+		}
+
+		// K : Clear map
+		if (key_.isKeyPressed(Key::K))
+		{
+			world_->clearWorld(false);
+		}
+
+		if (key_.isKeyPressed(Key::F))
+		{
+			world_->dstr="fungun";
+			//0, 47, 88
+			if (world_->di == 47) world_->di = 88;
+			else if (world_->di == 0) world_->di = 47;
+			else world_->di = 0;
 		}
 	}
 
@@ -284,7 +309,7 @@ void Game::handleInput(sf::Time dt)
 
 	//RS : Look
 	world_->look(b2Vec2(con_.checkRightX(), con_.checkRightY()));
-	camera_->lean(sf::Vector2f(con_.checkRightX() * 10, con_.checkRightY() * 10));
+	camera_->lean(sf::Vector2f(con_.checkRightX() * 10, con_.checkRightY() * 10), pause_);
 
 	//RT : Trigger
 	if (con_.checkRightHairTrigger())
@@ -432,9 +457,12 @@ bool Game::checkController(sf::Time dt)
 	return connected;
 }
 
-void Game::update(sf::Time dt)
+void Game::update(sf::Time dt, bool force)
 {
-	if (!pause_)
+	bool hadTarget = world_->hasControlled();
+
+	//Forced updates or if we're not paused
+	if (force || !pause_)
 	{
 		if (haptics_)
 		{
@@ -442,19 +470,32 @@ void Game::update(sf::Time dt)
 			con_.setVibrationR(world_->getHapticR());
 		}
 
-		camera_->update(dt.asMilliseconds());
 		world_->update(dt.asMilliseconds());
 		sf::Listener::setPosition(sf::Vector3f(camera_->getCenter().x, camera_->getCenter().y, 0));
 	}
 
+
+	//Stop vibration when paused
 	else
 	{
 		con_.stopVibration();
 	}
 
-	camera_->setTarget(world_->getControlled());
+	bool hasTarget = world_->hasControlled();
+	//Move the camera to controlled
+
+	if (hasTarget)
+		camera_->setTarget(world_->getControlled());
+
+	else if (!hasTarget && hadTarget)
+	{
+		camera_->clearTarget(true);
+	}
+
+	camera_->update(dt.asMilliseconds());
 
 
+	//End game pause
 	if (world_->hasControlled() == false && !pause_)
 	{
 		pause_ = true;

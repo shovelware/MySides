@@ -7,12 +7,15 @@
 namespace Weapon {
 	class SpreadMag : public WeaponI {
 	public:
-		SpreadMag(fireFunc& callback, ProjectileDef const &ammo);
-		SpreadMag(fireFunc& callback, ProjectileDef const &ammo, int magSize, int resetTime, int reloadTime, int pellets, float spread);
+		SpreadMag(fireFunc& callback, ProjectileDef const &ammo, std::string id);
+		SpreadMag(fireFunc& callback, ProjectileDef const &ammo, std::string id, int magSize, int resetTime, int reloadTime, int pellets, float spread);
+		
+		bool isUpping() const;
+		bool canFire() const;
 		bool canTrigger() const;
 
-		void reup();
-		void update(int dt);
+		void reup(bool instant = false);
+		void update(int ms);
 
 		void setMagSize(int size, bool reload = false);
 

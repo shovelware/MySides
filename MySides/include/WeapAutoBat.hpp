@@ -7,12 +7,14 @@
 namespace Weapon {
 	class AutoBat : public WeaponI {
 	public:
-		AutoBat(fireFunc& callback, ProjectileDef const &ammo);
-		AutoBat(fireFunc& callback, ProjectileDef const &ammo, int batterySize, int refireTime, int rechargeTime, int fireCharge);
+		AutoBat(fireFunc& callback, ProjectileDef const &ammo, std::string id);
+		AutoBat(fireFunc& callback, ProjectileDef const &ammo, std::string id, int batterySize, int refireTime, int rechargeTime, int fireCharge);
 
+		bool isUpping() const;
+		bool canFire() const;
 		bool canTrigger() const;
 
-		void reup();
+		void reup(bool instant = false);
 		void update(int dt);
 
 		void setBatterySize(int size, bool recharge = false);

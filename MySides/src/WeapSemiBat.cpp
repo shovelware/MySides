@@ -1,34 +1,36 @@
 #include "..\include\WeapSemiBat.hpp"
 
-Weapon::SemiBat::SemiBat(fireFunc & callback, ProjectileDef const & ammo) :
-	WeaponI(callback, ammo),
-	battery_(2000),
+Weapon::SemiBat::SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::string id) :
+	WeaponI(callback, ammo, id),
+	battery_(2000, false),
 	chargeAmount_(16),
 	dischargeAmount_(32),
 	primed_(true)
 {
-	id_ = "railgun";
-	battery_.empty();
 }
 
-Weapon::SemiBat::SemiBat(fireFunc & callback, ProjectileDef const & ammo, 
+Weapon::SemiBat::SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::string id,
 	int batterySize, int chargeAmount, int dischargeAmount) :
-	WeaponI(callback, ammo),
-	battery_(batterySize),
+	WeaponI(callback, ammo, id),
+	battery_(batterySize,false),
 	chargeAmount_(dischargeAmount),
 	dischargeAmount_(dischargeAmount),
 	primed_(true)
 {
-	id_ = "railgun";
-	battery_.empty();
 }
 
-void Weapon::SemiBat::reup()
+void Weapon::SemiBat::reup(bool instant)
 {
 	//No reload
+	if (instant == false);
+
+	else {
+		battery_.empty();
+		primed_ = true;
+	}
 }
 
-void Weapon::SemiBat::update(int dt)
+void Weapon::SemiBat::update(int ms)
 {
 	//Idle/charging up
 	if (primed_)
@@ -110,6 +112,16 @@ void Weapon::SemiBat::fire(b2Vec2 & heading)
 
 	//Fire projectile
 	fireCallback_(pv, id_);
+}
+
+bool Weapon::SemiBat::isUpping() const
+{
+	return (!primed_);
+}
+
+bool Weapon::SemiBat::canFire() const
+{
+	return (output_.isValid() && primed_);
 }
 
 bool Weapon::SemiBat::canTrigger() const

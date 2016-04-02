@@ -10,18 +10,21 @@
 namespace Weapon {
 	class AutoMag : public WeaponI {
 	public:
-		AutoMag(fireFunc& callback, ProjectileDef const &ammo);
-		AutoMag(fireFunc& callback, ProjectileDef const &ammo, int magSize, int refireTime, int reloadTime);
-		
+		AutoMag(fireFunc& callback, ProjectileDef const &ammo, std::string id);
+		AutoMag(fireFunc& callback, ProjectileDef const &ammo, std::string id, int magSize, int refireTime, int reloadTime, int spread);
+
+		bool isUpping() const;
+		bool canFire() const;
 		bool canTrigger() const;
 
-		void reup();
+		void reup(bool instant = false);
 		void update(int dt);
 
 		void setMagSize(int size, bool reload = false);
 
 		void setRefireTime(int ms);
 		void setReloadTime(int ms);
+		void setSpread(float spread);
 
 		int getBar() const;
 		int getBarMAX() const;
@@ -35,6 +38,8 @@ namespace Weapon {
 
 		int reloadTime_;
 		int reloadTimeMAX_;
+
+		int spread_;
 	};
 }
 #endif

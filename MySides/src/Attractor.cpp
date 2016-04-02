@@ -3,9 +3,9 @@
 #include "Bounds.hpp"
 #include "Pickup.hpp"
 
-Pickup::Attractor::Attractor(b2Body* body, int time) :
+Pickup::Attractor::Attractor(b2Body* body, int time, float radius) :
 	Pickup::PickupI(body, time),
-	radius_(7.5f)
+	radius_(radius > 0.f ? radius : 7.5f)
 {
 	//Body is initially made by pickup base class
 }

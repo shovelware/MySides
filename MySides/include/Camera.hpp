@@ -36,7 +36,7 @@ public:
 	void moveReset();
 
 	//! Lean controls for the camera
-	void lean(sf::Vector2f xf);
+	void lean(sf::Vector2f xf, bool force = false);
 	void leanReset();
 	
 	//! Zoom controls for camera

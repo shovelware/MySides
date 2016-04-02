@@ -55,7 +55,7 @@ public:
 	void addEnemy(const ShapeDef& def, Weapon::WeaponI* weapon = nullptr);
 	void addProjectile(const ProjectileDef& def);
 	void addSide(const SideDef& def);
-	void addPickup(Pickup::Type type, b2Vec2 position, int time);
+	void addPickup(Pickup::Type type, b2Vec2 position, int time, float strength = 0);
 	void addShrapnel(Projectile* src);
 	void addForce(b2Vec2 pos, float force, float radius, int time);
 
@@ -84,7 +84,7 @@ public:
 
 	//Cleaning up
 	void resetLevel();
-	void clearWorld();
+	void clearWorld(bool clearPlayer = true);
 
 	//Bounds manipulation
 	float getBoundsRadius();
@@ -155,6 +155,9 @@ public:
 	int getTimeInLevel() { return timeInLevel_ / 1000; }
 
 	/////Debug
+	//Debug vars
+	std::string dstr;
+	int di;
 	void testBed();
 	void f1();
 	void f2();

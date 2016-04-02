@@ -319,7 +319,7 @@ bool Shape::getWeaponReady()
 	
 	if (weapon_ != nullptr)
 	{
-		ready = weapon_->canTrigger();
+		ready = weapon_->canFire();
 	}
 
 	return ready;
@@ -328,10 +328,13 @@ bool Shape::getWeaponReady()
 void Shape::arm(Weapon::WeaponI * weapon)
 {
 	weapon_ = weapon;
-	weapon_->setPrimary(colTert_);
-	weapon_->setSecondary(colSecn_);
-	weapon_->setTertiary(colSecn_);
-	weapon_->setOwner(this);
+	if (weapon_ != nullptr)
+	{
+		weapon_->setPrimary(colTert_);
+		weapon_->setSecondary(colSecn_);
+		weapon_->setTertiary(colSecn_);
+		weapon_->setOwner(this);
+	}
 }
 
 Weapon::WeaponI * Shape::getWeapon() const
@@ -353,14 +356,22 @@ void Shape::trigger(b2Vec2& direction)
 {
 	b2Vec2 dir = direction;
 
+	//If there's no impulse, fire where we're looking
 	if (dir.Length() < 0.1f)
 	{
 		dir = getOrientation();
+		dir.Normalize();
+		dir *= size_;
 	}
 
-	orient(dir);
+	//Otherwise face towards new direction
+	else orient(dir);
+
+	//If we can fire, do so
 	if (weapon_ != nullptr)
 	{
+		dir.Normalize();
+		dir *= size_;
 		weapon_->trigger(dir);
 	}
 }
@@ -449,10 +460,10 @@ void Shape::update(int milliseconds)
 			}
 
 			//If we have a bunch of sides and could go up
-			if (sides_ >= 16 && vertices_ < 8)
+			if (vertices_ < 8 && sides_ >= ((vertices_ + 1 ) *hpScale_ ))
 			{
-				sides_ -= 16;
 				vertices_ += 1;
+				sides_ -= (vertices_ * hpScale_);
 			}
 
 		}//End alive

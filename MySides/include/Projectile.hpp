@@ -12,8 +12,8 @@ public:
 
 	void takeDamage(unsigned int damage);
 	int getDamage() const;
-	std::pair<float, float> getForce() const;
-	std::pair<int, int> getShrapnel() const;
+	std::pair<float, float> const& getForce() const;
+	std::pair<int, int> const& getShrapnel() const;
 
 	Entity* getOwner();
 	void setOwner(Entity* o);

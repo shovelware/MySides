@@ -7,9 +7,9 @@ private:
 	int chargeMAX_;
 
 public:
-	Battery(int capacity) :
+	Battery(int capacity, bool charged = true) :
 		chargeMAX_(capacity),
-		charge_(capacity)
+		charge_((charged ? capacity : 0))
 	{}
 
 	void recharge(int charge)

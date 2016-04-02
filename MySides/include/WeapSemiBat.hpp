@@ -7,13 +7,15 @@
 namespace Weapon {
 	class SemiBat : public WeaponI {
 	public:
-		SemiBat(fireFunc& callback, ProjectileDef const& ammo);
-		SemiBat(fireFunc& callback, ProjectileDef const& ammo, int batterySize, int chargeAmount, int dischargeAmount);
+		SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::string id);
+		SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::string id, int batterySize, int chargeAmount, int dischargeAmount);
 
+		bool isUpping() const;
+		bool canFire() const;
 		bool canTrigger() const;
 
-		void reup();
-		void update(int dt);
+		void reup(bool instant = false);
+		void update(int ms);
 
 		void setBatterySize(int size, bool recharge = false);
 

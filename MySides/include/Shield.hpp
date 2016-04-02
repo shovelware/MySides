@@ -6,7 +6,7 @@
 namespace Pickup {
 	class Shield : public PickupI {
 	public:
-		Shield(b2Body* body, int time);
+		Shield(b2Body* body, int time, float strength = 0.f);
 
 		void update(int milliseconds);
 

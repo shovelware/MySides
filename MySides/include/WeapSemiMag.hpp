@@ -7,12 +7,14 @@
 namespace Weapon {
 	class SemiMag : public WeaponI {
 	public:
-		SemiMag(fireFunc& callback, ProjectileDef const &ammo);
-		SemiMag(fireFunc& callback, ProjectileDef const &ammo, int magSize, int resetTime, int reloadTime);
+		SemiMag(fireFunc& callback, ProjectileDef const &ammo, std::string id);
+		SemiMag(fireFunc& callback, ProjectileDef const &ammo, std::string id, int magSize, int resetTime, int reloadTime);
 
+		bool isUpping() const;
+		bool canFire() const;
 		bool canTrigger() const;
 
-		void reup();
+		void reup(bool instant = false);
 		void update(int dt);
 
 		void setMagSize(int size, bool reload = false);

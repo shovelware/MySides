@@ -40,7 +40,6 @@ public:
 	int getHP() const;
 	unsigned int getHPMax() const;
 
-	bool canCollect() const;
 	int getSidesCollected() const;
 	float getSize() const;
 	

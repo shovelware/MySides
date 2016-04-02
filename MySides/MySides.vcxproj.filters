@@ -162,6 +162,9 @@
     <ClCompile Include="src\WeapSemiBat.cpp">
       <Filter>Source Files\Game\Weapon</Filter>
     </ClCompile>
+    <ClCompile Include="src\WeapSpreadBat.cpp">
+      <Filter>Source Files\Game\Weapon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Entity.hpp">
@@ -285,6 +288,9 @@
       <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\WeapSemiBat.hpp">
+      <Filter>Header Files\Game\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WeapSpreadBat.hpp">
       <Filter>Header Files\Game\Weapon</Filter>
     </ClInclude>
   </ItemGroup>

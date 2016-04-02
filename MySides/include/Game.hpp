@@ -41,7 +41,7 @@ private:
 	b2Vec2 SFtoB2(const sf::Vector2f &vec);
 	void processEvents();
 	void handleInput(sf::Time dt);
-	void update(sf::Time dt);
+	void update(sf::Time dt, bool force = false);
 	void render();
 
 	void toggleFullscreen();

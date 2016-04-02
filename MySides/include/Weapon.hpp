@@ -29,8 +29,11 @@ namespace Weapon {
 		void trigger(b2Vec2 &direction);	//!< Pulls the trigger on the weapon. The only exposed piece!
 		void release();						//!< Releases the trigger, for weapons that need it
 
-		virtual void reup() = 0;			//!< Manual reload, if available
+		virtual void reup(bool instant = false) = 0;//!< Manual reload, if available
 		void setProjectile(ProjectileDef const &pd);//!< Sets the passed Projectile to be the Weapon's output
+
+		void setLevel(int level);		//!< Sets weapon level
+		int getLevel() const;			//!< Gets weapon levelw
 
 		void setOwner(Shape* owner);	//!< Sets the owner of the Weapon to be a passed Shape
 		Shape* getOwner() const;		//!< Gets the owner of the weapon
@@ -49,13 +52,14 @@ namespace Weapon {
 		virtual int getBarMAX() const = 0;	//!< Max of status bar
 		virtual int getBar() const = 0;		//!< Current fill of status bar
 
-		//virtual bool canFire() const = 0		//!< Checks if a Weapon can fire
+		virtual bool isUpping() const = 0;		//!< Charging/Reloading stat
+		virtual bool canFire() const = 0;		//!< Checks if a Weapon can fire
 		virtual bool canTrigger() const = 0;	//!< Checks if a Weapon can trigger
 
-		virtual void update(int dt) = 0;	//!< Updates weapon
+		virtual void update(int ms) = 0;	//!< Updates weapon
 
 	protected:
-		WeaponI(fireFunc& callback, ProjectileDef const &ammo);
+		WeaponI(fireFunc& callback, ProjectileDef const &ammo, std::string ids);
 
 		std::string id_;
 		Shape* owner_;
@@ -65,6 +69,8 @@ namespace Weapon {
 
 		bool pin_;
 		b2Vec2 barrel_;
+
+		int level_;
 
 		virtual void fire(b2Vec2 &heading) = 0;
 	};

@@ -104,7 +104,7 @@ void Projectile::fire(float mult)
 
 		heading_ *= speed_ * mult;
 		
-		body_->SetLinearVelocity(heading_);
+		body_->SetLinearVelocity(body_->GetLinearVelocity() + heading_);
 		//newVelocity.x = body_->GetMass() / (newVelocity.x > 0 ? newVelocity.x : 1);
 				
 		//(newVelocity.x != 0 ? newVelocity.x = body_->GetMass() / newVelocity.x : newVelocity.x);
@@ -117,7 +117,7 @@ void Projectile::fire(float mult)
 void Projectile::takeDamage(unsigned int damage)
 {
 	hp_ -= damage;
-	if (hp_ < 0)
+	if (hp_ <= 0)
 		active_ = false;
 }
 
@@ -126,9 +126,9 @@ int Projectile::getDamage() const
 	return damage_;
 }
 
-std::pair<float, float> Projectile::getForce() const { return force_; }
+std::pair<float, float> const& Projectile::getForce() const { return force_; }
 
-std::pair<int, int> Projectile::getShrapnel() const { return shrapnel_; }
+std::pair<int, int> const& Projectile::getShrapnel() const { return shrapnel_; }
 
 Entity * Projectile::getOwner()
 {

@@ -4,9 +4,9 @@
 #include "Bounds.hpp"
 #include "Pickup.hpp"
 
-Pickup::Shield::Shield(b2Body* body, int time) :
+Pickup::Shield::Shield(b2Body* body, int time, float strength) :
 	Pickup::PickupI(body, time),
-	strength_(4)
+	strength_(strength > 0.f ? strength : 4)
 {
 	//Body is initially made by pickup base class
 }

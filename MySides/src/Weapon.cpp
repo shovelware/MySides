@@ -1,10 +1,10 @@
 #include "Weapon.hpp"
 
-Weapon::WeaponI::WeaponI(fireFunc& callback, ProjectileDef const &ammo) :
+Weapon::WeaponI::WeaponI(fireFunc& callback, ProjectileDef const &ammo, std::string id) :
 	owner_(nullptr),
 	fireCallback_(callback),
 	output_(ProjectileDef(ammo)),
-	id_("weapon"),
+	id_(id),
 	pin_(false),
 	barrel_(b2Vec2_zero)
 	{
@@ -28,7 +28,21 @@ Weapon::WeaponI::WeaponI(fireFunc& callback, ProjectileDef const &ammo) :
 
 	void Weapon::WeaponI::setProjectile(ProjectileDef const &pd)
 	{
-		output_ = ProjectileDef(pd);
+		ProjectileDef output = ProjectileDef(pd);
+		output.colPrim = output_.colPrim;
+		output.colSecn = output_.colSecn;
+		output.colTert = output_.colTert;
+		output_ = output;
+	}
+
+	void Weapon::WeaponI::setLevel(int level)
+	{
+		level_ = level;
+	}
+
+	int Weapon::WeaponI::getLevel() const
+	{
+		return level_;
 	}
 
 	void Weapon::WeaponI::setOwner(Shape* owner)

@@ -6,7 +6,7 @@
 namespace Pickup {
 	class Sight : public PickupI {
 	public:
-		Sight(b2Body* body, int time);
+		Sight(b2Body* body, int time, float length = 0.f);
 
 		void update(int milliseconds);
 
@@ -16,7 +16,7 @@ namespace Pickup {
 	private:
 		void onCollect();
 
-		float size_;
+		float length_;
 		b2Vec2 end_;
 	};
 }
