@@ -13,15 +13,20 @@ public:
 	float getValue();
 
 	b2Vec2 getHeading();
-
-	//Do we need an update function?
+	float getTimer() const;
+	
+	void update(int milliseconds);
 	bool collide(Entity* other, b2Contact& contact, std::string tag);
 
 private:
 	b2Vec2 heading_;
+	float length_;
+	int lifeTime_;
+	int lifeTimeMAX_;
 
 	void setShape(float size);
-	float length_;
+
+	
 };
 
 #endif

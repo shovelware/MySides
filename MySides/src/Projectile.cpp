@@ -267,7 +267,7 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 
 	else if (tag == "bounds")
 	{
-		takeDamage(2);
+		takeDamage(1);
 		handled = true;
 	}
 

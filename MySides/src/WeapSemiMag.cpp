@@ -25,18 +25,19 @@ Weapon::SemiMag::SemiMag(fireFunc& callback, ProjectileDef const &ammo, std::str
 
 void Weapon::SemiMag::reup(bool instant)
 {
-	if (instant == false && reloadTime_ <= 0)
-	{
-		reloadTime_ = reloadTimeMAX_;
-	}
-
-	else
+	if (instant)
 	{
 		magazine_.reload();
 		reloadTime_ = 0;
 		resetTime_ = 0;
 		cocked_ = true;
 	}
+
+	else if (instant == false && reloadTime_ <= 0)
+	{
+		reloadTime_ = reloadTimeMAX_;
+	}
+
 }
 
 void Weapon::SemiMag::update(int dt)

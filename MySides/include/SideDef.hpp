@@ -10,16 +10,17 @@ public:
 		position(b2Vec2_zero),
 		normal(b2Vec2_zero),
 		length(0),
+		lifeTime(1000),
 		colPrim(b2Color(1.f, 0.f, 0.f)),
 		colSecn(b2Color(.75f, .75f, .75f)),
 		colTert(b2Color(1.f, 1.f, 1.f))
 	{}
 
-
-	SideDef(b2Vec2 position, b2Vec2 normal, float length) :
+	SideDef(b2Vec2 position, b2Vec2 normal, float length, int lifeTime) :
 		position(position),
 		normal(normal),
 		length(length),
+		lifeTime(lifeTime),
 		colPrim(b2Color(1.f, 0.f, 0.f)),
 		colSecn(b2Color(.75f, .75f, .75f)),
 		colTert(b2Color(1.f, 1.f, 1.f))
@@ -29,6 +30,7 @@ public:
 		position(sd.position),
 		normal(sd.normal),
 		length(sd.length),
+		lifeTime(sd.lifeTime),
 		colPrim(sd.colPrim),
 		colSecn(sd.colSecn),
 		colTert(sd.colTert)
@@ -38,6 +40,7 @@ public:
 	b2Vec2 normal;
 
 	float length;
+	int lifeTime;
 
 	//Colours
 	b2Color colPrim;

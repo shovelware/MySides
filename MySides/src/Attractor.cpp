@@ -93,10 +93,12 @@ void Pickup::Attractor::update(int milliseconds)
 				if (s != nullptr)
 				{
 					b2Vec2 dir = body_->GetPosition() - s->GetPosition();
-					if (dir.Length() < radius_)
+					float dist = dir.Length();
+					if (dist < radius_)
 					{
+						
 						dir.Normalize();
-						dir *= 0.002f;
+						dir *= 0.005f * ((dist / radius_));
 
 						if (s->GetLinearVelocity().Length() < 0.02)
 							s->ApplyForceToCenter(dir, true);

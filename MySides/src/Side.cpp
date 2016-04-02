@@ -2,8 +2,11 @@
 
 Side::Side(b2Body * body, const SideDef& def) : 
 	Entity(body), 
+	heading_(def.normal),
 	length_(def.length),
-	heading_(def.normal)
+	lifeTimeMAX_(def.lifeTime),
+	lifeTime_(def.lifeTime)
+
 {
 	setShape(length_);
 
@@ -14,7 +17,7 @@ Side::Side(b2Body * body, const SideDef& def) :
 	b2Vec2 impulse = heading_;
 
 	float rotation = atan2f(heading_.y, heading_.x);
-	float adjust = randFloat(-0.2f, 0.2f);
+	float adjust = randFloat(-0.25f, 0.25f);
 	impulse.x = cosf(rotation + adjust);
 	impulse.y = sinf(rotation + adjust);
 
@@ -75,13 +78,30 @@ b2Vec2 Side::getHeading()
 	return heading_;
 }
 
+float Side::getTimer() const
+{
+	return (lifeTime_ *1.f / lifeTimeMAX_ * 1.f);
+}
+
+void Side::update(int milliseconds)
+{
+	lifeTime_ -= milliseconds;
+
+	if (lifeTime_ <= 0)
+	{
+		alive_ = false;
+		active_ = false;
+	}
+}
+
 bool Side::collide(Entity* other, b2Contact& contact, std::string tag)
 {
 	bool handled = false;
 
 	if (tag == "projectile")
 	{
-		body_->ApplyAngularImpulse(other->getBody()->GetLinearVelocity().Length(), true);
+		//Spin when hit
+		body_->ApplyAngularImpulse(500.f, true);
 	}
 
 	return handled;

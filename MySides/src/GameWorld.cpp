@@ -180,11 +180,12 @@ void GameWorld::spawnEnemy()
 //Adds a player to the world 
 void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 {
-	ShapeDef play = ShapeDef(pos, b2Vec2(0, -1), 5);
+	ShapeDef play = ShapeDef(pos, b2Vec2(0, -1), 6);
 	
 	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
 	play.colSecn = b2Color(0.f, 1.f, 1.f);
 	play.colTert = b2Color(1.f, 0.f, 0.f);
+	play.hpScale = 10;
 
 	if (player_ != nullptr)
 	{
@@ -192,14 +193,15 @@ void GameWorld::addPlayer(const b2Vec2& pos, bool control)
 	}
 
 	player_ = new Player(addDynamicBody(pos), play, addSide_);	
-	addPickup(Pickup::Type::ATTRACT, pos, -1);
+	addPickup(Pickup::Type::ATTRACT, pos, -1, 7.5f);
+	addPickup(Pickup::Type::ATTRACT, pos, -1, 15.f);
 
 	if (control)
 	{
 		//Set our control to the one we just put in
 		controlled_ = player_;
-
-		armShape(player_, armory_->getPistol(0));
+		Weapon::WeaponI* newWeap = armory_->getWerfer(0);
+		armShape(player_, newWeap);
 	}
 }
 
@@ -751,6 +753,7 @@ void GameWorld::updateSide(int dt)
 			//Pull pointer
 			Side* sd = (*sideIt);
 
+			sd->update(dt);
 
 			//If we're not active, increment by deleting
 			if (sd->getActive() == false)
@@ -1044,11 +1047,15 @@ void GameWorld::f4()
 {}
 
 void GameWorld::f5()
-{}
+{
+	if (bounds_ != nullptr)
+		randomiseCol(bounds_);
+}
 
 void GameWorld::f6()
 {
-	
+	if (player_ != nullptr)
+		randomiseCol(player_);
 }
 
 void GameWorld::f7()
@@ -1080,13 +1087,14 @@ void GameWorld::f8()
 void GameWorld::f9()
 {
 	if (player_ != nullptr)
-		randomiseCol(player_);
+		player_->takeDamage(1, b2Vec2(0, -20));
+	
 }
 
 void GameWorld::f0()
 {
 	if (player_ != nullptr)
-		player_->collect(999);
+		player_->collect(1);
 }
 
 void GameWorld::testBed()

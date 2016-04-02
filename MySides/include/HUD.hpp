@@ -15,12 +15,15 @@ public:
 	void drawWeaponStatus(sf::FloatRect box);
 	void drawSideStatus(sf::FloatRect box);
 	
-	void loadFont(std::string filename);
-	void drawString(sf::FloatRect box, std::string info, sf::Color col = sf::Color::Green);
+	void loadFont(std::string filename, unsigned int size);
+	void drawString(sf::FloatRect box, std::string info, sf::Color col = sf::Color::Green, float sizeScale = 1.f);
 private:
-	void drawBar(sf::FloatRect box, float min, float max, sf::Color fill, sf::Color back, sf::Color outline);
+	void drawBar(sf::FloatRect box, float min, float max, sf::Color fill, sf::Color back, sf::Color outline, int line = 2);
 	void drawRect(sf::FloatRect rect, sf::Color fill, sf::Color out = sf::Color::Black, int dent = 0);
 	void drawCirc(sf::Vector2f pos, float radius, sf::Color fill, sf::Color out = sf::Color::Black, int dent = 0);
+
+
+	sf::Color B2toSF(const b2Color& col) const;
 
 	sf::RenderTarget& trg_;
 	GameWorld* world_;

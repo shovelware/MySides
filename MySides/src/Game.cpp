@@ -48,7 +48,8 @@ int Game::run()
 	camera_->loadFont("game_over.ttf");
 
 	hud_ = new HUD(window_, world_);
-	hud_->loadFont("game_over.ttf");
+	//hud_->loadFont("game_over.ttf", 36);
+	hud_->loadFont("pixelmix.ttf", 12);
 
 	//Start fullscreen
 	//toggleFullscreen();
@@ -210,10 +211,19 @@ void Game::handleInput(sf::Time dt)
 		world_->trigger(fr);
 	}
 
-	//I,O,P : Camera controls
+	//U,H,J,K : Camera controls
+	sf::Vector2f look(0, 0);
+	if (key_.isKeyDown(Key::U)) { look.y -= 10; }
+	if (key_.isKeyDown(Key::H)) { look.x -= 10; }
+	if (key_.isKeyDown(Key::J)) { look.y += 10; }
+	if (key_.isKeyDown(Key::K)) { look.x += 10; }
+	camera_->lean(look, pause_);
+
+
+	//I,O,L : Camera controls
 	if (key_.isKeyDown(Key::I)) { camera_->zoomIn(); }
 	if (key_.isKeyDown(Key::O)) { camera_->zoomOut(); }
-	if (key_.isKeyPressed(Key::P)) { camera_->zoomReset(); }
+	if (key_.isKeyPressed(Key::L)) { camera_->zoomReset(); }
 
 	//Escape : Quit
 	if (key_.isKeyPressed(Key::Escape)) { quit_ = true; }
@@ -354,7 +364,8 @@ void Game::handleInput(sf::Time dt)
 	//B : Testing in player
 	if (con_.checkPressed(XINPUT_GAMEPAD_B))
 	{
-		world_->getPlayer()->testBed();
+		Shape* play = world_->getPlayer();
+		if (play != nullptr) play->testBed();
 	}
 
 	//X : Reup
@@ -420,10 +431,12 @@ void Game::handleInput(sf::Time dt)
 	}
 
 	//DPad :
-	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT)){}
-	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT)){}
-	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_DOWN)){}
-	if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_UP)){}
+	sf::Vector2f dlook = sf::Vector2f(0, 0);
+	if (con_.checkDown(XINPUT_GAMEPAD_DPAD_RIGHT))	{ dlook.x += 10; }
+	if (con_.checkDown(XINPUT_GAMEPAD_DPAD_LEFT))	{ dlook.x -= 10; }
+	if (con_.checkDown(XINPUT_GAMEPAD_DPAD_DOWN))	{ dlook.y += 10; }
+	if (con_.checkDown(XINPUT_GAMEPAD_DPAD_UP))		{ dlook.y -= 10; }
+	if (thor::length(dlook) > 0) camera_->lean(dlook, pause_);
 
 	//Start : Pause
 	if (con_.checkPressed(XINPUT_GAMEPAD_START))
@@ -476,14 +489,11 @@ void Game::update(sf::Time dt, bool force)
 
 
 	//Stop vibration when paused
-	else
-	{
-		con_.stopVibration();
-	}
+	else con_.stopVibration();
 
 	bool hasTarget = world_->hasControlled();
+	
 	//Move the camera to controlled
-
 	if (hasTarget)
 		camera_->setTarget(world_->getControlled());
 
@@ -532,10 +542,12 @@ void Game::render()
 	window_.setView(window_.getDefaultView());
 	if (renderHUD_)
 	{
+		sf::Vector2u size = window_.getSize();
+
 		hud_->drawLevelStatus(sf::FloatRect(20, 20, 100, 40));
-		hud_->drawShapeStatus(sf::FloatRect(280, 20, 100, 40));
-		hud_->drawSideStatus(sf::FloatRect(20, 680, 680, 20));
-		hud_->drawWeaponStatus(sf::FloatRect(600, 20, 100, 40));
+		hud_->drawShapeStatus(sf::FloatRect(size.x / 2.f - 100, 25, 200, 30));
+		hud_->drawSideStatus(sf::FloatRect(20, size.y - 40, size.x - 40, 20));
+		hud_->drawWeaponStatus(sf::FloatRect(size.x - 120, 20, 100, 40));
 	}
 
 	//Draw pause menu

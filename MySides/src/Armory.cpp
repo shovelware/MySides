@@ -141,24 +141,28 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		gren.shrapnel.first = 8;
 		gren.shrapnel.second = 4;
 		gren.width = 1.0f;
-		gren.lifeTime = 2000;
+		gren.lifeTime = 500;
 
-		funGun = new Weapon::SpreadMag(fireCallback_, gren, "thumper", 16, 50, 1000, 8, 0.3f);
+		funGun = new Weapon::SpreadMag(fireCallback_, gren, "thumper", 16, 50, 500, 8, 0.3f);
 		break;
 	}
 	
 		//Lance Beam
 	case 42:
+	{
+		ProjectileDef laser = getLaser();
 		break;
-		
+	}
 		//Black Hole Gun
 	case 8:
+	{
 		break;
-
+	}
 		//Broad Beam
 	case 1:
+	{
 		break;
-		
+		}
 		//Flak cannon
 	case 47:
 	{
@@ -172,7 +176,7 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		shrap.force.first = -0.5f;
 		shrap.force.second = 1.f;
 
-		funGun = new Weapon::SpreadMag(fireCallback_, shrap, "shotgun", 4, 0, 300, 8, 0.25f);
+		funGun = new Weapon::SpreadMag(fireCallback_, shrap, "shotgun", 4, 0, 300, 8, 0.5f);
 
 		break;
 	}
@@ -184,10 +188,10 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		bb.lifeTime = 200;
 		bb.oneHit = true;
 		bb.bounce = 0.f;
-		bb.force.first = 0.05f;
+		bb.force.first = 0.025f;
 		bb.force.second = 0.5f;
 
-		funGun = new Weapon::SpreadBat(fireCallback_, bb, "pistol", 2000, 50, 1000, 10, 12, 0, 0.5, .9);
+		funGun = new Weapon::SpreadBat(fireCallback_, bb, "pistol", 2000, 32, 1000, 10, 8, 0, 0.5, 1.1f);
 
 		break;
 	}
@@ -204,6 +208,7 @@ void Weapon::Armory::setWeaponLevel(WeaponI * weapon, int level, int projLevel)
 		std::string id = weapon->getID();
 		int lv = std::max(0, std::min(level, 8));
 		weapon->setLevel(lv);
+		weapon->reup(true);
 
 		if (id == "pistol")			upgradePistol(static_cast<Weapon::SemiMag*>(weapon), lv, projLevel);
 		else if (id == "rifle")		upgradeRifle(static_cast<Weapon::AutoMag*>(weapon), lv, projLevel);
@@ -309,7 +314,7 @@ ProjectileDef Weapon::Armory::getNinMil(int level)
 	ProjectileDef ninmil = ProjectileDef();
 	ninmil.velScale = 1.f;
 	ninmil.hpMAX = 1;
-	ninmil.width = 0.5f;
+	ninmil.width = 0.75f;
 	ninmil.damage = 8;
 	ninmil.lifeTime = 100;
 
@@ -326,7 +331,7 @@ ProjectileDef Weapon::Armory::getNinMil(int level)
 	if (level > 3) { ninmil.penetration = 1; }
 
 	//L5H : Damage++
-	if (level > 4) { ninmil.damage = 16; }
+	if (level > 4) { ninmil.damage = 24; }
 
 	//L6B : Force+
 	if (level > 5) { ninmil.force.first = 0.1f; ninmil.force.second = 1.f; }
@@ -339,7 +344,7 @@ ProjectileDef Weapon::Armory::getNinMil(int level)
 
 	return ninmil;
 }
-//*
+
 ProjectileDef Weapon::Armory::getBullet(int level)
 {
 	//L0 : Default
@@ -578,17 +583,18 @@ ProjectileDef Weapon::Armory::getSlug(int level)
 
 	return slug;
 }
-//
+
 ProjectileDef Weapon::Armory::getFlammen(int level)
 {
 	//L0 : Default
 	ProjectileDef flam = ProjectileDef();
 
-	flam.width = 1.5f;
+	flam.width = 0.01f;
+	flam.height = 1.f;
 	flam.hpMAX = 1;
 	flam.damage = 2;
 	flam.velScale = 0.15f;
-	flam.lifeTime = 50;
+	flam.lifeTime = 100;
 
 	//L1H : Speed+
 	if (level > 0) { flam.velScale = 0.25f; }
@@ -606,17 +612,17 @@ ProjectileDef Weapon::Armory::getFlammen(int level)
 	if (level > 4) { flam.penetration = 2; }
 
 	//L6B : LifeTime+
-	if (level > 5) { flam.lifeTime = 75; }
+	if (level > 5) { flam.lifeTime = 150; }
 
 	//L7F : Damage++
 	if (level > 6) { flam.damage = 6; }
 
 	//L8S : LifeTime++
-	if (level > 7) { flam.lifeTime = 100; }
+	if (level > 7) { flam.lifeTime = 200; }
 
 	return flam;
 }
-//*
+
 void Weapon::Armory::upgradePistol(Weapon::SemiMag* pistol, int level, int projLevel)
 {
 	//Set base attributes
@@ -632,7 +638,7 @@ void Weapon::Armory::upgradePistol(Weapon::SemiMag* pistol, int level, int projL
 	if (level > 0) { pistol->setResetTime(150); }
 
 	//L2B : ReloadTime-
-	if (level > 1) { pistol->setReloadTime(2000); }
+	if (level > 1) { pistol->setReloadTime(1750); }
 
 	//L3F : RefireTime--
 	if (level > 2) { pistol->setResetTime(100); }
@@ -641,7 +647,7 @@ void Weapon::Armory::upgradePistol(Weapon::SemiMag* pistol, int level, int projL
 	if (level > 3) { pistol->setMagSize(18, true); }
 
 	//L5H : ReloadTime--
-	if (level > 4) { pistol->setReloadTime(1500); }
+	if (level > 4) { pistol->setReloadTime(750); }
 
 	//L6B : Mag++
 	if (level > 5) { pistol->setMagSize(24, true); }
@@ -652,7 +658,7 @@ void Weapon::Armory::upgradePistol(Weapon::SemiMag* pistol, int level, int projL
 	//L8S : Mag+++
 	if (level > 7) { pistol->setMagSize(32, true); }
 }
-//*
+
 void Weapon::Armory::upgradeRifle(Weapon::AutoMag* rifle, int level, int projLevel)
 {
 	//Set base attributes
@@ -734,7 +740,7 @@ void Weapon::Armory::upgradeShotgun(Weapon::SpreadMag* shotgun, int level, int p
 	//L8S : Mag+
 	if (level > 7) { shotgun->setMagSize(16, true); }
 }
-//*
+
 void Weapon::Armory::upgradeWerfer(Weapon::SpreadBat* werfer, int level, int projLevel)
 {
 	//Match weapon level
@@ -768,6 +774,8 @@ void Weapon::Armory::upgradeWerfer(Weapon::SpreadBat* werfer, int level, int pro
 //
 void Weapon::Armory::upgradeCoilgun(Weapon::AutoBat* coilgun, int level, int projLevel)
 {
+
+
 }
 //
 void Weapon::Armory::upgradeRailgun(Weapon::SemiBat* railgun, int level, int projLevel)

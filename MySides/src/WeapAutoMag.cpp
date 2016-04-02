@@ -25,16 +25,16 @@ Weapon::AutoMag::AutoMag(fireFunc & callback, ProjectileDef const & ammo, std::s
 
 void Weapon::AutoMag::reup(bool instant)
 {
-	if (instant == false && reloadTime_ <= 0)
-	{
-		reloadTime_ = reloadTimeMAX_;
-	}
-
-	else
+	if (instant)
 	{
 		magazine_.reload();
 		reloadTime_ = 0;
 		refireTime_ = 0;
+	}
+
+	else if (reloadTime_ <= 0) 
+	{
+		reloadTime_ = reloadTimeMAX_;
 	}
 }
 

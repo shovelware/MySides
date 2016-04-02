@@ -233,6 +233,7 @@ void GameRenderer::drawSide(Side* const s)
 	//Pull vars
 	b2Body* body = s->getBody();
 	float length = s->getValue();
+	float alpha = s->getTimer();
 	sf::Vector2f pos = B2toSF(s->getPosition(), true);
 	sf::Vector2f dir = B2toSF(s->getHeading(), true);
 
@@ -243,10 +244,7 @@ void GameRenderer::drawSide(Side* const s)
 	b2Fixture* fix = body->GetFixtureList();
 
 	//It must be one of two
-	if (fix->GetUserData() != "side")
-	{
-		fix = fix->GetNext();
-	}
+	if (fix->GetUserData() != "side") {	fix = fix->GetNext(); }
 
 	//Pull other vars
 	b2EdgeShape* shape = static_cast<b2EdgeShape*>(fix->GetShape());
@@ -255,8 +253,8 @@ void GameRenderer::drawSide(Side* const s)
 	sf::Vector2f b = B2toSF(body->GetWorldPoint(shape->m_vertex2), true);
 
 	//Draw line
-	drawLine(a, b, pri);
-	drawCircle(pos, thor::length(dir), tweakAlpha(pri, 16), tweakAlpha(sec, 32));
+	drawLine(a, b, tweakAlpha(pri, 255 * alpha));
+	drawCircle(pos, thor::length(dir), tweakAlpha(pri, 32 * alpha + .25f), tweakAlpha(sec, 64 * alpha + .5f));
 	//drawCircle(pos, length, sec, pri, 0);
 }
 

@@ -62,17 +62,18 @@ bool Weapon::SpreadBat::canTrigger() const
 
 void Weapon::SpreadBat::reup(bool instant)
 {
-	//Manually restart charging cycle
-	if (instant == false && cooled_ == true)
-	{
-		cooled_ = false;
-	}
-
-	else {
+	if (instant) {
 		battery_.empty();
 		rechargeTime_ = 0;
 		cooled_ = true;
 	}
+	
+	//Manually restart charging cycle
+	else if (cooled_ == true)
+	{
+		cooled_ = false;
+	}
+
 }
 
 void Weapon::SpreadBat::update(int ms)
@@ -202,7 +203,7 @@ void Weapon::SpreadBat::fire(b2Vec2 & heading)
 	b2Vec2 newHead = heading;
 	float rotation = atan2f(heading.y, heading.x);
 	float adjust = 0.f;
-	float spread = fmaxf(0.f, spread_ - (spread_ * spreadScale_ * (1.f - (battery_.getPercent() / 100.f))));
+	float spread = fmaxf(0.1f, spread_ - (spread_ * spreadScale_ * (1.f - (battery_.getPercent() / 100.f))));
 
 	for (int i = 0; i < amount; ++i)
 	{

@@ -151,7 +151,7 @@ public:
 	int enemies;
 	int freesides;
 
-	int maxTime = 999;
+	int maxTime = 120;
 	int getTimeInLevel() { return timeInLevel_ / 1000; }
 
 	/////Debug

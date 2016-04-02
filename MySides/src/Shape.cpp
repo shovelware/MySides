@@ -3,16 +3,18 @@
 Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& callback) : 
 	Entity(body),
 	weapon_(nullptr),
-	lastDamage_(b2Vec2_zero)
+	lastDamage_(b2Vec2_zero),
+	size_(def.size),
+	verticesMAX_(8),
+	shapeVertices_(def.vertices),
+	sideCallback_(callback),
+	hpScale_(def.hpScale),
+	sides_(0)
 {	
 	//Collision
 	shapeFixDef_.userData = "shape";
 	addMaterial(shapeFixDef_);
 
-	//Local storing of def items
-	size_ = def.size;
-	shapeVertices_ = def.vertices;
-	
 	//Corrections
 	shapeVertices_ = fmax(3, fmin(shapeVertices_, 8));
 	vertices_ = shapeVertices_;
@@ -26,15 +28,14 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 	colSecn_ = def.colSecn;
 	colTert_ = def.colTert;
 
-	sideCallback_ = callback;
-
 	maxVel_ = 0.025f * (def.speedScale >= 0.5f ? def.speedScale : 0.5f); // max velocity in m/s // * size provisionally til we make an actual calculation
 	maxRot_ = 0.0001f;
 
-	hpScale_ = def.hpScale;
-	hpMAX_ = def.hpMAX * hpScale_;
+	hpMAX_ = vertices_ * hpScale_;
 	hp_ = hpMAX_;
-	sides_ = 0;
+	uhpScale_ = (def.upgrade ? hpScale_ : 0);
+	uhpMAX_ = ((vertices_ + 1) * uhpScale_);
+	uhp_ = 0;
 }
 
 //Destroys weapon if we have one
@@ -74,10 +75,7 @@ void Shape::setPoly(int vertices, float radius)
 	//Shape data
 	b2PolygonShape shap;
 
-	assert(2 < vertices && vertices < 9);
-	assert(radius > 0);
-
-	if (2 < vertices && vertices < 9)
+	if (radius > 0 && verticesMIN_ < vertices && vertices <= verticesMAX_)
 	{
 		b2Vec2* pnts = new b2Vec2[vertices];
 
@@ -116,23 +114,22 @@ void Shape::clearb2()
 }
 
 //Uses a callback to drop a side
-void Shape::dropSide(b2Vec2 dir, float size)
+void Shape::dropSide(b2Vec2 dir)
 {
 	b2Vec2 offset = dir;
 	offset.Normalize();
 	offset *= getSize();
-	SideDef newSide = SideDef(getPosition() + offset, dir, size);
-	
+	float rhs = std::sqrt((size_ * size_) + (size_ * size_) - (2 * size_ * size_) * cos(2 * M_PI / shapeVertices_));
+
+	SideDef newSide = SideDef(getPosition() + offset, dir, rhs, 5000.f * rhs);
+
 	newSide.colPrim = colSecn_;
 	newSide.colSecn = colPrim_;
 	newSide.colTert = colTert_;
 
-	float rhs = (size_ * size_) + (size_ * size_) - (2 * size_ * size_) * cos(2 * M_PI / shapeVertices_);
-
-	newSide.length = std::sqrt(rhs);
-
 	sideCallback_(newSide);
 }
+
 
 //Move in passed direction at constant speed
 void Shape::move(b2Vec2 direction)
@@ -223,6 +220,38 @@ b2Vec2 Shape::getOrientation() const
 	return b2Vec2(-sin(r), cos(r));
 }
 
+void Shape::heal(int health)
+{
+	for (int hlt = health; hlt > 0; --hlt) {
+		//Overhealing
+		if (uhpMAX_ != 0 && hp_ == hpMAX_) {
+
+			//If we can go up
+			if (uhp_ + 1 <= uhpMAX_) uhp_++;
+
+			//If we're full and can go up
+			if (uhpMAX_ != 0 && uhp_ == uhpMAX_ && vertices_ < verticesMAX_) {
+				vertices_++;
+
+				hpMAX_ = vertices_ * hpScale_;
+				hp_ += uhp_;
+				uhp_ = 0;
+
+				uhpMAX_ = (vertices_ + 1) * uhpScale_;
+				//if (vertices_ > 7) uhpMAX_ = 0;
+			}
+		}
+
+		//Just healing
+		else {
+			if (hp_ + 1 <= hpMAX_)	hp_++;
+
+			//Shop healing at full
+			if (hp_ == hpMAX_) break;
+		}
+	}
+}
+
 void Shape::takeDamage(int damage, b2Vec2 direction)
 {
 	lastDamage_ = direction;
@@ -230,31 +259,38 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 
 	for (int dmg = damage; dmg > 0; --dmg)
 	{
+		//If we're overhealed
+		if (uhp_ > 0)
+		{
+			uhp_ -= 1;
+		}
+
 		//If we're about to go down, go back a side
-		if (hp_ == 1)
+		else if (hp_ == 1)
 		{
 			hp_ -= 1;
 
-			vertices_ = (vertices_ - 1 >= 2 ? vertices_ - 1 : 2);
+			vertices_ = (vertices_ - 1 >= verticesMIN_ ? vertices_ - 1 : verticesMIN_);
 
-			if (vertices_ > 2)
+			if (vertices_ > verticesMIN_)
 			{
 				hpMAX_ = vertices_ * hpScale_;
 				hp_ = hpMAX_;
 			}
+
+			//Re-enable upgrades if we must
+			uhpMAX_ = (vertices_ + 1) * uhpScale_;
 		}
 
 		//Otherwise just take some hp
 		else
 		{
-			if (vertices_ > 2)
-			{
+			if (vertices_ > verticesMIN_) 
 				hp_ -= 1;
-			}
 		}
 		
 		//We're dead, stop hurting
-		if (vertices_ < 3 && hp_ <= 0)
+		if (vertices_ < verticesMIN_ + 1 && hp_ <= 0 && uhp_ <= 0)
 			break;
 	}
 }
@@ -262,27 +298,44 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 void Shape::collect(int value)
 {
 	sides_ += value;
+	heal(std::ceil(value));
 }
 
-int Shape::getHP() const
+int Shape::getHP() const 
 {
-	return hp_;
+	int hp = 0;
+	for (int vrts = vertices_ - 1; vrts > verticesMIN_; --vrts)
+	{
+		hp +=  vrts * hpScale_;
+	}
+
+	hp += hp_;
+
+	return hp; 
 }
 
-unsigned int Shape::getHPMax() const
+unsigned int Shape::getHPMax() const 
 {
-	return hpMAX_;
+	int mhp = 0;
+	int vertmax = vertices_;
+	if (uhpScale_ != 0) vertmax = verticesMAX_;
+
+	for (int vrts = vertmax; vrts > verticesMIN_; --vrts)
+	{
+		mhp += vrts * hpScale_;
+	}
+
+	
+
+	return mhp;
 }
 
-int Shape::getSidesCollected() const
-{
-	return sides_;
-}
+int Shape::getUHP() const { return uhp_; }
 
-float Shape::getSize() const
-{
-	return size_;
-}
+unsigned int Shape::getUHPMax() const { return uhpMAX_; }
+
+int Shape::getSidesCollected() const { return sides_; }
+float Shape::getSize() const { return size_; }
 
 void Shape::explode()
 {
@@ -302,9 +355,10 @@ void Shape::explode()
 		mid.y /= 2.f;
 
 		mid.Normalize();
-		dropSide(mid, 1);
+		dropSide(mid);
 	}
 
+	body_->GetFixtureList()->SetSensor(true);
 	alive_ = false;
 }
 
@@ -313,13 +367,25 @@ bool Shape::getArmed()
 	return (weapon_ != nullptr);
 }
 
-bool Shape::getWeaponReady()
+bool Shape::getWeaponReady() const
 {
 	bool ready = false;
 	
 	if (weapon_ != nullptr)
 	{
 		ready = weapon_->canFire();
+	}
+
+	return ready;
+}
+
+bool Shape::getWeaponLoading() const
+{
+	bool ready = false;
+
+	if (weapon_ != nullptr)
+	{
+		ready = weapon_->isUpping();
 	}
 
 	return ready;
@@ -429,16 +495,24 @@ void Shape::update(int milliseconds)
 				weapon_->update(milliseconds);
 			}
 
+			//If we have a bunch of uhhp and could go up a side
+			if (uhpMAX_ != 0 && vertices_ < verticesMAX_ && uhp_ >= uhpMAX_)
+			{
+				vertices_ += 1;
+				hp_ += uhp_;
+				uhp_ = 0;
+
+				uhpMAX_ = (vertices_ + 1) * uhpScale_;
+			}
+
 			//If we're at 0 health and can't go back, die
-			if (hp_ <= 0 && vertices_ <= 3)
+			if (hp_ <= 0 && vertices_ < verticesMIN_ + 1)
 			{
 				explode();
-
-				alive_ = false;
 			}
 
 			//If our internal shape mismatches our displayed shape
-			else if (vertices_ > 2 && vertices_ != shapeVertices_)
+			else if (vertices_ > verticesMIN_ && vertices_ != shapeVertices_)
 			{
 				int diff = shapeVertices_ - vertices_;
 
@@ -448,7 +522,7 @@ void Shape::update(int milliseconds)
 					//Drop the sides we lost
 					for (int i = diff; i > 0; --i)
 					{
-						dropSide(lastDamage_, 1);
+						dropSide(lastDamage_);
 					}
 				}
 
@@ -458,19 +532,11 @@ void Shape::update(int milliseconds)
 				hpMAX_ = vertices_ * hpScale_;
 				hp_ = hpMAX_;
 			}
-
-			//If we have a bunch of sides and could go up
-			if (vertices_ < 8 && sides_ >= ((vertices_ + 1 ) *hpScale_ ))
-			{
-				vertices_ += 1;
-				sides_ -= (vertices_ * hpScale_);
-			}
-
 		}//End alive
-
 	else active_ = false;
 	//Do death stuff in this else, then set active to false
 
+		//std::cout << uhp_ << "/" << uhpMAX_ << std:: endl;
 	}//end active
 }
 

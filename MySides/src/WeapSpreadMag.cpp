@@ -29,19 +29,20 @@ Weapon::SpreadMag::SpreadMag(fireFunc & callback, ProjectileDef const & ammo, st
 
 void Weapon::SpreadMag::reup(bool instant)
 {
-	if (instant == false && reloadTime_ <= 0)
-	{
-		reloadTime_ = reloadTimeMAX_;
-	}
-
-	else
+	if (instant)
 	{
 		magazine_.reload();
 		reloadTime_ = 0;
 		resetTime_ = 0;
 		pumped_ = true;
 	}
+
+	else if (reloadTime_ <= 0)
+	{
+		reloadTime_ = reloadTimeMAX_;
+	}
 }
+
 
 void Weapon::SpreadMag::update(int dt)
 {

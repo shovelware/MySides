@@ -33,12 +33,15 @@ public:
 	void stopRotate();
 	b2Vec2 getOrientation() const;
 
+	void heal(int health);
 	void takeDamage(int damage, b2Vec2 direction);
 	void collect(int value);
 
 	//HP values
 	int getHP() const;
 	unsigned int getHPMax() const;
+	int getUHP() const;
+	unsigned int getUHPMax() const;
 
 	int getSidesCollected() const;
 	float getSize() const;
@@ -50,7 +53,8 @@ public:
 	void disarm();
 	bool getArmed();
 	Weapon::WeaponI* getWeapon() const;//???
-	bool getWeaponReady();
+	bool getWeaponReady() const;
+	bool getWeaponLoading() const;
 	void trigger(b2Vec2& direction);
 	void release();
 	void reup();
@@ -77,19 +81,25 @@ protected:
 
 	//Side dropping
 	std::function<void(SideDef&)> sideCallback_;
-	void dropSide(b2Vec2 dir, float size);
+	void dropSide(b2Vec2 dir);
 
 	//HP
 	int hp_;
 	unsigned int hpMAX_;
 	int hpScale_;
-	
+
+	int uhp_;
+	unsigned int uhpMAX_;
+	int uhpScale_;
+
 	//Weapon
 	Weapon::WeaponI* weapon_;
 
 	//Body tracking
 	int shapeVertices_;
 	int vertices_;
+	const unsigned int verticesMIN_ = 2;
+	const unsigned int verticesMAX_;
 	float size_;
 
 	int sides_; //!< Currency

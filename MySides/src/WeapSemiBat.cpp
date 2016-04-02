@@ -22,12 +22,13 @@ Weapon::SemiBat::SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::str
 void Weapon::SemiBat::reup(bool instant)
 {
 	//No reload
-	if (instant == false);
-
-	else {
+	if (instant)
+	{
 		battery_.empty();
 		primed_ = true;
 	}
+
+	else;
 }
 
 void Weapon::SemiBat::update(int ms)

@@ -25,15 +25,15 @@ Weapon::AutoBat::AutoBat(fireFunc & callback, ProjectileDef const & ammo, std::s
 
 void Weapon::AutoBat::reup(bool instant)
 {
-	if (instant == false);
-	//No manual reload
-
-	else
+	if (instant)
 	{
 		battery_.refill();
 		rechargeTime_ = 0;
 		refireTime_ = 0;
 	}
+
+	//No manual reload
+	else;
 }
 
 void Weapon::AutoBat::update(int ms)
@@ -56,7 +56,7 @@ void Weapon::AutoBat::update(int ms)
 	}
 
 	//Fire if we can
-	if (pin_ && battery_.getCharge() <= fireCharge_)
+	if (pin_ && fireCharge_ <= battery_.getCharge())
 	{
 		fire(barrel_);
 
@@ -114,7 +114,7 @@ bool Weapon::AutoBat::isUpping() const
 
 bool Weapon::AutoBat::canFire() const
 {
-	return (output_.isValid() && battery_.getCharge() <= fireCharge_);
+	return (output_.isValid() && battery_.getCharge() >= fireCharge_);
 }
 
 bool Weapon::AutoBat::canTrigger() const
