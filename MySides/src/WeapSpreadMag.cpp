@@ -126,14 +126,8 @@ void Weapon::SpreadMag::fire(b2Vec2 &heading)
 	//Set up vector
 	std::vector<ProjectileDef> pv;
 	pv.reserve(pellets_);
-	pv.emplace_back(output_);
-	std::vector<ProjectileDef>::iterator newProj = pv.begin();
+	std::vector<ProjectileDef>::iterator newProj = pv.end();
 	b2Vec2 origin = owner_->getPosition();
-
-	//Set up projectile (centre)
-	newProj->origin = origin + heading;
-	newProj->heading = heading;
-	newProj->owner = owner_;
 	
 	//Set up other projectiles
 	b2Vec2 newDir = heading;
@@ -141,15 +135,15 @@ void Weapon::SpreadMag::fire(b2Vec2 &heading)
 	float adjust = 0.f;
 
 	//Thor distributions later
-	for (int i = 1; i < pellets_; ++i)
+	for (int i = 0; i < pellets_; ++i)
 	{
 		pv.emplace_back(output_);
-		newProj = --pv.end();
 
 		adjust = randFloat(-spread_, spread_);
 		newDir.x = cosf(rotation +adjust);
 		newDir.y = sinf(rotation +adjust);
 
+		newProj = (--pv.end());
 		newProj->origin = origin + newDir;
 		newProj->heading = newDir;
 		newProj->owner = owner_;

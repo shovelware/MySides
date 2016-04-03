@@ -113,8 +113,10 @@ void GameRenderer::drawShape(Shape* const s)
 	drawLine(pos, pos - vel, ter);
 
 	//Orientation circle
-	drawCircle(pos - pointing, 4, (armed ? ter : tweakAlpha(ter, 64)), (armed ? sec : tweakAlpha(sec, 64)));
-
+	drawCircle(pos - pointing, size * 4, (armed ? ter : tweakAlpha(ter, 64)), (armed ? sec : tweakAlpha(sec, 64)));
+	drawCircle(pos - (pointing *  2.f), size * 3, (armed ? tweakAlpha(ter, 128) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 128) : tweakAlpha(sec, 32)));
+	drawCircle(pos - (pointing *  3.f), size * 4, (armed ? tweakAlpha(ter, 128) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 128) : tweakAlpha(sec, 32)));
+	
 	//Actual shape
 	drawPolygon(verts, count, pri, sec);
 
@@ -275,18 +277,18 @@ void GameRenderer::drawPickup(Pickup::PickupI * const p)
 
 		drawCircle(pos, rad, pri, sec);
 		drawCircle(pos, rad / 2, sec, ter);
-		
 	}
 
 	else
 	{
 		if (Pickup::Sight* s = dynamic_cast<Pickup::Sight*>(p))
 		{
-			sf::Vector2f end = B2toSF(s->getEnd(), true);
-			sf::Vector2f beg = B2toSF(s->getOwner()->getPosition(), true);
-			sf::Vector2f mid = end - beg;
-
 			b2Body* body = p->getBody();
+			b2EdgeShape* ed = static_cast<b2EdgeShape*>(s->getBody()->GetFixtureList()->GetShape());
+			sf::Vector2f end = B2toSF(s->getPosition(), true);
+			sf::Vector2f beg = B2toSF(body->GetWorldPoint(ed->m_vertex2), true);
+			sf::Vector2f mid = end - beg;
+			bool contact = s->getContact();
 
 			sf::Color pri = B2toSF(p->getPrimary());
 			sf::Color sec = B2toSF(p->getSecondary());
@@ -294,7 +296,7 @@ void GameRenderer::drawPickup(Pickup::PickupI * const p)
 
 			//drawLine(end, mid, pri);
 			//drawLine(mid, end, sec);
-			drawLine(beg, end, tweakAlpha(sec, 128));
+			drawLine(end, beg, tweakAlpha((contact ? ter : sec), 32));
 		}
 
 		else if (Pickup::Shield* s = dynamic_cast<Pickup::Shield*>(p))

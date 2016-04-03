@@ -113,12 +113,26 @@ Weapon::WeaponI* Weapon::Armory::getRailgun(int level, int projLevel)
 //Explosive Weapons
 Weapon::WeaponI* Weapon::Armory::getThumper(int level, int projLevel)
 {
-	return nullptr;
+	//Min level 0
+	int weaplv = std::max(0, std::min(level, 8));
+	//If -1, match weapon level (default behaviour)
+	int projlv = (projLevel > -1 ? projLevel : level);
+
+	Weapon::SpreadMag* thumper = new Weapon::SpreadMag(fireCallback_, getGrenade(projlv), "thumper");
+	upgradeThumper(thumper, weaplv, projLevel);
+	return static_cast<Weapon::WeaponI*>(thumper);
 }
 
 Weapon::WeaponI* Weapon::Armory::getLauncher(int level, int projLevel)
 {
-	return nullptr;
+	//Min level 0
+	int weaplv = std::max(0, std::min(level, 8));
+	//If -1, match weapon level (default behaviour)
+	int projlv = (projLevel > -1 ? projLevel : level);
+
+	Weapon::SemiMag* launcher = new Weapon::SemiMag(fireCallback_, getRocket(projlv), "launcher");
+	upgradeLauncher(launcher, weaplv, projLevel);
+	return static_cast<Weapon::WeaponI*>(launcher);
 }
 
 //Fun weapons
@@ -129,7 +143,7 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 	switch (type)
 	{
 		// Explosive Buckshot
-	case 0:
+	case 44:
 	{
 		ProjectileDef gren = ProjectileDef();
 		gren.bounce = 0.f;
@@ -140,7 +154,7 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		gren.force.second = 2.f;
 		gren.shrapnel.first = 8;
 		gren.shrapnel.second = 4;
-		gren.width = 1.0f;
+		gren.width = 4.f;
 		gren.lifeTime = 500;
 
 		funGun = new Weapon::SpreadMag(fireCallback_, gren, "thumper", 16, 50, 500, 8, 0.3f);
@@ -151,18 +165,33 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 	case 42:
 	{
 		ProjectileDef laser = getLaser();
+		laser.damage = 80.f;
+		laser.hpMAX = 20;
+		laser.lifeTime = 5000;
+		laser.height = 10.f;
+		laser.width = 100.f;
+		laser.penetration = 100;
+		
+		funGun = new Weapon::SemiBat(fireCallback_, laser, "coilgun", 1280, 32, 64);
 		break;
 	}
 		//Black Hole Gun
-	case 8:
+	case 88:
 	{
+		ProjectileDef voib = ProjectileDef();
+		voib.force.first = -1;
+		voib.force.second = 20.f;
+		voib.lifeTime = 1000;
+		voib.penetration = 15;
+		voib.hpMAX = 10;
+		voib.bounce = 0.75f;
+		voib.width = 1;
+		voib.height = 1;
+
+		funGun = new Weapon::SemiMag(fireCallback_, voib, "thumper", 2, 400, 2000);
 		break;
 	}
-		//Broad Beam
-	case 1:
-	{
-		break;
-		}
+
 		//Flak cannon
 	case 47:
 	{
@@ -173,16 +202,16 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		shrap.width *= 2;
 		shrap.shrapnel.first = 4;
 		shrap.shrapnel.second = 8;
-		shrap.force.first = -0.5f;
+		shrap.force.first = 0.5f;
 		shrap.force.second = 1.f;
 
-		funGun = new Weapon::SpreadMag(fireCallback_, shrap, "shotgun", 4, 0, 300, 8, 0.5f);
+		funGun = new Weapon::SpreadMag(fireCallback_, shrap, "shotgun", 4, 0, 300, 8, 0.75f);
 
 		break;
 	}
 
 		//Chaingun
-	case 88:
+	case 888:
 	{
 		ProjectileDef bb = getShrapnel(8);
 		bb.lifeTime = 200;
@@ -192,12 +221,15 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		bb.force.second = 0.5f;
 
 		funGun = new Weapon::SpreadBat(fireCallback_, bb, "pistol", 2000, 32, 1000, 10, 8, 0, 0.5, 1.1f);
-
+		
 		break;
 	}
 
 	}//End switch
 
+	if (funGun != nullptr)
+		funGun->setLevel(type);
+	
 	return funGun;
 }
 
@@ -207,8 +239,6 @@ void Weapon::Armory::setWeaponLevel(WeaponI * weapon, int level, int projLevel)
 	{
 		std::string id = weapon->getID();
 		int lv = std::max(0, std::min(level, 8));
-		weapon->setLevel(lv);
-		weapon->reup(true);
 
 		if (id == "pistol")			upgradePistol(static_cast<Weapon::SemiMag*>(weapon), lv, projLevel);
 		else if (id == "rifle")		upgradeRifle(static_cast<Weapon::AutoMag*>(weapon), lv, projLevel);
@@ -217,8 +247,10 @@ void Weapon::Armory::setWeaponLevel(WeaponI * weapon, int level, int projLevel)
 		else if (id == "werfer")	upgradeWerfer(static_cast<Weapon::SpreadBat*>(weapon), lv, projLevel);
 		else if (id == "coilgun")	upgradeCoilgun(static_cast<Weapon::AutoBat*>(weapon), lv, projLevel);
 		else if (id == "railgun")	upgradeRailgun(static_cast<Weapon::SemiBat*>(weapon), lv, projLevel);
-		else if (id == "thumper")	upgradeThumper(static_cast<Weapon::SemiMag*>(weapon), lv, projLevel);
+		else if (id == "thumper")	upgradeThumper(static_cast<Weapon::SpreadMag*>(weapon), lv, projLevel);
 		else if (id == "launcher")	upgradeLauncher(static_cast<Weapon::SemiMag*>(weapon), lv, projLevel);
+
+		weapon->reup(true);
 	}
 }
 
@@ -238,32 +270,32 @@ ProjectileDef Weapon::Armory::getShrapnel(int level)
 {
 	//L0 : Default
 	ProjectileDef shard = ProjectileDef();
-	shard.velScale = 0.5f;
-	shard.hpMAX = 1;
+	shard.velScale = 0.75f;
+	shard.hpMAX = 100;
 	shard.width = 0.15f;
-	shard.damage = 1;
+	shard.damage = 4;
 	shard.lifeTime = 25;
 
 	//L1H : Damage+
-	if (level > 0) { shard.damage = 2; }
+	if (level > 0) { shard.damage = 6; }
 
 	//L2B : Lifetime+
 	if (level > 1) { shard.lifeTime = 40; }
 
 	//L3F : Speed+
-	if (level > 2) { shard.velScale = 0.75f; }
+	if (level > 2) { shard.velScale = 1.f; }
 
 	//L4S : Speed++
-	if (level > 3) { shard.velScale = 1.f; }
+	if (level > 3) { shard.velScale = 1.25f; }
 
 	//L5H : Damage++
-	if (level > 4) { shard.damage = 3; }
+	if (level > 4) { shard.damage = 8; }
 
 	//L6B : Bounce+
 	if (level > 5) { shard.bounce = 0.5f; }
 
 	//L7F : Speed++
-	if (level > 6) { shard.velScale = 1.25f; }
+	if (level > 6) { shard.velScale = 1.5f; }
 
 	//L8S : Lifetime++
 	if (level > 7) { shard.lifeTime = 64; }
@@ -368,7 +400,7 @@ ProjectileDef Weapon::Armory::getBullet(int level)
 	if (level > 3) { bullet.hpMAX = 2; }
 
 	//L5H : Force+
-	if (level > 4) { bullet.force.first = 0.1f; bullet.force.second = 1.f; }
+	if (level > 4) { bullet.force.first = 0.1f; bullet.force.second = 0.5f; }
 
 	//L6B : Damage++
 	if (level > 5) { bullet.damage = 16; }
@@ -381,45 +413,44 @@ ProjectileDef Weapon::Armory::getBullet(int level)
 
 	return bullet;
 }
-//
+
 ProjectileDef Weapon::Armory::getCannonball(int level)
 {
 	//L0 : Default
 	ProjectileDef ball = ProjectileDef();
-	ball.velScale = 3;
+	ball.velScale = 2;
 	ball.hpMAX = 4;
 	ball.width = 4.f;
-	ball.damage = 2.f;
-	ball.lifeTime = 1500;
+	ball.damage = 24;
+	ball.lifeTime = 200;
 
+	//L1H : Damage+
+	if (level > 0) { ball.damage = 32; }
 
-	//L1H : 
-	if (level > 0) {}
+	//L2B : Size+
+	if (level > 1) { ball.width = 6.f; }
 
-	//L2B : 
-	if (level > 1) {}
+	//L3F : Speed+
+	if (level > 2) { ball.velScale = 3; }
 
-	//L3F : 
-	if (level > 2) {}
+	//L4S : Force+
+	if (level > 3) { ball.force.first = 0.2f; ball.force.second = 0.8f;}
 
-	//L4S : 
-	if (level > 3) {}
+	//L5H : Lifetime+
+	if (level > 4) { ball.lifeTime = 400; }
 
-	//L5H : 
-	if (level > 4) {}
+	//L6B : Size+
+	if (level > 5) { ball.width = 8.f; }
 
-	//L6B :
-	if (level > 5) {}
+	//L7F : Speed++
+	if (level > 6) { ball.velScale = 4; }
 
-	//L7F :
-	if (level > 6) {}
-
-	//L8S :
-	if (level > 7) {}
+	//L8S : HP+
+	if (level > 7) { ball.hpMAX = 8; ball.bounce = 0.9f; }
 
 	return ball;
 }
-//
+
 ProjectileDef Weapon::Armory::getGrenade(int level)
 {
 	//L0 : Default
@@ -427,159 +458,159 @@ ProjectileDef Weapon::Armory::getGrenade(int level)
 	grenade.velScale = 1.f;
 	grenade.oneHit = true;
 	grenade.hpMAX = 1;
-	grenade.force.first = 0.25f;
+	grenade.force.first = 0.15f;
 	grenade.force.second = 2.f;
 	grenade.width = 1.75f;
 	grenade.height = 1.75f;
 	grenade.shrapnel.first = 12;
-	grenade.shrapnel.second = 4;
-	grenade.damage = 1;
-	grenade.lifeTime = 1000;
+	grenade.shrapnel.second = 6;
+	grenade.damage = 10;
+	grenade.lifeTime = 400;
 
-	//L1H : 
-	if (level > 0) {}
+	//L1H : Damage+
+	if (level > 0) { grenade.damage = 12; }
 
-	//L2B : 
-	if (level > 1) {}
+	//L2B : LifeTime++
+	if (level > 1) { grenade.lifeTime = 600; }
 
-	//L3F : 
-	if (level > 2) {}
+	//L3F : Speed+
+	if (level > 2) { grenade.velScale = 1.2f; }
 
-	//L4S : 
-	if (level > 3) {}
+	//L4S :  Force+
+	if (level > 3) { grenade.force.first = 0.2f; }
 
-	//L5H : 
-	if (level > 4) {}
+	//L5H : Shrapnel+
+	if (level > 4) { grenade.shrapnel.second = 8; }
 
-	//L6B :
-	if (level > 5) {}
+	//L6B : Damage++
+	if (level > 5) { grenade.damage = 16; }
 
-	//L7F :
-	if (level > 6) {}
+	//L7F : Force++
+	if (level > 6) { grenade.force.first = 0.4f; grenade.force.second = 2.5f; }
 
-	//L8S :
-	if (level > 7) {}
+	//L8S : Speed++
+	if (level > 7) { grenade.velScale = 1.5f; }
 
 	return grenade;
 }
-//
+
 ProjectileDef Weapon::Armory::getRocket(int level)
 {
 	//L0 : Default
 	ProjectileDef rocket = ProjectileDef();
-	rocket.velScale = 2.f;
+	rocket.velScale = 1.f;
 	rocket.oneHit = true;
 	rocket.hpMAX = 1;
 	rocket.width = 2.f;
 	rocket.height = 3.f;
+	rocket.force.first = 0.1f;
+	rocket.force.second = 2.f;
 	rocket.shrapnel.first = 8;
-	rocket.damage = 1.f;
+	rocket.shrapnel.second = 4;
+	rocket.damage = 16;
 	rocket.lifeTime = 500;
 
-	//L1H : 
-	if (level > 0) {}
+	//L1H : Speed+
+	if (level > 0) { rocket.velScale = 1.5f; }
 
-	//L2B : 
-	if (level > 1) {}
+	//L2B : Damage+
+	if (level > 1) { rocket.damage = 24; }
 
-	//L3F : 
-	if (level > 2) {}
+	//L3F : Speed+
+	if (level > 2) { rocket.velScale = 2.f; }
 
-	//L4S : 
-	if (level > 3) {}
+	//L4S : Damage++
+	if (level > 3) { rocket.damage = 32; }
 
-	//L5H : 
-	if (level > 4) {}
+	//L5H : Shrapnel+
+	if (level > 4) { rocket.shrapnel.second = 6; }
 
-	//L6B :
-	if (level > 5) {}
+	//L6B : Force+
+	if (level > 5) { rocket.force.first = 0.2f; rocket.force.second = 3.f; }
 
-	//L7F :
-	if (level > 6) {}
+	//L7F : Damage++++
+	if (level > 6) { rocket.damage = 48; }
 
-	//L8S :
-	if (level > 7) {}
+	//L8S : Force++
+	if (level > 7) { rocket.force.first = 0.5f; rocket.force.second = 4.f; }
 
 	return rocket;
 }
-//
+
 ProjectileDef Weapon::Armory::getLaser(int level)
 {
 	//L0 : Default
 	ProjectileDef laser = ProjectileDef();
-	laser.velScale = 1.5f;
+	laser.velScale = 1.25f;
 	laser.hpMAX = 1;
 	laser.width = .5f;
 	laser.height = 6.f;
-	laser.penetration = 3;
-	laser.damage = 1.f;
-	laser.lifeTime = 500;
+	laser.penetration = 1;
+	laser.damage = 4;
+	laser.lifeTime = 125;
 
-	//L1H : 
-	if (level > 0) {}
+	//L1H : Damage+
+	if (level > 0) { laser.damage = 8; }
 
-	//L2B : 
-	if (level > 1) {}
+	//L2B : Penetration+
+	if (level > 1) { laser.penetration = 2; }
 
-	//L3F : 
-	if (level > 2) {}
+	//L3F : Speed+
+	if (level > 2) { laser.velScale = 1.5f; }
 
-	//L4S : 
-	if (level > 3) {}
+	//L4S : Lifetime+
+	if (level > 3) { laser.lifeTime = 175; }
 
-	//L5H : 
-	if (level > 4) {}
+	//L5H : Penetration++
+	if (level > 4) { laser.penetration = 3; }
 
-	//L6B :
-	if (level > 5) {}
+	//L6B : Damage++
+	if (level > 5) { laser.damage = 16; }
 
-	//L7F :
-	if (level > 6) {}
+	//L7F : Speed++
+	if (level > 6) { laser.velScale = 1.75f; }
 
-	//L8S :
-	if (level > 7) {}
+	//L8S : Damage +++
+	if (level > 7) { laser.damage = 24; }
 
 	return laser;
 }
-//
+
 ProjectileDef Weapon::Armory::getSlug(int level)
 {
 	//L0 : Default
 	ProjectileDef slug = ProjectileDef();
 
 	slug.width = .8f;
-	slug.height = 1.6f;
-	slug.force.first = 0.4f;
-	slug.force.second = 0.5f;
 	slug.hpMAX = 1;
-	slug.penetration = 1;
-	slug.damage = 8;
-	slug.velScale = 1.f;
-	slug.lifeTime = 3000;
+	slug.damage = 32;
+	slug.velScale = 0.75f;
+	slug.lifeTime = 150;
+	slug.height = 1.6f;
 
-	//L1H : 
-	if (level > 0) {}
+	//L1H : Damage+
+	if (level > 0) { slug.damage = 48; }
 
-	//L2B : 
-	if (level > 1) {}
+	//L2B : Penetration+
+	if (level > 1) { slug.penetration = 1; }
 
-	//L3F : 
-	if (level > 2) {}
+	//L3F : Speed+
+	if (level > 2) { slug.velScale = 1.f;  }
 
-	//L4S : 
-	if (level > 3) {}
+	//L4S : Force+
+	if (level > 3) { slug.force.first = 0.4f; slug.force.second = 0.5f; }
 
-	//L5H : 
-	if (level > 4) {}
+	//L5H : Damage++
+	if (level > 4) { slug.damage = 64; }
 
-	//L6B :
-	if (level > 5) {}
+	//L6B : Lifetime+
+	if (level > 5) { slug.lifeTime = 300; }
 
-	//L7F :
-	if (level > 6) {}
+	//L7F : Speed++
+	if (level > 6) { slug.velScale = 1.1; }
 
-	//L8S :
-	if (level > 7) {}
+	//L8S : Penetration++
+	if (level > 7) { slug.penetration = 2; }
 
 	return slug;
 }
@@ -625,14 +656,15 @@ ProjectileDef Weapon::Armory::getFlammen(int level)
 
 void Weapon::Armory::upgradePistol(Weapon::SemiMag* pistol, int level, int projLevel)
 {
+	//Match weapon level
+	if (projLevel > -1) pistol->setProjectile(getNinMil(projLevel));
+	else pistol->setProjectile(getNinMil(level));
+	pistol->setLevel(level);
+
 	//Set base attributes
 	pistol->setMagSize(12, true);
 	pistol->setResetTime(200);
 	pistol->setReloadTime(2500);
-
-	//Match weapon level
-	if (projLevel > -1) pistol->setProjectile(getPellet(projLevel));
-	else pistol->setProjectile(getNinMil(level));
 
 	//L1H : ResetTime-
 	if (level > 0) { pistol->setResetTime(150); }
@@ -661,15 +693,16 @@ void Weapon::Armory::upgradePistol(Weapon::SemiMag* pistol, int level, int projL
 
 void Weapon::Armory::upgradeRifle(Weapon::AutoMag* rifle, int level, int projLevel)
 {
+	//Match weapon level
+	if (projLevel > -1) rifle->setProjectile(getBullet(projLevel));
+	else rifle->setProjectile(getBullet(level));
+	rifle->setLevel(level);
+
 	//Set base attributes
 	rifle->setMagSize(27, true);
 	rifle->setRefireTime(150);
 	rifle->setReloadTime(4000);
 	rifle->setSpread(0.005);
-
-	//Match weapon level
-	if (projLevel > -1) rifle->setProjectile(getPellet(projLevel));
-	else rifle->setProjectile(getBullet(level));
 
 	//L1H : Spread-
 	if (level > 0) { rifle->setSpread(0.0025); }
@@ -695,26 +728,58 @@ void Weapon::Armory::upgradeRifle(Weapon::AutoMag* rifle, int level, int projLev
 	//L8S : Mag++
 	if (level > 7) { rifle->setMagSize(45, true); }
 }
-//
+
 void Weapon::Armory::upgradeCannon(Weapon::SemiMag* cannon, int level, int projLevel)
 {
+	//Match weapon level
+	if (projLevel > -1) cannon->setProjectile(getCannonball(projLevel));
+	else cannon->setProjectile(getCannonball(level));
+	cannon->setLevel(level);
+
+	//Set base attributes
+	cannon->setMagSize(6);
 	cannon->setResetTime(1000);
 	cannon->setReloadTime(4000);
-	cannon->setMagSize(8);
+
+	//L1H : ResetTime-
+	if (level > 0) { cannon->setResetTime(800); }
+
+	//L2B : Magsize+
+	if (level > 1) { cannon->setMagSize(12); }
+
+	//L3F : ReloadTime-
+	if (level > 2) { cannon->setReloadTime(3000); }
+
+	//L4S : ResetTime--
+	if (level > 3) { cannon->setResetTime(600); }
+
+	//L5H : Magsize++
+	if (level > 4) { cannon->setMagSize(18); }
+
+	//L6B : Magsize+++
+	if (level > 5) { cannon->setMagSize(24); }
+
+	//L7F : ReloadTime--
+	if (level > 6) { cannon->setReloadTime(2000); }
+
+	//L8S : ResetTime---
+	if (level > 7) { cannon->setResetTime(400); }
+
 }
 
 void Weapon::Armory::upgradeShotgun(Weapon::SpreadMag* shotgun, int level, int projLevel)
 {
+	//Match weapon level
+	if (projLevel != -1) shotgun->setProjectile(getPellet(projLevel));
+	else shotgun->setProjectile(getPellet(level));
+	shotgun->setLevel(level);
+
 	//Set base attributes
 	shotgun->setMagSize(8, true);
-	shotgun->setResetTime(400);
+	shotgun->setResetTime(200);
 	shotgun->setReloadTime(1500);
 	shotgun->setPellets(6);
 	shotgun->setSpread(.3f);
-
-	//Match weapon level
-	if (projLevel != -1) shotgun->setProjectile(getPellet(projLevel));
-	else shotgun->setProjectile(getNinMil(level));
 
 	//L1H : Pellets+
 	if (level > 0) { shotgun->setPellets(8); }
@@ -722,8 +787,8 @@ void Weapon::Armory::upgradeShotgun(Weapon::SpreadMag* shotgun, int level, int p
 	//L2B : Spread-
 	if (level > 1) { shotgun->setSpread(.2f); }
 
-	//L3F : RefireTime-
-	if (level > 2) { shotgun->setResetTime(200); }
+	//L3F : ResetTime-
+	if (level > 2) { shotgun->setResetTime(100); }
 
 	//L4S : Mag+
 	if (level > 3) { shotgun->setMagSize(12, true); }
@@ -734,8 +799,8 @@ void Weapon::Armory::upgradeShotgun(Weapon::SpreadMag* shotgun, int level, int p
 	//L6B : Spread-
 	if (level > 5) { shotgun->setSpread(.15f); }
 
-	//L7F : RefireTime-
-	if (level > 6) { shotgun->setResetTime(100); }
+	//L7F : ReloadTime-
+	if (level > 6) { shotgun->setReloadTime(750); }
 
 	//L8S : Mag+
 	if (level > 7) { shotgun->setMagSize(16, true); }
@@ -746,6 +811,16 @@ void Weapon::Armory::upgradeWerfer(Weapon::SpreadBat* werfer, int level, int pro
 	//Match weapon level
 	if (projLevel > -1) werfer->setProjectile(getFlammen(projLevel));
 	else werfer->setProjectile(getFlammen(level));
+	werfer->setLevel(level);
+
+	//Set base attributes
+	werfer->setBatterySize(1600);
+	werfer->setRefireTime(50);
+	werfer->setRechargeTime(2000);
+	werfer->setAmount(8);
+	werfer->setAmountScale(0.5f);
+	werfer->setSpread(1.f);
+	werfer->setSpreadScale(0.5f);
 
 	//L1H : Amount+
 	if (level > 0) { werfer->setAmount(12); }
@@ -771,22 +846,158 @@ void Weapon::Armory::upgradeWerfer(Weapon::SpreadBat* werfer, int level, int pro
 	//L8S : AmountScale++
 	if (level > 7) { werfer->setAmountScale(0.75f);}
 }
-//
+
 void Weapon::Armory::upgradeCoilgun(Weapon::AutoBat* coilgun, int level, int projLevel)
 {
+	//Match weapon level
+	if (projLevel > -1) coilgun->setProjectile(getLaser(projLevel));
+	else coilgun->setProjectile(getLaser(level));
+	coilgun->setLevel(level);
 
+	//Set base attributes
+	coilgun->setBatterySize(1600);
+	coilgun->setRefireTime(150);
+	coilgun->setRechargeTime(1000);
+	coilgun->setFireCharge(40);
+
+	//L1H : RefireTime-
+	if (level > 0) { coilgun->setRefireTime(100); }
+
+	//L2B : BatterySize+
+	if (level > 1) { coilgun->setBatterySize(2400, true); }
+
+	//L3F : RechargeTime-
+	if (level > 2) { coilgun->setRechargeTime(500); }
+
+	//L4S : FireCharge-
+	if (level > 3) { coilgun->setFireCharge(20); }
+
+	//L5H : RefireTime--
+	if (level > 4) { coilgun->setRefireTime(50); }
+
+	//L6B : RechargeTime--
+	if (level > 5) { coilgun->setRechargeTime(250); }
+
+	//L7F : BatterySize++
+	if (level > 6) { coilgun->setBatterySize(3200, true); }
+
+	//L8S : FireCharge--
+	if (level > 7) { coilgun->setFireCharge(16); }
 
 }
-//
+
 void Weapon::Armory::upgradeRailgun(Weapon::SemiBat* railgun, int level, int projLevel)
 {
+	//Match weapon level
+	if (projLevel > -1) railgun->setProjectile(getSlug(projLevel));
+	else railgun->setProjectile(getSlug(level));
+	railgun->setLevel(level);
+
+	//Set base attributes
+	railgun->setBatterySize(1280);
+	railgun->setChargeAmount(8);
+	railgun->setDischargeAmount(16);
+
+	//L1H : Discharge+
+	if (level > 0) { railgun->setDischargeAmount(24); }
+
+	//L2B : Charge+
+	if (level > 1) { railgun->setChargeAmount(12); }
+
+	//L3F : Battery-
+	if (level > 2) { railgun->setBatterySize(960); }
+
+	//L4S : Charge++
+	if (level > 3) { railgun->setChargeAmount(16); }
+
+	//L5H : Battery--
+	if (level > 4) { railgun->setBatterySize(800); }
+
+	//L6B : Discharge++
+	if (level > 5) { railgun->setDischargeAmount(32); }
+
+	//L7F : Discharge++
+	if (level > 6) { railgun->setDischargeAmount(48); }
+
+	//L8S : Charge++
+	if (level > 7) { railgun->setChargeAmount(24); }
 
 }
-//
-void Weapon::Armory::upgradeThumper(Weapon::SemiMag* thumper, int level, int projLevel)
+
+void Weapon::Armory::upgradeThumper(Weapon::SpreadMag* thumper, int level, int projLevel)
 {
+	//Match weapon level
+	if (projLevel > -1) thumper->setProjectile(getGrenade(projLevel));
+	else thumper->setProjectile(getGrenade(level));
+	thumper->setLevel(level);
+
+	//Set base attributes
+	thumper->setMagSize(6, true);
+	thumper->setResetTime(750);
+	thumper->setReloadTime(1500);
+	thumper->setPellets(1);
+	thumper->setSpread(0.1f);
+
+	//L1H : ResetTime-
+	if (level > 0) { thumper->setResetTime(500); }
+
+	//L2B : ReloadTime-
+	if (level > 1) { thumper->setReloadTime(1000); }
+
+	//L3F : Spread-
+	if (level > 2) { thumper->setSpread(0.05f); }
+
+	//L4S : ResetTime--
+	if (level > 3) { thumper->setResetTime(300); }
+
+	//L5H : Magsize+
+	if (level > 4) { thumper->setMagSize(12, true); }
+
+	//L6B : ReloadTime--
+	if (level > 5) { thumper->setReloadTime(730); }
+
+	//L7F : Pellets+
+	if (level > 6) { thumper->setPellets(3); thumper->setSpread(0.1f); }
+
+	//L8S : ReloadTime---
+	if (level > 7) { thumper->setReloadTime(500); }
+
 }
-//
+
 void Weapon::Armory::upgradeLauncher(Weapon::SemiMag* launcher, int level, int projLevel)
 {
+	//Match weapon level
+	if (projLevel > -1) launcher->setProjectile(getRocket(projLevel));
+	else launcher->setProjectile(getRocket(level));
+	launcher->setLevel(level);
+
+	//Set base attributes
+	launcher->setMagSize(4, true);
+	launcher->setResetTime(800);
+	launcher->setReloadTime(3000);
+
+	//L1H : ReloadTime-
+	if (level > 0) { launcher->setReloadTime(2500); }
+
+	//L2B : ResetTime-
+	if (level > 1) { launcher->setResetTime(600); }
+
+	//L3F : Magsize+
+	if (level > 2) { launcher->setMagSize(8, true); }
+	
+	//L4S : ReestTime--
+	if (level > 3) { launcher->setResetTime(400); }
+
+	//L5H : Magsize++
+	if (level > 4) { launcher->setMagSize(12, true); }
+
+	//L6B : Reloadtime--
+	if (level > 5) { launcher->setReloadTime(2000); }
+
+	//L7F : Magsize+++
+	if (level > 6) { launcher->setMagSize(16, true); }
+
+	//L8S : ReloadTime--
+	if (level > 7) { launcher->setReloadTime(1500); }
+
 }

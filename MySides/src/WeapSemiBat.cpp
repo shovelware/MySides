@@ -1,4 +1,4 @@
-#include "..\include\WeapSemiBat.hpp"
+#include "WeapSemiBat.hpp"
 
 Weapon::SemiBat::SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::string id) :
 	WeaponI(callback, ammo, id),
@@ -12,7 +12,7 @@ Weapon::SemiBat::SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::str
 Weapon::SemiBat::SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::string id,
 	int batterySize, int chargeAmount, int dischargeAmount) :
 	WeaponI(callback, ammo, id),
-	battery_(batterySize,false),
+	battery_(batterySize, false),
 	chargeAmount_(dischargeAmount),
 	dischargeAmount_(dischargeAmount),
 	primed_(true)
@@ -22,7 +22,7 @@ Weapon::SemiBat::SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::str
 void Weapon::SemiBat::reup(bool instant)
 {
 	//No reload
-	if (instant)
+	if (instant && primed_ == false)
 	{
 		battery_.empty();
 		primed_ = true;
@@ -85,19 +85,19 @@ void Weapon::SemiBat::setChargeAmount(int amount)
 	chargeAmount_ = (amount > 0 ? amount : chargeAmount_);
 }
 
-void Weapon::SemiBat::setdisChargeAmount(int amount)
+void Weapon::SemiBat::setDischargeAmount(int amount)
 {
 	dischargeAmount_ = (amount > 0 ? amount : dischargeAmount_);
 }
 
 int Weapon::SemiBat::getBar() const
 {
-	return battery_.getCharge();
+	return battery_.getPercent();
 }
 
 int Weapon::SemiBat::getBarMAX() const
 {
-	return battery_.getChargeMAX();
+	return 100;
 }
 
 void Weapon::SemiBat::fire(b2Vec2 & heading)

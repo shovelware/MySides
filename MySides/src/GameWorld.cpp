@@ -19,6 +19,14 @@ GameWorld::GameWorld() :
 	fireWeap_ = [this](std::vector<ProjectileDef>& defs, std::string id) { fireWeapon(defs, id); };
 	addForce_ = [this](b2Vec2 pos, float force, float radius, int time) { addForce(pos, force, radius, time); };
 
+	
+	boundsFriction_.localAnchorA = (b2Vec2(0, 0));
+	boundsFriction_.localAnchorB = (b2Vec2(0, 0));
+	boundsFriction_.bodyB = bounds_->getBody();
+	boundsFriction_.maxForce = 0.0025f;
+	boundsFriction_.maxTorque = 0.05f;
+	boundsFriction_.collideConnected = false;
+
 	//armory
 	armory_ = new Weapon::Armory(fireWeap_);
 
@@ -84,21 +92,6 @@ b2Body * GameWorld::addDynamicBody(const b2Vec2& pos)
 	//Create body using world's factory
 	b2Body* body = CreateBody(&bodyDef);
 
-	//Dynamic bodies have friction with bounds
-	b2FrictionJointDef fric;
-	fric.localAnchorA = (b2Vec2(0, 0));
-	fric.localAnchorB = (b2Vec2(0, 0));
-
-	fric.bodyA = body;
-	fric.bodyB = bounds_->getBody();
-
-	fric.maxForce	= 0.0001f;
-	fric.maxTorque = 0.0005f;
-
-	fric.collideConnected = false;
-
-	CreateJoint(&fric);
-
 	return body;
 }
 
@@ -155,7 +148,7 @@ void GameWorld::popInside(Entity * ent)
 		//ent->setPosition(between);
 
 		//Push inside
-		between *= 0.005f;
+		between *= 0.5f;
 		
 		ent->getBody()->ApplyForceToCenter(-between, true);
 	}
@@ -164,101 +157,89 @@ void GameWorld::popInside(Entity * ent)
 //Spawn a random enemy
 void GameWorld::spawnEnemy()
 {
+	std::string c[9];
+	c[0] = "pistol";
+	c[1] = "rifle";
+	c[2] = "shotgun";
+	c[3] = "coilgun";
+	c[4] = "cannon";
+	c[5] = "werfer";
+	c[6] = "railgun";
+	c[7] = "thumper";
+	c[8] = "launcher";
+
 	for (int i = 0; i < spawns_; ++i)
 	{
 		b2Vec2 pos;
+		float minRad = getBoundsRadius() * 0.4f;
 		float rad = getBoundsRadius() * 0.9f;
 		pos.y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
 		pos.x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
-
-		pos *= rad;
-
-		addEnemy(pos);
+	
+		pos *= randFloat(minRad, rad);
+	
+		ShapeDef enem = ShapeDef(pos, pos, randFloat(3, 6));
+		enem.hpScale = randFloat(2, 5);
+		enem.size = randFloat(0.5f, 1.5f);
+		enem.upgrade = false;
+		enem.colPrim = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
+		enem.colSecn = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
+		enem.colTert = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
+	
+		Weapon::WeaponI* weap = armory_->requisition(c[(int)std::floor(randFloat(0, 9))], (int)std::floor(randFloat(0, 4)));
+		
+		addEnemy(enem, weap);
 	}
 }
 
 //Adds a player to the world 
-void GameWorld::addPlayer(const b2Vec2& pos, bool control)
+void GameWorld::addPlayer(const ShapeDef& def, Weapon::WeaponI* weapon)
 {
-	ShapeDef play = ShapeDef(pos, b2Vec2(0, -1), 6);
+	if (player_ != nullptr) 
+		removePlayer();
 	
-	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
-	play.colSecn = b2Color(0.f, 1.f, 1.f);
-	play.colTert = b2Color(1.f, 0.f, 0.f);
-	play.hpScale = 10;
-
-	if (player_ != nullptr)
+	if (def.isValid())
 	{
-		delete player_;
+		b2Body* body = addDynamicBody(def.position);
+
+		//Shapes have friction with bounds
+		boundsFriction_.bodyA = body;
+		CreateJoint(&boundsFriction_);
+		boundsFriction_.bodyA = nullptr;
+
+		player_ = new Player(body, def, addSide_);
+		pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), -1, 5.f, 3.f));
+		pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), -1, 15.f, 1.f));
+		addPickup(Pickup::Type::SIGHT, def.position, -1, 32.f);
+		audio_.playSFX("spawn", B2toSF(b2Vec2_zero, true));
+
+		if (weapon != nullptr)
+			armShape(player_, weapon);
 	}
 
-	player_ = new Player(addDynamicBody(pos), play, addSide_);	
-	addPickup(Pickup::Type::ATTRACT, pos, -1, 7.5f);
-	addPickup(Pickup::Type::ATTRACT, pos, -1, 15.f);
-
-	if (control)
-	{
-		//Set our control to the one we just put in
-		controlled_ = player_;
-		Weapon::WeaponI* newWeap = armory_->getWerfer(0);
-		armShape(player_, newWeap);
-	}
-}
-
-//Adds a basic enemy to the world
-void GameWorld::addEnemy(const b2Vec2& pos)
-{
-	//Push the shape into the shape vector
-	//AND add body to world with function
-	ShapeDef enem = ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
-	//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
-	enem.size = .5f;
-	enem.speedScale = .5f;
-	enem.hpScale = 5;
-
-	enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
-	enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
-	enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.1f, 0.3f), randFloat(0.1f, 0.3f));
-
-	shapes_.push_back(new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_));
-
-	Shape* added = *(--shapes_.end());
-
-	ProjectileDef newDef = armory_->getBullet();
-	newDef.velScale = 0.5f;
-	newDef.damage = 1;
-	newDef.width = 1.f;
-	newDef.hpMAX = 1;
-	//newDef.lifeTime = 100;
-
-	//Weapon::WeaponI* newWeap;
-	//
-	//if (coinFlip())
-	//{
-	//	weapons_.push_back(new Weapon::Shotgun(fireWeap_, newDef));
-	//}
-	//
-	//else
-	//{
-	//	weapons_.push_back(new Weapon::Rifle(fireWeap_, newDef));
-	//}
-	//
-	//newWeap = (*--weapons_.end());
-	//added->arm(newWeap);
-
-	audio_.playSFX("spawn", B2toSF(pos, true));
-
-	enemies++;
+	controlled_ = player_;
 }
 
 void GameWorld::addEnemy(const ShapeDef& def, Weapon::WeaponI* weapon)
 {
-	shapes_.push_back(new Enemy(addDynamicBody(def.position), def, addSide_, getControlled_));
-	
-	//p. sure this is broke
-	if (weapon != nullptr)
+	if (def.isValid())
 	{
-		armShape((*--shapes_.end()), weapon);
+		b2Body* body = addDynamicBody(def.position);
+
+		//Shapes have friction with bounds
+		boundsFriction_.bodyA = body;
+		CreateJoint(&boundsFriction_);
+		boundsFriction_.bodyA = nullptr;
+
+		Enemy* enem = new Enemy(body, def, addSide_, getControlled_);
+
+		//p. sure this is broke
+		if (weapon != nullptr)
+			armShape(enem, weapon);
+
+		shapes_.push_back(enem);
+
+		enemies++;
 	}
 }
 
@@ -271,7 +252,9 @@ void GameWorld::addProjectile(const ProjectileDef& def)
 //Adds a side to game world via definition
 void GameWorld::addSide(const SideDef& def)
 {
-	sides_.push_back(new Side(addDynamicBody(def.position), def));
+	b2Body* body = addDynamicBody(def.position);
+
+	sides_.push_back(new Side(body, def));
 	
 	audio_.playSFX("drop", B2toSF(def.position, true));
 
@@ -339,7 +322,7 @@ void GameWorld::addForce(b2Vec2 pos, float force, float radius, int lifetime)
 	forces_.push_back(new Force(addStaticBody(pos), force, radius, lifetime));
 }
 
-void GameWorld::armShape(Shape * shape, Weapon::WeaponI * weapon)
+void GameWorld::armShape(Shape* shape, Weapon::WeaponI * weapon)
 {
 	if (weapon != nullptr)
 	{
@@ -348,7 +331,7 @@ void GameWorld::armShape(Shape * shape, Weapon::WeaponI * weapon)
 	}
 }
 
-void GameWorld::disarmShape(Shape * shape)
+void GameWorld::disarmShape(Shape* shape)
 {
 	shape->disarm();
 }
@@ -375,8 +358,9 @@ void GameWorld::removePlayer()
 
 	if (player_ != nullptr)
 	{
-		//Play loss sound at position
-		audio_.playSFX("loss", B2toSF(player_->getPosition(), true));
+		//Play loss sound at position if we're dead
+		if (player_->getAlive() == false)
+			audio_.playSFX("loss", B2toSF(player_->getPosition(), true));
 
 		cleanPickups(player_);
 		DestroyBody(player_->getBody());
@@ -413,7 +397,7 @@ void GameWorld::removeProjectile(Projectile* p)
 	//If we need to explode
 	if (p->getForce().first != 0 && p->getForce().second != 0)
 	{
-		addForce(p->getPosition(), p->getForce().first, p->getForce().second, 50);
+		addForce(p->getPosition(), p->getForce().first, p->getForce().second, 100);
 	}
 
 	DestroyBody(p->getBody());
@@ -457,10 +441,14 @@ void GameWorld::resetLevel()
 	spawnTime_ = 15000;
 
 	bounds_->setSecondary(b2Color(0, 0, 0, 1));
-	//Add a new player
-	addPlayer(b2Vec2_zero, true);
 
-	audio_.playSFX("spawn", B2toSF(b2Vec2_zero, true));
+	//Add a new player
+	ShapeDef play = ShapeDef(b2Vec2_zero, b2Vec2(0, -1), 6);
+	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
+	play.colSecn = b2Color(0.f, 1.f, 1.f);
+	play.colTert = b2Color(1.f, 0.f, 0.f);
+	addPlayer(play);
+
 	spawns_ = 1;
 
 	//Restart bgm
@@ -517,12 +505,19 @@ void GameWorld::clearWorld(bool clearPlayer)
 	if (pickups_.empty() == false)
 	{
 		for (std::list<Pickup::PickupI*>::iterator p = pickups_.begin();
-		p != pickups_.end(); p = pickups_.erase(p))
+		p != pickups_.end(); )
 		{
-			removePickup((*p));
+			if (!clearPlayer && (*p)->getOwner() == player_)
+			{
+				++p;
+				continue;
+			}
+
+			removePickup((*p)); 
+			p = pickups_.erase(p);
 		}
 	}
-	pickups_.clear();
+	if (clearPlayer) pickups_.clear();
 
 	if (forces_.empty() == false)
 	{
@@ -627,6 +622,8 @@ void GameWorld::update(int dt)
 {
 	if (!pause_)
 	{
+		Step(dt, VELOCITY_ITERS, POSITION_ITERS);
+
 		updatePlayer(dt);
 		updateEnemy(dt);
 		updateProjectile(dt);
@@ -635,7 +632,6 @@ void GameWorld::update(int dt)
 		updateForce(dt);
 		updateLevel(dt);
 
-		Step(dt, VELOCITY_ITERS, POSITION_ITERS);
 		
 		//Sound
 		if (player_ != nullptr && player_->getCollected())
@@ -727,7 +723,7 @@ void GameWorld::updateProjectile(int dt)
 
 			bool inside = prj->getPosition().Length() < bounds_->getRadius();
 			//If we're not active, increment by deleting
-			if (!inside || prj->getActive() == false)
+			if (prj->getActive() == false || !inside)
 			{
 				removeProjectile(prj);
 
@@ -960,9 +956,9 @@ void GameWorld::reup()
 	}
 }
 
-void GameWorld::bomb()
+void GameWorld::bomb(bool nuke)
 {
-	if (player_ != nullptr)
+	if (!nuke && player_ != nullptr)
 	{
 		if (player_->getBombReady())
 		{
@@ -994,34 +990,63 @@ void GameWorld::bomb()
 			player_->bomb();
 		}
 	}
+
+	else if (nuke = true)
+	{
+		//Explode shapes
+		if (shapes_.empty() == false)
+		{
+			for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
+			shapeIt != shapes_.end(); ++shapeIt)
+			{
+					(*shapeIt)->explode();
+			}
+		}
+
+		//Baleet projectiles
+		if (projectiles_.empty() == false)
+		{
+			for (std::list<Projectile*>::iterator projIt = projectiles_.begin();
+			projIt != projectiles_.end(); ++projIt)
+			{
+				(*projIt)->setActive(false);
+			}
+		}
+
+		audio_.playSFX("bomb", B2toSF(player_->getPosition(), true));
+	}
 }
 
 void GameWorld::f1()
 {
-	//Testing projectile levels
+	//Testing Weapon levels
+	int nom = 0;
+	for (char c : dstr)
+	{
+		char x = c;
+		nom += x;
+	}
+
+	nom = nom % 255;
+	//std::cout << nom / 255.f << std::endl;
 	for (int i = 0; i < 8; ++i)
 	{
-		ShapeDef enem = ShapeDef(b2Vec2(-20 + 5 * i, 15), b2Vec2(0, -1), i);
+		ShapeDef enem = ShapeDef(b2Vec2(-20 + 5 * i, 15), b2Vec2(0, -1), std::max(i, 3));
 		
-		float e =  1 - i * (1 / 8.f);
-		float s =  1 - i * (1 / 16.f);
-		float t =  1 - i * (1 / 32.f);
 
-		enem.colPrim = b2Color(e, e, e);
-		enem.colSecn = b2Color(s, s, s);
-		enem.colTert = b2Color(t, t, t);
+		float e = (nom / 255.f) - i * 3 * (nom / 255);
+		float s = 1 - i * (nom / 255.f);
+		float t = (nom / 255.f) - i * 0.5f * (nom / 255);
 
-		ProjectileDef newDef = armory_->getPellet(i);
-		newDef.damage = 0;
-
-		Enemy* added = new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_);
-
-		std::string wn = "pistol";
+		enem.colPrim = b2Color(e, 0.5, e);
+		enem.colSecn = b2Color(s, s, 0);
+		enem.colTert = b2Color(1, 0, t);
+		
+		std::string wn = dstr;
 
 		Weapon::WeaponI* newWeap = armory_->requisition(wn, i);
 
-		armShape(added, newWeap);
-		shapes_.push_back(added);
+		addEnemy(enem, newWeap);
 	}
 }
 
@@ -1044,7 +1069,9 @@ void GameWorld::f3()
 }
 
 void GameWorld::f4()
-{}
+{
+	spawnEnemy();
+}
 
 void GameWorld::f5()
 {
@@ -1086,15 +1113,62 @@ void GameWorld::f8()
 
 void GameWorld::f9()
 {
-	if (player_ != nullptr)
-		player_->takeDamage(1, b2Vec2(0, -20));
-	
+	b2Vec2 centre (0, 0);
+	b2Vec2 pos(0, 0);
+	float radius = 20.f;
+	ShapeDef def;
+	int groups = 8;
+	int shapes = 10;
+
+	//for 4 sizes
+	for (float i = 1; i <= groups; ++i)
+	{
+		centre.y = radius * (cos((M_PI * 2) / groups * i));
+		centre.x = radius * (-sin((M_PI * 2) / groups * i));
+
+		//for 5 shape sizes
+		for (float j = 3, max = shapes + 2; j <= max; ++j)
+		{
+			float ang = atan2f(centre.y, centre.x);
+			pos.y = (radius / 4.f) * (cos((M_PI * 2)/ max * j));
+			pos.x = (radius / 4.f) * (-sin((M_PI * 2)/ max * j));
+			
+			def.position = centre + pos;
+			def.heading =  pos + centre;
+			def.size = i * 0.25f;
+
+			def.vertices = (j < shapes ? j : 3 + (int)j % shapes);
+			def.hpScale = 5 * i;
+			def.colPrim = (b2Color(0.2f * i, 0.1f * j, 1.f - j / 10));
+			def.colSecn = (b2Color(0.2f * j, 0.1f * (i / j), 0.05f * (i + j)));
+			def.colTert = (b2Color(0.1f * i, 0.3f * i, 1.f * (j - i)));
+
+			addEnemy(def);
+		}
+	}
 }
 
 void GameWorld::f0()
 {
-	if (player_ != nullptr)
-		player_->collect(1);
+	float x, y, rad = getBoundsRadius() * 0.7f;
+	y = -(cos((2 * M_PI) * 64 / randFloat(0, 64)));
+	x = -(sin((2 * M_PI) * 64 / randFloat(0, 64)));
+
+	b2Vec2 pos(x, y);
+	pos.Normalize();
+	pos *= randFloat(10, rad);
+
+	ShapeDef enem = ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
+	//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
+	enem.size = .5f;
+	enem.speedScale = .5f;
+	enem.hpScale = 5;
+
+	enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
+	enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
+	enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.1f, 0.3f), randFloat(0.1f, 0.3f));
+
+	addEnemy(enem);
 }
 
 void GameWorld::testBed()

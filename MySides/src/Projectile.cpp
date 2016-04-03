@@ -63,7 +63,7 @@ void Projectile::setAsCircle(b2Vec2 size, float bounce = 0.f, bool ghost = false
 
 	//End box2d setup
 	 
-	speed_ = 0.00025f * M_PI * size.x * size.x;
+	speed_ = 0.0025f * M_PI * size.x * size.x;
 }
 
 void Projectile::setAsRect(b2Vec2 size, float bounce = 0.f, bool ghost = false)
@@ -86,12 +86,12 @@ void Projectile::setAsRect(b2Vec2 size, float bounce = 0.f, bool ghost = false)
 
 	//End box2d setup
 	body_->SetTransform(body_->GetPosition(), atan2f(-heading_.x, heading_.y));
-	speed_ = 0.00025f * (size.x * size.y);
+	speed_ = 0.0025f * (size.x * size.y);
 }
 
 void Projectile::addMaterial(b2FixtureDef & def, float bounce)
 {
-	def.density = 0.5f;
+	def.density = 50.0f;
 	def.friction = 0.0f;
 	def.restitution = bounce;
 }
@@ -118,7 +118,7 @@ void Projectile::takeDamage(unsigned int damage)
 {
 	hp_ -= damage;
 	if (hp_ <= 0)
-		active_ = false;
+		alive_ = false;
 }
 
 int Projectile::getDamage() const
@@ -159,32 +159,37 @@ void Projectile::update(int milliseconds)
 {
 	lifeTime_ -= milliseconds;
 
-	if (fired_)
+	if (alive_)
 	{
-		//body_->ApplyForce(heading_, body_->GetWorldCenter(), true);
-	}
-	b2Vec2 vel = body_->GetLinearVelocity();
+		if (fired_)
+		{
+			//body_->ApplyForce(heading_, body_->GetWorldCenter(), true);
+		}
 
-	if (penetration_ < 0)
-	{
-		body_->GetFixtureList()->SetSensor(false);
-	}
-	body_->SetTransform(body_->GetPosition(), atan2f(-vel.x, vel.y));
+		b2Vec2 vel = body_->GetLinearVelocity();
 
-	//std::cout << body_->GetLinearVelocity().Length();
+		if (penetration_ < 0)
+		{
+			body_->GetFixtureList()->SetSensor(false);
+		}
+		body_->SetTransform(body_->GetPosition(), atan2f(-vel.x, vel.y));
 
-	if (vel.Length() <= 0 || hp_ <= 0 || lifeTime_ <= 0)
-	{
-		alive_ = false;
-		active_ = false;		
+		//std::cout << body_->GetLinearVelocity().Length();
+
+		if (vel.Length() <= 0 || hp_ <= 0 || lifeTime_ <= 0)
+		{
+			alive_ = false;
+		}
 	}
+
+	else active_ = false;
 }
 
 bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 {
 	bool handled = false;
 
-	if (tag == "shape")////
+	if (tag == "player" || tag == "enemy" || tag == "shape")////
 	{
 		Shape* shape = static_cast<Shape*>(other);
 		//Projectiles do not hurt their owner
@@ -209,8 +214,10 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 					body_->SetLinearVelocity(vel);
 
 				}
-
 			}
+
+			if (alive_ == false)
+				contact.SetEnabled(false);
 		}
 
 		else contact.SetEnabled(false);
@@ -228,6 +235,8 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 			if (--penetration_ < 0)
 			{
 				takeDamage(proj->getDamage());
+				if (alive_ == false)
+					contact.SetEnabled(false);
 			}
 
 
@@ -237,6 +246,12 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 		//Else we must have same owner, do not interact
 		else contact.SetEnabled(false);
 
+		handled = true;
+	}
+
+	else if (tag == "pickup")
+	{
+		contact.SetEnabled(false);
 		handled = true;
 	}
 

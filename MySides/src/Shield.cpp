@@ -14,11 +14,12 @@ Pickup::Shield::Shield(b2Body* body, int time, float strength) :
 void Pickup::Shield::onCollect()
 {
 	body_->DestroyFixture(body_->GetFixtureList());
-
+	b2Body* ownerBody = owner_->getBody();
+	body_->SetTransform(ownerBody->GetPosition(), ownerBody->GetAngle());
+	
 	//Usual box2d setup
 	b2FixtureDef def;
 	def.userData = "shield";
-
 	def.density = 0.f;
 	def.friction = 0.f;
 	def.restitution = 0.f;
@@ -26,23 +27,18 @@ void Pickup::Shield::onCollect()
 
 	body_->SetFixedRotation(false);
 	
-	b2RevoluteJointDef rev;
-	rev.localAnchorA = b2Vec2(0, 0);
-	rev.localAnchorB = b2Vec2(0, 0);
-	
-
-	rev.bodyA = body_;
-	rev.bodyB = owner_->getBody();
-	
-	rev.collideConnected = false;
-
-	body_->GetWorld()->CreateJoint(&rev);
-
 	b2CircleShape shape;
 	shape.m_radius = owner_->getSize() * 2.f;
-
 	def.shape = &shape;
 
+	b2RevoluteJointDef dis;
+	dis.localAnchorA = b2Vec2(0, 0);
+	dis.localAnchorB = b2Vec2(0, 0);
+	dis.bodyA = body_;
+	dis.bodyB = owner_->getBody();
+	dis.collideConnected = false;
+
+	body_->GetWorld()->CreateJoint(&dis);
 	body_->CreateFixture(&def);
 
 	collected_ = true;
@@ -53,7 +49,7 @@ bool Pickup::Shield::collide(Entity* other, b2Contact& contact, std::string tag)
 
 	bool handled = false;
 
-	if (tag == "shape")
+	if (tag == "player" || tag == "enemy")
 	{
 		if (!collected_)
 		{
@@ -85,7 +81,16 @@ bool Pickup::Shield::collide(Entity* other, b2Contact& contact, std::string tag)
 	
 		handled = true;
 	}
-	
+
+	else if (tag == "pickup")
+	{
+		contact.SetEnabled(false);
+	}
+
+	else if (tag == "shield")
+	{
+		contact.SetEnabled(false);
+	}
 	return handled;
 }
 
@@ -108,7 +113,7 @@ void Pickup::Shield::update(int milliseconds)
 
 		//Edge case where projectile is in shield radius on collect and kills you after pickup
 		else {
-			time_ == 0;
+			time_ = 0;
 		}
 	}
 

@@ -46,12 +46,8 @@ public:
 	Shape* getControlled();
 	bool hasControlled();
 
-	//These should go soon
-	void addPlayer(const b2Vec2& pos, bool control);
-	void addEnemy(const b2Vec2& pos);
-
 	//Spawning works off definitions
-	void addPlayer(const ShapeDef& def);
+	void addPlayer(const ShapeDef& def, Weapon::WeaponI* weapon = nullptr);
 	void addEnemy(const ShapeDef& def, Weapon::WeaponI* weapon = nullptr);
 	void addProjectile(const ProjectileDef& def);
 	void addSide(const SideDef& def);
@@ -76,7 +72,6 @@ public:
 	void fireWeapon(std::vector<ProjectileDef>& defs, std::string id);
 
 	std::function<Shape*()> getControlled_;
-
 
 	//void loadLevel();
 	//b2Vec2 randomPos(); //On a circle, in an arc, from centre, whatever, reuse code test stuff
@@ -126,27 +121,11 @@ public:
 	int getHapticL() const;
 	int getHapticR() const;
 
-	////TEMP
-	void PutEnemy() 
-	{
-		float x, y, rad = getBoundsRadius() * 0.7f;
-		//y = -(cos((2 * M_PI) * 64 / randFloat(0, 64)));
-		//x = -(sin((2 * M_PI) * 64 / randFloat(0, 64)));
-		x = randFloat(-0.25f, 0.25f);
-		y = randFloat(-1, 0);
-
-		b2Vec2 pos(x, y);
-		pos.Normalize();
-		pos *= randFloat(10, rad);
-
-		addEnemy(pos);
-	}
-
 	//////SPRINT 3 SLINGING
 	int hiSides;
 	unsigned int hiTime;
 
-	void bomb();
+	void bomb(bool nuke = false);
 
 	int enemies;
 	int freesides;
@@ -175,6 +154,7 @@ private:
 	const int VELOCITY_ITERS = 6;
 	const int POSITION_ITERS = 2;
 	ContactListener contactListener_;
+	b2FrictionJointDef boundsFriction_;
 	
 	//Passthroughs
 	bool pause_;

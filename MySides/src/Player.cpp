@@ -9,6 +9,8 @@ Player::Player(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callba
 	bombTime_(0),
 	bombRange_(15)
 {
+	body_->GetFixtureList()->SetUserData("player");
+	shapeFixDef_.userData = "player";
 }
 
 //Only deals with the effects of this collision on this entity
@@ -23,6 +25,9 @@ bool Player::collide(Entity * other, b2Contact& contact, std::string tag)
 		if (proj->getOwner() != this)
 		{
 			takeDamage(proj->getDamage(), proj->getDirection());
+
+			if (alive_ == false)
+				contact.SetEnabled(false);
 		}
 
 		else contact.SetEnabled(false);

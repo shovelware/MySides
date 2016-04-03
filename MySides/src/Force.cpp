@@ -37,11 +37,11 @@ bool Force::collide(Entity* other, b2Contact& contact, std::string tag)
 {
 	bool handled = true;
 
-	if (tag == "shape" || tag == "projectile" || tag == "pickup" )
+	if (tag == "enemy"  || tag == "player" || tag == "pickup" || tag == "side")
 	{
 		b2Vec2 dir = other->getPosition() - body_->GetPosition();
 		dir.Normalize();
-		dir *= 0.01 * force_;
+		dir *= 10.f * force_ ;
 
 		other->getBody()->ApplyForceToCenter(dir, true);
 	}

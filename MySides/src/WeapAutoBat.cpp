@@ -2,12 +2,12 @@
 			
 Weapon::AutoBat::AutoBat(fireFunc& callback, ProjectileDef const &ammo, std::string id) :
 	WeaponI(callback, ammo, id),
-	battery_(2000),
+	battery_(1600),
 	refireTime_(0),
-	refireTimeMAX_(100),
+	refireTimeMAX_(150),
 	rechargeTime_(0),
-	rechargeTimeMAX_(500),
-	fireCharge_(30)
+	rechargeTimeMAX_(1000),
+	fireCharge_(40)
 {
 }
 

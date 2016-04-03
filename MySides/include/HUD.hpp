@@ -14,9 +14,13 @@ public:
 	void drawShapeStatus(sf::FloatRect box);
 	void drawWeaponStatus(sf::FloatRect box);
 	void drawSideStatus(sf::FloatRect box);
+
+	void drawDebugStatus(sf::FloatRect box);
 	
 	void loadFont(std::string filename, unsigned int size);
 	void drawString(sf::FloatRect box, std::string info, sf::Color col = sf::Color::Green, float sizeScale = 1.f);
+	void drawStringLeft(sf::FloatRect box, std::string info, sf::Color col = sf::Color::Green, float sizeScale = 1.f);
+	void drawStringRight(sf::FloatRect box, std::string info, sf::Color col = sf::Color::Green, float sizeScale = 1.f);
 private:
 	void drawBar(sf::FloatRect box, float min, float max, sf::Color fill, sf::Color back, sf::Color outline, int line = 2);
 	void drawRect(sf::FloatRect rect, sf::Color fill, sf::Color out = sf::Color::Black, int dent = 0);

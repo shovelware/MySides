@@ -62,8 +62,6 @@ public:
 	b2Color colSecn;
 	b2Color colTert;
 
-	//Entity* parent;//???	
-
-	bool isValid() { return (2 < vertices && vertices < 9); }
+	bool isValid() const { return (2 < vertices && vertices < 9); }
 };
 #endif

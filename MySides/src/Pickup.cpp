@@ -10,8 +10,8 @@ Pickup::PickupI::PickupI(b2Body* body, int time) :
 	b2FixtureDef def;
 	def.userData = "pickup";
 
-	def.density = 1.0f;
-	def.friction = 0.8f;
+	def.density = 0.25f;
+	def.friction = 0.4f;
 	def.restitution = 1.f;
 	def.isSensor = true;
 

@@ -55,6 +55,7 @@ public:
 	Weapon::WeaponI* getWeapon() const;//???
 	bool getWeaponReady() const;
 	bool getWeaponLoading() const;
+	int getWeaponLevel() const;
 	void trigger(b2Vec2& direction);
 	void release();
 	void reup();

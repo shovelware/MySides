@@ -27,8 +27,9 @@ Side::Side(b2Body * body, const SideDef& def) :
 	body_->ApplyLinearImpulse(impulse, body_->GetWorldCenter(), true);
 
 	bool dir = coinFlip();
-	body_->SetAngularVelocity(randFloat(0.035f, 0.037f) * (dir ? 1 : -1));
-	body_->SetAngularDamping(randFloat(0.0001f, 0.0003f));
+	body_->SetAngularVelocity(randFloat(0.35f, 0.37f) * (dir ? 1 : -1));
+	body_->SetAngularDamping(randFloat(0.01f, 0.03f));
+	body_->SetLinearDamping(randFloat(0.01f, 0.03f));
 
 	//Color data
 	colPrim_ = def.colPrim;
@@ -47,7 +48,7 @@ void Side::setShape(float size)
 
 	body_->CreateFixture(&lineDef);
 
-	lineDef.density = 1.0f;
+	lineDef.density = 5.0f;
 	lineDef.friction = 0.0f;
 	lineDef.restitution = 1.0f;
 
@@ -86,12 +87,15 @@ float Side::getTimer() const
 void Side::update(int milliseconds)
 {
 	lifeTime_ -= milliseconds;
-
-	if (lifeTime_ <= 0)
+	if (alive_)
 	{
-		alive_ = false;
-		active_ = false;
+		if (lifeTime_ <= 0)
+		{
+			alive_ = false;
+		}
 	}
+
+	else active_ = false;
 }
 
 bool Side::collide(Entity* other, b2Contact& contact, std::string tag)

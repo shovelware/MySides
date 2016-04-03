@@ -79,7 +79,7 @@ void HUD::drawShapeStatus(sf::FloatRect box)
 				drawRect(uhpRect, s);
 		}
 		//drawRect(topBox + );
-		//drawString(box, std::to_string((int)(hp + uhp)), tex, 1.75f);
+		drawString(box, std::to_string((int)(hp + uhp)), tex, 1.75f);
 	}
 }
 
@@ -92,18 +92,40 @@ void HUD::drawWeaponStatus(sf::FloatRect box)
 		float min = c->getWeaponBar();
 		float max = c->getWeaponBarMAX();
 		bool ready = c->getWeaponReady();
+		bool loading = c->getWeaponLoading();
+		int level = c->getWeaponLevel();
 
 		sf::Color p = B2toSF(c->getPrimary());
 		sf::Color s = B2toSF(c->getSecondary());
 		sf::Color t = B2toSF(c->getTertiary());
 		
-		drawBar(box, min, max, t, p, s);
+		int dent = 2;
+		//
+		drawRect(box, p, s, -dent);
+		if (max < box.width - (max - 1));
+		else {
+			sf::FloatRect barBox(box.left + dent, box.top + dent, box.width - dent * 2, box.height - dent * 2);
+			barBox.width *= (min / max);
+			drawRect(barBox, s);
+		}
 
-		sf::Color txt(s);
-		if (!ready)
-			txt = p;
+		//drawBar(box, min, max, t, p, s);
+
+		sf::Color txt(p);
+		if (loading)
+			txt = t;
+		else if (ready)
+			txt = s;
 
 		drawString(box, std::to_string((int)min), txt, 2.f);
+		sf::FloatRect eighthBox(box.left, box.height + (box.height / 2), box.width / 8, box.height / 8);
+		//int powlv = pow(level, 2);
+		//if (level > 8) powlv = level; //Special weapons have special levels
+		//std::string lvlstr = std::string("V" + std::to_string(powlv % 10 > 1 ? powlv / 10 : 0) + "." + std::to_string(powlv % 10));
+		//lvlstr = std::to_string(powlv);
+		int lv = (level < 10 ? level * 10 : level);
+		std::string lvlstr = std::to_string(lv / 10) + "." + std::to_string(lv % 10);
+		drawString(eighthBox, lvlstr, t, 1.f);
 	}
 }
 
@@ -125,6 +147,15 @@ void HUD::drawSideStatus(sf::FloatRect box)
 	}
 }
 
+void HUD::drawDebugStatus(sf::FloatRect box)
+{
+	sf::FloatRect leftBox(box.left, box.top, box.width / 10, box.height);
+	sf::FloatRect rightBox(box.left + (box.width / 10), box.top, (box.width / 10) * 9, box.height);
+
+	drawString(leftBox, std::to_string(world_->di));
+	drawStringLeft(rightBox, world_->dstr);
+}
+
 void HUD::loadFont(std::string filename, unsigned int size)
 {
 	sf::Font* fnt = new sf::Font();
@@ -141,7 +172,7 @@ void HUD::loadFont(std::string filename, unsigned int size)
 	else delete fnt;
 }
 
-void HUD::drawString(sf::FloatRect box, std::string info, sf::Color col, float scale)
+void HUD::drawString(sf::FloatRect box, std::string info, sf::Color col, float sizeScale)
 {
 	if (font_ != nullptr)
 	{
@@ -151,7 +182,7 @@ void HUD::drawString(sf::FloatRect box, std::string info, sf::Color col, float s
 		if ((col.r + col.g + col.b) < (128.f * 3.f))
 			outlineCol = sf::Color::White;
 		
-		text_.setScale(sf::Vector2f(scale * 1.2f, scale * 1.2f));
+		text_.setScale(sf::Vector2f(sizeScale * 1.2f, sizeScale * 1.2f));
 		sf::FloatRect txt = text_.getLocalBounds();
 		text_.setOrigin(txt.left + txt.width / 2, txt.top + txt.height / 2);
 		text_.setPosition(box.left + box.width / 2, box.top + box. height / 2);
@@ -159,14 +190,60 @@ void HUD::drawString(sf::FloatRect box, std::string info, sf::Color col, float s
 		text_.setColor(outlineCol);
 		trg_.draw(text_);
 
-		text_.setScale(sf::Vector2f(scale, scale));
-		txt = text_.getLocalBounds();
-		text_.setOrigin(txt.left + txt.width / 2, txt.top + txt.height / 2);
-		text_.setPosition(box.left + box.width / 2, box.top + box.height / 2);
+		text_.setScale(sf::Vector2f(sizeScale, sizeScale));
+		text_.setColor(col);
+		trg_.draw(text_);
+
+	}
+}
+
+void HUD::drawStringLeft(sf::FloatRect box, std::string info, sf::Color col, float sizeScale)
+{
+	if (font_ != nullptr)
+	{
+		text_.setString(info);
+
+		sf::Color outlineCol = sf::Color::Black;
+		if ((col.r + col.g + col.b) < (128.f * 3.f))
+			outlineCol = sf::Color::White;
+
+		text_.setScale(sf::Vector2f(sizeScale * 1.2f, sizeScale * 1.2f));
+		sf::FloatRect txt = text_.getLocalBounds();
+		text_.setOrigin(txt.left, txt.top + txt.height / 2);
+		text_.setPosition(box.left, box.top + box.height / 2);
+
+		text_.setColor(outlineCol);
+		trg_.draw(text_);
+
+		text_.setScale(sf::Vector2f(sizeScale, sizeScale));
 
 		text_.setColor(col);
 		trg_.draw(text_);
 
+	}
+}
+
+void HUD::drawStringRight(sf::FloatRect box, std::string info, sf::Color col, float sizeScale)
+{
+	if (font_ != nullptr)
+	{
+		text_.setString(info);
+
+		sf::Color outlineCol = sf::Color::Black;
+		if ((col.r + col.g + col.b) < (128.f * 3.f))
+			outlineCol = sf::Color::White;
+
+		text_.setScale(sf::Vector2f(sizeScale * 1.2f, sizeScale * 1.2f));
+		sf::FloatRect txt = text_.getLocalBounds();
+		text_.setOrigin(txt.left + txt.width, txt.top + txt.height / 2);
+		text_.setPosition(box.left + box.width, box.top + box.height / 2);
+
+		text_.setColor(outlineCol);
+		trg_.draw(text_);
+
+		text_.setScale(sf::Vector2f(sizeScale, sizeScale));
+		text_.setColor(col);
+		trg_.draw(text_);
 	}
 }
 

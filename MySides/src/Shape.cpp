@@ -22,14 +22,14 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 	setPoly(vertices_, size_);
 
 	snapOrient(def.heading); 
-
+	
 	//Color data
 	colPrim_ = def.colPrim;
 	colSecn_ = def.colSecn;
 	colTert_ = def.colTert;
 
 	maxVel_ = 0.025f * (def.speedScale >= 0.5f ? def.speedScale : 0.5f); // max velocity in m/s // * size provisionally til we make an actual calculation
-	maxRot_ = 0.0001f;
+	maxRot_ = 0.001f;
 
 	hpMAX_ = vertices_ * hpScale_;
 	hp_ = hpMAX_;
@@ -64,7 +64,7 @@ void Shape::testBed()
 //Add material data to passed fixture def
 void Shape::addMaterial(b2FixtureDef &def)
 {
-	def.density = 1.0f;
+	def.density = 100.0f;
 	def.friction = 0.8f;
 	def.restitution = 1.f;
 }
@@ -81,8 +81,8 @@ void Shape::setPoly(int vertices, float radius)
 
 		for (int i = 0; i < vertices; ++i)
 		{
-			pnts[i].y = radius * (cos(DR * 360 / vertices * i)); //MAKE THESE START WITH DOWN
-			pnts[i].x = radius * (-sin(DR * 360 / vertices * i)); //MAKE THESE START WITH DOWN
+			pnts[i].y = radius * (cos(DR * 360 / vertices * i));
+			pnts[i].x = radius * (-sin(DR * 360 / vertices * i));
 		}
 
 		shapeVertices_ = vertices;
@@ -121,7 +121,7 @@ void Shape::dropSide(b2Vec2 dir)
 	offset *= getSize();
 	float rhs = std::sqrt((size_ * size_) + (size_ * size_) - (2 * size_ * size_) * cos(2 * M_PI / shapeVertices_));
 
-	SideDef newSide = SideDef(getPosition() + offset, dir, rhs, 5000.f * rhs);
+	SideDef newSide = SideDef(getPosition() + offset, dir, rhs * size_, 5000.f * rhs);
 
 	newSide.colPrim = colSecn_;
 	newSide.colSecn = colPrim_;
@@ -129,7 +129,6 @@ void Shape::dropSide(b2Vec2 dir)
 
 	sideCallback_(newSide);
 }
-
 
 //Move in passed direction at constant speed
 void Shape::move(b2Vec2 direction)
@@ -359,7 +358,7 @@ void Shape::explode()
 	}
 
 	body_->GetFixtureList()->SetSensor(true);
-	alive_ = false;
+	kill();
 }
 
 bool Shape::getArmed()
@@ -389,6 +388,18 @@ bool Shape::getWeaponLoading() const
 	}
 
 	return ready;
+}
+
+int Shape::getWeaponLevel() const 
+{
+	int lvl = 0;
+
+	if (weapon_ != nullptr)
+	{
+		lvl = weapon_->getLevel();
+	}
+
+	return lvl;
 }
 
 void Shape::arm(Weapon::WeaponI * weapon)
@@ -489,6 +500,13 @@ void Shape::update(int milliseconds)
 		//Death check
 		if (alive_)
 		{
+			b2Vec2 vel = body_->GetLinearVelocity();
+			if (vel.Length() > maxVel_)
+			{
+				vel *= 0.9f;
+				body_->SetLinearVelocity(vel);
+			}
+
 			//Update weapon if we have on
 			if (weapon_ != nullptr)
 			{
@@ -533,10 +551,9 @@ void Shape::update(int milliseconds)
 				hp_ = hpMAX_;
 			}
 		}//End alive
-	else active_ = false;
-	//Do death stuff in this else, then set active to false
 
-		//std::cout << uhp_ << "/" << uhpMAX_ << std:: endl;
+	else active_ = false;
+
 	}//end active
 }
 

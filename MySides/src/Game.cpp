@@ -128,9 +128,7 @@ int Game::run()
 				//Render this frame
 				render();
 			}
-
 		}
-
 	}
 #pragma endregion
 
@@ -228,10 +226,6 @@ void Game::handleInput(sf::Time dt)
 	//Escape : Quit
 	if (key_.isKeyPressed(Key::Escape)) { quit_ = true; }
 
-	//E : Spawn
-	if (key_.isKeyPressed(Key::E)) { world_->PutEnemy(); }
-	if (key_.isKeyDown(Key::R)) { world_->PutEnemy(); }
-
 	//Return : Fullscreen
 	if (key_.isKeyPressed(Key::Return)) { toggleFullscreen(); }
 
@@ -291,35 +285,106 @@ void Game::handleInput(sf::Time dt)
 			renderCAM_ = !renderCAM_;
 		}
 
+		// Insert : Rest debug string
+		if (key_.isKeyPressed(Key::Insert))
+		{
+			world_->dstr = "X";
+			//std::cout << world_->di << " | " << world_->dstr << std::endl;
+		}
+		// Del : Reset debug int
+		if (key_.isKeyPressed(Key::Delete))
+		{
+			world_->di = -1;
+		}
+
 		// RShift : Advance one step
 		if (key_.isKeyPressed(Key::RShift))
 		{
 			update(sf::Time(sf::seconds(_TICKTIME_)), true);
 		}
 
-		// K : Clear map
-		if (key_.isKeyPressed(Key::K))
+
+		// X : Nuke world
+		if (key_.isKeyPressed(Key::X))
+		{
+			world_->bomb(true);
+		}
+
+		// T : Clear map
+		if (key_.isKeyPressed(Key::T))
 		{
 			world_->clearWorld(false);
 		}
 
+		// - : Debug int decrement
+		if (key_.isKeyPressed(Key::Dash))
+		{
+			world_->di--;
+		}
+
+		// + : Debug int increment
+		if (key_.isKeyPressed(Key::Equal))
+		{
+			world_->di++;
+		}
+
+		//G : Scrolling Weapon Select
+		if (key_.isKeyPressed(Key::G))
+		{
+			if (world_->dstr == "launcher" || world_->dstr == "fungun" || world_->dstr == "X") world_->dstr = "pistol";
+			else if (world_->dstr == "pistol") world_->dstr = "rifle";
+			else if (world_->dstr == "rifle") world_->dstr = "shotgun";
+			else if (world_->dstr == "shotgun") world_->dstr = "cannon";
+			else if (world_->dstr == "cannon") world_->dstr = "coilgun";
+			else if (world_->dstr == "coilgun") world_->dstr = "railgun";
+			else if (world_->dstr == "railgun") world_->dstr = "werfer";
+			else if (world_->dstr == "werfer") world_->dstr = "thumper";
+			else if (world_->dstr == "thumper") world_->dstr = "launcher";
+			else world_->dstr == "launcher";
+
+			if (world_->di > 8)
+				world_->di = 0;
+		}
+
+		//Scrolling fun select
 		if (key_.isKeyPressed(Key::F))
 		{
-			world_->dstr="fungun";
-			//0, 47, 88
-			if (world_->di == 47) world_->di = 88;
-			else if (world_->di == 0) world_->di = 47;
-			else world_->di = 0;
-		}
-	}
+			world_->dstr = "fungun";
 
-	//Controller Control
+			int max = 5;
+			int i[5];
+			i[0] = 44;
+			i[1] = 42;
+			i[2] = 47;
+			i[3] = 88;
+			i[4] = 888;
+
+			for (int w = 0; w < max; ++w)
+			{
+				if (w == max -1)
+				{
+					world_->di = i[0];
+					break;
+				}
+
+				if (world_->di == i[w])
+				{
+					world_->di = i[w + 1];
+					break;
+				}
+			}
+		}
+
+
+	}//end debug backspace
+
+	//Controller Controls
 	//LS : Move
 	world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
 
 	//RS : Look
 	world_->look(b2Vec2(con_.checkRightX(), con_.checkRightY()));
-	camera_->lean(sf::Vector2f(con_.checkRightX() * 10, con_.checkRightY() * 10), pause_);
+	if (!pause_) camera_->lean(sf::Vector2f(con_.checkRightX() * 10, con_.checkRightY() * 10), pause_);
 
 	//RT : Trigger
 	if (con_.checkRightHairTrigger())
@@ -484,9 +549,7 @@ void Game::update(sf::Time dt, bool force)
 		}
 
 		world_->update(dt.asMilliseconds());
-		sf::Listener::setPosition(sf::Vector3f(camera_->getCenter().x, camera_->getCenter().y, 0));
 	}
-
 
 	//Stop vibration when paused
 	else con_.stopVibration();
@@ -503,7 +566,7 @@ void Game::update(sf::Time dt, bool force)
 	}
 
 	camera_->update(dt.asMilliseconds());
-
+	sf::Listener::setPosition(sf::Vector3f(camera_->getCenter().x, camera_->getCenter().y, 0));
 
 	//End game pause
 	if (world_->hasControlled() == false && !pause_)
@@ -545,9 +608,10 @@ void Game::render()
 		sf::Vector2u size = window_.getSize();
 
 		hud_->drawLevelStatus(sf::FloatRect(20, 20, 100, 40));
-		hud_->drawShapeStatus(sf::FloatRect(size.x / 2.f - 100, 25, 200, 30));
+		hud_->drawShapeStatus(sf::FloatRect(size.x / 2.f - 200, 25, 400, 30));
 		hud_->drawSideStatus(sf::FloatRect(20, size.y - 40, size.x - 40, 20));
 		hud_->drawWeaponStatus(sf::FloatRect(size.x - 120, 20, 100, 40));
+		hud_->drawDebugStatus(sf::FloatRect(0, size.y - 120, size.x, 60));
 	}
 
 	//Draw pause menu

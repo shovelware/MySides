@@ -63,7 +63,7 @@ bool Weapon::SpreadBat::canTrigger() const
 void Weapon::SpreadBat::reup(bool instant)
 {
 	if (instant) {
-		battery_.empty();
+		battery_.refill();
 		rechargeTime_ = 0;
 		cooled_ = true;
 	}
@@ -198,7 +198,6 @@ void Weapon::SpreadBat::fire(b2Vec2 & heading)
 	std::vector<ProjectileDef>::iterator newProj = pv.end();
 	b2Vec2 origin = owner_->getPosition();
 
-	//Set up other projectiles
 	b2Vec2 newOrig = origin;
 	b2Vec2 newHead = heading;
 	float rotation = atan2f(heading.y, heading.x);

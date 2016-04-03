@@ -6,7 +6,8 @@
 
 Pickup::Sight::Sight(b2Body* body, int time, float length) :
 	Pickup::PickupI(body, time),
-	length_(length > 0.f? length : 10.f)
+	length_(length > 0.f? length : 10.f),
+	contact_(false)
 {
 	//Body is initially made by pickup base class
 }
@@ -14,6 +15,21 @@ Pickup::Sight::Sight(b2Body* body, int time, float length) :
 void Pickup::Sight::onCollect()
 {
 	body_->DestroyFixture(body_->GetFixtureList());
+	body_->SetFixedRotation(true);
+	body_->SetTransform(owner_->getBody()->GetPosition(), body_->GetAngle());
+
+	b2FixtureDef def;
+	def.userData = "sight";
+	def.density = 0.f;
+	def.friction = 0.f;
+	def.restitution = 0.f;
+	def.isSensor = true;
+	
+	b2EdgeShape shape;
+	shape.Set(b2Vec2(0, 0), b2Vec2(0, length_));
+	def.shape = &shape;
+
+	body_->CreateFixture(&def);
 
 	collected_ = true;
 }
@@ -22,7 +38,7 @@ bool Pickup::Sight::collide(Entity* other, b2Contact& contact, std::string tag)
 {
 	bool handled = false;
 
-	if (tag == "shape")
+	if (tag == "player" || tag == "enemy")
 	{
 		Shape* shape = dynamic_cast<Shape*>(other);
 
@@ -31,21 +47,13 @@ bool Pickup::Sight::collide(Entity* other, b2Contact& contact, std::string tag)
 			setOwner(shape);
 		}
 
-		else
-		{
-			if (shape != owner_)
-			{
-				//We've hit an enemy
-				//There's no body here for this though
-				//hyuk
-			}
-		}
 
 		handled = true;
 	}
 
 	return handled;
 }
+bool Pickup::Sight::getContact() const { return contact_; }
 
 void Pickup::Sight::update(int milliseconds)
 {
@@ -61,17 +69,53 @@ void Pickup::Sight::update(int milliseconds)
 	{
 		if (owner_ != nullptr)
 		{
-			setPosition(owner_->getPosition());
-
 			float angle = owner_->getBody()->GetAngle();
 
-			end_ = body_->GetPosition() + b2Vec2(sin(angle) * -length_, -cos(angle) * -length_);
+			body_->SetTransform(owner_->getBody()->GetPosition(), angle);
+
+			contact_ = false;
+
+			b2EdgeShape* shap = static_cast<b2EdgeShape*>(body_->GetFixtureList()->GetShape());
+
+			for (b2ContactEdge* ed = body_->GetContactList(); ed != nullptr; ed = ed->next)
+			{
+				b2Body* s = nullptr;
+
+				if (ed->contact->GetFixtureA()->GetUserData() == "enemy")
+					s = ed->contact->GetFixtureA()->GetBody();
+
+				else if (ed->contact->GetFixtureB()->GetUserData() == "enemy")
+					s = ed->contact->GetFixtureB()->GetBody();
+
+				if (s != nullptr)
+				{
+					b2Vec2 dist = body_->GetPosition() + s->GetPosition();
+					// divide each vector by length
+					b2Vec2 v1 = body_->GetPosition() + shap->m_vertex2;
+					b2Vec2 v2 = dist;
+
+					v1.Normalize();
+					v2.Normalize();
+
+					float ang = acos(b2Dot(v1, v2));
+
+					if (ang < 1.2f && dist.Length() <= length_)
+						contact_ = true;
+
+				}
+
+				if (contact_ == true)
+					break;
+			}
+
+			
 		}
 
 		else
 		{
 			time_ == 0;
 		}
+
 	}
 
 	//Deletion flag
@@ -80,9 +124,4 @@ void Pickup::Sight::update(int milliseconds)
 		owner_ = nullptr;
 	}
 
-}
-
-b2Vec2 Pickup::Sight::getEnd()
-{
-	return end_;
 }

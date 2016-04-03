@@ -9,6 +9,8 @@ Enemy::Enemy(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback
 	getPlayer_(player),
 	collector_(false)
 {
+	body_->GetFixtureList()->SetUserData("enemy");
+	shapeFixDef_.userData = "enemy";
 }
 
 void Enemy::update(int milliseconds)
@@ -42,6 +44,8 @@ void Enemy::update(int milliseconds)
 		}
 	}
 
+	move(b2Vec2_zero);
+
 	//fire(b2Vec2_zero + body_->GetPosition());
 	if (getWeaponReady())
 	{
@@ -71,6 +75,8 @@ bool Enemy::collide(Entity * other, b2Contact& contact, std::string tag)
 		if (proj->getOwner() != this)
 		{
 			takeDamage(proj->getDamage(), proj->getDirection());
+			if (alive_ == false)
+				contact.SetEnabled(false);
 		}
 
 		else contact.SetEnabled(false);
@@ -94,7 +100,6 @@ bool Enemy::collide(Entity * other, b2Contact& contact, std::string tag)
 		}
 		handled = true;
 	}
-
 
 	return handled;
 }

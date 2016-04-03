@@ -20,7 +20,7 @@ namespace Weapon {
 		void setBatterySize(int size, bool recharge = false);
 
 		void setChargeAmount(int amount);
-		void setdisChargeAmount(int amount);
+		void setDischargeAmount(int amount);
 
 		int getBar() const;
 		int getBarMAX() const;

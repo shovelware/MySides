@@ -3,9 +3,10 @@
 #include "Bounds.hpp"
 #include "Pickup.hpp"
 
-Pickup::Attractor::Attractor(b2Body* body, int time, float radius) :
+Pickup::Attractor::Attractor(b2Body* body, int time, float radius, float strengthScale) :
 	Pickup::PickupI(body, time),
-	radius_(radius > 0.f ? radius : 7.5f)
+	radius_(radius > 0.f ? radius : 7.5f),
+	strengthScale_(strengthScale >= -1.f ? strengthScale : 1.f)
 {
 	//Body is initially made by pickup base class
 }
@@ -13,6 +14,9 @@ Pickup::Attractor::Attractor(b2Body* body, int time, float radius) :
 void Pickup::Attractor::onCollect()
 {
 	body_->DestroyFixture(body_->GetFixtureList());
+	b2Body* ownerBody = owner_->getBody();
+	float angle = atan2f(owner_->getOrientation().y,owner_->getOrientation().x);
+	body_->SetTransform(ownerBody->GetPosition(), angle);
 
 	b2FixtureDef def;
 	def.userData = "attractor";
@@ -22,23 +26,18 @@ void Pickup::Attractor::onCollect()
 	def.restitution = 0.f;
 	def.isSensor = true;
 
-	b2RevoluteJointDef rev;
-	rev.localAnchorA = b2Vec2(0, 0);
-	rev.localAnchorB = b2Vec2(0, 0);
-
-
-	rev.bodyA = body_;
-	rev.bodyB = owner_->getBody();
-
-	rev.collideConnected = false;
-
-	body_->GetWorld()->CreateJoint(&rev);
-
 	b2CircleShape shape;
 	shape.m_radius = radius_;
-
 	def.shape = &shape;
 
+	b2RevoluteJointDef weld;
+	weld.localAnchorA = b2Vec2(0, 0);
+	weld.localAnchorB = b2Vec2(0, 0);
+	weld.bodyA = body_;
+	weld.bodyB = owner_->getBody();
+	weld.collideConnected = false;
+
+	body_->GetWorld()->CreateJoint(&weld);
 	body_->CreateFixture(&def);
 
 	collected_ = true;
@@ -49,7 +48,7 @@ bool Pickup::Attractor::collide(Entity* other, b2Contact& contact, std::string t
 
 	bool handled = false;
 
-	if (tag == "shape")
+	if (tag == "player" || tag == "enemy")
 	{
 		if (!collected_)
 		{
@@ -98,9 +97,10 @@ void Pickup::Attractor::update(int milliseconds)
 					{
 						
 						dir.Normalize();
-						dir *= 0.005f * ((dist / radius_));
+						dir *= 0.05f * ((dist / radius_)) * strengthScale_;
+						b2Vec2 vel = s->GetLinearVelocity();
 
-						if (s->GetLinearVelocity().Length() < 0.02)
+						if (0.2 > vel.Length()  && vel.Length() < dir.Length() / 2)
 							s->ApplyForceToCenter(dir, true);
 					}
 				}
@@ -116,6 +116,8 @@ void Pickup::Attractor::update(int milliseconds)
 		owner_ = nullptr;
 		body_->GetWorld()->DestroyJoint(body_->GetJointList()->joint);
 	}
+
+
 }
 
 float Pickup::Attractor::getRadius()

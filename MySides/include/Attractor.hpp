@@ -7,7 +7,7 @@
 namespace Pickup {
 	class Attractor : public PickupI {
 	public:
-		Attractor(b2Body* body, int time, float radius = 0);
+		Attractor(b2Body* body, int time, float radius = 0, float strengthScale = 1.f);
 
 		void update(int milliseconds);
 
@@ -18,6 +18,7 @@ namespace Pickup {
 		void onCollect();
 
 		float radius_;
+		float strengthScale_;
 	};
 }
 

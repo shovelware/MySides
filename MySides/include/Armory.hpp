@@ -66,7 +66,7 @@ namespace Weapon {
 			void upgradeWerfer(Weapon::SpreadBat* weapon, int level = 0, int projLevel = -1);
 			void upgradeCoilgun(Weapon::AutoBat* weapon, int level = 0, int projLevel = -1);
 			void upgradeRailgun(Weapon::SemiBat* weapon, int level = 0, int projLevel = -1);
-			void upgradeThumper(Weapon::SemiMag* weapon, int level = 0, int projLevel = -1);
+			void upgradeThumper(Weapon::SpreadMag* weapon, int level = 0, int projLevel = -1);
 			void upgradeLauncher(Weapon::SemiMag* weapon, int level = 0, int projLevel = -1);
 
 	};

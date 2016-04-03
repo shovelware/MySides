@@ -10,14 +10,14 @@ namespace Pickup {
 
 		void update(int milliseconds);
 
-		b2Vec2 getEnd();
+		bool getContact() const;
 
 		bool collide(Entity* other, b2Contact& contact, std::string tag);
 	private:
 		void onCollect();
 
 		float length_;
-		b2Vec2 end_;
+		bool contact_;
 	};
 }
 
