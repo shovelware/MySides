@@ -11,46 +11,19 @@ Player::Player(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callba
 {
 	body_->GetFixtureList()->SetUserData("player");
 	shapeFixDef_.userData = "player";
+	collector_ = true;
 }
 
 //Only deals with the effects of this collision on this entity
 bool Player::collide(Entity * other, b2Contact& contact, std::string tag)
 {
-	bool handled = false;
+	bool handled = Shape::collide(other, contact, tag);
 
-	if (tag == "projectile")
+	if (!handled)
 	{
-		Projectile* proj = static_cast<Projectile*>(other);
 
-		if (proj->getOwner() != this)
-		{
-			takeDamage(proj->getDamage(), proj->getDirection());
-
-			if (alive_ == false)
-				contact.SetEnabled(false);
-		}
-
-		else contact.SetEnabled(false);
-
-		handled = true;
 	}
-
-	else if (tag == "side")
-	{
-		char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
-		char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
-
-		if (tagA == "side" || tagB == "side")
-		{
-			Side* side = static_cast<Side*>(other);
-			collect(side->getValue());
-			side->collect();
-			hasCollected_ = true;
-		}
-
-		handled = true;
-	}
-
+	
 	return handled;
 }
 

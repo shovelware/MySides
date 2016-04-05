@@ -172,6 +172,7 @@ void GameWorld::addPlayer(const ShapeDef& def, Weapon::WeaponI* weapon)
 		pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), -1, 5.f, 3.f));
 		pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), -1, 15.f, 1.f));
 		addPickup(Pickup::Type::SIGHT, def.position, -1, 32.f);
+		
 		audio_.playSFX("spawn", B2toSF(b2Vec2_zero, true));
 
 		if (weapon != nullptr)
@@ -458,6 +459,7 @@ void GameWorld::resetLevel()
 	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
 	play.colSecn = b2Color(0.f, 1.f, 1.f);
 	play.colTert = b2Color(1.f, 0.f, 0.f);
+	play.hpScale = 10;
 	addPlayer(play);
 
 	spawns_ = 0;
@@ -639,7 +641,6 @@ void GameWorld::update(int dt)
 	if (!pause_)
 	{
 		//step(dt);
-
 		updatePlayer(dt);
 		updateEnemy(dt);
 		updateProjectile(dt);
@@ -1093,8 +1094,26 @@ void GameWorld::f2()
 
 void GameWorld::f3()
 {
+	//if (player_ != nullptr)
+	//	addPickup(Pickup::Type::ATTRACT, player_->getPosition(), 5000, 64.f);
+
+
+	ProjectileDef boom = ProjectileDef();
+
+	boom.damage = 80.f;
+	boom.hpMAX = 4;
+	boom.lifeTime = 5000;
+	boom.height = 1.f;
+	boom.width = 1.f;
+	boom.penetration = 8;
+	boom.target = player_;
+
+	Weapon::WeaponI* newWeap = new Weapon::SemiBat(fireWeap_, boom, "coilgun", 1280, 32, 64);
+
 	if (player_ != nullptr)
-		addPickup(Pickup::Type::ATTRACT, player_->getPosition(), 5000, 64.f);
+	{
+		armShape(player_, newWeap);
+	}
 }
 
 void GameWorld::f4()
@@ -1122,7 +1141,6 @@ void GameWorld::f6()
 
 void GameWorld::f7()
 {
-
 	//EW
 	for (int max = 9, i = 0; i < max; ++i)
 	{
@@ -1275,9 +1293,11 @@ void GameWorld::f9()
 
 			def.vertices = (j < shapes ? j : 3 + (int)j % shapes);
 			def.hpScale = 5 * i;
-			def.colPrim = (b2Color(0.2f * i, 0.1f * j, 1.f - j / 10));
-			def.colSecn = (b2Color(0.2f * j, 0.1f * (i / j), 0.05f * (i + j)));
-			def.colTert = (b2Color(0.1f * i, 0.3f * i, 1.f * (j - i)));
+			def.colPrim = b2Color(0.2f * i, 0.1f * j, 1.f - j / 10, 1 - (0.1 * i));
+			def.colSecn = b2Color(0.2f * j, 0.1f * (i / j), 0.05f * (i + j), 1 - (0.1 * i));
+			def.colTert = b2Color(0.1f * i, 0.3f * i, 1.f * (j - i), 1 - (0.1 * i));
+			def.ai = 1;
+			
 
 			addEnemy(def);
 		}
@@ -1294,12 +1314,18 @@ void GameWorld::f0()
 	pos.Normalize();
 	pos *= randFloat(10, rad);
 
+	if (player_ != nullptr)
+	{
+		pos = player_->getOrientation();
+		pos *= player_->getSize() * 1.1f;
+		pos += player_->getPosition();
+	}
+
 	ShapeDef enem = ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
 	//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
 	enem.size = .5f;
 	enem.speedScale = .5f;
 	enem.hpScale = 5;
-
 	enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
 	enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
 	enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.1f, 0.3f), randFloat(0.1f, 0.3f));

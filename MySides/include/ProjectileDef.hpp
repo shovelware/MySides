@@ -83,7 +83,7 @@ public:
 		colSecn(pd.colSecn),
 		colTert(pd.colTert),
 		owner(nullptr),
-		target(nullptr)
+		target(pd.target)
 	{
 	}
 

@@ -1,6 +1,6 @@
 #include "Armory.hpp"
 
-Weapon::Armory::Armory(std::function<void(std::vector<ProjectileDef>&defs, std::string id)> fireCallback) :
+Weapon::Armory::Armory(FireFunc& fireCallback) :
 	fireCallback_(fireCallback)
 {
 }
@@ -142,6 +142,12 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 
 	switch (type)
 	{
+		//Boomerang
+	case 22:
+	{
+	}
+
+
 	// Explosive Buckshot
 	case 44:
 	{
@@ -172,9 +178,6 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		laser.height = 50.f;
 		laser.width = 200.f;
 		laser.penetration = 100;
-		laser.detonation.force = -0.5f;
-		laser.detonation.radius = 3.f;
-		laser.detonation.lifeTime = 50;
 		
 		funGun = new Weapon::SemiBat(fireCallback_, laser, "coilgun", 1280, 32, 64);
 		break;
@@ -247,7 +250,7 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		lance.damage = 30;
 		lance.lifeTime = 300;
 
-		funGun = new Weapon::SpreadBat(fireCallback_, lance, "coilgun", 1600, 16, 500, 16, 1, -10.0, 4.f, 2.f);
+		funGun = new Weapon::SpreadBat(fireCallback_, lance, "coilgun", 2400, 16, 500, 16, 1, -10.0, 4.f, 2.f);
 		break;
 	}
 	//Mikrowerfer
@@ -490,7 +493,7 @@ ProjectileDef Weapon::Armory::getCannonball(int level)
 	if (level > 2) { ball.velScale = 3; }
 
 	//L4S : Det+
-	if (level > 3) { ball.detonation.force = 2.f; ball.detonation.radius = 2.0f; ball.detonation.lifeTime = 100; }
+	if (level > 3) { ball.shrapnel.shards = 16; ball.shrapnel.level = 5; }
 
 	//L5H : Lifetime+
 	if (level > 4) { ball.lifeTime = 400; }

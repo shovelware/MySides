@@ -7,7 +7,6 @@
 #include "Pickup.hpp"
 #include "Shield.hpp"
 
-
 Projectile::Projectile(b2Body* body, const ProjectileDef& def, ForceFunc& forceCallback) :
 	Entity(body),
 	forceCallback_(forceCallback),
@@ -159,6 +158,23 @@ void Projectile::update(int milliseconds)
 		body_->SetTransform(body_->GetPosition(), atan2f(-vel.x, vel.y));
 
 		//std::cout << vel.Length() << std::endl;
+
+		if (target_ != nullptr)
+		{
+			b2Vec2 direction = target_->getPosition() - body_->GetPosition();
+			float bodyAngle = body_->GetAngle();
+			float desiredAngle = atan2f(-direction.x, direction.y);
+			float nextAngle = body_->GetAngle() + body_->GetAngularVelocity() / _TICKTIME_;
+
+			float totalRotation = desiredAngle - bodyAngle;
+
+			while (totalRotation < -180 * DR) totalRotation += 360 * DR;
+			while (totalRotation >  180 * DR) totalRotation -= 360 * DR;
+
+			float change = 20 * DR; //allow 20 degree rotation per time step
+			float newAngle = bodyAngle + std::min(change, std::max(-change, totalRotation));
+			body_->SetTransform(body_->GetPosition(), newAngle);
+		}
 
 		if (vel.Length() <= 0 || hp_ <= 0 || lifeTime_ <= 0)
 		{

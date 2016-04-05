@@ -22,8 +22,6 @@ private:
 	float bombRange_;
 	int bombTime_;
 	int bombTimeMax_;
-
-	bool hasCollected_;
 };
 
 #endif

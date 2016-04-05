@@ -7,7 +7,6 @@
 Enemy::Enemy(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) :
 	Shape(body, def, callback),
 	getPlayer_(player),
-	collector_(false),
 	aistate(def.ai)
 {
 	body_->GetFixtureList()->SetUserData("enemy");
@@ -27,15 +26,17 @@ void Enemy::update(int milliseconds)
 	{
 		move(b2Vec2_zero);
 
-		//fire(b2Vec2_zero + body_->GetPosition());
-		if (getWeaponReady())
+		if (getArmed())
 		{
-			trigger(b2Vec2(0, 0));
-		}
+			if (getWeaponReady())
+			{
+				trigger(b2Vec2(0, 0));
+			}
 
-		else
-		{
-			release();
+			else
+			{
+				release();
+			}
 		}
 	}
 
@@ -98,39 +99,11 @@ void Enemy::setCollector(bool collect)
 //Only deals with the effects of this collision on this entity
 bool Enemy::collide(Entity * other, b2Contact& contact, std::string tag)
 {
-	bool handled = false;
+	bool handled = Shape::collide(other, contact, tag);
 
-	if (tag == "projectile")
+	if (!handled)
 	{
-		Projectile* proj = static_cast<Projectile*>(other);
 
-		if (proj->getOwner() != this)
-		{
-			takeDamage(proj->getDamage(), proj->getDirection());
-			if (alive_ == false)
-				contact.SetEnabled(false);
-		}
-
-		else contact.SetEnabled(false);
-
-		handled = true;
-	}
-
-	else if (tag == "side")
-	{
-		if (collector_)
-		{
-			char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
-			char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
-
-			if (tagA == "side" || tagB == "side")
-			{
-				Side* side = static_cast<Side*>(other);
-				collect(side->getValue());
-				side->collect();
-			}
-		}
-		handled = true;
 	}
 
 	return handled;
