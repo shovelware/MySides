@@ -1,6 +1,6 @@
 #include "WeapAutoBat.hpp"
 			
-Weapon::AutoBat::AutoBat(fireFunc& callback, ProjectileDef const &ammo, std::string id) :
+Weapon::AutoBat::AutoBat(FireFunc& callback, ProjectileDef const &ammo, std::string id) :
 	WeaponI(callback, ammo, id),
 	battery_(1600),
 	refireTime_(0),
@@ -11,7 +11,7 @@ Weapon::AutoBat::AutoBat(fireFunc& callback, ProjectileDef const &ammo, std::str
 {
 }
 
-Weapon::AutoBat::AutoBat(fireFunc & callback, ProjectileDef const & ammo, std::string id,
+Weapon::AutoBat::AutoBat(FireFunc & callback, ProjectileDef const & ammo, std::string id,
 	int batterySize, int refireTime, int rechargeTime, int fireCharge) :
 	WeaponI(callback, ammo, id),
 	battery_(batterySize),
@@ -102,6 +102,7 @@ void Weapon::AutoBat::fire(b2Vec2 & heading)
 	newProj->origin = owner_->getPosition() + heading;
 	newProj->heading = heading;
 	newProj->owner = owner_;
+	newProj->inVelocity = owner_->getBody()->GetLinearVelocity();
 
 	//Fire projectile
 	fireCallback_(pv, id_);

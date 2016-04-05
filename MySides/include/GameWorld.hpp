@@ -65,6 +65,7 @@ public:
 	void removeForce(Force* f);
 
 	//Weapon handling
+	bool requisition(Shape* shape, std::string weaponName, int weaponCode);
 	void armShape(Shape* shape, Weapon::WeaponI* weapon);
 	void disarmShape(Shape* shape);
 	
@@ -101,7 +102,6 @@ public:
 	void SetDebugDraw(b2Draw* debugDraw);
 	void DrawDebugData();
 
-
 	//Return a reference to lists for drawing
 	Bounds* getBounds();
 	Shape* getPlayer();
@@ -112,6 +112,7 @@ public:
 	
 
 	//Update & Pause
+	void step(int dt);
 	void update(int dt);
 	void pause();
 	bool getPaused() const;

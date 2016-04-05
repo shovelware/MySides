@@ -6,12 +6,11 @@
 
 #include "Weapon.hpp"
 #include "Magazine.hpp"
-
 namespace Weapon {
 	class AutoMag : public WeaponI {
 	public:
-		AutoMag(fireFunc& callback, ProjectileDef const &ammo, std::string id);
-		AutoMag(fireFunc& callback, ProjectileDef const &ammo, std::string id, int magSize, int refireTime, int reloadTime, int spread);
+		AutoMag(FireFunc& callback, ProjectileDef const &ammo, std::string id);
+		AutoMag(FireFunc& callback, ProjectileDef const &ammo, std::string id, int magSize, int refireTime, int reloadTime, float spread);
 
 		bool isUpping() const;
 		bool canFire() const;
@@ -39,7 +38,7 @@ namespace Weapon {
 		int reloadTime_;
 		int reloadTimeMAX_;
 
-		int spread_;
+		float spread_;
 	};
 }
 #endif

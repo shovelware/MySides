@@ -1,6 +1,6 @@
 #include "Weapon.hpp"
 
-Weapon::WeaponI::WeaponI(fireFunc& callback, ProjectileDef const &ammo, std::string id) :
+Weapon::WeaponI::WeaponI(FireFunc& callback, ProjectileDef const &ammo, std::string id) :
 	owner_(nullptr),
 	fireCallback_(callback),
 	output_(ProjectileDef(ammo)),

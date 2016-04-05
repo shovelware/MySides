@@ -1,6 +1,6 @@
 #include "WeapSpreadBat.hpp"
 
-Weapon::SpreadBat::SpreadBat(fireFunc& callback, ProjectileDef const& ammo, std::string id) :
+Weapon::SpreadBat::SpreadBat(FireFunc& callback, ProjectileDef const& ammo, std::string id) :
 	WeaponI(callback, ammo, id),
 	battery_(1600),
 	refireTime_(0),
@@ -16,7 +16,7 @@ Weapon::SpreadBat::SpreadBat(fireFunc& callback, ProjectileDef const& ammo, std:
 {
 }
 
-Weapon::SpreadBat::SpreadBat(fireFunc & callback, ProjectileDef const & ammo, std::string id,
+Weapon::SpreadBat::SpreadBat(FireFunc & callback, ProjectileDef const & ammo, std::string id,
 	int batterySize, int refireTime, int rechargeTime, int fireCharge, int amount, float amountScale, float spread, float spreadScale) :
 	WeaponI(callback, ammo, id),
 	battery_(batterySize),

@@ -114,6 +114,7 @@ int Game::run()
 			//Only update if the controller is connected
 			//if (checkController(tickTime))
 			{
+				//Do game logic stuff
 				//Update with this tick
 				checkController(tickTime); //XOR with if above
 
@@ -124,11 +125,12 @@ int Game::run()
 
 				//Take this tick out of the accumulator
 				accumulator -= tickTime;
-				
-				//Render this frame
-				render();
 			}
 		}
+		if (!pause_)
+			world_->step(frameTime.asMilliseconds());
+
+		render();
 	}
 #pragma endregion
 
@@ -191,9 +193,10 @@ void Game::handleInput(sf::Time dt)
 	if (key_.isKeyDown(Key::A)) { mv.x += -1; }
 	if (key_.isKeyDown(Key::D)) { mv.x += 1; }
 
-	if (key_.isKeyDown(Key::LAlt)) { mv *= 0.5f; }
+	if (key_.isKeyDown(Key::LAlt)) { mv *= 0.25f; }
 
-	world_->move(mv);
+	if (mv.Length() > 0)
+		world_->move(mv);
 
 	//Arrows : Look
 	b2Vec2 fr(0, 0);
@@ -259,10 +262,30 @@ void Game::handleInput(sf::Time dt)
 	if (key_.isKeyPressed(Key::Num0)) { world_->f0(); }
 
 	//Debug controls
-	if (key_.isKeyDown(Key::BackSpace))
+	if (key_.isKeyDown(Key::BackSpace) || (0.5f <= con_.checkLeftTrigger() && con_.checkLeftTrigger() <= 1.f))
 	{
+		//Y : Toggle through rendering
+		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
+		{
+			if (renderDD_ && renderGAME_)
+			{
+				renderGAME_ = false;
+			}
+
+			else if (renderDD_)
+			{
+				renderDD_ = false; 
+				renderGAME_ = true;
+			}
+
+			else if (renderGAME_)
+			{
+				renderDD_ = true;
+			}
+		}
+
 		// < : Render debugDraw
-		if (key_.isKeyPressed(Key::Comma))
+		if (key_.isKeyPressed(Key::Comma) )
 		{
 			renderDD_ = !renderDD_;
 		}
@@ -285,24 +308,25 @@ void Game::handleInput(sf::Time dt)
 			renderCAM_ = !renderCAM_;
 		}
 
-		// Insert : Rest debug string
+		// Insert : Reset debug string
 		if (key_.isKeyPressed(Key::Insert))
 		{
 			world_->dstr = "X";
 			//std::cout << world_->di << " | " << world_->dstr << std::endl;
 		}
+
 		// Del : Reset debug int
 		if (key_.isKeyPressed(Key::Delete))
 		{
 			world_->di = -1;
 		}
 
-		// RShift : Advance one step
-		if (key_.isKeyPressed(Key::RShift))
+		// RShift : Advance one step (B, [LC])
+		if (key_.isKeyPressed(Key::RShift) || con_.checkPressed(XINPUT_GAMEPAD_B))
 		{
+			world_->step(_TICKTIME_ * 1000);
 			update(sf::Time(sf::seconds(_TICKTIME_)), true);
 		}
-
 
 		// X : Nuke world
 		if (key_.isKeyPressed(Key::X))
@@ -317,19 +341,23 @@ void Game::handleInput(sf::Time dt)
 		}
 
 		// - : Debug int decrement
-		if (key_.isKeyPressed(Key::Dash))
+		if (key_.isKeyPressed(Key::Dash)  || 
+			con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT) || 
+			(((con_.checkHeld(XINPUT_GAMEPAD_DPAD_LEFT) - 600) % 32) == 0))
 		{
 			world_->di--;
 		}
 
 		// + : Debug int increment
-		if (key_.isKeyPressed(Key::Equal))
+		if (key_.isKeyPressed(Key::Equal) || 
+			con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT) || 
+			(((con_.checkHeld(XINPUT_GAMEPAD_DPAD_RIGHT) - 600) % 32) == 0))
 		{
 			world_->di++;
 		}
 
 		//G : Scrolling Weapon Select
-		if (key_.isKeyPressed(Key::G))
+		if (key_.isKeyPressed(Key::G) || con_.checkPressed(XINPUT_GAMEPAD_DPAD_DOWN))
 		{
 			if (world_->dstr == "launcher" || world_->dstr == "fungun" || world_->dstr == "X") world_->dstr = "pistol";
 			else if (world_->dstr == "pistol") world_->dstr = "rifle";
@@ -347,17 +375,20 @@ void Game::handleInput(sf::Time dt)
 		}
 
 		//Scrolling fun select
-		if (key_.isKeyPressed(Key::F))
+		if (key_.isKeyPressed(Key::F)|| con_.checkPressed(XINPUT_GAMEPAD_DPAD_UP))
 		{
 			world_->dstr = "fungun";
 
-			int max = 5;
-			int i[5];
+			int max = 8;
+			int i[8];
 			i[0] = 44;
 			i[1] = 42;
 			i[2] = 47;
-			i[3] = 88;
-			i[4] = 888;
+			i[3] = 60;
+			i[4] = 88;
+			i[5] = 111;
+			i[6] = 666;
+			i[7] = 888;
 
 			for (int w = 0; w < max; ++w)
 			{
@@ -375,8 +406,13 @@ void Game::handleInput(sf::Time dt)
 			}
 		}
 
+		//Requisition
+		if (con_.checkPressed(XINPUT_GAMEPAD_Y))
+		{
+			world_->requisition(world_->getPlayer(), world_->dstr, world_->di);
+		}
 
-	}//end debug backspace
+	}//end debug key check
 
 	//Controller Controls
 	//LS : Move
@@ -408,29 +444,12 @@ void Game::handleInput(sf::Time dt)
 	//A : Testing in world/resume
 	if (con_.checkPressed(XINPUT_GAMEPAD_A))
 	{
-		//float base = 32;
-		//float lt = con_.checkLeftTrigger() * 96;
-		//
-		//world_->resizeBounds(base + lt);
-		//
-		//std::cout << base + lt << "  " << world_->getBoundsSide() << std::endl;
-
-		if (pause_)
-		{
-			pause_ = false;
-		}
-
-		else
-		{
-			world_->testBed();
-		}
+		world_->f9();
 	}
 
 	//B : Testing in player
 	if (con_.checkPressed(XINPUT_GAMEPAD_B))
 	{
-		Shape* play = world_->getPlayer();
-		if (play != nullptr) play->testBed();
 	}
 
 	//X : Reup
@@ -447,7 +466,6 @@ void Game::handleInput(sf::Time dt)
 			world_->resetLevel();
 			camera_->setCenter(sf::Vector2f(0, 0));
 		}
-
 		//float lt = (con_.checkLeftTrigger() > 0 ? con_.checkLeftTrigger() : 0.1f);
 		//int spawn = lt * 10;
 		//
@@ -495,7 +513,7 @@ void Game::handleInput(sf::Time dt)
 	{
 	}
 
-	//DPad :
+	//DPad : Camera Lean (Forced)
 	sf::Vector2f dlook = sf::Vector2f(0, 0);
 	if (con_.checkDown(XINPUT_GAMEPAD_DPAD_RIGHT))	{ dlook.x += 10; }
 	if (con_.checkDown(XINPUT_GAMEPAD_DPAD_LEFT))	{ dlook.x -= 10; }
@@ -524,13 +542,14 @@ bool Game::checkController(sf::Time dt)
 	bool connected = false;
 
 	//If we're paused, don't update the controller's button holds
-	if (pause_)
-	{
-		connected = con_.update(-1);
-	}
+	//if (pause_)
+	//{
+	//	connected = con_.update(-1);
+	//}
 
 	//Normal update
-	else connected = con_.update(dt.asMilliseconds());
+	//else 
+	connected = con_.update(dt.asMilliseconds());
 	
 	return connected;
 }

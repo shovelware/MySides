@@ -1,6 +1,6 @@
 #include "WeapSemiMag.hpp"
 
-Weapon::SemiMag::SemiMag(fireFunc& callback, ProjectileDef const &ammo, std::string id) :
+Weapon::SemiMag::SemiMag(FireFunc& callback, ProjectileDef const &ammo, std::string id) :
 	WeaponI(callback, ammo, id),
 	magazine_(18),
 	resetTime_(0),
@@ -11,7 +11,7 @@ Weapon::SemiMag::SemiMag(fireFunc& callback, ProjectileDef const &ammo, std::str
 {
 }
 
-Weapon::SemiMag::SemiMag(fireFunc& callback, ProjectileDef const &ammo, std::string id,
+Weapon::SemiMag::SemiMag(FireFunc& callback, ProjectileDef const &ammo, std::string id,
 	int magSize, int resetTime, int reloadTime) :
 	WeaponI(callback, ammo, id),
 	magazine_(magSize),
@@ -54,12 +54,12 @@ void Weapon::SemiMag::update(int dt)
 	}
 
 	// If we're cycling, time down
-	if (!pin_ && resetTime_ > 0)
+	if (resetTime_ > 0)
 	{
 		resetTime_ = (resetTime_ - dt >= 0 ? resetTime_ - dt : 0);
 	}
 
-	if (resetTime_ == 0)
+	if (!pin_ && resetTime_ == 0)
 	{
 		cocked_ = true;
 	}
@@ -113,6 +113,7 @@ void Weapon::SemiMag::fire(b2Vec2 &heading)
 	newProj->origin = owner_->getPosition() + heading;
 	newProj->heading = heading;
 	newProj->owner = owner_;
+	newProj->inVelocity = owner_->getBody()->GetLinearVelocity();
 
 	//Fire projectile
 	fireCallback_(pv, id_);

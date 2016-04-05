@@ -122,6 +122,12 @@ unsigned int XController::checkTimeHeld(WORD button) const
 	
 }
 
+//Sets a button to be up
+void XController::setDown(WORD button)
+{
+	curState_.Gamepad.wButtons |= button;
+}
+
 #pragma endregion
 
 #pragma region Sticks

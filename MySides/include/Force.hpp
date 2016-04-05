@@ -12,9 +12,9 @@ public:
 private:
 	void createBody(float radius);
 
-	int lifeTime_;
-
 	float force_;
+	float radius_;
+	int lifeTime_;
 };
 
 #endif

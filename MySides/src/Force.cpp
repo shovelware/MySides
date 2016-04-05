@@ -3,9 +3,10 @@
 Force::Force(b2Body * body, float force, float radius, int lifeTime) :
 	Entity(body),
 	force_(force),
+	radius_(radius),
 	lifeTime_(lifeTime)
 {
-	createBody(radius);
+	createBody(radius_);
 }
 
 void Force::createBody(float radius)
@@ -31,17 +32,46 @@ void Force::update(int milliseconds)
 		active_ = false;
 		alive_ = false;
 	}
+
+	for (b2ContactEdge* ed = body_->GetContactList(); ed != nullptr; ed = ed->next)
+	{
+		b2Body* e = nullptr;
+		char* tagA;
+		char* tagB;
+
+		tagA = static_cast<char*>(ed->contact->GetFixtureA()->GetUserData());
+		tagB = static_cast<char*>(ed->contact->GetFixtureB()->GetUserData());
+		if ((tagA == "enemy" || tagA == "player" || tagA == "pickup" || tagA == "side"))
+			e = ed->contact->GetFixtureA()->GetBody();
+
+
+		else if ((tagB == "enemy" || tagB == "player" || tagB == "pickup" || tagB == "side"))
+			e = ed->contact->GetFixtureB()->GetBody();
+
+		if (e != nullptr)
+		{
+			b2Vec2 dir =  e->GetPosition()- body_->GetPosition();
+			float dist = dir.Length();
+			if (dist < radius_)
+			{
+
+				dir.Normalize();
+				dir *= force_ * ((dist / radius_));
+				e->ApplyForceToCenter(dir, true);
+			}
+		}
+	}
 }
 
 bool Force::collide(Entity* other, b2Contact& contact, std::string tag)
 {
 	bool handled = true;
 
-	if (tag == "enemy"  || tag == "player" || tag == "pickup" || tag == "side")
+	if (tag == "enemy" || tag == "player" || tag == "pickup" || tag == "side")
 	{
 		b2Vec2 dir = other->getPosition() - body_->GetPosition();
 		dir.Normalize();
-		dir *= 10.f * force_ ;
+		dir *= 10.f * force_;
 
 		other->getBody()->ApplyForceToCenter(dir, true);
 	}

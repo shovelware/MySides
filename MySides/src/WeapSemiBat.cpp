@@ -1,6 +1,6 @@
 #include "WeapSemiBat.hpp"
 
-Weapon::SemiBat::SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::string id) :
+Weapon::SemiBat::SemiBat(FireFunc& callback, ProjectileDef const& ammo, std::string id) :
 	WeaponI(callback, ammo, id),
 	battery_(2000, false),
 	chargeAmount_(16),
@@ -9,7 +9,7 @@ Weapon::SemiBat::SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::str
 {
 }
 
-Weapon::SemiBat::SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::string id,
+Weapon::SemiBat::SemiBat(FireFunc& callback, ProjectileDef const& ammo, std::string id,
 	int batterySize, int chargeAmount, int dischargeAmount) :
 	WeaponI(callback, ammo, id),
 	battery_(batterySize, false),
@@ -110,6 +110,7 @@ void Weapon::SemiBat::fire(b2Vec2 & heading)
 	newProj->origin = owner_->getPosition() + heading;
 	newProj->heading = heading;
 	newProj->owner = owner_;
+	newProj->inVelocity = owner_->getBody()->GetLinearVelocity();
 
 	//Fire projectile
 	fireCallback_(pv, id_);

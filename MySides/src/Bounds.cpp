@@ -87,6 +87,8 @@ b2CircleShape* Bounds::getCircleShape()
 			return static_cast<b2CircleShape*>(fix->GetShape());
 		}
 	}
+
+	return nullptr;
 }
 
 b2ChainShape* Bounds::getPoly()
@@ -99,6 +101,7 @@ b2ChainShape* Bounds::getPoly()
 		}
 	}
 
+	return nullptr;
 }
 
 //Gets radius of bounds

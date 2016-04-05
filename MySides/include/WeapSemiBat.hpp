@@ -7,8 +7,8 @@
 namespace Weapon {
 	class SemiBat : public WeaponI {
 	public:
-		SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::string id);
-		SemiBat(fireFunc& callback, ProjectileDef const& ammo, std::string id, int batterySize, int chargeAmount, int dischargeAmount);
+		SemiBat(FireFunc& callback, ProjectileDef const& ammo, std::string id);
+		SemiBat(FireFunc& callback, ProjectileDef const& ammo, std::string id, int batterySize, int chargeAmount, int dischargeAmount);
 
 		bool isUpping() const;
 		bool canFire() const;

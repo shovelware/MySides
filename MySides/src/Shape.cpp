@@ -13,7 +13,9 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 {	
 	//Collision
 	shapeFixDef_.userData = "shape";
-	addMaterial(shapeFixDef_);
+	shapeFixDef_.density = 100.0f;
+	shapeFixDef_.friction = 0.8f;
+	shapeFixDef_.restitution = 0.3f;
 
 	//Corrections
 	shapeVertices_ = fmax(3, fmin(shapeVertices_, 8));
@@ -45,28 +47,6 @@ Shape::~Shape()
 	{
 		weapon_->setOwner(nullptr);
 	}
-}
-
-void Shape::testBed()
-{
-	setPrimary(b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f)));
-	setSecondary(b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f)));
-	setTertiary(b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f)));
-
-	if (weapon_ != nullptr)
-	{
-		weapon_->setPrimary(colPrim_);
-		weapon_->setSecondary(colSecn_);
-		weapon_->setTertiary(colTert_);
-	}
-}
-
-//Add material data to passed fixture def
-void Shape::addMaterial(b2FixtureDef &def)
-{
-	def.density = 100.0f;
-	def.friction = 0.8f;
-	def.restitution = 1.f;
 }
 
 //Should only be called by set[shape] methods
@@ -121,7 +101,7 @@ void Shape::dropSide(b2Vec2 dir)
 	offset *= getSize();
 	float rhs = std::sqrt((size_ * size_) + (size_ * size_) - (2 * size_ * size_) * cos(2 * M_PI / shapeVertices_));
 
-	SideDef newSide = SideDef(getPosition() + offset, dir, rhs * size_, 5000.f * rhs);
+	SideDef newSide = SideDef(getPosition() + offset, dir, rhs, 5000.f * rhs);
 
 	newSide.colPrim = colSecn_;
 	newSide.colSecn = colPrim_;
@@ -298,6 +278,33 @@ void Shape::collect(int value)
 {
 	sides_ += value;
 	heal(std::ceil(value));
+}
+
+void Shape::setPrimary(b2Color col)
+{
+	colPrim_ = col;
+	if (weapon_ != nullptr)
+	{
+		weapon_->setPrimary(col);
+	}
+}
+
+void Shape::setSecondary(b2Color col)
+{
+	colSecn_ = col;
+	if (weapon_ != nullptr)
+	{
+		weapon_->setSecondary(col);
+	}
+}
+
+void Shape::setTertiary(b2Color col)
+{
+	colTert_ = col;
+	if (weapon_ != nullptr)
+	{
+		weapon_->setTertiary(col);
+	}
 }
 
 int Shape::getHP() const 

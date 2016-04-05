@@ -1,6 +1,6 @@
 #include "WeapAutoMag.hpp"
 
-Weapon::AutoMag::AutoMag(fireFunc& callback, ProjectileDef const &ammo, std::string id) :
+Weapon::AutoMag::AutoMag(FireFunc& callback, ProjectileDef const &ammo, std::string id) :
 	WeaponI(callback, ammo, id),
 	magazine_(30),
 	refireTime_(0),
@@ -11,8 +11,8 @@ Weapon::AutoMag::AutoMag(fireFunc& callback, ProjectileDef const &ammo, std::str
 {
 }
 
-Weapon::AutoMag::AutoMag(fireFunc & callback, ProjectileDef const & ammo, std::string id,
-	int magSize, int refireTime, int reloadTime, int spread) :
+Weapon::AutoMag::AutoMag(FireFunc & callback, ProjectileDef const & ammo, std::string id,
+	int magSize, int refireTime, int reloadTime, float spread) :
 	WeaponI(callback, ammo, id),
 	magazine_(magSize),
 	refireTime_(0),
@@ -109,7 +109,7 @@ void Weapon::AutoMag::fire(b2Vec2 &heading)
 
 	//Set up projectile
 	newProj->origin = owner_->getPosition() + heading;
-
+	newProj->inVelocity = owner_->getBody()->GetLinearVelocity();
 
 	float rotation = atan2f(heading.y, heading.x);
 	float adjust = randFloat(-spread_, spread_);
@@ -117,6 +117,7 @@ void Weapon::AutoMag::fire(b2Vec2 &heading)
 
 	newProj->heading = newDir;
 	newProj->owner = owner_;
+	newProj->inVelocity = owner_->getBody()->GetLinearVelocity();
 
 	//Fire projectile
 	fireCallback_(pv, id_);

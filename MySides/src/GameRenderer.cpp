@@ -194,7 +194,17 @@ void GameRenderer::drawProjectile(Projectile* const p)
 
 	sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
 	sf::Vector2f vel = B2toSF(body->GetLinearVelocity(), true);
+	float length = thor::length(vel);
+	if (length > 4) 
+	{
+		vel = thor::unitVector(vel);
+		vel *= fminf(length, (2));
+	}
+
 	vel *= (float)_SCALE_;
+	
+
+	//std::cout << thor::length(vel) << std::endl;
 
 	sf::Color pri = B2toSF(p->getPrimary());
 	sf::Color sec = B2toSF(p->getSecondary());

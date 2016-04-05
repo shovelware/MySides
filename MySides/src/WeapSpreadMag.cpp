@@ -1,6 +1,6 @@
 #include "WeapSpreadMag.hpp"
 
-Weapon::SpreadMag::SpreadMag(fireFunc& callback, ProjectileDef const &ammo, std::string id) :
+Weapon::SpreadMag::SpreadMag(FireFunc& callback, ProjectileDef const &ammo, std::string id) :
 	WeaponI(callback, ammo, id),
 	magazine_(8),
 	resetTime_(0),
@@ -13,7 +13,7 @@ Weapon::SpreadMag::SpreadMag(fireFunc& callback, ProjectileDef const &ammo, std:
 {
 }
 
-Weapon::SpreadMag::SpreadMag(fireFunc & callback, ProjectileDef const & ammo, std::string id,
+Weapon::SpreadMag::SpreadMag(FireFunc & callback, ProjectileDef const & ammo, std::string id,
 	int magSize, int resetTime, int reloadTime, int pellets, float spread) :
 	WeaponI(callback, ammo, id),
 	magazine_(magSize),

@@ -9,6 +9,17 @@ class Entity;
 
 class ProjectileDef {
 public:
+	struct ProjDet {
+		float force = 0;
+		float radius = 0;
+		int lifeTime = 0;
+	};
+
+	struct ProjShrapnel {
+		int shards = 0;
+		int level = 0;
+	};
+
 	ProjectileDef() :
 		origin(b2Vec2_zero),
 		heading(b2Vec2_zero),
@@ -17,8 +28,8 @@ public:
 		oneHit(false),
 		bounce(0),
 		penetration(0),
-		force(std::make_pair(0.f, 0.f)),
-		shrapnel(std::make_pair(0, 0)),
+		detonation(ProjDet()),
+		shrapnel(ProjShrapnel()),
 		hpMAX(0),
 		width(0),
 		height(0),
@@ -38,9 +49,9 @@ public:
 		velScale(1),
 		oneHit(false),
 		bounce(0),
-		penetration(0),
-		force(std::make_pair(0.f, 0.f)),
-		shrapnel(std::make_pair(0, 0)),
+		penetration(0), 
+		detonation(ProjDet()),
+		shrapnel(ProjShrapnel()),
 		hpMAX(1),
 		width(1),
 		height(0),
@@ -61,7 +72,7 @@ public:
 		velScale(pd.velScale),
 		bounce(pd.bounce),
 		penetration(pd.penetration),
-		force(pd.force),
+		detonation(pd.detonation),
 		shrapnel(pd.shrapnel),
 		hpMAX(pd.hpMAX),
 		width(pd.width),
@@ -73,7 +84,8 @@ public:
 		colTert(pd.colTert),
 		owner(nullptr),
 		target(nullptr)
-	{}
+	{
+	}
 
 	//Some projDef fields should be manually set every time, 
 	//to avoid confusion while copying
@@ -89,8 +101,8 @@ public:
 	bool oneHit;
 	float bounce;
 	int penetration;
-	std::pair<float, float> force; //! < force, radius 
-	std::pair<int, int> shrapnel;	//! < number, level
+	ProjDet detonation; //! < force, radius, lifetime
+	ProjShrapnel shrapnel;	//! < number, level
 
 	unsigned int hpMAX;
 	float width;

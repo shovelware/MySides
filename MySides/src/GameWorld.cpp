@@ -18,7 +18,6 @@ GameWorld::GameWorld() :
 	addSide_ = [this](SideDef& def) { addSide(def); };
 	fireWeap_ = [this](std::vector<ProjectileDef>& defs, std::string id) { fireWeapon(defs, id); };
 	addForce_ = [this](b2Vec2 pos, float force, float radius, int time) { addForce(pos, force, radius, time); };
-
 	
 	boundsFriction_.localAnchorA = (b2Vec2(0, 0));
 	boundsFriction_.localAnchorB = (b2Vec2(0, 0));
@@ -246,7 +245,7 @@ void GameWorld::addEnemy(const ShapeDef& def, Weapon::WeaponI* weapon)
 //Adds a projectile to the world via definition
 void GameWorld::addProjectile(const ProjectileDef& def)
 {
-	projectiles_.push_back(new Projectile(addBulletBody(def.origin), def));
+	projectiles_.push_back(new Projectile(addBulletBody(def.origin), def, addForce_));
 }
 
 //Adds a side to game world via definition
@@ -286,19 +285,19 @@ void GameWorld::addPickup(Pickup::Type type, b2Vec2 position, int time, float st
 
 void GameWorld::addShrapnel(Projectile* src)
 {
-	if (src->getShrapnel().first > 0)
+	if (src->getShrapnel().shards > 0)
 	{
 		b2Vec2 pos = src->getPosition();
 		b2Vec2 dir(0, 0);
 		Entity* owner = src->getOwner();
 
-		ProjectileDef shrapDef = armory_->getShrapnel(src->getShrapnel().second);
+		ProjectileDef shrapDef = armory_->getShrapnel(src->getShrapnel().level);
 		shrapDef.colPrim = src->getSecondary();
 		shrapDef.colSecn = src->getSecondary();
 		shrapDef.colTert = src->getPrimary();
 		shrapDef.damage = src->getDamage();
 		
-		for (int i = src->getShrapnel().first; i > 0; --i)
+		for (int i = src->getShrapnel().shards; i > 0; --i)
 		{
 			dir.x = randFloat(-1, 1);
 			dir.y = randFloat(-1, 1);
@@ -319,7 +318,23 @@ void GameWorld::addShrapnel(Projectile* src)
 
 void GameWorld::addForce(b2Vec2 pos, float force, float radius, int lifetime)
 {
-	forces_.push_back(new Force(addStaticBody(pos), force, radius, lifetime));
+		forces_.push_back(new Force(addStaticBody(pos), force, radius, lifetime));
+}
+
+bool GameWorld::requisition(Shape * shape, std::string weaponName, int weaponCode)
+{
+	if (shape != nullptr)
+	{
+		Weapon::WeaponI* newWeap = armory_->requisition(weaponName, weaponCode);
+		
+		if (newWeap != nullptr)
+		{
+			armShape(shape, newWeap);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void GameWorld::armShape(Shape* shape, Weapon::WeaponI * weapon)
@@ -389,15 +404,9 @@ void GameWorld::removeEnemy(Enemy* e)
 void GameWorld::removeProjectile(Projectile* p)
 {
 	//Shrapnel if we need to
-	if (p->getShrapnel().first != 0)
+	if (p->getShrapnel().shards != 0)
 	{
 		addShrapnel(p);
-	}
-
-	//If we need to explode
-	if (p->getForce().first != 0 && p->getForce().second != 0)
-	{
-		addForce(p->getPosition(), p->getForce().first, p->getForce().second, 100);
 	}
 
 	DestroyBody(p->getBody());
@@ -617,12 +626,17 @@ std::list<Projectile*>& GameWorld::getProjectiles() { return projectiles_; }
 std::list<Side*>& GameWorld::getSides() { return sides_; }
 std::list<Pickup::PickupI*>& GameWorld::getPickups() { return pickups_; }
 
+void GameWorld::step(int dt)
+{
+	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
+}
+
 //Update entity code and step the world
 void GameWorld::update(int dt)
 {
 	if (!pause_)
 	{
-		Step(dt, VELOCITY_ITERS, POSITION_ITERS);
+		//step(dt);
 
 		updatePlayer(dt);
 		updateEnemy(dt);
@@ -722,7 +736,8 @@ void GameWorld::updateProjectile(int dt)
 			prj->update(dt);
 
 			bool inside = prj->getPosition().Length() < bounds_->getRadius();
-			//If we're not active, increment by deleting
+
+			//If we're not active, or outside the bounds increment by deleting
 			if (prj->getActive() == false || !inside)
 			{
 				removeProjectile(prj);
@@ -1052,14 +1067,20 @@ void GameWorld::f1()
 
 void GameWorld::f2()
 {
-	Weapon::WeaponI* newWeap = armory_->requisition(dstr, di);
-	std::cout << "REQ: " << dstr << "/" << di << std::endl;
-	
-	if (newWeap != nullptr)
+	for (int i = 1; i < 7; ++i)
 	{
-		armShape(player_, newWeap);
+		for (int j = 1; j < 7; ++j)
+		{
+			b2Vec2 pos(-10 + j * 5,  - i * 5);
+			ShapeDef e(pos, b2Vec2_zero + pos, i + 2);
+			e.size = 0.5 * i;
+			e.hpScale = 5 * (j -1);
+			e.colPrim = b2Color(0.1 * i, 0.05 * j, 0.4);
+			e.colSecn = b2Color(0.7, 0.4 + (0.05 * i), 0.9 - (0.1 * j));
+			e.colTert = b2Color(1 - (0.05 * (i + j)), 0.7, 0.025 * (i * j));
+			addEnemy(e);
+		}
 	}
-
 }
 
 void GameWorld::f3()
@@ -1087,92 +1108,7 @@ void GameWorld::f6()
 
 void GameWorld::f7()
 {
-	Weapon::WeaponI* pweap = player_->getWeapon();
 
-	if (pweap != nullptr)
-	{
-		int lv = pweap->getLevel();
-		
-		if (lv == 8)
-		{
-			armory_->setWeaponLevel(pweap, 0);
-		}
-
-		else armory_->upgradeWeapon(pweap);
-
-		std::cout << "LVL: " << pweap->getID() << "/" << pweap->getLevel() << std::endl;
-	}
-
-}
-
-void GameWorld::f8()
-{
-	addPickup(Pickup::Type::SHIELD, b2Vec2(-10, 0), 20000);
-	addPickup(Pickup::Type::SIGHT, b2Vec2(10, 0), 20000);
-}
-
-void GameWorld::f9()
-{
-	b2Vec2 centre (0, 0);
-	b2Vec2 pos(0, 0);
-	float radius = 20.f;
-	ShapeDef def;
-	int groups = 8;
-	int shapes = 10;
-
-	//for 4 sizes
-	for (float i = 1; i <= groups; ++i)
-	{
-		centre.y = radius * (cos((M_PI * 2) / groups * i));
-		centre.x = radius * (-sin((M_PI * 2) / groups * i));
-
-		//for 5 shape sizes
-		for (float j = 3, max = shapes + 2; j <= max; ++j)
-		{
-			float ang = atan2f(centre.y, centre.x);
-			pos.y = (radius / 4.f) * (cos((M_PI * 2)/ max * j));
-			pos.x = (radius / 4.f) * (-sin((M_PI * 2)/ max * j));
-			
-			def.position = centre + pos;
-			def.heading =  pos + centre;
-			def.size = i * 0.25f;
-
-			def.vertices = (j < shapes ? j : 3 + (int)j % shapes);
-			def.hpScale = 5 * i;
-			def.colPrim = (b2Color(0.2f * i, 0.1f * j, 1.f - j / 10));
-			def.colSecn = (b2Color(0.2f * j, 0.1f * (i / j), 0.05f * (i + j)));
-			def.colTert = (b2Color(0.1f * i, 0.3f * i, 1.f * (j - i)));
-
-			addEnemy(def);
-		}
-	}
-}
-
-void GameWorld::f0()
-{
-	float x, y, rad = getBoundsRadius() * 0.7f;
-	y = -(cos((2 * M_PI) * 64 / randFloat(0, 64)));
-	x = -(sin((2 * M_PI) * 64 / randFloat(0, 64)));
-
-	b2Vec2 pos(x, y);
-	pos.Normalize();
-	pos *= randFloat(10, rad);
-
-	ShapeDef enem = ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
-	//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
-	enem.size = .5f;
-	enem.speedScale = .5f;
-	enem.hpScale = 5;
-
-	enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
-	enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
-	enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.1f, 0.3f), randFloat(0.1f, 0.3f));
-
-	addEnemy(enem);
-}
-
-void GameWorld::testBed()
-{
 	//EW
 	for (int max = 9, i = 0; i < max; ++i)
 	{
@@ -1187,7 +1123,7 @@ void GameWorld::testBed()
 		case 0:
 			newWeap = armory_->getShotgun();
 			newDef = armory_->getPellet();
-			
+
 			enem.colPrim = b2Color(.75f, .75f, .75f);
 			enem.colSecn = b2Color(.5f, .5f, .5f);
 			enem.colTert = b2Color(.75f, .75f, .75f);
@@ -1268,7 +1204,7 @@ void GameWorld::testBed()
 
 		float x, y;
 
-		y = -(cos((2 * M_PI) * i / max))  *5;
+		y = -(cos((2 * M_PI) * i / max)) * 5;
 		x = -(sin((2 * M_PI) * i / max)) * 5;
 
 		enem.position = (b2Vec2(x, y));
@@ -1278,7 +1214,7 @@ void GameWorld::testBed()
 		newDef.damage = 0;
 
 		Enemy* enemy = new Enemy(addDynamicBody(enem.position), enem, addSide_, getControlled_);
-		
+
 
 		if (newWeap != nullptr)
 		{
@@ -1288,4 +1224,75 @@ void GameWorld::testBed()
 
 		shapes_.push_back(enemy);
 	}
+
+}
+
+void GameWorld::f8()
+{
+	addPickup(Pickup::Type::SHIELD, b2Vec2(-10, 0), 20000);
+	addPickup(Pickup::Type::SIGHT, b2Vec2(10, 0), 20000);
+}
+
+void GameWorld::f9()
+{
+	b2Vec2 centre (0, 0);
+	b2Vec2 pos(0, 0);
+	float radius = 20.f;
+	ShapeDef def;
+	int groups = 8;
+	int shapes = 10;
+
+	//for 4 sizes
+	for (float i = 1; i <= groups; ++i)
+	{
+		centre.y = radius * (cos((M_PI * 2) / groups * i));
+		centre.x = radius * (-sin((M_PI * 2) / groups * i));
+
+		//for 5 shape sizes
+		for (float j = 3, max = shapes + 2; j <= max; ++j)
+		{
+			float ang = atan2f(centre.y, centre.x);
+			pos.y = (radius / 4.f) * (cos((M_PI * 2)/ max * j));
+			pos.x = (radius / 4.f) * (-sin((M_PI * 2)/ max * j));
+			
+			def.position = centre + pos;
+			def.heading =  pos + centre;
+			def.size = i * 0.25f;
+
+			def.vertices = (j < shapes ? j : 3 + (int)j % shapes);
+			def.hpScale = 5 * i;
+			def.colPrim = (b2Color(0.2f * i, 0.1f * j, 1.f - j / 10));
+			def.colSecn = (b2Color(0.2f * j, 0.1f * (i / j), 0.05f * (i + j)));
+			def.colTert = (b2Color(0.1f * i, 0.3f * i, 1.f * (j - i)));
+
+			addEnemy(def);
+		}
+	}
+}
+
+void GameWorld::f0()
+{
+	float x, y, rad = getBoundsRadius() * 0.7f;
+	y = -(cos((2 * M_PI) * 64 / randFloat(0, 64)));
+	x = -(sin((2 * M_PI) * 64 / randFloat(0, 64)));
+
+	b2Vec2 pos(x, y);
+	pos.Normalize();
+	pos *= randFloat(10, rad);
+
+	ShapeDef enem = ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
+	//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
+	enem.size = .5f;
+	enem.speedScale = .5f;
+	enem.hpScale = 5;
+
+	enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
+	enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
+	enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.1f, 0.3f), randFloat(0.1f, 0.3f));
+
+	addEnemy(enem);
+}
+
+void GameWorld::testBed()
+{
 }

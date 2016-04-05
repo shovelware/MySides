@@ -142,7 +142,7 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 
 	switch (type)
 	{
-		// Explosive Buckshot
+	// Explosive Buckshot
 	case 44:
 	{
 		ProjectileDef gren = ProjectileDef();
@@ -150,75 +150,131 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		gren.hpMAX = 1;
 		gren.damage = 10;
 		//gren.oneHit = true;
-		gren.force.first = 0.25f;
-		gren.force.second = 2.f;
-		gren.shrapnel.first = 8;
-		gren.shrapnel.second = 4;
+		gren.detonation.force = 0.25f;
+		gren.detonation.radius = 2.f;
+		gren.detonation.lifeTime = 50;
+		gren.shrapnel.shards = 8;
+		gren.shrapnel.level = 4;
 		gren.width = 4.f;
-		gren.lifeTime = 500;
+		gren.lifeTime = 250;
 
 		funGun = new Weapon::SpreadMag(fireCallback_, gren, "thumper", 16, 50, 500, 8, 0.3f);
 		break;
 	}
 	
-		//Lance Beam
+	//Broad Beam
 	case 42:
 	{
 		ProjectileDef laser = getLaser();
 		laser.damage = 80.f;
 		laser.hpMAX = 20;
 		laser.lifeTime = 5000;
-		laser.height = 10.f;
-		laser.width = 100.f;
+		laser.height = 50.f;
+		laser.width = 200.f;
 		laser.penetration = 100;
+		laser.detonation.force = -0.5f;
+		laser.detonation.radius = 3.f;
+		laser.detonation.lifeTime = 50;
 		
 		funGun = new Weapon::SemiBat(fireCallback_, laser, "coilgun", 1280, 32, 64);
 		break;
 	}
-		//Black Hole Gun
+	
+	//Flak cannon
+	case 47:
+	{
+		ProjectileDef shrap = getShrapnel(8);
+		shrap.lifeTime = 175;
+		shrap.oneHit = true;
+		shrap.height = shrap.width * 8;
+		shrap.width *= 4;
+		shrap.shrapnel.shards = 4;
+		shrap.shrapnel.level = 8;
+		shrap.detonation.force = 0.5f;
+		shrap.detonation.radius = 1.f;
+		shrap.detonation.lifeTime = 150;
+
+		funGun = new Weapon::SpreadMag(fireCallback_, shrap, "shotgun", 4, 0, 300, 10, 2.f);
+
+		break;
+	}	
+
+	//Chug cannon
+	case 60:
+	{
+		ProjectileDef shug = ProjectileDef();
+		shug.velScale = 1.f;
+		shug.width = 1.f;
+		shug.hpMAX = 1;
+		//shug.bounce = 1.0;
+		shug.damage = 20;
+		//shug.oneHit = true;
+		shug.shrapnel.shards = 32;
+		shug.shrapnel.level = 8;
+		shug.lifeTime = 500;
+
+		funGun = new Weapon::AutoMag(fireCallback_, shug, "launcher", 24, 50, 2000, 0.15f );
+		break;
+	}
+
+	//Black Hole Gun
 	case 88:
 	{
 		ProjectileDef voib = ProjectileDef();
-		voib.force.first = -1;
-		voib.force.second = 20.f;
-		voib.lifeTime = 1000;
+		voib.detonation.force = -0.1f;
+		voib.detonation.radius = 10.f;
+		voib.detonation.lifeTime = 2500;
+		voib.lifeTime = 500;
 		voib.penetration = 15;
 		voib.hpMAX = 10;
 		voib.bounce = 0.75f;
 		voib.width = 1;
 		voib.height = 1;
 
-		funGun = new Weapon::SemiMag(fireCallback_, voib, "thumper", 2, 400, 2000);
+		funGun = new Weapon::SemiMag(fireCallback_, voib, "railgun", 2, 400, 2000);
 		break;
 	}
 
-		//Flak cannon
-	case 47:
+	//Lance Beam
+	case 111:
 	{
-		ProjectileDef shrap = getShrapnel(8);
-		shrap.lifeTime = 150;
-		shrap.oneHit = true;
-		shrap.height = shrap.width * 4;
-		shrap.width *= 2;
-		shrap.shrapnel.first = 4;
-		shrap.shrapnel.second = 8;
-		shrap.force.first = 0.5f;
-		shrap.force.second = 1.f;
+		ProjectileDef lance = ProjectileDef();
+		lance.velScale = 1.f;
+		lance.width = 0.5f;
+		lance.height = 4.f;
+		lance.penetration = 4;
+		lance.hpMAX = 4;
+		lance.damage = 30;
+		lance.lifeTime = 300;
 
-		funGun = new Weapon::SpreadMag(fireCallback_, shrap, "shotgun", 4, 0, 300, 8, 0.75f);
+		funGun = new Weapon::SpreadBat(fireCallback_, lance, "coilgun", 1600, 16, 500, 16, 1, -10.0, 4.f, 2.f);
+		break;
+	}
+	//Mikrowerfer
+	case 666:
+	{
+		ProjectileDef wave = ProjectileDef();
+		wave.velScale = 1.25f;
+		wave.width = 2.5f;
+		wave.bounce = 1.f;
+		wave.hpMAX = 8;
+		wave.damage = 40;
+		wave.lifeTime = 3000;
 
+		funGun = new Weapon::SpreadBat(fireCallback_, wave, "launcher", 320, 16, 800, 16, 6, -1.0, 0.9f, -2.f);
 		break;
 	}
 
-		//Chaingun
+	//Chaingun
 	case 888:
 	{
 		ProjectileDef bb = getShrapnel(8);
 		bb.lifeTime = 200;
 		bb.oneHit = true;
 		bb.bounce = 0.f;
-		bb.force.first = 0.025f;
-		bb.force.second = 0.5f;
+		bb.detonation.force = 0.025f;
+		bb.detonation.radius = 0.5f;
+		bb.detonation.lifeTime = 25;
 
 		funGun = new Weapon::SpreadBat(fireCallback_, bb, "pistol", 2000, 32, 1000, 10, 8, 0, 0.5, 1.1f);
 		
@@ -280,7 +336,7 @@ ProjectileDef Weapon::Armory::getShrapnel(int level)
 	if (level > 0) { shard.damage = 6; }
 
 	//L2B : Lifetime+
-	if (level > 1) { shard.lifeTime = 40; }
+	if (level > 1) { shard.lifeTime = 75; }
 
 	//L3F : Speed+
 	if (level > 2) { shard.velScale = 1.f; }
@@ -292,13 +348,13 @@ ProjectileDef Weapon::Armory::getShrapnel(int level)
 	if (level > 4) { shard.damage = 8; }
 
 	//L6B : Bounce+
-	if (level > 5) { shard.bounce = 0.5f; }
+	if (level > 5) { shard.bounce = 1.f; }
 
 	//L7F : Speed++
 	if (level > 6) { shard.velScale = 1.5f; }
 
 	//L8S : Lifetime++
-	if (level > 7) { shard.lifeTime = 64; }
+	if (level > 7) { shard.lifeTime = 100; }
 
 	return shard;
 }
@@ -307,20 +363,20 @@ ProjectileDef Weapon::Armory::getPellet(int level)
 {
 	//L0 : Default
 	ProjectileDef pellet = ProjectileDef();
-	pellet.velScale = 1.f;
+	pellet.velScale = 0.75f;
 	pellet.hpMAX = 1;
-	pellet.width = 0.25f;
+	pellet.width = 0.35f;
 	pellet.damage = 4;
 	pellet.lifeTime = 150;
 
 	//L1H : Damage+
 	if (level > 0) { pellet.damage = 6; }
 
-	//L2B : Life+
+	//L2B : Lifetime+
 	if (level > 1) { pellet.lifeTime = 200; }
 
 	//L3F : Speed+
-	if (level > 2) { pellet.velScale = 1.25f; }
+	if (level > 2) { pellet.velScale = 1.f; }
 
 	//L4S : HP+
 	if (level > 3) { pellet.hpMAX = 2; }
@@ -329,10 +385,10 @@ ProjectileDef Weapon::Armory::getPellet(int level)
 	if (level > 4) { pellet.damage = 8; }
 
 	//L6B : Bounce+
-	if (level > 5) { pellet.bounce = 0.5f; }
+	if (level > 5) { pellet.bounce = 0.75f; }
 
-	//L7F : Speed++
-	if (level > 6) { pellet.velScale = 1.5f; }
+	//L7F : Lifetime++
+	if (level > 6) { pellet.lifeTime = 500; }
 
 	//L8S : HP++
 	if (level > 7) { pellet.hpMAX = 3; }
@@ -365,8 +421,8 @@ ProjectileDef Weapon::Armory::getNinMil(int level)
 	//L5H : Damage++
 	if (level > 4) { ninmil.damage = 24; }
 
-	//L6B : Force+
-	if (level > 5) { ninmil.force.first = 0.1f; ninmil.force.second = 1.f; }
+	//L6B : Det+
+	if (level > 5) { ninmil.detonation.force = 0.05f; ninmil.detonation.radius = 0.5f; ninmil.detonation.lifeTime = 25; }
 
 	//L7F : Speed++
 	if (level > 6) { ninmil.velScale = 1.6; }
@@ -399,14 +455,14 @@ ProjectileDef Weapon::Armory::getBullet(int level)
 	//L4S : HP+
 	if (level > 3) { bullet.hpMAX = 2; }
 
-	//L5H : Force+
-	if (level > 4) { bullet.force.first = 0.1f; bullet.force.second = 0.5f; }
+	//L5H : Det+
+	if (level > 4) { bullet.detonation.force = 0.05f; bullet.detonation.radius = 0.5f; bullet.detonation.lifeTime = 25; }
 
 	//L6B : Damage++
 	if (level > 5) { bullet.damage = 16; }
 
-	//L7F : Speed++
-	if (level > 6) { bullet.velScale = 1.2f; }
+	//L7F : Lifetime++
+	if (level > 6) { bullet.lifeTime = 250; }
 
 	//L8S : Penetration+
 	if (level > 7) { bullet.penetration = 1; }
@@ -433,8 +489,8 @@ ProjectileDef Weapon::Armory::getCannonball(int level)
 	//L3F : Speed+
 	if (level > 2) { ball.velScale = 3; }
 
-	//L4S : Force+
-	if (level > 3) { ball.force.first = 0.2f; ball.force.second = 0.8f;}
+	//L4S : Det+
+	if (level > 3) { ball.detonation.force = 2.f; ball.detonation.radius = 2.0f; ball.detonation.lifeTime = 100; }
 
 	//L5H : Lifetime+
 	if (level > 4) { ball.lifeTime = 400; }
@@ -458,12 +514,13 @@ ProjectileDef Weapon::Armory::getGrenade(int level)
 	grenade.velScale = 1.f;
 	grenade.oneHit = true;
 	grenade.hpMAX = 1;
-	grenade.force.first = 0.15f;
-	grenade.force.second = 2.f;
+	grenade.detonation.force = 0.5f;
+	grenade.detonation.radius = 2.f;
+	grenade.detonation.lifeTime = 250;
 	grenade.width = 1.75f;
 	grenade.height = 1.75f;
-	grenade.shrapnel.first = 12;
-	grenade.shrapnel.second = 6;
+	grenade.shrapnel.shards = 12;
+	grenade.shrapnel.level = 6;
 	grenade.damage = 10;
 	grenade.lifeTime = 400;
 
@@ -476,17 +533,17 @@ ProjectileDef Weapon::Armory::getGrenade(int level)
 	//L3F : Speed+
 	if (level > 2) { grenade.velScale = 1.2f; }
 
-	//L4S :  Force+
-	if (level > 3) { grenade.force.first = 0.2f; }
+	//L4S :  Det+
+	if (level > 3) { grenade.detonation.force = 0.2f; }
 
 	//L5H : Shrapnel+
-	if (level > 4) { grenade.shrapnel.second = 8; }
+	if (level > 4) { grenade.shrapnel.level = 8; }
 
 	//L6B : Damage++
 	if (level > 5) { grenade.damage = 16; }
 
-	//L7F : Force++
-	if (level > 6) { grenade.force.first = 0.4f; grenade.force.second = 2.5f; }
+	//L7F : Det++
+	if (level > 6) { grenade.detonation.force = 1.f; grenade.detonation.radius = 2.5f; grenade.detonation.lifeTime = 300; }
 
 	//L8S : Speed++
 	if (level > 7) { grenade.velScale = 1.5f; }
@@ -503,10 +560,11 @@ ProjectileDef Weapon::Armory::getRocket(int level)
 	rocket.hpMAX = 1;
 	rocket.width = 2.f;
 	rocket.height = 3.f;
-	rocket.force.first = 0.1f;
-	rocket.force.second = 2.f;
-	rocket.shrapnel.first = 8;
-	rocket.shrapnel.second = 4;
+	rocket.detonation.force = 0.5f;
+	rocket.detonation.radius = 2.f;
+	rocket.detonation.lifeTime = 50;
+	rocket.shrapnel.shards = 8;
+	rocket.shrapnel.level = 4;
 	rocket.damage = 16;
 	rocket.lifeTime = 500;
 
@@ -523,16 +581,16 @@ ProjectileDef Weapon::Armory::getRocket(int level)
 	if (level > 3) { rocket.damage = 32; }
 
 	//L5H : Shrapnel+
-	if (level > 4) { rocket.shrapnel.second = 6; }
+	if (level > 4) { rocket.shrapnel.level = 6; }
 
-	//L6B : Force+
-	if (level > 5) { rocket.force.first = 0.2f; rocket.force.second = 3.f; }
+	//L6B : Det+
+	if (level > 5) { rocket.detonation.force = 1.f; rocket.detonation.radius = 3.f;	rocket.detonation.lifeTime = 75; }
 
 	//L7F : Damage++++
 	if (level > 6) { rocket.damage = 48; }
 
-	//L8S : Force++
-	if (level > 7) { rocket.force.first = 0.5f; rocket.force.second = 4.f; }
+	//L8S : Det++
+	if (level > 7) { rocket.detonation.force = 0.5f; rocket.detonation.radius = 4.f; rocket.detonation.lifeTime = 100; }
 
 	return rocket;
 }
@@ -547,7 +605,7 @@ ProjectileDef Weapon::Armory::getLaser(int level)
 	laser.height = 6.f;
 	laser.penetration = 1;
 	laser.damage = 4;
-	laser.lifeTime = 125;
+	laser.lifeTime = 175;
 
 	//L1H : Damage+
 	if (level > 0) { laser.damage = 8; }
@@ -559,7 +617,7 @@ ProjectileDef Weapon::Armory::getLaser(int level)
 	if (level > 2) { laser.velScale = 1.5f; }
 
 	//L4S : Lifetime+
-	if (level > 3) { laser.lifeTime = 175; }
+	if (level > 3) { laser.lifeTime = 300; }
 
 	//L5H : Penetration++
 	if (level > 4) { laser.penetration = 3; }
@@ -585,7 +643,7 @@ ProjectileDef Weapon::Armory::getSlug(int level)
 	slug.hpMAX = 1;
 	slug.damage = 32;
 	slug.velScale = 0.75f;
-	slug.lifeTime = 150;
+	slug.lifeTime = 500;
 	slug.height = 1.6f;
 
 	//L1H : Damage+
@@ -597,14 +655,14 @@ ProjectileDef Weapon::Armory::getSlug(int level)
 	//L3F : Speed+
 	if (level > 2) { slug.velScale = 1.f;  }
 
-	//L4S : Force+
-	if (level > 3) { slug.force.first = 0.4f; slug.force.second = 0.5f; }
+	//L4S : Det+
+	if (level > 3) { slug.detonation.force = 0.2f; slug.detonation.radius = 1.f; slug.detonation.lifeTime = 50; }
 
 	//L5H : Damage++
 	if (level > 4) { slug.damage = 64; }
 
 	//L6B : Lifetime+
-	if (level > 5) { slug.lifeTime = 300; }
+	if (level > 5) { slug.lifeTime = 750; }
 
 	//L7F : Speed++
 	if (level > 6) { slug.velScale = 1.1; }
@@ -620,21 +678,21 @@ ProjectileDef Weapon::Armory::getFlammen(int level)
 	//L0 : Default
 	ProjectileDef flam = ProjectileDef();
 
-	flam.width = 0.01f;
-	flam.height = 1.f;
+	flam.width = 4.f;
+	flam.height = 1.5f;
 	flam.hpMAX = 1;
 	flam.damage = 2;
-	flam.velScale = 0.15f;
+	flam.velScale = 0.75f;
 	flam.lifeTime = 100;
 
-	//L1H : Speed+
-	if (level > 0) { flam.velScale = 0.25f; }
+	//L1H : LifeTime+
+	if (level > 0) { flam.lifeTime = 150; }
 
 	//L2B : Pen+
 	if (level > 1) { flam.penetration = 1; }
 
 	//L3F : Speed++
-	if (level > 2) { flam.velScale = 0.3f; }
+	if (level > 2) { flam.velScale = 1.f; }
 
 	//L4S : Damage+
 	if (level > 3) { flam.damage = 4; }
@@ -642,14 +700,14 @@ ProjectileDef Weapon::Armory::getFlammen(int level)
 	//L5H : Pen++
 	if (level > 4) { flam.penetration = 2; }
 
-	//L6B : LifeTime+
-	if (level > 5) { flam.lifeTime = 150; }
+	//L6B : LifeTime++
+	if (level > 5) { flam.lifeTime = 200; }
 
 	//L7F : Damage++
 	if (level > 6) { flam.damage = 6; }
 
-	//L8S : LifeTime++
-	if (level > 7) { flam.lifeTime = 200; }
+	//L8S : LifeTime+++
+	if (level > 7) { flam.lifeTime = 300; }
 
 	return flam;
 }
@@ -702,7 +760,7 @@ void Weapon::Armory::upgradeRifle(Weapon::AutoMag* rifle, int level, int projLev
 	rifle->setMagSize(27, true);
 	rifle->setRefireTime(150);
 	rifle->setReloadTime(4000);
-	rifle->setSpread(0.005);
+	rifle->setSpread(0.125f);
 
 	//L1H : Spread-
 	if (level > 0) { rifle->setSpread(0.0025); }
@@ -714,13 +772,13 @@ void Weapon::Armory::upgradeRifle(Weapon::AutoMag* rifle, int level, int projLev
 	if (level > 2) { rifle->setReloadTime(3000); }
 
 	//L4S : Mag+
-	if (level > 3) { rifle->setSpread(.2f); }
+	if (level > 3) { rifle->setSpread(.1f); }
 
 	//L5H : ReloadTime--
 	if (level > 4) { rifle->setReloadTime(2000); }
 
 	//L6B : Spread--
-	if (level > 5) { rifle->setSpread(0.001f); }
+	if (level > 5) { rifle->setSpread(0.05f); }
 
 	//L7F : RefireTime-
 	if (level > 6) { rifle->setRefireTime(50); }

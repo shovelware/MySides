@@ -7,8 +7,8 @@
 namespace Weapon {
 	class SemiMag : public WeaponI {
 	public:
-		SemiMag(fireFunc& callback, ProjectileDef const &ammo, std::string id);
-		SemiMag(fireFunc& callback, ProjectileDef const &ammo, std::string id, int magSize, int resetTime, int reloadTime);
+		SemiMag(FireFunc& callback, ProjectileDef const &ammo, std::string id);
+		SemiMag(FireFunc& callback, ProjectileDef const &ammo, std::string id, int magSize, int resetTime, int reloadTime);
 
 		bool isUpping() const;
 		bool canFire() const;

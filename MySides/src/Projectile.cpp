@@ -7,20 +7,21 @@
 #include "Pickup.hpp"
 #include "Shield.hpp"
 
-Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
+
+Projectile::Projectile(b2Body* body, const ProjectileDef& def, ForceFunc& forceCallback) :
 	Entity(body),
+	forceCallback_(forceCallback),
 	fired_(false),
 	oneHit_(def.oneHit),
 	origin_(def.origin), heading_(def.heading),
+	lastPen_ (def.origin),
 	maxHP_(def.hpMAX), hp_(def.hpMAX),
 	damage_(def.damage),
 	size_(def.width, def.height),
 	lifeTime_(def.lifeTime),
 	owner_(def.owner), 
 	target_(def.target),
-	penetration_(def.penetration),
-	force_(std::make_pair(def.force.first, def.force.second)),
-	shrapnel_(std::make_pair(def.shrapnel.first, def.shrapnel.second))
+	penetration_(def.penetration)
 {
 	if (def.height > 0)
 	{
@@ -32,8 +33,13 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def) :
 		setAsCircle(size_, def.bounce, def.penetration);
 	}
 
+	//Explosive properties
+	force_ = def.detonation;
+	shrapnel_ = def.shrapnel;
+
 	//Do maths to orient body
-	body_->SetTransform(def.origin, body_->GetAngle());
+	body_->SetTransform(def.origin, atan2f(-heading_.x, heading_.y));
+	body_->SetLinearVelocity(def.inVelocity);
 
 	//Set up colours
 	colPrim_ = def.colPrim;
@@ -56,14 +62,15 @@ void Projectile::setAsCircle(b2Vec2 size, float bounce = 0.f, bool ghost = false
 
 	//Collision
 	fixtureDef.userData = "projectile";
-	addMaterial(fixtureDef, bounce);
+	fixtureDef.density = 25.f;
+	fixtureDef.friction = 1.0f;
+	fixtureDef.restitution = bounce;
 
 	//Bind fixture
 	body_->CreateFixture(&fixtureDef);
 
 	//End box2d setup
-	 
-	speed_ = 0.0025f * M_PI * size.x * size.x;
+	speed_ = 0.05f * (M_PI * (size.x * size.x));
 }
 
 void Projectile::setAsRect(b2Vec2 size, float bounce = 0.f, bool ghost = false)
@@ -79,21 +86,15 @@ void Projectile::setAsRect(b2Vec2 size, float bounce = 0.f, bool ghost = false)
 
 	//Collision
 	fixtureDef.userData = "projectile";
-	addMaterial(fixtureDef, bounce);
-
+	fixtureDef.density = 25.f;
+	fixtureDef.friction = 1.0f;
+	fixtureDef.restitution = bounce;
+	
 	//Bind fixture
 	body_->CreateFixture(&fixtureDef);
 
 	//End box2d setup
-	body_->SetTransform(body_->GetPosition(), atan2f(-heading_.x, heading_.y));
-	speed_ = 0.0025f * (size.x * size.y);
-}
-
-void Projectile::addMaterial(b2FixtureDef & def, float bounce)
-{
-	def.density = 50.0f;
-	def.friction = 0.0f;
-	def.restitution = bounce;
+	speed_ = 0.05f * (size.x * size.y);
 }
 
 void Projectile::fire(float mult)
@@ -102,14 +103,19 @@ void Projectile::fire(float mult)
 	{
 		heading_.Normalize();
 
-		heading_ *= speed_ * mult;
 		
-		body_->SetLinearVelocity(body_->GetLinearVelocity() + heading_);
+		b2Vec2 newVelocity = heading_;
+		newVelocity *= speed_ * mult;
+		
+		//body_->SetLinearVelocity(body_->GetLinearVelocity() + heading_);
 		//newVelocity.x = body_->GetMass() / (newVelocity.x > 0 ? newVelocity.x : 1);
 				
 		//(newVelocity.x != 0 ? newVelocity.x = body_->GetMass() / newVelocity.x : newVelocity.x);
 		//(newVelocity.y != 0 ? newVelocity.y = body_->GetMass() / newVelocity.y : newVelocity.y);
-		body_->ApplyForce(heading_, body_->GetWorldCenter(), true);
+
+		//std::cout << std::endl << "NEWVEL===" << std::endl << newVelocity.Length() << std::endl;
+
+		body_->ApplyLinearImpulse(newVelocity, body_->GetWorldCenter(), true);
 		fired_ = true;
 	}
 }
@@ -118,42 +124,18 @@ void Projectile::takeDamage(unsigned int damage)
 {
 	hp_ -= damage;
 	if (hp_ <= 0)
+	{
 		alive_ = false;
+	}
 }
 
-int Projectile::getDamage() const
-{
-	return damage_;
-}
-
-std::pair<float, float> const& Projectile::getForce() const { return force_; }
-
-std::pair<int, int> const& Projectile::getShrapnel() const { return shrapnel_; }
-
-Entity * Projectile::getOwner()
-{
-	return owner_;
-}
-
-void Projectile::setOwner(Entity* o)
-{
-	owner_ = o;
-}
-
-Entity* Projectile::getTarget()
-{
-	return target_;
-}
-
-void Projectile::setTarget(Entity* s)
-{
-	target_ = s;
-}
-
-b2Vec2 Projectile::getDirection() const
-{
-	return heading_;
-}
+int Projectile::getDamage() const { return damage_; }
+ProjectileDef::ProjShrapnel const& Projectile::getShrapnel() const { return shrapnel_; }
+Entity * Projectile::getOwner() { return owner_; }
+void Projectile::setOwner(Entity* o) {	owner_ = o; }
+Entity* Projectile::getTarget() { return target_; }
+void Projectile::setTarget(Entity* s) {	target_ = s; }
+b2Vec2 Projectile::getDirection() const { return heading_; }
 
 void Projectile::update(int milliseconds)
 {
@@ -161,25 +143,34 @@ void Projectile::update(int milliseconds)
 
 	if (alive_)
 	{
-		if (fired_)
-		{
-			//body_->ApplyForce(heading_, body_->GetWorldCenter(), true);
-		}
-
-		b2Vec2 vel = body_->GetLinearVelocity();
-
+		//Turn off penetration
 		if (penetration_ < 0)
 		{
 			body_->GetFixtureList()->SetSensor(false);
 		}
+
+		if (!(lastPen_ == origin_))
+		{
+			forceCallback_(lastPen_, force_.force, force_.radius, force_.lifeTime);
+			lastPen_ = origin_;
+		}
+
+		b2Vec2 vel = body_->GetLinearVelocity();
 		body_->SetTransform(body_->GetPosition(), atan2f(-vel.x, vel.y));
 
-		//std::cout << body_->GetLinearVelocity().Length();
+		//std::cout << vel.Length() << std::endl;
 
 		if (vel.Length() <= 0 || hp_ <= 0 || lifeTime_ <= 0)
 		{
 			alive_ = false;
 		}
+	}
+
+	//Do our force once before we deactivate
+	else if (alive_ == false && active_ == true)
+	{
+		forceCallback_(body_->GetPosition(), force_.force, force_.radius, force_.lifeTime);
+		active_ = false;
 	}
 
 	else active_ = false;
@@ -198,22 +189,27 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 			//Onehit projectiles die on hit, precedence over all
 			if (oneHit_)
 			{
-				active_ = false;
+				alive_ = false;
 			}
 
 			//If we can't penetrate
-			if (penetration_-- < 0)
+			if (penetration_-- <= 0)
 			{
 				takeDamage(1);
 				
 				if (size_.y > 0)
 				{
-					b2Vec2 vel = body_->GetLinearVelocity();
-					vel *= (0.1* size_.x * size_.y);
-
-					body_->SetLinearVelocity(vel);
-
+					//b2Vec2 vel = body_->GetLinearVelocity();
+					//vel *= (0.1* size_.x * size_.y);
+					//
+					//body_->SetLinearVelocity(vel);
 				}
+			}
+
+			//Do our force on penetration
+			else
+			{
+				lastPen_ = body_->GetPosition();
 			}
 
 			if (alive_ == false)

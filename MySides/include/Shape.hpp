@@ -23,19 +23,25 @@ class Shape : public Entity {
 public:
 	Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& callback);
 	~Shape();
-
+	
+	//Movement
 	void move(b2Vec2 direction); //override
 	void orientedMove(b2Vec2 direction); //Thrusts and rotates towards direction
 	void stopMove();
 
+	//Orientation
 	void orient(b2Vec2 direction);
 	void snapOrient(b2Vec2 direction);
 	void stopRotate();
 	b2Vec2 getOrientation() const;
 
+	//State changers
 	void heal(int health);
 	void takeDamage(int damage, b2Vec2 direction);
 	void collect(int value);
+	void setPrimary(b2Color col);
+	void setSecondary(b2Color col);
+	void setTertiary(b2Color col);
 
 	//HP values
 	int getHP() const;
@@ -43,9 +49,11 @@ public:
 	int getUHP() const;
 	unsigned int getUHPMax() const;
 
+	//Accessors
 	int getSidesCollected() const;
 	float getSize() const;
 	
+	//Death
 	void explode();
 
 	//New weapons system
@@ -63,26 +71,21 @@ public:
 	int getWeaponBarMAX();
 	
 	void update(int milliseconds);
-
-	void testBed();
-
-	//void draw(GameDrawer d); // override//override
 protected:
 	/*const*/ float maxVel_;//maximum velocity
 	/*const*/ float maxRot_;//maximum rotation
 
-	b2FixtureDef shapeFixDef_;
 
 	//Add physics and shapes
-	void addMaterial(b2FixtureDef & def);
 	void setPoly(int vertices, float radius);
 	void clearb2();
+	b2FixtureDef shapeFixDef_;
 
-	b2Vec2 lastDamage_;
 
 	//Side dropping
 	std::function<void(SideDef&)> sideCallback_;
 	void dropSide(b2Vec2 dir);
+	b2Vec2 lastDamage_;
 
 	//HP
 	int hp_;

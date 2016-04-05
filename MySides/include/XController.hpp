@@ -40,6 +40,8 @@ public:
 	bool checkPressed(WORD button) const;
 	bool checkReleased(WORD button) const;
 
+	void setDown(WORD button);
+
 	bool checkHeld(WORD button) const;
 
 	unsigned int checkTimeHeld(WORD button) const;

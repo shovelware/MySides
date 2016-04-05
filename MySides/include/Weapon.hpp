@@ -22,7 +22,7 @@
 class Shape;
 
 namespace Weapon {
-	typedef std::function<void(std::vector<ProjectileDef>& defs, std::string id)> fireFunc;
+	typedef std::function<void(std::vector<ProjectileDef>& defs, std::string id)> FireFunc;
 
 	class WeaponI {
 	public:
@@ -59,13 +59,13 @@ namespace Weapon {
 		virtual void update(int ms) = 0;	//!< Updates weapon
 
 	protected:
-		WeaponI(fireFunc& callback, ProjectileDef const &ammo, std::string ids);
+		WeaponI(FireFunc& callback, ProjectileDef const &ammo, std::string ids);
 
 		std::string id_;
 		Shape* owner_;
 
 		ProjectileDef output_;
-		fireFunc fireCallback_;
+		FireFunc fireCallback_;
 
 		bool pin_;
 		b2Vec2 barrel_;
