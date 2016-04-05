@@ -7,7 +7,8 @@
 Enemy::Enemy(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) :
 	Shape(body, def, callback),
 	getPlayer_(player),
-	collector_(false)
+	collector_(false),
+	aistate(def.ai)
 {
 	body_->GetFixtureList()->SetUserData("enemy");
 	shapeFixDef_.userData = "enemy";
@@ -17,44 +18,75 @@ void Enemy::update(int milliseconds)
 {
 	Shape::update(milliseconds);
 
-	Shape* player = getPlayer_();
+	//Still
+	if (aistate == 0);
 
-	if (player)
+
+	//Blind fire
+	else if (aistate == 1)
 	{
-		b2Vec2 playerPos = player->getPosition();
-		b2Vec2 ePos = getPosition();
-		b2Vec2 between = playerPos - ePos;
-	
-		//orient(between);
-	
-		if (between.Length() > 40 || between.Length() < 4.f)
+		move(b2Vec2_zero);
+
+		//fire(b2Vec2_zero + body_->GetPosition());
+		if (getWeaponReady())
 		{
-	
+			trigger(b2Vec2(0, 0));
 		}
-	
-		else if (between.Length() < 25 && (getHP() >= getHPMax() / 2))
+
+		else
 		{
-			//move(between);
-			//fire(between);
-		}
-	
-		else if (between.Length() < 10 * (getHPMax() - getHP()))
-		{
-			//move(-between);
+			release();
 		}
 	}
 
-	move(b2Vec2_zero);
-
-	//fire(b2Vec2_zero + body_->GetPosition());
-	if (getWeaponReady())
+	//Classic AI
+	else if (aistate == 2)
 	{
-		trigger(b2Vec2(0, 0));
-	}
+		Shape* player = getPlayer_();
 
-	else
-	{
-		release();
+		if (player)
+		{
+			b2Vec2 playerPos = player->getPosition();
+			b2Vec2 ePos = getPosition();
+			b2Vec2 between = playerPos - ePos;
+
+			if (between.Length() < 40 || between.Length() < 4.f)
+			{
+				orient(between);
+			}
+
+			if (between.Length() < 25 && (getHP() >= getHPMax() / 2))
+			{
+				if (getArmed())
+				{
+					move(between);
+					orient(between);
+					if (getWeaponReady())
+					{
+
+						float rotation = atan2f(between.y, between.x);
+						float adjust = randFloat(-0.4, 0.4);
+						b2Vec2 newDir(cosf(rotation + adjust), sinf(rotation + adjust));
+						trigger(between);
+					}
+					else release();
+				}
+			}
+
+			else if (between.Length() < 1.f * (getHPMax() - getHP()) / hpScale_)
+			{
+				orient(-between);
+				move(-between);
+			}
+
+			else if (!getArmed() && between.Length() < 0.25f * (getHPMax() - getHP()) / hpScale_) 
+			{
+				orient(-between);
+				move(-between);
+			}
+
+			else move(b2Vec2_zero);
+		}
 	}
 }
 

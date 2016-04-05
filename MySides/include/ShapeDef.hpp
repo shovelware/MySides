@@ -14,6 +14,7 @@ public:
 		size(1),
 		speedScale(1),
 		vertices(0),
+		ai(0),
 		colPrim(b2Color(.5f, .5f, .5f)),
 		colSecn(b2Color(.75f, .75f, .75f)),
 		colTert(b2Color(0.f, 0.f, 0.f))
@@ -27,6 +28,7 @@ public:
 		size(1),
 		speedScale(1),
 		vertices(vertices),
+		ai(0),
 		colPrim(b2Color(.5f, .5f, .5f)),
 		colSecn(b2Color(.75f, .75f, .75f)),
 		colTert(b2Color(0.f, 0.f, 0.f))
@@ -40,6 +42,7 @@ public:
 		size(sd.size),
 		speedScale(sd.speedScale),
 		vertices(sd.vertices),
+		ai(sd.ai),
 		colPrim(sd.colPrim),
 		colSecn(sd.colSecn),
 		colTert(sd.colTert)
@@ -56,6 +59,8 @@ public:
 	float speedScale;
 
 	int vertices;
+
+	int ai;
 
 	//Colours
 	b2Color colPrim;

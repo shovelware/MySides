@@ -22,6 +22,7 @@ void HUD::drawLevelStatus(sf::FloatRect box)
 
 	float tim = world_->maxTime;
 	float timel = world_->getTimeInLevel();
+	int spawns = world_->getSpawns();
 
 	sf::Color p = sf::Color::Blue;
 	sf::Color s = sf::Color::Black;
@@ -36,7 +37,8 @@ void HUD::drawLevelStatus(sf::FloatRect box)
 	}
 
 	drawBar(box, timel, tim, s, p, t);
-	drawString(box, std::to_string((int)(tim - timel)), t, 2.f);
+	drawStringRight(box, std::to_string((int)(tim - timel)), t, 2.f);
+	drawStringLeft(box, std::to_string(spawns - 1), t, 1.5f);
 }
 
 void HUD::drawShapeStatus(sf::FloatRect box)

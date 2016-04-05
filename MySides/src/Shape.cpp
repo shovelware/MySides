@@ -152,12 +152,6 @@ void Shape::move(b2Vec2 direction)
 	//l.out(l.message, 'P', "Player move");
 }
 
-void Shape::orientedMove(b2Vec2 direction)
-{
-	orient(direction);
-	move(direction);
-}
-
 void Shape::stopMove()
 {
 	body_->SetLinearVelocity(b2Vec2_zero);
@@ -277,7 +271,7 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 void Shape::collect(int value)
 {
 	sides_ += value;
-	heal(std::ceil(value));
+	heal(std::ceil(value) * hpScale_);
 }
 
 void Shape::setPrimary(b2Color col)
@@ -330,8 +324,6 @@ unsigned int Shape::getHPMax() const
 	{
 		mhp += vrts * hpScale_;
 	}
-
-	
 
 	return mhp;
 }

@@ -15,6 +15,9 @@ public:
 
 	bool collide(Entity* other, b2Contact& contact, std::string tag);
 
+	//Debug
+	int aistate;
+
 private:
 	bool collector_;
 

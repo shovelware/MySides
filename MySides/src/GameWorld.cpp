@@ -153,44 +153,6 @@ void GameWorld::popInside(Entity * ent)
 	}
 }
 
-//Spawn a random enemy
-void GameWorld::spawnEnemy()
-{
-	std::string c[9];
-	c[0] = "pistol";
-	c[1] = "rifle";
-	c[2] = "shotgun";
-	c[3] = "coilgun";
-	c[4] = "cannon";
-	c[5] = "werfer";
-	c[6] = "railgun";
-	c[7] = "thumper";
-	c[8] = "launcher";
-
-	for (int i = 0; i < spawns_; ++i)
-	{
-		b2Vec2 pos;
-		float minRad = getBoundsRadius() * 0.4f;
-		float rad = getBoundsRadius() * 0.9f;
-		pos.y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
-		pos.x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
-	
-		pos *= randFloat(minRad, rad);
-	
-		ShapeDef enem = ShapeDef(pos, pos, randFloat(3, 6));
-		enem.hpScale = randFloat(2, 5);
-		enem.size = randFloat(0.5f, 1.5f);
-		enem.upgrade = false;
-		enem.colPrim = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
-		enem.colSecn = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
-		enem.colTert = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
-	
-		Weapon::WeaponI* weap = armory_->requisition(c[(int)std::floor(randFloat(0, 9))], (int)std::floor(randFloat(0, 4)));
-		
-		addEnemy(enem, weap);
-	}
-}
-
 //Adds a player to the world 
 void GameWorld::addPlayer(const ShapeDef& def, Weapon::WeaponI* weapon)
 {
@@ -319,6 +281,46 @@ void GameWorld::addShrapnel(Projectile* src)
 void GameWorld::addForce(b2Vec2 pos, float force, float radius, int lifetime)
 {
 		forces_.push_back(new Force(addStaticBody(pos), force, radius, lifetime));
+}
+
+//Spawn a random enemy
+void GameWorld::spawnEnemy()
+{
+	std::string c[9];
+	c[0] = "pistol";
+	c[1] = "rifle";
+	c[2] = "shotgun";
+	c[3] = "coilgun";
+	c[4] = "cannon";
+	c[5] = "werfer";
+	c[6] = "railgun";
+	c[7] = "thumper";
+	c[8] = "launcher";
+
+	for (int i = 0; i < spawns_; ++i)
+	{
+		b2Vec2 pos;
+		float minRad = getBoundsRadius() * 0.5f;
+		float rad = getBoundsRadius() * 0.9f;
+		pos.y = -(cos((2 * M_PI) * 32 / randFloat(0, 32)));
+		pos.x = -(sin((2 * M_PI) * 32 / randFloat(0, 32)));
+
+		pos *= randFloat(minRad, rad);
+
+		ShapeDef enem = ShapeDef(pos, pos, randFloat(3, 6));
+		enem.hpScale = randFloat(2, 5);
+		enem.speedScale = 0.5f;
+		enem.size = randFloat(0.5f, 1.5f);
+		enem.upgrade = false;
+		enem.ai = 2;
+		enem.colPrim = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
+		enem.colSecn = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
+		enem.colTert = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
+
+		Weapon::WeaponI* weap = armory_->requisition(c[(int)std::floor(randFloat(0, 4))], (int)std::floor(randFloat(0, 4)));
+
+		addEnemy(enem, weap);
+	}
 }
 
 bool GameWorld::requisition(Shape * shape, std::string weaponName, int weaponCode)
@@ -458,7 +460,7 @@ void GameWorld::resetLevel()
 	play.colTert = b2Color(1.f, 0.f, 0.f);
 	addPlayer(play);
 
-	spawns_ = 1;
+	spawns_ = 0;
 
 	//Restart bgm
 	//audio_.playAFX("spriterip");
@@ -843,18 +845,20 @@ void GameWorld::updateLevel(int dt)
 	//Basic difficulty ramp
 	timeInLevel_ += dt;
 	timeInLevel_ % UINT16_MAX;
+	if (spawns_ > 0)
+	{
+		if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_)
+		{
+			lastSpawn_ = timeInLevel_;
 
-	//if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_ / 5)
-	//{
-	//	lastSpawn_ = timeInLevel_;
-	//
-	//	//if we want to do less than double the enemy number
-	//	if (enemies < spawns_ * 2)
-	//	{
-	//		spawnEnemy();
-	//		spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
-	//	}
-	//}
+			//if we want to do less than double the enemy number
+			if (enemies < spawns_ * 2)
+			{
+				spawnEnemy();
+				spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
+			}
+		}
+	}
 }
 
 void GameWorld::cullWeapons()
@@ -1056,12 +1060,14 @@ void GameWorld::f1()
 		enem.colPrim = b2Color(e, 0.5, e);
 		enem.colSecn = b2Color(s, s, 0);
 		enem.colTert = b2Color(1, 0, t);
+		enem.ai = 1;
 		
 		std::string wn = dstr;
 
 		Weapon::WeaponI* newWeap = armory_->requisition(wn, i);
 
 		addEnemy(enem, newWeap);
+
 	}
 }
 
@@ -1071,13 +1077,15 @@ void GameWorld::f2()
 	{
 		for (int j = 1; j < 7; ++j)
 		{
-			b2Vec2 pos(-10 + j * 5,  - i * 5);
+			b2Vec2 pos(-17.5 + j * 5,  2 - i * pow(1.25, i));
 			ShapeDef e(pos, b2Vec2_zero + pos, i + 2);
 			e.size = 0.5 * i;
 			e.hpScale = 5 * (j -1);
 			e.colPrim = b2Color(0.1 * i, 0.05 * j, 0.4);
 			e.colSecn = b2Color(0.7, 0.4 + (0.05 * i), 0.9 - (0.1 * j));
 			e.colTert = b2Color(1 - (0.05 * (i + j)), 0.7, 0.025 * (i * j));
+			e.ai = 2;
+
 			addEnemy(e);
 		}
 	}
@@ -1091,7 +1099,13 @@ void GameWorld::f3()
 
 void GameWorld::f4()
 {
-	spawnEnemy();
+	if (spawns_ <= 0)
+	{
+		spawns_ = 1;
+		spawnEnemy();
+	}
+
+	else spawns_ = 0;
 }
 
 void GameWorld::f5()

@@ -26,7 +26,6 @@ public:
 	
 	//Movement
 	void move(b2Vec2 direction); //override
-	void orientedMove(b2Vec2 direction); //Thrusts and rotates towards direction
 	void stopMove();
 
 	//Orientation
