@@ -2,7 +2,7 @@
 
 //Construct an entity, which MUST have a body
 //Entities are alive and active at construction
-Entity::Entity(b2Body * body) : body_(body), alive_(true), active_(true)
+Entity::Entity(b2Body * body) : body_(body), alive_(true), active_(true), faction_(0)
 {
 	body->SetUserData(this);
 }
@@ -64,6 +64,9 @@ void Entity::setActive(bool a)
 {
 	active_ = a;
 }
+
+void Entity::setFaction(int faction) { faction_ = faction; }
+int Entity::getFaction() const { return faction_; }
 
 b2Color Entity::getPrimary() const { return colPrim_; }
 b2Color Entity::getSecondary() const { return colSecn_; }

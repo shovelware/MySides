@@ -6,8 +6,9 @@
 
 Pickup::Sight::Sight(b2Body* body, int time, float length) :
 	Pickup::PickupI(body, time),
-	length_(length > 0.f? length : 10.f),
-	contact_(false)
+	length_(length > 0.f ? length : 10.f),
+	contact_(false),
+	colourChange_(true)
 {
 	//Body is initially made by pickup base class
 }
@@ -30,6 +31,22 @@ void Pickup::Sight::onCollect()
 	def.shape = &shape;
 
 	body_->CreateFixture(&def);
+
+	//Enable sighting
+	switch (faction_)
+	{
+	case 0:
+		enemyTag_ = "";
+		break;
+	case 1:
+		enemyTag_ = "enemy";
+		break;
+	case 2:
+		enemyTag_ = "player";
+		break;
+	case 3:
+		enemyTag_ = "obstacle";
+	}
 
 	collected_ = true;
 }
@@ -75,37 +92,40 @@ void Pickup::Sight::update(int milliseconds)
 
 			contact_ = false;
 
-			b2EdgeShape* shap = static_cast<b2EdgeShape*>(body_->GetFixtureList()->GetShape());
-
-			for (b2ContactEdge* ed = body_->GetContactList(); ed != nullptr; ed = ed->next)
+			if (colourChange_)
 			{
-				b2Body* s = nullptr;
+				b2EdgeShape* shap = static_cast<b2EdgeShape*>(body_->GetFixtureList()->GetShape());
 
-				if (ed->contact->GetFixtureA()->GetUserData() == "enemy")
-					s = ed->contact->GetFixtureA()->GetBody();
-
-				else if (ed->contact->GetFixtureB()->GetUserData() == "enemy")
-					s = ed->contact->GetFixtureB()->GetBody();
-
-				if (s != nullptr)
+				for (b2ContactEdge* ed = body_->GetContactList(); ed != nullptr; ed = ed->next)
 				{
-					b2Vec2 dist = body_->GetPosition() + s->GetPosition();
-					// divide each vector by length
-					b2Vec2 v1 = body_->GetPosition() + shap->m_vertex2;
-					b2Vec2 v2 = dist;
+					b2Body* s = nullptr;
 
-					v1.Normalize();
-					v2.Normalize();
+					if (ed->contact->GetFixtureA()->GetUserData() == enemyTag_.c_str())
+						s = ed->contact->GetFixtureA()->GetBody();
 
-					float ang = acos(b2Dot(v1, v2));
+					else if (ed->contact->GetFixtureB()->GetUserData() == enemyTag_.c_str())
+						s = ed->contact->GetFixtureB()->GetBody();
 
-					if (ang < 1.2f && dist.Length() <= length_)
-						contact_ = true;
+					if (s != nullptr)
+					{
+						b2Vec2 dist = body_->GetPosition() + s->GetPosition();
+						// divide each vector by length
+						b2Vec2 v1 = body_->GetPosition() + shap->m_vertex2;
+						b2Vec2 v2 = dist;
 
+						v1.Normalize();
+						v2.Normalize();
+
+						float ang = acos(b2Dot(v1, v2));
+
+						if (ang < 1.2f && dist.Length() <= length_)
+							contact_ = true;
+
+					}
+
+					if (contact_ == true)
+						break;
 				}
-
-				if (contact_ == true)
-					break;
 			}
 
 			

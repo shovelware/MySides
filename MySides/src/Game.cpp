@@ -379,16 +379,17 @@ void Game::handleInput(sf::Time dt)
 		{
 			world_->dstr = "fungun";
 
-			int max = 8;
-			int i[8];
+			int max = 9;
+			int i[9];
 			i[0] = 44;
 			i[1] = 42;
 			i[2] = 47;
 			i[3] = 60;
 			i[4] = 88;
 			i[5] = 111;
-			i[6] = 666;
-			i[7] = 888;
+			i[6] = 404;
+			i[7] = 666;
+			i[8] = 888;
 
 			for (int w = 0; w < max; ++w)
 			{
@@ -406,8 +407,8 @@ void Game::handleInput(sf::Time dt)
 			}
 		}
 
-		//Requisition
-		if (con_.checkPressed(XINPUT_GAMEPAD_Y))
+		//R/Y : Requisition
+		if (key_.isKeyPressed(Key::R) || con_.checkPressed(XINPUT_GAMEPAD_Y))
 		{
 			world_->requisition(world_->getPlayer(), world_->dstr, world_->di);
 		}

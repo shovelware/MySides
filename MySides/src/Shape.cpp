@@ -16,6 +16,7 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 	shapeFixDef_.density = 100.0f;
 	shapeFixDef_.friction = 0.8f;
 	shapeFixDef_.restitution = 0.3f;
+	faction_ = def.faction;
 
 	//Corrections
 	shapeVertices_ = fmax(3, fmin(shapeVertices_, 8));
@@ -410,6 +411,7 @@ void Shape::arm(Weapon::WeaponI * weapon)
 		weapon_->setSecondary(colSecn_);
 		weapon_->setTertiary(colSecn_);
 		weapon_->setOwner(this);
+		weapon_->setFaction(faction_);
 	}
 }
 

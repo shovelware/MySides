@@ -4,7 +4,7 @@
 #include "Side.hpp"
 #include "Pickup.hpp"
 
-Enemy::Enemy(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) :
+Enemy::Enemy(b2Body* body, const ShapeDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) :
 	Shape(body, def, callback),
 	getPlayer_(player),
 	collector_(false),
@@ -104,7 +104,7 @@ bool Enemy::collide(Entity * other, b2Contact& contact, std::string tag)
 	{
 		Projectile* proj = static_cast<Projectile*>(other);
 
-		if (proj->getOwner() != this)
+		if (proj->getFaction() != faction_ && faction_ != GOD)
 		{
 			takeDamage(proj->getDamage(), proj->getDirection());
 			if (alive_ == false)

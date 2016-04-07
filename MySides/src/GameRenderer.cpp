@@ -209,8 +209,13 @@ void GameRenderer::drawProjectile(Projectile* const p)
 	sf::Color pri = B2toSF(p->getPrimary());
 	sf::Color sec = B2toSF(p->getSecondary());
 	sf::Color ter = B2toSF(p->getTertiary());
-	
-	if (b2CircleShape* shape = dynamic_cast<b2CircleShape*>(p->getBody()->GetFixtureList()->GetShape()))
+	b2Fixture* fixture = p->getBody()->GetFixtureList();
+	if (fixture->GetUserData() == "projtracking")
+	{
+		fixture = fixture->GetNext();
+	}
+
+	if (b2CircleShape* shape = dynamic_cast<b2CircleShape*>(fixture->GetShape()))
 	{
 		float rad = shape->m_radius * _SCALE_;
 
@@ -220,7 +225,7 @@ void GameRenderer::drawProjectile(Projectile* const p)
 		drawPoint(pos, ter);
 	}
 
-	else if (b2PolygonShape* shape = dynamic_cast<b2PolygonShape*>(p->getBody()->GetFixtureList()->GetShape()))
+	else if (b2PolygonShape* shape = dynamic_cast<b2PolygonShape*>(fixture->GetShape()))
 	{
 		int count = shape->GetVertexCount();
 

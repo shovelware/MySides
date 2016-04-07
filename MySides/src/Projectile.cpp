@@ -1,12 +1,8 @@
 #include "Projectile.hpp"
 
-#include "Bounds.hpp"
 #include "Shape.hpp"
 #include "Projectile.hpp"
-#include "Side.hpp"
-#include "Pickup.hpp"
 #include "Shield.hpp"
-
 
 Projectile::Projectile(b2Body* body, const ProjectileDef& def, ForceFunc& forceCallback) :
 	Entity(body),
@@ -14,13 +10,13 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def, ForceFunc& forceC
 	fired_(false),
 	oneHit_(def.oneHit),
 	origin_(def.origin), heading_(def.heading),
-	lastPen_ (def.origin),
+	lastPen_ (0, 0, 0),
 	maxHP_(def.hpMAX), hp_(def.hpMAX),
 	damage_(def.damage),
 	size_(def.width, def.height),
 	lifeTime_(def.lifeTime),
 	owner_(def.owner), 
-	target_(def.target),
+	tracking_(def.tracking),
 	penetration_(def.penetration)
 {
 	if (def.height > 0)
@@ -33,9 +29,18 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def, ForceFunc& forceC
 		setAsCircle(size_, def.bounce, def.penetration);
 	}
 
+	//Faction
+	faction_ = def.faction;
+
 	//Explosive properties
 	force_ = def.detonation;
 	shrapnel_ = def.shrapnel;
+
+	//Tracking
+	if (tracking_.radius > 0 && tracking_.speed > 0)
+	{
+		setTracking(tracking_.radius);
+	}
 
 	//Do maths to orient body
 	body_->SetTransform(def.origin, atan2f(-heading_.x, heading_.y));
@@ -79,22 +84,55 @@ void Projectile::setAsRect(b2Vec2 size, float bounce = 0.f, bool ghost = false)
 	b2PolygonShape box;
 	box.SetAsBox(0.1f * size.x, 0.1f * size.y);
 
+//Fixture
+b2FixtureDef fixtureDef;
+fixtureDef.isSensor = (penetration_ > 0);
+fixtureDef.shape = &box;
+
+//Collision
+fixtureDef.userData = "projectile";
+fixtureDef.density = 25.f;
+fixtureDef.friction = 1.0f;
+fixtureDef.restitution = bounce;
+
+//Bind fixture
+body_->CreateFixture(&fixtureDef);
+
+//End box2d setup
+speed_ = 0.05f * (size.x * size.y);
+}
+
+void Projectile::setTracking(float radius)
+{
+	b2CircleShape track;
+	track.m_radius = (radius);
+
 	//Fixture
 	b2FixtureDef fixtureDef;
-	fixtureDef.isSensor = (penetration_ > 0);
-	fixtureDef.shape = &box;
+	fixtureDef.isSensor = true;
+	fixtureDef.shape = &track;
 
 	//Collision
-	fixtureDef.userData = "projectile";
-	fixtureDef.density = 25.f;
-	fixtureDef.friction = 1.0f;
-	fixtureDef.restitution = bounce;
-	
+	fixtureDef.userData = "projtracking";
+
 	//Bind fixture
 	body_->CreateFixture(&fixtureDef);
 
-	//End box2d setup
-	speed_ = 0.05f * (size.x * size.y);
+	//Tags for b2 tracking
+	switch (faction_)
+	{
+	case 0:
+		enemyTag_ = "";
+		break;
+	case 1:
+		enemyTag_ = "enemy";
+		break;
+	case 2:
+		enemyTag_ = "player";
+		break;
+	case 3:
+		enemyTag_ = "obstacle";
+	}
 }
 
 void Projectile::fire(float mult)
@@ -103,13 +141,13 @@ void Projectile::fire(float mult)
 	{
 		heading_.Normalize();
 
-		
+
 		b2Vec2 newVelocity = heading_;
 		newVelocity *= speed_ * mult;
-		
+
 		//body_->SetLinearVelocity(body_->GetLinearVelocity() + heading_);
 		//newVelocity.x = body_->GetMass() / (newVelocity.x > 0 ? newVelocity.x : 1);
-				
+
 		//(newVelocity.x != 0 ? newVelocity.x = body_->GetMass() / newVelocity.x : newVelocity.x);
 		//(newVelocity.y != 0 ? newVelocity.y = body_->GetMass() / newVelocity.y : newVelocity.y);
 
@@ -118,6 +156,66 @@ void Projectile::fire(float mult)
 		body_->ApplyLinearImpulse(newVelocity, body_->GetWorldCenter(), true);
 		fired_ = true;
 	}
+}
+
+void Projectile::track()
+{
+	for (b2ContactEdge* ed = body_->GetContactList(); ed != nullptr; ed = ed->next)
+	{
+		Shape* s = nullptr;
+		float dist = FLT_MAX;
+		std::string tag;
+		if (ed->contact->GetFixtureA()->GetUserData() == "projtracking")
+		{
+			tag = std::string(static_cast<char*>(ed->contact->GetFixtureB()->GetUserData()));
+
+			if (tag == enemyTag_)
+			{
+				b2Vec2 pos = ed->contact->GetFixtureB()->GetBody()->GetPosition();
+				if (pos.Length() < dist)
+				{
+					target_ = b2Vec3(pos.x, pos.y, 1);
+				}
+			}
+		}
+
+		else if (ed->contact->GetFixtureB()->GetUserData() == "projtracking")
+		{
+
+			tag = std::string(static_cast<char*>(ed->contact->GetFixtureA()->GetUserData()));
+
+			if (tag == enemyTag_)
+			{
+				b2Vec2 pos = ed->contact->GetFixtureB()->GetBody()->GetPosition();
+				if (pos.Length() < dist)
+				{
+					target_ = b2Vec3(pos.x, pos.y, 1);
+				}
+			}
+		}
+	}
+}
+
+void Projectile::orient(b2Vec2 target)
+{
+	float bodyAngle = body_->GetAngle();
+	float desiredAngle = atan2f(-target.x, target.y);
+	float nextAngle = body_->GetAngle() + body_->GetAngularVelocity() / _TICKTIME_;
+
+	float totalRotation = desiredAngle - bodyAngle;
+
+	while (totalRotation < -180 * DR) totalRotation += 360 * DR;
+	while (totalRotation >  180 * DR) totalRotation -= 360 * DR;
+
+	float change = 20 * DR; //allow 20 degree rotation per time step
+	float newAngle = bodyAngle + std::min(change, std::max(-change, totalRotation));
+	float vel = body_->GetLinearVelocity().Length();
+	b2Vec2 newVel(vel * cos(newAngle), vel * sin(newAngle));
+	body_->SetLinearVelocity(newVel);
+
+	//body_->SetTransform(body_->GetPosition(), newAngle);
+	//vx = magnitude * cos(angle)
+	//vy = magnitude * sin(angle)
 }
 
 void Projectile::takeDamage(unsigned int damage)
@@ -133,8 +231,6 @@ int Projectile::getDamage() const { return damage_; }
 ProjectileDef::ProjShrapnel const& Projectile::getShrapnel() const { return shrapnel_; }
 Entity * Projectile::getOwner() { return owner_; }
 void Projectile::setOwner(Entity* o) {	owner_ = o; }
-Entity* Projectile::getTarget() { return target_; }
-void Projectile::setTarget(Entity* s) {	target_ = s; }
 b2Vec2 Projectile::getDirection() const { return heading_; }
 
 void Projectile::update(int milliseconds)
@@ -149,10 +245,20 @@ void Projectile::update(int milliseconds)
 			body_->GetFixtureList()->SetSensor(false);
 		}
 
-		if (!(lastPen_ == origin_))
+		if (lastPen_.z != 0)
 		{
-			forceCallback_(lastPen_, force_.force, force_.radius, force_.lifeTime);
-			lastPen_ = origin_;
+			forceCallback_(b2Vec2(lastPen_.x, lastPen_.y), force_.force, force_.radius, force_.lifeTime);
+			lastPen_.z = 0;
+		}
+
+		if (tracking_.radius != 0 && tracking_.speed != 0)
+		{
+			track();
+		}
+
+		if (target_.z != 0)
+		{
+			orient(b2Vec2(target_.x, target_.y));
 		}
 
 		b2Vec2 vel = body_->GetLinearVelocity();
@@ -160,7 +266,7 @@ void Projectile::update(int milliseconds)
 
 		//std::cout << vel.Length() << std::endl;
 
-		if (vel.Length() <= 0 || hp_ <= 0 || lifeTime_ <= 0)
+		if (hp_ <= 0 || lifeTime_ <= 0)
 		{
 			alive_ = false;
 		}
@@ -179,12 +285,26 @@ void Projectile::update(int milliseconds)
 bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 {
 	bool handled = false;
+	
+	if (handled == false)
+	{
+		//Get fixture string
+		std::string tig = std::string(static_cast<char*>(contact.GetFixtureA()->GetUserData()));
 
-	if (tag == "player" || tag == "enemy" || tag == "shape")////
+		//If it's the other, get what we are in contact
+		if (tig == tag)
+			tig = std::string(static_cast<char*>(contact.GetFixtureB()->GetUserData()));
+
+		//If it's our tracking, don't bother
+		if (tig == "projtracking")
+			handled = true;
+	}
+
+	else if (tag == "player" || tag == "enemy" || tag == "shape")////
 	{
 		Shape* shape = static_cast<Shape*>(other);
-		//Projectiles do not hurt their owner
-		if (owner_ != shape)
+		//Projectiles do not hurt their friends
+		if (faction_ != shape->getFaction() && shape->getFaction() != GOD)
 		{
 			//Onehit projectiles die on hit, precedence over all
 			if (oneHit_)
@@ -209,7 +329,7 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 			//Do our force on penetration
 			else
 			{
-				lastPen_ = body_->GetPosition();
+				lastPen_.z = 0;
 			}
 
 			if (alive_ == false)
@@ -225,7 +345,7 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 	{
 		Projectile* proj = static_cast<Projectile*>(other);
 		//If we're not friends
-		if (owner_ != proj->getOwner())
+		if (faction_ != proj->getFaction())
 		{
 			//If we can't penetrate
 			if (--penetration_ < 0)

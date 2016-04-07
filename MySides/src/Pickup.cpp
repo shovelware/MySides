@@ -45,12 +45,12 @@ void Pickup::PickupI::update(int milliseconds)
 void Pickup::PickupI::setOwner(Shape* o)
 {
 	owner_ = o;
-
 	if (o != nullptr)
 	{
 		setPrimary(o->getPrimary());
 		setSecondary(o->getSecondary());
 		setTertiary(o->getTertiary());
+		faction_ = owner_->getFaction();
 	}
 }
 

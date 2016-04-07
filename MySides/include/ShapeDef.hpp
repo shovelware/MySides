@@ -60,6 +60,7 @@ public:
 
 	int vertices;
 
+	int faction;
 	int ai;
 
 	//Colours

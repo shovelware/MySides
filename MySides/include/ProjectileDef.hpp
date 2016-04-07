@@ -20,6 +20,11 @@ public:
 		int level = 0;
 	};
 
+	struct ProjTracking {
+		float radius = 0;
+		float speed = 0;
+	};
+
 	ProjectileDef() :
 		origin(b2Vec2_zero),
 		heading(b2Vec2_zero),
@@ -30,16 +35,17 @@ public:
 		penetration(0),
 		detonation(ProjDet()),
 		shrapnel(ProjShrapnel()),
+		tracking(ProjTracking()),
 		hpMAX(0),
 		width(0),
 		height(0),
 		damage(1),
 		lifeTime(0),
+		faction(0),
 		colPrim(b2Color(.75f, .75f, 0.f)),
 		colSecn(b2Color(.75f, .75f, 0.f)),
 		colTert(b2Color(1.f, 1.f, 1.f)),
-		owner(nullptr),
-		target(nullptr)
+		owner(nullptr)
 	{}
 
 	ProjectileDef(b2Vec2 origin, b2Vec2 heading, b2Vec2 inVelocity = b2Vec2_zero) :
@@ -52,16 +58,17 @@ public:
 		penetration(0), 
 		detonation(ProjDet()),
 		shrapnel(ProjShrapnel()),
+		tracking(ProjTracking()),
 		hpMAX(1),
 		width(1),
 		height(0),
 		damage(1),
 		lifeTime(1000),
+		faction(0),
 		colPrim(b2Color(.75f, .75f, 0.f)),
 		colSecn(b2Color(.75f, .75f, 0.f)),
 		colTert(b2Color(1.f, 1.f, 1.f)),
-		owner(nullptr),
-		target(nullptr)
+		owner(nullptr)
 	{}
 
 	ProjectileDef(const ProjectileDef& pd) :
@@ -74,16 +81,17 @@ public:
 		penetration(pd.penetration),
 		detonation(pd.detonation),
 		shrapnel(pd.shrapnel),
+		tracking(pd.tracking),
 		hpMAX(pd.hpMAX),
 		width(pd.width),
 		height(pd.height),
 		damage(pd.damage),
 		lifeTime(pd.lifeTime),
+		faction(pd.faction),
 		colPrim(pd.colPrim),
 		colSecn(pd.colSecn),
 		colTert(pd.colTert),
-		owner(nullptr),
-		target(nullptr)
+		owner(nullptr)
 	{
 	}
 
@@ -103,6 +111,7 @@ public:
 	int penetration;
 	ProjDet detonation; //! < force, radius, lifetime
 	ProjShrapnel shrapnel;	//! < number, level
+	ProjTracking tracking;
 
 	unsigned int hpMAX;
 	float width;
@@ -110,6 +119,7 @@ public:
 
 	int damage;
 	int lifeTime;
+	int faction;
 
 	//Colours
 	b2Color colPrim;
@@ -118,7 +128,6 @@ public:
 
 	//Not copied
 	Entity* owner;
-	Entity* target;
 
 	bool isValid() const { return lifeTime >= 0; }
 };

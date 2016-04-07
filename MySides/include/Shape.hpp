@@ -74,12 +74,10 @@ protected:
 	/*const*/ float maxVel_;//maximum velocity
 	/*const*/ float maxRot_;//maximum rotation
 
-
 	//Add physics and shapes
 	void setPoly(int vertices, float radius);
 	void clearb2();
 	b2FixtureDef shapeFixDef_;
-
 
 	//Side dropping
 	std::function<void(SideDef&)> sideCallback_;

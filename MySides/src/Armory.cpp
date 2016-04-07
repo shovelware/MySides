@@ -250,11 +250,33 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		funGun = new Weapon::SpreadBat(fireCallback_, lance, "coilgun", 1600, 16, 500, 16, 1, -10.0, 4.f, 2.f);
 		break;
 	}
+
+	case 404:
+	{
+		ProjectileDef missile = ProjectileDef();
+		missile.velScale = 1.2f;
+		missile.width = 2.5f;
+		missile.height = 5.f;
+		missile.tracking.radius = 20;
+		missile.tracking.speed = 20;
+		missile.lifeTime = 7500;
+		//missile.shrapnel.level = 7;
+		//missile.shrapnel.shards = 4;
+		missile.detonation.force = 0.4f;
+		missile.detonation.lifeTime = 50;
+		missile.detonation.radius = 1.f;
+		missile.oneHit = true;
+		missile.hpMAX = 1;
+		
+		funGun = new Weapon::SemiMag(fireCallback_, missile, "launcher", 8, 500, 3000);
+		break;
+	}
+
 	//Mikrowerfer
 	case 666:
 	{
 		ProjectileDef wave = ProjectileDef();
-		wave.velScale = 1.25f;
+		wave.velScale = 4.f;
 		wave.width = 2.5f;
 		wave.bounce = 1.f;
 		wave.hpMAX = 8;

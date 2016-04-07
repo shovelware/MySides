@@ -49,6 +49,9 @@ namespace Weapon {
 		void setID(std::string id);		//!< Sets a new id for the weapon
 		std::string getID();			//!< Gets the id of the weapon
 
+		void setFaction(int faction); //!< Sets faction
+		int getFaction() const; //!< Gets faction
+
 		virtual int getBarMAX() const = 0;	//!< Max of status bar
 		virtual int getBar() const = 0;		//!< Current fill of status bar
 

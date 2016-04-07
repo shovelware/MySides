@@ -3,7 +3,7 @@
 #include "Projectile.hpp"
 #include "Side.hpp"
 
-Player::Player(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback) :
+Player::Player(b2Body* body, const ShapeDef& def, std::function<void(SideDef&)>& callback) :
 	Shape(body, def, callback),
 	bombTimeMax_(30000),
 	bombTime_(0),
@@ -22,7 +22,7 @@ bool Player::collide(Entity * other, b2Contact& contact, std::string tag)
 	{
 		Projectile* proj = static_cast<Projectile*>(other);
 
-		if (proj->getOwner() != this)
+		if (proj->getFaction() != faction_ && faction_ != GOD)
 		{
 			takeDamage(proj->getDamage(), proj->getDirection());
 

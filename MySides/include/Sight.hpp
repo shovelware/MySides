@@ -16,8 +16,11 @@ namespace Pickup {
 	private:
 		void onCollect();
 
+		bool colourChange_;
+
 		float length_;
 		bool contact_;
+		std::string enemyTag_;
 	};
 }
 

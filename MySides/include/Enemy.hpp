@@ -8,7 +8,7 @@
 class Enemy : public Shape
 {
 public:
-	Enemy(b2Body* body, ShapeDef def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player);
+	Enemy(b2Body* body,const ShapeDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player);
 
 	void update(int milliseconds);
 	void setCollector(bool collect);

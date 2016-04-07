@@ -162,7 +162,6 @@ void GameWorld::addPlayer(const ShapeDef& def, Weapon::WeaponI* weapon)
 	if (def.isValid())
 	{
 		b2Body* body = addDynamicBody(def.position);
-
 		//Shapes have friction with bounds
 		boundsFriction_.bodyA = body;
 		CreateJoint(&boundsFriction_);
@@ -258,6 +257,7 @@ void GameWorld::addShrapnel(Projectile* src)
 		shrapDef.colSecn = src->getSecondary();
 		shrapDef.colTert = src->getPrimary();
 		shrapDef.damage = src->getDamage();
+		shrapDef.faction = src->getFaction();
 		
 		for (int i = src->getShrapnel().shards; i > 0; --i)
 		{
@@ -316,6 +316,7 @@ void GameWorld::spawnEnemy()
 		enem.colPrim = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
 		enem.colSecn = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
 		enem.colTert = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
+		enem.faction = 2;
 
 		Weapon::WeaponI* weap = armory_->requisition(c[(int)std::floor(randFloat(0, 4))], (int)std::floor(randFloat(0, 4)));
 
@@ -458,6 +459,7 @@ void GameWorld::resetLevel()
 	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
 	play.colSecn = b2Color(0.f, 1.f, 1.f);
 	play.colTert = b2Color(1.f, 0.f, 0.f);
+	play.faction = 1;
 	addPlayer(play);
 
 	spawns_ = 0;

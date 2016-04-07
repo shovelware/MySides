@@ -61,5 +61,7 @@ Weapon::WeaponI::WeaponI(FireFunc& callback, ProjectileDef const &ammo, std::str
 	void Weapon::WeaponI::setTertiary(b2Color col) { output_.colTert = col; }
 
 	void Weapon::WeaponI::setID(std::string id)	{ id_ = id;	}
-
 	std::string Weapon::WeaponI::getID() { return id_; }
+
+	void Weapon::WeaponI::setFaction(int faction) { output_.faction = faction; }
+	int Weapon::WeaponI::getFaction() const { return output_.faction; }

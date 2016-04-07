@@ -66,9 +66,9 @@ bool Pickup::Shield::collide(Entity* other, b2Contact& contact, std::string tag)
 		{
 			Projectile* proj = dynamic_cast<Projectile*>(other);
 			//Enemy projectiles after collection
-			if (proj->getOwner() != owner_)
+			if (proj->getFaction() != faction_)
 			{
-				int x = 4;
+				//int x = 4;
 			}
 
 			else {

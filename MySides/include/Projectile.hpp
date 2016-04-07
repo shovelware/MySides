@@ -11,7 +11,6 @@ class Projectile : public Entity{
 public:
 	Projectile(b2Body* body, const ProjectileDef& def, ForceFunc& forceCallback);
 
-	void fire(float mult);
 
 	void takeDamage(unsigned int damage);
 	int getDamage() const;
@@ -19,9 +18,6 @@ public:
 
 	Entity* getOwner();
 	void setOwner(Entity* o);
-
-	Entity* getTarget();
-	void setTarget(Entity* s);
 
 	b2Vec2 getDirection() const;
 
@@ -31,6 +27,12 @@ public:
 private:
 	void setAsCircle(b2Vec2 size, float bounce, bool ghost);
 	void setAsRect(b2Vec2 size, float bounce, bool ghost);
+	void setTracking(float radius);
+
+	void fire(float mult);
+	void track();
+	void orient(b2Vec2 target);
+	b2Vec3 target_;
 
 	b2Vec2 size_;
 	float speed_;
@@ -38,13 +40,13 @@ private:
 	int penetration_;
 	ProjectileDef::ProjDet force_;
 	ProjectileDef::ProjShrapnel shrapnel_;
+	ProjectileDef::ProjTracking tracking_;
 	std::function<void(b2Vec2 pos, float force, float radius, int time)> forceCallback_;
 
 	Entity* owner_;
-	Entity* target_;
 	b2Vec2 origin_;
 	b2Vec2 heading_;
-	b2Vec2 lastPen_;
+	b2Vec3 lastPen_;
 
 	int lifeTime_;
 
