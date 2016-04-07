@@ -81,7 +81,9 @@ void HUD::drawShapeStatus(sf::FloatRect box)
 				drawRect(uhpRect, s);
 		}
 		//drawRect(topBox + );
+		drawStringLeft(box, std::to_string((int)(hp)), tex, 0.75f);
 		drawString(box, std::to_string((int)(hp + uhp)), tex, 1.75f);
+		drawStringRight(box, std::to_string((int)(uhp)), tex, 0.75f);
 	}
 }
 
@@ -101,25 +103,28 @@ void HUD::drawWeaponStatus(sf::FloatRect box)
 		sf::Color s = B2toSF(c->getSecondary());
 		sf::Color t = B2toSF(c->getTertiary());
 		
+		//HUD element indent
 		int dent = 2;
-		//
-		drawRect(box, p, s, -dent);
-		if (max < box.width - (max - 1));
-		else {
-			sf::FloatRect barBox(box.left + dent, box.top + dent, box.width - dent * 2, box.height - dent * 2);
-			barBox.width *= (min / max);
-			drawRect(barBox, s);
-		}
-
+		
+		//Replace bg and bars with this if you want no gaps
 		//drawBar(box, min, max, t, p, s);
 
+
+		//Draw background
+		drawRect(box, p, s, -dent);
+		
+	
+
+
+		//Draw Ammo Number
 		sf::Color txt(p);
 		if (loading)
 			txt = t;
 		else if (ready)
 			txt = s;
-
 		drawString(box, std::to_string((int)min), txt, 2.f);
+
+		//Draw level value
 		sf::FloatRect eighthBox(box.left, box.height + (box.height / 2), box.width / 8, box.height / 8);
 		//int powlv = pow(level, 2);
 		//if (level > 8) powlv = level; //Special weapons have special levels
@@ -210,6 +215,7 @@ void HUD::drawStringLeft(sf::FloatRect box, std::string info, sf::Color col, flo
 			outlineCol = sf::Color::White;
 
 		text_.setScale(sf::Vector2f(sizeScale * 1.2f, sizeScale * 1.2f));
+		float margin = text_.getCharacterSize() * sizeScale;
 		sf::FloatRect txt = text_.getLocalBounds();
 		text_.setOrigin(txt.left, txt.top + txt.height / 2);
 		text_.setPosition(box.left, box.top + box.height / 2);
@@ -236,6 +242,7 @@ void HUD::drawStringRight(sf::FloatRect box, std::string info, sf::Color col, fl
 			outlineCol = sf::Color::White;
 
 		text_.setScale(sf::Vector2f(sizeScale * 1.2f, sizeScale * 1.2f));
+		float margin = text_.getCharacterSize() * sizeScale;
 		sf::FloatRect txt = text_.getLocalBounds();
 		text_.setOrigin(txt.left + txt.width, txt.top + txt.height / 2);
 		text_.setPosition(box.left + box.width, box.top + box.height / 2);
@@ -253,15 +260,32 @@ void HUD::drawBar(sf::FloatRect box, float min, float max, sf::Color fill, sf::C
 {
 	drawRect(box, back, outline, -line);
 
-
 	sf::FloatRect fillRect(box);
 	fillRect.left += line;
 	fillRect.top += line;
 	fillRect.height -= line * 2;
 	fillRect.width -= line * 2;
 
-	if (max != 0)
-		fillRect.width *= (min / max);
+	//Draw fill bars if we're fillable
+	if (max >= min)
+	{
+		sf::FloatRect barBox(box.left + line, box.top + line, box.width - line * 2, box.height - line * 2);
+
+		float div = barBox.width - ((max - 1) * (line * 0.5f));
+
+		if (barBox.width < div)
+		{
+			//draw each round
+			int x = 0;
+		}
+
+		else if (max != 0)
+		{
+		fillRect.width *= fminf(max / max, (min / max));
+		drawRect(fillRect, fill );
+		}
+	}
+
 
 	drawRect(fillRect, fill);
 }

@@ -13,7 +13,7 @@
 namespace Weapon {
 	class Armory {
 		public:
-			Armory(std::function<void(std::vector<ProjectileDef>& defs, std::string id)> fireCallback);
+			Armory(FireFunc& fireCallback);
 
 			//For use with text-based levels
 			WeaponI* requisition(std::string name, int code = 0);

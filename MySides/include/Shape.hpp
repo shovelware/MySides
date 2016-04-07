@@ -36,6 +36,8 @@ public:
 
 	//State changers
 	void heal(int health);
+	bool syncHP();
+	void syncPoly();
 	void takeDamage(int damage, b2Vec2 direction);
 	void collect(int value);
 	void setPrimary(b2Color col);
@@ -68,7 +70,8 @@ public:
 	void reup();
 	int getWeaponBar();
 	int getWeaponBarMAX();
-	
+
+	bool collide(Entity* other, b2Contact& contact, std::string tag);
 	void update(int milliseconds);
 protected:
 	/*const*/ float maxVel_;//maximum velocity
@@ -100,10 +103,12 @@ protected:
 	int shapeVertices_;
 	int vertices_;
 	const unsigned int verticesMIN_ = 2;
-	const unsigned int verticesMAX_;
+	const unsigned int verticesMAX_ = 8;
 	float size_;
 
 	int sides_; //!< Currency
+	bool collector_;
+	bool hasCollected_;
 };
 
 #endif

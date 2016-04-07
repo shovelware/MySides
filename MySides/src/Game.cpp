@@ -321,7 +321,7 @@ void Game::handleInput(sf::Time dt)
 			world_->di = -1;
 		}
 
-		// RShift : Advance one step (B, [LC])
+		// RShift : Advance one step (B)
 		if (key_.isKeyPressed(Key::RShift) || con_.checkPressed(XINPUT_GAMEPAD_B))
 		{
 			world_->step(_TICKTIME_ * 1000);
@@ -342,18 +342,28 @@ void Game::handleInput(sf::Time dt)
 
 		// - : Debug int decrement
 		if (key_.isKeyPressed(Key::Dash)  || 
-			con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT) || 
-			(((con_.checkHeld(XINPUT_GAMEPAD_DPAD_LEFT) - 600) % 32) == 0))
+			con_.checkDown(XINPUT_GAMEPAD_DPAD_LEFT))
 		{
-			world_->di--;
+			int time = (con_.checkTimeHeld(XINPUT_GAMEPAD_DPAD_LEFT) - 400);
+
+			if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT) ||
+				(time > 0 && time % 160 == 0))
+			{
+				world_->di--;
+			}
 		}
 
 		// + : Debug int increment
-		if (key_.isKeyPressed(Key::Equal) || 
-			con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT) || 
-			(((con_.checkHeld(XINPUT_GAMEPAD_DPAD_RIGHT) - 600) % 32) == 0))
+		if (key_.isKeyPressed(Key::Equal) ||
+			con_.checkDown(XINPUT_GAMEPAD_DPAD_RIGHT))
 		{
-			world_->di++;
+			int time = (con_.checkTimeHeld(XINPUT_GAMEPAD_DPAD_RIGHT) - 400);
+
+			if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT) ||
+				(time > 0 && time % 160 == 0))
+			{
+				world_->di++;
+			}
 		}
 
 		//G : Scrolling Weapon Select

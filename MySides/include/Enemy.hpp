@@ -19,8 +19,6 @@ public:
 	int aistate;
 
 private:
-	bool collector_;
-
 	static std::list<Enemy*> others_; //Provision for swarming
 
 	std::function<Shape*()>& getPlayer_;

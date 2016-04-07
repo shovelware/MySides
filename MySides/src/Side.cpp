@@ -16,20 +16,19 @@ Side::Side(b2Body * body, const SideDef& def) :
 	//Shoot off, while spinning
 	b2Vec2 impulse = heading_;
 
-	float rotation = atan2f(heading_.y, heading_.x);
-	float adjust = randFloat(-0.25f, 0.25f);
-	impulse.x = cosf(rotation + adjust);
-	impulse.y = sinf(rotation + adjust);
+	bool dir = coinFlip();
+	//float rotation = atan2f(heading_.y, heading_.x);
+	//float adjust = randFloat(-0.25f, 0.25f);
+	//impulse.x = cosf(rotation + adjust);
+	//impulse.y = sinf(rotation + adjust);
 
 	impulse.Normalize();
-	impulse *= 0.03f;
+	impulse *= 0.3f;
 
-	body_->ApplyLinearImpulse(impulse, body_->GetWorldCenter(), true);
-
-	bool dir = coinFlip();
-	body_->SetAngularVelocity(randFloat(0.35f, 0.37f) * (dir ? 1 : -1));
 	body_->SetAngularDamping(randFloat(0.01f, 0.03f));
 	body_->SetLinearDamping(randFloat(0.01f, 0.03f));
+	body_->ApplyLinearImpulse(impulse, body_->GetWorldCenter(), true);
+	body_->ApplyAngularImpulse(randFloat(0.35f, 0.37f) * (dir ? 1 : -1), true);
 
 	//Color data
 	colPrim_ = def.colPrim;

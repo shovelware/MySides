@@ -1,14 +1,16 @@
 #include "Shape.hpp"
+#include "Projectile.hpp"
+#include "Side.hpp"
 
 Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& callback) : 
 	Entity(body),
 	weapon_(nullptr),
 	lastDamage_(b2Vec2_zero),
 	size_(def.size),
-	verticesMAX_(8),
 	shapeVertices_(def.vertices),
 	sideCallback_(callback),
 	hpScale_(def.hpScale),
+	collector_(false),
 	sides_(0)
 {	
 	//Collision
@@ -100,6 +102,7 @@ void Shape::dropSide(b2Vec2 dir)
 	b2Vec2 offset = dir;
 	offset.Normalize();
 	offset *= getSize();
+
 	float rhs = std::sqrt((size_ * size_) + (size_ * size_) - (2 * size_ * size_) * cos(2 * M_PI / shapeVertices_));
 
 	SideDef newSide = SideDef(getPosition() + offset, dir, rhs, 5000.f * rhs);
@@ -196,32 +199,31 @@ b2Vec2 Shape::getOrientation() const
 
 void Shape::heal(int health)
 {
-	for (int hlt = health; hlt > 0; --hlt) {
+	for (int hlt = health, max = getHPMax(); hlt > 0 && (hp_ + uhp_ < max); --hlt) 
+	{
 		//Overhealing
-		if (uhpMAX_ != 0 && hp_ == hpMAX_) {
+		if (uhpMAX_ != 0 && hp_ == hpMAX_)
+		{
 
 			//If we can go up
 			if (uhp_ + 1 <= uhpMAX_) uhp_++;
 
-			//If we're full and can go up
-			if (uhpMAX_ != 0 && uhp_ == uhpMAX_ && vertices_ < verticesMAX_) {
-				vertices_++;
+			syncHP();
 
-				hpMAX_ = vertices_ * hpScale_;
-				hp_ += uhp_;
-				uhp_ = 0;
-
-				uhpMAX_ = (vertices_ + 1) * uhpScale_;
-				//if (vertices_ > 7) uhpMAX_ = 0;
+			//At the top, break
+			if (uhp_ == uhpMAX_)
+			{
+				break;
 			}
 		}
 
 		//Just healing
-		else {
-			if (hp_ + 1 <= hpMAX_)	hp_++;
+		else
+		{
+			if (hp_ + 1 <= hpMAX_) hp_++;
 
-			//Shop healing at full
-			if (hp_ == hpMAX_) break;
+			//If we can't add overheal
+			else if (uhpMAX_ == 0) break;
 		}
 	}
 }
@@ -248,31 +250,76 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 
 			if (vertices_ > verticesMIN_)
 			{
+				//Reset health
 				hpMAX_ = vertices_ * hpScale_;
 				hp_ = hpMAX_;
-			}
 
-			//Re-enable upgrades if we must
-			uhpMAX_ = (vertices_ + 1) * uhpScale_;
+				//Re-enable upgrades if we must
+				uhpMAX_ = (vertices_ + 1) * uhpScale_;
+			}
 		}
 
 		//Otherwise just take some hp
 		else
 		{
-			if (vertices_ > verticesMIN_) 
+			if (vertices_ > verticesMIN_)
 				hp_ -= 1;
 		}
-		
+
 		//We're dead, stop hurting
-		if (vertices_ < verticesMIN_ + 1 && hp_ <= 0 && uhp_ <= 0)
+		if (vertices_ <= verticesMIN_ && hp_ <= 0 && uhp_ <= 0)
+		{
+			syncHP();
 			break;
+		}
+	}
+
+	if (hp_ <= 0)
+	{
+		alive_ = false;
 	}
 }
 
 void Shape::collect(int value)
 {
 	sides_ += value;
-	heal(std::ceil(value) * hpScale_);
+}
+
+bool Shape::syncHP()
+{
+	if (uhpMAX_ != 0 && uhp_ >= uhpMAX_ && vertices_ < verticesMAX_)
+	{
+		vertices_++;
+		hp_ = hpMAX_;
+		hpMAX_ = vertices_ * hpScale_;
+		uhp_ = 0;
+		uhpMAX_ = (vertices_ + 1) * uhpScale_;
+		return true;
+	}
+
+	else return false;
+}
+
+void Shape::syncPoly()
+{
+	//If our internal shape mismatches our displayed shape
+	if (vertices_ > verticesMIN_ && vertices_ != shapeVertices_)
+	{
+		int diff = shapeVertices_ - vertices_;
+
+		//This means we've moved down
+		if (diff > 0)
+		{
+			//Drop the sides we lost
+			for (int i = diff; i > 0; --i)
+			{
+				dropSide(lastDamage_);
+			}
+		}
+
+		//Correct mismatch
+		setPoly(vertices_, size_);
+	}
 }
 
 void Shape::setPrimary(b2Color col)
@@ -342,21 +389,21 @@ void Shape::explode()
 
 	for (int i = 0, count = shapeVertices_; i < count; ++i)
 	{
-
 		int a = i;
 		int b = (a + 1 != count ? a + 1 : 0);
 
-		b2Vec2 vA = shape->GetVertex(a);
-		b2Vec2 vB = shape->GetVertex(b);
-		
-		b2Vec2 mid = vA + vB;
-		mid.x /= 2.f;
-		mid.y /= 2.f;
+		b2Vec2 vA = body_->GetWorldPoint(shape->GetVertex(a));
+		b2Vec2 vB = body_->GetWorldPoint(shape->GetVertex(b));
+		b2Vec2 mid = vA - vB;
 
-		mid.Normalize();
-		dropSide(mid);
+		b2Vec2 norm = b2Vec2(-mid.y, mid.x);
+		norm.x /= 2.f;
+		norm.y /= 2.f;
+
+		norm.Normalize();
+		dropSide(norm);
 	}
-
+	
 	body_->GetFixtureList()->SetSensor(true);
 	kill();
 }
@@ -472,7 +519,7 @@ void Shape::reup()
 
 int Shape::getWeaponBar()
 {
-	int bar = -1;
+	int bar = 0;
 
 	if (weapon_ != nullptr)
 	{
@@ -494,6 +541,47 @@ int Shape::getWeaponBarMAX()
 	return max;
 }
 
+bool Shape::collide(Entity* other, b2Contact& contact, std::string tag)
+{
+	bool handled = false;
+
+	if (tag == "projectile")
+	{
+		Projectile* proj = static_cast<Projectile*>(other);
+
+		if (proj->getOwner() != this)
+		{
+			takeDamage(proj->getDamage(), proj->getDirection());
+		}
+
+		else contact.SetEnabled(false);
+
+		handled = true;
+	}
+
+	else if (tag == "side" && collector_)
+	{
+		char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
+		char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
+		
+		if (tagA == "side" || tagB == "side")
+		{
+			Side* side = static_cast<Side*>(other);
+
+			collect(side->getValue());
+			heal(std::ceil(side->getValue()) * (hpScale_ / 2));
+			
+			side->collect();
+			
+			hasCollected_ = true;
+		}
+
+		handled = true;
+	}
+
+	return handled;
+}
+
 void Shape::update(int milliseconds)
 {
 	if (active_)
@@ -501,6 +589,7 @@ void Shape::update(int milliseconds)
 		//Death check
 		if (alive_)
 		{
+			//Slow down to maxVel
 			b2Vec2 vel = body_->GetLinearVelocity();
 			if (vel.Length() > maxVel_)
 			{
@@ -508,53 +597,22 @@ void Shape::update(int milliseconds)
 				body_->SetLinearVelocity(vel);
 			}
 
-			//Update weapon if we have on
+			//Update weapon if we have one
 			if (weapon_ != nullptr)
 			{
 				weapon_->update(milliseconds);
 			}
 
-			//If we have a bunch of uhhp and could go up a side
-			if (uhpMAX_ != 0 && vertices_ < verticesMAX_ && uhp_ >= uhpMAX_)
-			{
-				vertices_ += 1;
-				hp_ += uhp_;
-				uhp_ = 0;
-
-				uhpMAX_ = (vertices_ + 1) * uhpScale_;
-			}
-
-			//If we're at 0 health and can't go back, die
-			if (hp_ <= 0 && vertices_ < verticesMIN_ + 1)
-			{
-				explode();
-			}
-
-			//If our internal shape mismatches our displayed shape
-			else if (vertices_ > verticesMIN_ && vertices_ != shapeVertices_)
-			{
-				int diff = shapeVertices_ - vertices_;
-
-				//This means we've moved down
-				if (diff > 0)
-				{
-					//Drop the sides we lost
-					for (int i = diff; i > 0; --i)
-					{
-						dropSide(lastDamage_);
-					}
-				}
-
-				//Correct mismatch
-				setPoly(vertices_, size_);
-
-				hpMAX_ = vertices_ * hpScale_;
-				hp_ = hpMAX_;
-			}
+			syncHP();
+			syncPoly();
 		}//End alive
 
-	else active_ = false;
-
+		//If dead
+		else
+		{
+			explode();
+			active_ = false;
+		}
 	}//end active
 }
 
