@@ -992,7 +992,7 @@ void GameWorld::bomb(bool nuke)
 				shapeIt != shapes_.end(); ++shapeIt)
 				{
 					if (b2Distance((*shapeIt)->getPosition(), player_->getPosition()) < range)
-						(*shapeIt)->explode();
+						(*shapeIt)->setAlive(false);
 				}
 			}
 
@@ -1021,7 +1021,7 @@ void GameWorld::bomb(bool nuke)
 			for (std::list<Enemy*>::iterator shapeIt = shapes_.begin();
 			shapeIt != shapes_.end(); ++shapeIt)
 			{
-					(*shapeIt)->explode();
+				(*shapeIt)->setAlive(false);
 			}
 		}
 
@@ -1096,26 +1096,8 @@ void GameWorld::f2()
 
 void GameWorld::f3()
 {
-	//if (player_ != nullptr)
-	//	addPickup(Pickup::Type::ATTRACT, player_->getPosition(), 5000, 64.f);
-
-
-	ProjectileDef boom = ProjectileDef();
-
-	boom.damage = 80.f;
-	boom.hpMAX = 4;
-	boom.lifeTime = 5000;
-	boom.height = 1.f;
-	boom.width = 1.f;
-	boom.penetration = 8;
-	boom.target = player_;
-
-	Weapon::WeaponI* newWeap = new Weapon::SemiBat(fireWeap_, boom, "coilgun", 1280, 32, 64);
-
 	if (player_ != nullptr)
-	{
-		armShape(player_, newWeap);
-	}
+		addPickup(Pickup::Type::ATTRACT, player_->getPosition(), 5000, 64.f);
 }
 
 void GameWorld::f4()

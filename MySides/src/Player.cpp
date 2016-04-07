@@ -21,18 +21,6 @@ bool Player::collide(Entity * other, b2Contact& contact, std::string tag)
 
 	if (!handled)
 	{
-		//Does this even happen???
-		if (proj->getFaction() != faction_ && faction_ != GOD)
-		{
-			takeDamage(proj->getDamage(), proj->getDirection());
-
-			if (alive_ == false)
-				contact.SetEnabled(false);
-		}
-
-		else contact.SetEnabled(false);
-
-		handled = true;
 	}
 	
 	return handled;

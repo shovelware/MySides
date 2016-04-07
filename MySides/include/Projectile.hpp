@@ -35,6 +35,7 @@ private:
 	b2Vec3 target_;
 
 	b2Vec2 size_;
+	float bounce_;
 	float speed_;
 	float damage_;
 	int penetration_;

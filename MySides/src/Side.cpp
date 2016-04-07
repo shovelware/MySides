@@ -23,13 +23,15 @@ Side::Side(b2Body * body, const SideDef& def) :
 	//impulse.y = sinf(rotation + adjust);
 
 	impulse.Normalize();
-	impulse *= 0.3f;
+	impulse *= 0.25f;
 
-	body_->SetAngularDamping(randFloat(0.01f, 0.03f));
+	float spin = randFloat(4.f, 10.f) * (dir ? 1 : -1);
+
 	body_->SetLinearDamping(randFloat(0.01f, 0.03f));
 	body_->ApplyLinearImpulse(impulse, body_->GetWorldCenter(), true);
-	body_->ApplyAngularImpulse(randFloat(0.35f, 0.37f) * (dir ? 1 : -1), true);
-
+	body_->SetAngularDamping(randFloat(0.005f, 0.001f));
+	body_->SetAngularVelocity(spin);
+	//std::cout << spin << "||" << body_->GetAngularVelocity() << std::endl;
 	//Color data
 	colPrim_ = def.colPrim;
 	colSecn_ = def.colSecn;

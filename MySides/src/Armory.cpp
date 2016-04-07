@@ -261,7 +261,7 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		missile.width = 2.5f;
 		missile.height = 5.f;
 		missile.tracking.radius = 20;
-		missile.tracking.speed = 20;
+		missile.tracking.speed = 5.f;
 		missile.lifeTime = 7500;
 		//missile.shrapnel.level = 7;
 		//missile.shrapnel.shards = 4;

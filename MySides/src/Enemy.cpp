@@ -20,7 +20,6 @@ void Enemy::update(int milliseconds)
 	//Still
 	if (aistate == 0);
 
-
 	//Blind fire
 	else if (aistate == 1)
 	{
@@ -74,16 +73,15 @@ void Enemy::update(int milliseconds)
 				}
 			}
 
-			else if (between.Length() < 1.f * (getHPMax() - getHP()) / hpScale_)
+			else if (getArmed() && between.Length() < 0.1f * (getHPMax() - getHP()) / hpScale_) 
 			{
 				orient(-between);
 				move(-between);
 			}
 
-			else if (!getArmed() && between.Length() < 0.25f * (getHPMax() - getHP()) / hpScale_) 
+			else if (!getArmed() && between.Length() < size_ * 1.5f)
 			{
 				orient(-between);
-				move(-between);
 			}
 
 			else move(b2Vec2_zero);

@@ -169,10 +169,10 @@ void Shape::orient(b2Vec2 direction)
 
 	float totalRotation = desiredAngle - bodyAngle;
 
-	while (totalRotation < -180 * DR) totalRotation += 360 * DR;
-	while (totalRotation >  180 * DR) totalRotation -= 360 * DR;
+	while (totalRotation < M_PI) totalRotation += 2 * M_PI;
+	while (totalRotation > M_PI) totalRotation -= 2 * M_PI;
 
-	float change = 20 * DR; //allow 20 degree rotation per time step
+	float change = 0.2f  * size_; //allow 20 degree rotation per time step
 	float newAngle = bodyAngle + std::min(change, std::max(-change, totalRotation));
 	body_->SetTransform(body_->GetPosition(), newAngle);
 }
@@ -385,27 +385,31 @@ float Shape::getSize() const { return size_; }
 
 void Shape::explode()
 {
-	b2PolygonShape* shape = static_cast<b2PolygonShape*>(body_->GetFixtureList()->GetShape());
-
-	for (int i = 0, count = shapeVertices_; i < count; ++i)
+	if (vertices_ > 0)
 	{
-		int a = i;
-		int b = (a + 1 != count ? a + 1 : 0);
+		b2PolygonShape* shape = static_cast<b2PolygonShape*>(body_->GetFixtureList()->GetShape());
 
-		b2Vec2 vA = body_->GetWorldPoint(shape->GetVertex(a));
-		b2Vec2 vB = body_->GetWorldPoint(shape->GetVertex(b));
-		b2Vec2 mid = vA - vB;
+		for (int i = 0, count = vertices_; i < count; ++i)
+		{
+			int a = i;
+			int b = (a + 1 != count ? a + 1 : 0);
 
-		b2Vec2 norm = b2Vec2(-mid.y, mid.x);
-		norm.x /= 2.f;
-		norm.y /= 2.f;
+			b2Vec2 vA = body_->GetWorldPoint(shape->GetVertex(a));
+			b2Vec2 vB = body_->GetWorldPoint(shape->GetVertex(b));
+			b2Vec2 mid = vA - vB;
 
-		norm.Normalize();
-		dropSide(norm);
+			b2Vec2 norm = b2Vec2(-mid.y, mid.x);
+			norm.x /= 2.f;
+			norm.y /= 2.f;
+
+			norm.Normalize();
+			dropSide(norm);
+		}
+
+		body_->GetFixtureList()->SetSensor(true);
+		kill();
+		vertices_ = 0;
 	}
-	
-	body_->GetFixtureList()->SetSensor(true);
-	kill();
 }
 
 bool Shape::getArmed()

@@ -17,16 +17,17 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def, ForceFunc& forceC
 	lifeTime_(def.lifeTime),
 	owner_(def.owner), 
 	tracking_(def.tracking),
-	penetration_(def.penetration)
+	penetration_(def.penetration),
+	bounce_(def.bounce)
 {
 	if (def.height > 0)
 	{
-		setAsRect(size_, def.bounce, def.penetration);
+		setAsRect(size_, bounce_, penetration_);
 	}
 
 	else
 	{
-		setAsCircle(size_, def.bounce, def.penetration);
+		setAsCircle(size_, bounce_, penetration_);
 	}
 
 	//Faction
@@ -43,7 +44,7 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def, ForceFunc& forceC
 	}
 
 	//Do maths to orient body
-	body_->SetTransform(def.origin, atan2f(-heading_.x, heading_.y));
+	body_->SetTransform(origin_, atan2f(-heading_.x, heading_.y));
 	body_->SetLinearVelocity(def.inVelocity);
 
 	//Set up colours
@@ -160,11 +161,15 @@ void Projectile::fire(float mult)
 
 void Projectile::track()
 {
+	std::string shortTag;
+
+	bool found = false;
 	for (b2ContactEdge* ed = body_->GetContactList(); ed != nullptr; ed = ed->next)
 	{
 		Shape* s = nullptr;
 		float dist = FLT_MAX;
 		std::string tag;
+
 		if (ed->contact->GetFixtureA()->GetUserData() == "projtracking")
 		{
 			tag = std::string(static_cast<char*>(ed->contact->GetFixtureB()->GetUserData()));
@@ -175,25 +180,34 @@ void Projectile::track()
 				if (pos.Length() < dist)
 				{
 					target_ = b2Vec3(pos.x, pos.y, 1);
+					dist = pos.Length();
+					shortTag = tag;
 				}
 			}
 		}
 
 		else if (ed->contact->GetFixtureB()->GetUserData() == "projtracking")
 		{
-
 			tag = std::string(static_cast<char*>(ed->contact->GetFixtureA()->GetUserData()));
 
 			if (tag == enemyTag_)
 			{
-				b2Vec2 pos = ed->contact->GetFixtureB()->GetBody()->GetPosition();
+				b2Vec2 pos = ed->contact->GetFixtureA()->GetBody()->GetPosition();
 				if (pos.Length() < dist)
 				{
+					found = true;
 					target_ = b2Vec3(pos.x, pos.y, 1);
+					dist = pos.Length();
+					shortTag = tag;
 				}
 			}
 		}
 	}
+
+	if (found == false)
+		target_.z = 0;
+
+	std::cout  << target_.x << "\t" << target_.y << "\t " << target_.z << "\t" << shortTag.c_str() << ::endl;
 }
 
 void Projectile::orient(b2Vec2 target)
@@ -204,14 +218,17 @@ void Projectile::orient(b2Vec2 target)
 
 	float totalRotation = desiredAngle - bodyAngle;
 
-	while (totalRotation < -180 * DR) totalRotation += 360 * DR;
-	while (totalRotation >  180 * DR) totalRotation -= 360 * DR;
+	while (totalRotation < M_PI) totalRotation += 2 * M_PI;
+	while (totalRotation > M_PI) totalRotation -= 2 * M_PI;
 
-	float change = 20 * DR; //allow 20 degree rotation per time step
+	float change = 10 * DR; //allow 20 degree rotation per time step
 	float newAngle = bodyAngle + std::min(change, std::max(-change, totalRotation));
+	
 	float vel = body_->GetLinearVelocity().Length();
+	
 	b2Vec2 newVel(vel * cos(newAngle), vel * sin(newAngle));
-	body_->SetLinearVelocity(newVel);
+	
+	//body_->SetLinearVelocity(newVel);
 
 	//body_->SetTransform(body_->GetPosition(), newAngle);
 	//vx = magnitude * cos(angle)
@@ -258,7 +275,8 @@ void Projectile::update(int milliseconds)
 
 		if (target_.z != 0)
 		{
-			orient(b2Vec2(target_.x, target_.y));
+			b2Vec2 dir = b2Vec2(body_->GetPosition().x - target_.x, body_->GetPosition().y - target_.y);
+			orient(dir);
 		}
 
 		b2Vec2 vel = body_->GetLinearVelocity();
@@ -266,7 +284,7 @@ void Projectile::update(int milliseconds)
 
 		//std::cout << vel.Length() << std::endl;
 
-		if (hp_ <= 0 || lifeTime_ <= 0)
+		if ((bounce_ <= 0 && vel.Length() <= 0) || hp_ <= 0 || lifeTime_ <= 0)
 		{
 			alive_ = false;
 		}
@@ -286,18 +304,17 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 {
 	bool handled = false;
 	
-	if (handled == false)
+	//Get fixture string
+	std::string tig = std::string(static_cast<char*>(contact.GetFixtureA()->GetUserData()));
+
+	//If it's the other, get what we are in contact
+	if (tig == tag)
+		tig = std::string(static_cast<char*>(contact.GetFixtureB()->GetUserData()));
+
+	//If it's our tracking, don't bother
+	if (tig == "projtracking")
 	{
-		//Get fixture string
-		std::string tig = std::string(static_cast<char*>(contact.GetFixtureA()->GetUserData()));
-
-		//If it's the other, get what we are in contact
-		if (tig == tag)
-			tig = std::string(static_cast<char*>(contact.GetFixtureB()->GetUserData()));
-
-		//If it's our tracking, don't bother
-		if (tig == "projtracking")
-			handled = true;
+		handled = true;
 	}
 
 	else if (tag == "player" || tag == "enemy" || tag == "shape")////
@@ -316,7 +333,6 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 			if (penetration_-- <= 0)
 			{
 				takeDamage(1);
-				
 				if (size_.y > 0)
 				{
 					//b2Vec2 vel = body_->GetLinearVelocity();
@@ -329,7 +345,7 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 			//Do our force on penetration
 			else
 			{
-				lastPen_.z = 0;
+				lastPen_ = b2Vec3(body_->GetPosition().x, body_->GetPosition().y, 1);
 			}
 
 			if (alive_ == false)
@@ -351,11 +367,16 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 			if (--penetration_ < 0)
 			{
 				takeDamage(proj->getDamage());
+
 				if (alive_ == false)
 					contact.SetEnabled(false);
 			}
 
-
+			//Do our force on penetration
+			else
+			{
+				lastPen_ = b2Vec3(body_->GetPosition().x, body_->GetPosition().y, 1);
+			}
 			//Maybe set contact to false so stronger proj continues?
 		}
 
