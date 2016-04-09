@@ -380,8 +380,10 @@ void GameRenderer::drawForce(Force* const f)
 	sf::Color sec = B2toSF(f->getSecondary());
 	sf::Color ter = B2toSF(f->getTertiary());
 
+	//Indent scales based on lifetime in or out based on force
+	float dent = (in ? -rad * (1.f - life) : (-rad) + (rad * (1.f -life)));
 	//Draw shape
-	drawCircle(pos, rad, tweakAlpha(blend(pri, 1, sec, 1), life * 32), tweakAlpha(ter, life * 48), (in ? -rad * (1 - life): rad * -2+ life) );
+	drawCircle(pos, rad, tweakAlpha(blend(pri, 1, sec, 1), life * 32), tweakAlpha(ter, life * 48), dent);
 }
 
 /*GameRenderer::DrawShape(const &Shape s)

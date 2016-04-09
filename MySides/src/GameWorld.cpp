@@ -8,7 +8,8 @@ GameWorld::GameWorld() :
 	controlled_(nullptr),
 	pause_(false),
 	dstr("X"),
-	di(-1)
+	di(-1),
+	currentLevel_(Level())
 {
 	SetContactListener(&contactListener_);
 
@@ -29,7 +30,21 @@ GameWorld::GameWorld() :
 	//armory
 	armory_ = new Weapon::Armory(fireWeap_);
 
-	//audio_.addBGM("spriterip", "../assets/spriterip.ogg");
+	//Level
+	ShapeDef play = ShapeDef(b2Vec2_zero, b2Vec2(0, -1), 6);
+	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
+	play.colSecn = b2Color(0.f, 1.f, 1.f);
+	play.colTert = b2Color(1.f, 0.f, 0.f);
+	play.faction = 1;
+	play.hpScale = 10;
+	currentLevel_ = Level(2 * 60 * 1000, play);
+	//currentLevel_.addAFX("../assets/spriterip.ogg", 1, 0.2, 400, 1024);
+	currentLevel_.addAFX("../assets/wind.ogg", 0, 1, 750, 1000);
+	currentLevel_.setPrimary(b2Color(0.1f, 0.5f, 0.9f));
+	currentLevel_.setSecondary(b2Color(0.9f, 0.5f, 0.9f));
+	currentLevel_.setTertiary(b2Color(0.4f, 0.9f, 0.6f));
+
+	//AFX
 	audio_.addAFX("spriterip", "../assets/spriterip.ogg", 1, 0.2, 400, 1024);
 	audio_.addAFX("wind", "../assets/wind.ogg", 0, 1, 750, 1000);
 
@@ -58,6 +73,9 @@ GameWorld::GameWorld() :
 	audio_.addSFX("collect", "../assets/collect.wav", 8);
 	
 	getControlled_ = std::bind(&GameWorld::getControlled, this);
+
+	loadTestLevel();
+	//resetWorld();
 }
 
 GameWorld::~GameWorld()
@@ -170,7 +188,7 @@ void GameWorld::addPlayer(const ShapeDef& def, Weapon::WeaponI* weapon)
 		player_ = new Player(body, def, addSide_);
 		pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), -1, 5.f, 3.f));
 		pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), -1, 15.f, 1.f));
-		addPickup(Pickup::Type::SIGHT, def.position, -1, 32.f);
+		addPickup(Pickup::Type::SIGHT, def.position, -1, 10.f);
 		
 		audio_.playSFX("spawn", B2toSF(b2Vec2_zero, true));
 
@@ -285,9 +303,17 @@ void GameWorld::addForce(b2Vec2 pos, float force, float radius, int lifetime)
 	{
 		Force * f =	new Force(addStaticBody(pos), force, radius, lifetime);
 		float col = randFloat(0.f, 0.25f);
+		float col2 = col * 2;
+		float col3 = col * 3;
+		float col4 = col * 4;
+
 		f->setPrimary(b2Color(col, col, col));
-		f->setSecondary(b2Color(col * 2, col * 2, col * 2));
-		f->setTertiary(b2Color(col * 4, col * 4, col * 4));
+		f->setSecondary(b2Color(col3, col3, col3));
+		if (force < 0)
+			f->setTertiary(b2Color(col4, col4, col4));
+		else
+			f->setTertiary(b2Color(col2, col2, col2));
+
 		forces_.push_back(f);
 	}
 }
@@ -453,7 +479,7 @@ void GameWorld::removeForce(Force* f)
 }
 
 //Resets the level
-void GameWorld::resetLevel()
+void GameWorld::resetWorld()
 {
 	//Clear world
 	clearWorld();
@@ -553,15 +579,43 @@ void GameWorld::clearWorld(bool clearPlayer)
 	forces_.clear();
 }
 
-int GameWorld::getHapticL() const
+void GameWorld::loadLevel(Level& level)
 {
-	return leftHaptic_;
+	//unload current level
+	clearWorld();
+
+	//AFX
+	std::queue<Level::AFXDef> afx(level.getAFX());
+	for (int i = 0, max = afx.size(); i < max; ++i)
+	{
+		Level::AFXDef& a = afx.front();
+		audio_.addAFX(std::string("levelAFX" + i), a.path, a.nearFactor, a.farFactor, a.nearDistance, a.farDistance);
+		audio_.playAFX(std::string("levelAFX" + i));
+		afx.pop();
+	}
+
+	//Bounds
+	bounds_->setPrimary(level.getPrimary());
+	bounds_->setSecondary(level.getSecondary());
+	bounds_->setTertiary(level.getTertiary());
+
+	//Player
+	addPlayer(level.getPlayer(), armory_->requisition(level.getPlayerWeapon(), level.getPlayerWeaponLevel()));
 }
 
-int GameWorld::getHapticR() const
+void GameWorld::resetLevel()
 {
-	return rightHaptic_;
+	//Reload current level
+	loadLevel(currentLevel_);
 }
+
+void GameWorld::unloadLevel()
+{
+	//unload current level's afx
+}
+
+int GameWorld::getHapticL() const {	return leftHaptic_; }
+int GameWorld::getHapticR() const {	return rightHaptic_; }
 
 //Returns the radius of the level bounds
 float GameWorld::getBoundsRadius()
@@ -641,6 +695,11 @@ std::list<Side*>& GameWorld::getSides() { return sides_; }
 std::list<Pickup::PickupI*>& GameWorld::getPickups() { return pickups_; }
 std::list<Force*>& GameWorld::getForces() { return forces_; }
 
+Level & GameWorld::getCurrentLevel()
+{
+	return currentLevel_;
+}
+
 void GameWorld::step(int dt)
 {
 	Step(dt, VELOCITY_ITERS, POSITION_ITERS);
@@ -659,7 +718,6 @@ void GameWorld::update(int dt)
 		updatePickup(dt);
 		updateForce(dt);
 		updateLevel(dt);
-
 		
 		//Sound
 		if (player_ != nullptr && player_->getCollected())
@@ -854,23 +912,24 @@ void GameWorld::updateForce(int dt)
 
 void GameWorld::updateLevel(int dt)
 {
-	//Basic difficulty ramp
-	timeInLevel_ += dt;
-	timeInLevel_ % UINT16_MAX;
-	if (spawns_ > 0)
-	{
-		if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_)
-		{
-			lastSpawn_ = timeInLevel_;
-
-			//if we want to do less than double the enemy number
-			if (enemies < spawns_ * 2)
-			{
-				spawnEnemy();
-				spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
-			}
-		}
-	}
+	currentLevel_.update(dt);
+	////Basic difficulty ramp
+	//timeInLevel_ += dt;
+	//timeInLevel_ % UINT16_MAX;
+	//if (spawns_ > 0)
+	//{
+	//	if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_)
+	//	{
+	//		lastSpawn_ = timeInLevel_;
+	//
+	//		//if we want to do less than double the enemy number
+	//		if (enemies < spawns_ * 2)
+	//		{
+	//			spawnEnemy();
+	//			spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
+	//		}
+	//	}
+	//}
 }
 
 void GameWorld::cullWeapons()

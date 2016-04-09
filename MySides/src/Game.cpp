@@ -79,9 +79,6 @@ int Game::run()
 	//Avoids nasty white windows
 	window_.clear(sf::Color::Black);
 	window_.display();
-
-	//Begin game
-	world_->resetLevel();
 #pragma endregion
 
 #pragma region Game Loop
@@ -127,6 +124,7 @@ int Game::run()
 				accumulator -= tickTime;
 			}
 		}
+
 		if (!pause_)
 			world_->step(frameTime.asMilliseconds());
 
@@ -238,7 +236,7 @@ void Game::handleInput(sf::Time dt)
 	//F5 : Reset Level
 	if (key_.isKeyPressed(Key::F5))
 	{
-		world_->resetLevel();
+		world_->resetWorld();
 		camera_->setTarget(world_->getPlayer());
 		camera_->setCenter(sf::Vector2f(0, 0));
 	}
@@ -389,17 +387,18 @@ void Game::handleInput(sf::Time dt)
 		{
 			world_->dstr = "fungun";
 
-			int max = 9;
-			int i[9];
+			int max = 10;
+			int i[10];
 			i[0] = 44;
 			i[1] = 42;
 			i[2] = 47;
 			i[3] = 60;
 			i[4] = 88;
 			i[5] = 111;
-			i[6] = 404;
-			i[7] = 666;
-			i[8] = 888;
+			i[6] = 250;
+			i[7] = 404;
+			i[8] = 666;
+			i[9] = 888;
 
 			for (int w = 0; w < max; ++w)
 			{
@@ -420,6 +419,7 @@ void Game::handleInput(sf::Time dt)
 		//R/Y : Requisition
 		if (key_.isKeyPressed(Key::R) || con_.checkPressed(XINPUT_GAMEPAD_Y))
 		{
+
 			world_->requisition(world_->getPlayer(), world_->dstr, world_->di);
 		}
 

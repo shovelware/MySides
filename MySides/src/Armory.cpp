@@ -254,6 +254,23 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		break;
 	}
 
+	case 250:
+	{
+		ProjectileDef can = ProjectileDef();
+		can.velScale = 1.f;
+		can.lifeTime = 1000;
+		can.hpMAX = 1;
+		can.oneHit = true;
+		can.detonation.force = 0.3f;
+		can.detonation.lifeTime = 1000;
+		can.detonation.radius = 7.5f;
+		can.width = 1;
+		can.height = 1;
+
+		funGun = new Weapon::SemiMag(fireCallback_, can, "shotgun", 10, 1000, 500);
+		break;
+	}
+
 	case 404:
 	{
 		ProjectileDef missile = ProjectileDef();

@@ -19,10 +19,11 @@ HUD::~HUD()
 
 void HUD::drawLevelStatus(sf::FloatRect box)
 {
-
-	float tim = world_->maxTime;
-	float timel = world_->getTimeInLevel();
-	int spawns = world_->getSpawns();
+	Level& level = world_->getCurrentLevel();
+	int limitMin = level.getLimit();
+	int limitMax = level.getLimitMAX();
+	int time = level.getTime();
+	sf::FloatRect eighthBox((box.width / 8) * 7, box.height + (box.height / 2), box.width / 8, box.height / 8);
 
 	sf::Color p = sf::Color::Blue;
 	sf::Color s = sf::Color::Black;
@@ -36,9 +37,11 @@ void HUD::drawLevelStatus(sf::FloatRect box)
 		t = B2toSF(bounds->getTertiary());
 	}
 
-	drawBar(box, timel, tim, s, p, t);
-	drawStringRight(box, std::to_string((int)(tim - timel)), t, 2.f);
-	drawStringLeft(box, std::to_string(spawns - 1), t, 1.5f);
+
+	drawBar(box, limitMin, limitMax, s, p, t);
+	drawString(eighthBox, std::to_string((int)(time)), t, 1.f);
+	drawStringLeft(box, std::to_string(limitMin), t, 1.5f);
+	drawStringRight(box, std::to_string(limitMax), t, 1.5f);
 }
 
 void HUD::drawShapeStatus(sf::FloatRect box)
@@ -210,8 +213,8 @@ void HUD::drawStringLeft(sf::FloatRect box, std::string info, sf::Color col, flo
 		text_.setScale(sf::Vector2f(sizeScale * 1.2f, sizeScale * 1.2f));
 		float margin = text_.getCharacterSize() * sizeScale;
 		sf::FloatRect txt = text_.getLocalBounds();
-		text_.setOrigin(txt.left, txt.top + txt.height / 2);
-		text_.setPosition(box.left, box.top + box.height / 2);
+		text_.setOrigin(txt.left + txt.width / 2, txt.top + txt.height / 2);
+		text_.setPosition(box.left + txt.width / 2, box.top + box.height / 2);
 
 		text_.setColor(outlineCol);
 		trg_.draw(text_);
@@ -237,8 +240,8 @@ void HUD::drawStringRight(sf::FloatRect box, std::string info, sf::Color col, fl
 		text_.setScale(sf::Vector2f(sizeScale * 1.2f, sizeScale * 1.2f));
 		float margin = text_.getCharacterSize() * sizeScale;
 		sf::FloatRect txt = text_.getLocalBounds();
-		text_.setOrigin(txt.left + txt.width, txt.top + txt.height / 2);
-		text_.setPosition(box.left + box.width, box.top + box.height / 2);
+		text_.setOrigin(txt.left + txt.width / 2, txt.top + txt.height / 2);
+		text_.setPosition(box.left + box.width - txt.width / 2, box.top + box.height / 2);
 
 		text_.setColor(outlineCol);
 		trg_.draw(text_);

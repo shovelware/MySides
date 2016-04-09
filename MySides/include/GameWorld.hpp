@@ -25,8 +25,9 @@
 
 #include "Player.hpp"
 #include "Enemy.hpp"
+#include "Level.hpp"
+#include "Armory.hpp"
 
-#include "ShapeDef.hpp"
 #include "SideDef.hpp"
 
 #include "Pickup.hpp"
@@ -34,7 +35,6 @@
 #include "Shield.hpp"
 #include "Attractor.hpp"
 
-#include "Armory.hpp"
 
 #include "SoundSystem.hpp"
 
@@ -79,8 +79,15 @@ public:
 	//
 
 	//Cleaning up
-	void resetLevel();
+	void resetWorld();
 	void clearWorld(bool clearPlayer = true);
+
+	//Level control
+	void loadLevel(Level& level);
+	void resetLevel();
+	void unloadLevel();
+
+	void loadTestLevel() { loadLevel(currentLevel_); } ////DEBUG
 
 	//Bounds manipulation
 	float getBoundsRadius();
@@ -102,7 +109,7 @@ public:
 	void SetDebugDraw(b2Draw* debugDraw);
 	void DrawDebugData();
 
-	//Return a reference to lists for drawing
+	//Return a reference to items for drawing
 	Bounds* getBounds();
 	Shape* getPlayer();
 	std::list<Enemy*>& getShapes();
@@ -110,7 +117,7 @@ public:
 	std::list<Side*>& getSides();
 	std::list<Pickup::PickupI*>& getPickups();
 	std::list<Force*>& getForces();
-	int getSpawns() { return spawns_; } //////DELETE THIS
+	Level& getCurrentLevel();
 
 	//Update & Pause
 	void step(int dt);
@@ -193,6 +200,9 @@ private:
 
 	//Keep inside bounds
 	void popInside(Entity* ent);
+
+	//Levels
+	Level currentLevel_;
 
 	//AI spawning
 	void spawnEnemy();
