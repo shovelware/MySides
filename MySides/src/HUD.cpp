@@ -23,7 +23,6 @@ void HUD::drawLevelStatus(sf::FloatRect box)
 	int limitMin = level.getLimit();
 	int limitMax = level.getLimitMAX();
 	int time = level.getTime();
-	sf::FloatRect eighthBox((box.width / 8) * 7, box.height + (box.height / 2), box.width / 8, box.height / 8);
 
 	sf::Color p = sf::Color::Blue;
 	sf::Color s = sf::Color::Black;
@@ -37,6 +36,7 @@ void HUD::drawLevelStatus(sf::FloatRect box)
 		t = B2toSF(bounds->getTertiary());
 	}
 
+	sf::FloatRect eighthBox(box.left + box.width - (box.width / 8), box.height + (box.height / 2), box.width / 8, box.height / 8);
 
 	drawBar(box, limitMin, limitMax, s, p, t);
 	drawString(eighthBox, std::to_string((int)(time)), t, 1.f);
@@ -84,9 +84,9 @@ void HUD::drawShapeStatus(sf::FloatRect box)
 				drawRect(uhpRect, s);
 		}
 		//drawRect(topBox + );
-		drawStringLeft(box, std::to_string((int)(hp)), tex, 0.75f);
-		drawString(box, std::to_string((int)(hp + uhp)), tex, 1.75f);
-		drawStringRight(box, std::to_string((int)(uhp)), tex, 0.75f);
+		//drawStringLeft(box, std::to_string((int)(hp)), tex, 0.75f);
+		//drawString(box, std::to_string((int)(hp + uhp)), tex, 1.75f);
+		//drawStringRight(box, std::to_string((int)(uhp)), tex, 0.75f);
 	}
 }
 
@@ -196,7 +196,6 @@ void HUD::drawString(sf::FloatRect box, std::string info, sf::Color col, float s
 		text_.setScale(sf::Vector2f(sizeScale, sizeScale));
 		text_.setColor(col);
 		trg_.draw(text_);
-
 	}
 }
 
@@ -214,7 +213,7 @@ void HUD::drawStringLeft(sf::FloatRect box, std::string info, sf::Color col, flo
 		float margin = text_.getCharacterSize() * sizeScale;
 		sf::FloatRect txt = text_.getLocalBounds();
 		text_.setOrigin(txt.left + txt.width / 2, txt.top + txt.height / 2);
-		text_.setPosition(box.left + txt.width / 2, box.top + box.height / 2);
+		text_.setPosition(box.left + txt.width, box.top + box.height / 2);
 
 		text_.setColor(outlineCol);
 		trg_.draw(text_);
@@ -241,14 +240,15 @@ void HUD::drawStringRight(sf::FloatRect box, std::string info, sf::Color col, fl
 		float margin = text_.getCharacterSize() * sizeScale;
 		sf::FloatRect txt = text_.getLocalBounds();
 		text_.setOrigin(txt.left + txt.width / 2, txt.top + txt.height / 2);
-		text_.setPosition(box.left + box.width - txt.width / 2, box.top + box.height / 2);
-
+		text_.setPosition(box.left + box.width - txt.width, box.top + box.height / 2);
+		
 		text_.setColor(outlineCol);
 		trg_.draw(text_);
 
 		text_.setScale(sf::Vector2f(sizeScale, sizeScale));
 		text_.setColor(col);
 		trg_.draw(text_);
+
 	}
 }
 
@@ -263,32 +263,36 @@ void HUD::drawBar(sf::FloatRect box, float min, float max, sf::Color fill, sf::C
 	fillRect.width -= line * 2;
 
 	//Draw fill bars if we're fillable
-	if (max >= min)
+	if (max > 0)
 	{
-		sf::FloatRect barBox(box.left + line, box.top + line, box.width - line * 2, box.height - line * 2);
-
-		float div = line * 0.5f;		
-		float divsW = (max - 1) * div;
-		float splitMax = max + divsW;
-
-		if (splitMax < barBox.width)
+		if (max >= min)
 		{
-			float roundW = (barBox.width - divsW) / max;
-			sf::FloatRect roundRect(barBox.left, barBox.top, roundW, barBox.height);
-			for (int i = 0; i < min; ++i)
+			sf::FloatRect barBox(box.left + line, box.top + line, box.width - line * 2, box.height - line * 2);
+
+			float div = line * 0.5f;
+			float divsW = (max - 1) * div;
+			float splitMax = max + divsW;
+
+			if (splitMax < barBox.width)
 			{
-				drawRect(roundRect, fill);
-				roundRect.left += (div  +  roundW);
+				float roundW = (barBox.width - divsW) / max;
+				sf::FloatRect roundRect(barBox.left, barBox.top, roundW, barBox.height);
+				for (int i = 0; i < min; ++i)
+				{
+					drawRect(roundRect, fill);
+					roundRect.left += (div + roundW);
+				}
+			}
+
+			else if (max != 0)
+			{
+				fillRect.width *= fminf(max / max, (min / max));
+				drawRect(fillRect, fill);
 			}
 		}
 
-		else if (max != 0)
-		{
-		fillRect.width *= fminf(max / max, (min / max));
-		drawRect(fillRect, fill);
-		}
+		else drawRect(fillRect, fill);
 	}
-
 
 	//drawRect(fillRect, fill);
 }

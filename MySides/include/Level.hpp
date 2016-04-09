@@ -30,7 +30,11 @@ public:
 	int getTime() const;
 
 	ShapeDef& getPlayer();
+
+	void setPlayerWeapon(std::string weapon);
 	std::string getPlayerWeapon() const;
+
+	void setPlayerWeaponLevel(int level);
 	int getPlayerWeaponLevel() const;
 
 	void addAFX(std::string path, float nearFactor, float farFactor, float nearDistance, float farDistance);

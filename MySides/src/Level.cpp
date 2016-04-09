@@ -10,8 +10,6 @@ time_(0)
 Level::Level(int limit, ShapeDef player) :
 	player_(player),
 	timeMAX_(limit),
-	playerWeapon_("rifle"),
-	playerWeaponLevel_(4),
 	boundsPoints_(32),
 	boundsRadius_(32),
 	time_(0)
@@ -39,9 +37,19 @@ ShapeDef& Level::getPlayer()
 	return player_;
 }
 
+void Level::setPlayerWeapon(std::string weapon)
+{
+	playerWeapon_ = weapon;
+}
+
 std::string Level::getPlayerWeapon() const
 {
 	return playerWeapon_;
+}
+
+void Level::setPlayerWeaponLevel(int level)
+{
+	playerWeaponLevel_ = level;
 }
 
 int Level::getPlayerWeaponLevel() const

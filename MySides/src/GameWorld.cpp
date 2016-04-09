@@ -35,6 +35,7 @@ GameWorld::GameWorld() :
 	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
 	play.colSecn = b2Color(0.f, 1.f, 1.f);
 	play.colTert = b2Color(1.f, 0.f, 0.f);
+	play.upgrade = true;
 	play.faction = 1;
 	play.hpScale = 10;
 	currentLevel_ = Level(2 * 60 * 1000, play);

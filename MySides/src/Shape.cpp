@@ -573,7 +573,7 @@ bool Shape::collide(Entity* other, b2Contact& contact, std::string tag)
 			Side* side = static_cast<Side*>(other);
 
 			collect(side->getValue());
-			heal(std::ceil(side->getValue()) * (hpScale_ / 2));
+			heal(std::ceil(side->getValue()) * fmaxf(1.f, (hpScale_ / 2)));
 			
 			side->collect();
 			

@@ -292,6 +292,23 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		break;
 	}
 
+	//Armageddon Cannon
+	case 555:
+	{
+		ProjectileDef meteor = ProjectileDef();
+		meteor.lifeTime = 1000;
+		meteor.width = 20;
+		meteor.damage = 100;
+		meteor.velScale = 8.f;
+		meteor.hpMAX = 10;
+		meteor.detonation.force = 0.5f;
+		meteor.detonation.lifeTime = 25;
+		meteor.detonation.radius = 10;
+		
+		funGun = new Weapon::AutoMag(fireCallback_, meteor, "cannon", 32, 500, 5000, .25f);
+		break;
+	}
+
 	//Mikrowerfer
 	case 666:
 	{

@@ -387,8 +387,8 @@ void Game::handleInput(sf::Time dt)
 		{
 			world_->dstr = "fungun";
 
-			int max = 10;
-			int i[10];
+			int max = 11;
+			int i[11];
 			i[0] = 44;
 			i[1] = 42;
 			i[2] = 47;
@@ -397,8 +397,9 @@ void Game::handleInput(sf::Time dt)
 			i[5] = 111;
 			i[6] = 250;
 			i[7] = 404;
-			i[8] = 666;
-			i[9] = 888;
+			i[8] = 555;
+			i[9] = 666;
+			i[10] = 888;
 
 			for (int w = 0; w < max; ++w)
 			{
