@@ -109,6 +109,7 @@ public:
 	std::list<Projectile*>& getProjectiles();
 	std::list<Side*>& getSides();
 	std::list<Pickup::PickupI*>& getPickups();
+	std::list<Force*>& getForces();
 	int getSpawns() { return spawns_; } //////DELETE THIS
 
 	//Update & Pause

@@ -28,6 +28,7 @@ private:
 	void drawProjectile(Projectile* const p);
 	void drawSide(Side* const s);
 	void drawPickup(Pickup::PickupI* const p);
+	void drawForce(Force* const f);
 };
 
 #endif

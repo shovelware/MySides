@@ -2,13 +2,14 @@
 
 Bounds::Bounds(b2Body* body, float radius) : 
 	Entity(body), 
-	radius_(radius)
+	radius_(radius),
+	points_(32)
 {
 	//Add userdata to fixture for contacts
 	boundsDef_.userData = "bounds";
 
 	b2ChainShape chain;
-	fillChain(chain, radius, 32);
+	fillChain(chain, radius, points_);
 	boundsDef_.shape = &chain;
 
 	//Add material properties to the fixture

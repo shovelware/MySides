@@ -25,11 +25,12 @@ Side::Side(b2Body * body, const SideDef& def) :
 	impulse.Normalize();
 	impulse *= 0.25f;
 
-	float spin = randFloat(4.f, 10.f) * (dir ? 1 : -1);
+	float spin = randFloat(0.03f) * (dir ? 1 : -1);
 
-	body_->SetLinearDamping(randFloat(0.01f, 0.03f));
+	body_->SetLinearDamping(0.02f);
 	body_->ApplyLinearImpulse(impulse, body_->GetWorldCenter(), true);
-	body_->SetAngularDamping(randFloat(0.005f, 0.001f));
+
+	body_->SetAngularDamping(0.004f);
 	body_->SetAngularVelocity(spin);
 	//std::cout << spin << "||" << body_->GetAngularVelocity() << std::endl;
 	//Color data

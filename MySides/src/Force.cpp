@@ -4,6 +4,7 @@ Force::Force(b2Body * body, float force, float radius, int lifeTime) :
 	Entity(body),
 	force_(force),
 	radius_(radius),
+	lifeTimeMAX_(lifeTime),
 	lifeTime_(lifeTime)
 {
 	createBody(radius_);
@@ -62,6 +63,10 @@ void Force::update(int milliseconds)
 		}
 	}
 }
+
+float Force::getForce() const { return force_; }
+float Force::getRadius() const { return radius_; }
+float Force::getLifeTimePercent() const { return (lifeTime_  * 1.f/ lifeTimeMAX_ * 1.f) * 100.f; }
 
 bool Force::collide(Entity* other, b2Contact& contact, std::string tag)
 {

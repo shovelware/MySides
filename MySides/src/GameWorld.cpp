@@ -281,7 +281,15 @@ void GameWorld::addShrapnel(Projectile* src)
 
 void GameWorld::addForce(b2Vec2 pos, float force, float radius, int lifetime)
 {
-		forces_.push_back(new Force(addStaticBody(pos), force, radius, lifetime));
+	if (radius > 0 && lifetime > 0)
+	{
+		Force * f =	new Force(addStaticBody(pos), force, radius, lifetime);
+		float col = randFloat(0.f, 0.25f);
+		f->setPrimary(b2Color(col, col, col));
+		f->setSecondary(b2Color(col * 2, col * 2, col * 2));
+		f->setTertiary(b2Color(col * 4, col * 4, col * 4));
+		forces_.push_back(f);
+	}
 }
 
 //Spawn a random enemy
@@ -631,6 +639,7 @@ std::list<Enemy*>& GameWorld::getShapes() {	return shapes_; }
 std::list<Projectile*>& GameWorld::getProjectiles() { return projectiles_; }
 std::list<Side*>& GameWorld::getSides() { return sides_; }
 std::list<Pickup::PickupI*>& GameWorld::getPickups() { return pickups_; }
+std::list<Force*>& GameWorld::getForces() { return forces_; }
 
 void GameWorld::step(int dt)
 {

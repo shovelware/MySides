@@ -828,7 +828,7 @@ void Weapon::Armory::upgradeCannon(Weapon::SemiMag* cannon, int level, int projL
 	if (level > 0) { cannon->setResetTime(800); }
 
 	//L2B : Magsize+
-	if (level > 1) { cannon->setMagSize(12); }
+	if (level > 1) { cannon->setMagSize(12, true); }
 
 	//L3F : ReloadTime-
 	if (level > 2) { cannon->setReloadTime(3000); }
@@ -837,10 +837,10 @@ void Weapon::Armory::upgradeCannon(Weapon::SemiMag* cannon, int level, int projL
 	if (level > 3) { cannon->setResetTime(600); }
 
 	//L5H : Magsize++
-	if (level > 4) { cannon->setMagSize(18); }
+	if (level > 4) { cannon->setMagSize(16, true); }
 
 	//L6B : Magsize+++
-	if (level > 5) { cannon->setMagSize(24); }
+	if (level > 5) { cannon->setMagSize(24, true); }
 
 	//L7F : ReloadTime--
 	if (level > 6) { cannon->setReloadTime(2000); }

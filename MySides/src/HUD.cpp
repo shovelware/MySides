@@ -107,22 +107,15 @@ void HUD::drawWeaponStatus(sf::FloatRect box)
 		int dent = 2;
 		
 		//Replace bg and bars with this if you want no gaps
-		//drawBar(box, min, max, t, p, s);
-
-
-		//Draw background
-		drawRect(box, p, s, -dent);
-		
-	
-
+		drawBar(box, min, max, t, p, s);
 
 		//Draw Ammo Number
-		sf::Color txt(p);
+		sf::Color txtcol(p);
 		if (loading)
-			txt = t;
+			txtcol = t;
 		else if (ready)
-			txt = s;
-		drawString(box, std::to_string((int)min), txt, 2.f);
+			txtcol = s;
+		drawString(box, std::to_string((int)min), txtcol, 2.f);
 
 		//Draw level value
 		sf::FloatRect eighthBox(box.left, box.height + (box.height / 2), box.width / 8, box.height / 8);
@@ -271,23 +264,30 @@ void HUD::drawBar(sf::FloatRect box, float min, float max, sf::Color fill, sf::C
 	{
 		sf::FloatRect barBox(box.left + line, box.top + line, box.width - line * 2, box.height - line * 2);
 
-		float div = barBox.width - ((max - 1) * (line * 0.5f));
+		float div = line * 0.5f;		
+		float divsW = (max - 1) * div;
+		float splitMax = max + divsW;
 
-		if (barBox.width < div)
+		if (splitMax < barBox.width)
 		{
-			//draw each round
-			int x = 0;
+			float roundW = (barBox.width - divsW) / max;
+			sf::FloatRect roundRect(barBox.left, barBox.top, roundW, barBox.height);
+			for (int i = 0; i < min; ++i)
+			{
+				drawRect(roundRect, fill);
+				roundRect.left += (div  +  roundW);
+			}
 		}
 
 		else if (max != 0)
 		{
 		fillRect.width *= fminf(max / max, (min / max));
-		drawRect(fillRect, fill );
+		drawRect(fillRect, fill);
 		}
 	}
 
 
-	drawRect(fillRect, fill);
+	//drawRect(fillRect, fill);
 }
 
 void HUD::drawRect(sf::FloatRect rect, sf::Color fill, sf::Color out, int dent)

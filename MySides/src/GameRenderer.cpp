@@ -41,33 +41,62 @@ void GameRenderer::render()
 	drawBounds(world_->getBounds());
 
 	std::list<Side*>& sides = world_->getSides();
-	for (Side* sd : sides)
+	if (!sides.empty())
 	{
-		drawSide(sd);
+		for (Side* sd : sides)
+		{
+			if (sd->getActive())
+				drawSide(sd);
+		}
+	}
+	
+	std::list<Projectile*>& projs = world_->getProjectiles();
+	if (!projs.empty())
+	{
+		for (Projectile* prj : projs)
+		{
+			if (prj->getActive())
+				drawProjectile(prj);
+		}
 	}
 
-	std::list<Projectile*>& projs = world_->getProjectiles();
-	for (Projectile* prj : projs)
-	{
-		drawProjectile(prj);
-	}
 
 	std::list<Enemy*>& shapes = world_->getShapes();
-	for (Enemy* shp : shapes)
+	if (!shapes.empty())
 	{
-		drawShape(shp);
+		for (Enemy* shp : shapes)
+		{
+			if (shp->getActive())
+				drawShape(shp);
+		}
 	}
 
 	Shape* player = world_->getPlayer();
 	if (player != nullptr)
 	{
-		drawShape(player);
+		if (player->getActive())
+			drawShape(player);
 	}
 
 	std::list<Pickup::PickupI*>& pickups = world_->getPickups();
-	for (Pickup::PickupI* pic : pickups)
+	
+	if (!pickups.empty())
 	{
-		drawPickup(pic);
+		for (Pickup::PickupI* pic : pickups)
+		{
+			if (pic->getActive())
+				drawPickup(pic);
+		}
+	}
+
+	std::list<Force*>& forces = world_->getForces();
+	if (!forces.empty())
+	{
+		for (Force* force : forces)
+		{
+			if (force->getActive())
+				drawForce(force);
+		}
 	}
 
 }
@@ -115,7 +144,7 @@ void GameRenderer::drawShape(Shape* const s)
 	//Orientation circle
 	drawCircle(pos - pointing, size * 4, (armed ? ter : tweakAlpha(ter, 64)), (armed ? sec : tweakAlpha(sec, 64)));
 	drawCircle(pos - (pointing *  2.f), size * 3, (armed ? tweakAlpha(ter, 128) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 128) : tweakAlpha(sec, 32)));
-	drawCircle(pos - (pointing *  3.f), size * 4, (armed ? tweakAlpha(ter, 128) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 128) : tweakAlpha(sec, 32)));
+	drawCircle(pos - (pointing *  3.f), size * 2, (armed ? tweakAlpha(ter, 196) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 196) : tweakAlpha(sec, 32)));
 	
 	//Actual shape
 	drawPolygon(verts, count, pri, sec);
@@ -134,6 +163,7 @@ void GameRenderer::drawBounds(Bounds* const b)
 	b2Fixture* fix = body->GetFixtureList();
 	
 	sf::Vector2f pos = B2toSF(b->getPosition(), true);
+	float radius = b->getRadius();
 
 	sf::Color pri = B2toSF(b->getPrimary());
 	sf::Color sec = B2toSF(b->getSecondary());
@@ -167,7 +197,7 @@ void GameRenderer::drawBounds(Bounds* const b)
 
 	//Draw stuff
 	//Draw base polygon
-	drawPolygon(verts, count, sec, ter);
+	drawPolygon(verts, count, sec, tweakAlpha(ter, 64), radius);
 
 	//Draw other layers, getting smaller
 	for (int l = 0; l <= layers - 1; ++l)
@@ -181,7 +211,7 @@ void GameRenderer::drawBounds(Bounds* const b)
 	}
 
 	//Centre circle
-	drawCircle(pos, 1, ter, sec, 0);
+	drawCircle(pos, radius, tweakAlpha(blend(pri, 1, ter, 1), 64), sec, 0);
 
 	//Clean up
 	delete[] verts;
@@ -331,6 +361,27 @@ void GameRenderer::drawPickup(Pickup::PickupI * const p)
 		}
 	}
 
+}
+
+void GameRenderer::drawForce(Force* const f)
+{
+	//Pull vars
+	b2Body* body = f->getBody();
+
+	sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
+
+	float rad = f->getRadius() * _SCALE_;
+	float force = f->getForce();
+	bool in = (force < 0);
+	
+	float life = (f->getLifeTimePercent() / 100);
+
+	sf::Color pri = B2toSF(f->getPrimary());
+	sf::Color sec = B2toSF(f->getSecondary());
+	sf::Color ter = B2toSF(f->getTertiary());
+
+	//Draw shape
+	drawCircle(pos, rad, tweakAlpha(blend(pri, 1, sec, 1), life * 32), tweakAlpha(ter, life * 48), (in ? -rad * (1 - life): rad * -2+ life) );
 }
 
 /*GameRenderer::DrawShape(const &Shape s)
