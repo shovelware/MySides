@@ -5,7 +5,7 @@
 
 class Force : public Entity{
 public:
-	Force(b2Body* body, float force, float radius, int lifeTime);
+	Force(b2Body* body, float force, float radius, int lifeTime, int faction = 0);
 	void update(int milliseconds);
 
 	float getForce() const;

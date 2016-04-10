@@ -25,8 +25,6 @@ private:
 	int lifeTimeMAX_;
 
 	void setShape(float size);
-
-	
 };
 
 #endif

@@ -254,7 +254,8 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		break;
 	}
 
-	case 250:
+	//Sonic Boom
+	case 120:
 	{
 		ProjectileDef can = ProjectileDef();
 		can.velScale = 1.f;
@@ -271,6 +272,7 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		break;
 	}
 
+	//Tracking missile
 	case 404:
 	{
 		ProjectileDef missile = ProjectileDef();
@@ -299,7 +301,7 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		meteor.lifeTime = 1000;
 		meteor.width = 20;
 		meteor.damage = 100;
-		meteor.velScale = 8.f;
+		meteor.velScale = 16.f;
 		meteor.hpMAX = 10;
 		meteor.detonation.force = 0.5f;
 		meteor.detonation.lifeTime = 25;
@@ -313,12 +315,13 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 	case 666:
 	{
 		ProjectileDef wave = ProjectileDef();
-		wave.velScale = 4.f;
+		wave.velScale = 0.5f;
 		wave.width = 2.5f;
+		wave.height = 1.5f;
 		wave.bounce = 1.f;
 		wave.hpMAX = 8;
 		wave.damage = 40;
-		wave.lifeTime = 3000;
+		wave.lifeTime = 500;
 
 		funGun = new Weapon::SpreadBat(fireCallback_, wave, "launcher", 320, 16, 800, 16, 6, -1.0, 0.9f, -2.f);
 		break;
@@ -328,15 +331,30 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 	case 888:
 	{
 		ProjectileDef bb = getShrapnel(8);
-		bb.lifeTime = 200;
+		bb.lifeTime = 300;
 		bb.oneHit = true;
 		bb.bounce = 0.f;
-		bb.detonation.force = 0.025f;
+		bb.detonation.force = 0.005f;
 		bb.detonation.radius = 0.5f;
 		bb.detonation.lifeTime = 25;
 
-		funGun = new Weapon::SpreadBat(fireCallback_, bb, "pistol", 2000, 32, 1000, 10, 8, 0, 0.5, 1.1f);
+		funGun = new Weapon::SpreadBat(fireCallback_, bb, "pistol", 2000, 64, 1000, 10, 8, 0, 0.5, 1.1f);
 		
+		break;
+	}
+
+	case 999:
+	{
+		ProjectileDef knife = ProjectileDef();
+		knife.oneHit = true;
+		knife.hpMAX = 1;
+		knife.damage = 999999;
+		knife.height = 20.f;
+		knife.width = 1.f;
+		knife.velScale = 3.f;
+		knife.lifeTime = 4000;
+
+		funGun = new Weapon::SemiBat(fireCallback_, knife, "coilgun", 160, 16, 8);
 		break;
 	}
 
@@ -698,12 +716,12 @@ ProjectileDef Weapon::Armory::getSlug(int level)
 	//L0 : Default
 	ProjectileDef slug = ProjectileDef();
 
-	slug.width = .8f;
+	slug.width = 1.6f;
 	slug.hpMAX = 1;
 	slug.damage = 32;
 	slug.velScale = 0.75f;
 	slug.lifeTime = 500;
-	slug.height = 1.6f;
+	slug.height = 3.2f;
 
 	//L1H : Damage+
 	if (level > 0) { slug.damage = 48; }

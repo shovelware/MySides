@@ -30,7 +30,22 @@ void Pickup::Sight::onCollect()
 	shape.Set(b2Vec2(0, 0), b2Vec2(0, length_));
 	def.shape = &shape;
 
+
+	//b2RevoluteJointDef dis;
+	//dis.localAnchorA = b2Vec2(0, 0);
+	//dis.localAnchorB = b2Vec2(0, 0);
+	//dis.bodyA = owner_->getBody();
+	//dis.bodyB = body_;
+	//dis.enableLimit = true;
+	//dis.lowerAngle = 0;
+	//dis.upperAngle = 0;
+	//dis.collideConnected = false;
+	//
+	//body_->GetWorld()->CreateJoint(&dis);
 	body_->CreateFixture(&def);
+
+	float angle = owner_->getBody()->GetAngle();
+	body_->SetTransform(owner_->getBody()->GetPosition(), angle);
 
 	//Enable sighting
 	switch (faction_)
@@ -87,7 +102,6 @@ void Pickup::Sight::update(int milliseconds)
 		if (owner_ != nullptr)
 		{
 			float angle = owner_->getBody()->GetAngle();
-
 			body_->SetTransform(owner_->getBody()->GetPosition(), angle);
 
 			contact_ = false;

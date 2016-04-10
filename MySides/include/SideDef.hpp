@@ -10,6 +10,7 @@ public:
 		position(b2Vec2_zero),
 		normal(b2Vec2_zero),
 		length(0),
+		faction(0),
 		lifeTime(1000),
 		colPrim(b2Color(1.f, 0.f, 0.f)),
 		colSecn(b2Color(.75f, .75f, .75f)),
@@ -30,6 +31,7 @@ public:
 		position(sd.position),
 		normal(sd.normal),
 		length(sd.length),
+		faction(sd.faction),
 		lifeTime(sd.lifeTime),
 		colPrim(sd.colPrim),
 		colSecn(sd.colSecn),
@@ -40,6 +42,7 @@ public:
 	b2Vec2 normal;
 
 	float length;
+	int faction;
 	int lifeTime;
 
 	//Colours

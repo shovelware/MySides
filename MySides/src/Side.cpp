@@ -10,6 +10,8 @@ Side::Side(b2Body * body, const SideDef& def) :
 {
 	setShape(length_);
 
+	faction_ = def.faction;
+
 	float desiredAngle = atan2f(-def.normal.x, def.normal.y);
 	body_->SetTransform(def.position, desiredAngle);
 

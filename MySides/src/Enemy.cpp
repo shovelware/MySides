@@ -17,6 +17,9 @@ void Enemy::update(int milliseconds)
 {
 	Shape::update(milliseconds);
 
+	//Don't do AI things if we're not alive
+	if (!alive_) return;
+
 	//Still
 	if (aistate == 0);
 

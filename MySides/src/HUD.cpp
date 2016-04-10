@@ -17,7 +17,7 @@ HUD::~HUD()
 	}
 }
 
-void HUD::drawLevelStatus(sf::FloatRect box)
+void HUD::drawLevelStatus(sf::FloatRect& const box)
 {
 	Level& level = world_->getCurrentLevel();
 	int limitMin = level.getLimit();
@@ -28,13 +28,10 @@ void HUD::drawLevelStatus(sf::FloatRect box)
 	sf::Color s = sf::Color::Black;
 	sf::Color t = sf::Color::White;
 
-	Bounds* bounds = world_->getBounds();
-	if (bounds != nullptr)
-	{
-		p = B2toSF(bounds->getPrimary());
-		s = B2toSF(bounds->getSecondary());
-		t = B2toSF(bounds->getTertiary());
-	}
+	Bounds& bounds = world_->getBounds();
+		p = B2toSF(bounds.getPrimary());
+		s = B2toSF(bounds.getSecondary());
+		t = B2toSF(bounds.getTertiary());
 
 	sf::FloatRect eighthBox(box.left + box.width - (box.width / 8), box.height + (box.height / 2), box.width / 8, box.height / 8);
 
@@ -44,12 +41,13 @@ void HUD::drawLevelStatus(sf::FloatRect box)
 	drawStringRight(box, std::to_string(limitMax), t, 1.5f);
 }
 
-void HUD::drawShapeStatus(sf::FloatRect box)
+void HUD::drawShapeStatus(sf::FloatRect& const box)
 {
 	Shape* c = world_->getControlled();
 
 	if (c != nullptr)
 	{
+		sf::FloatRect barBox(box);
 		float hp = c->getHP();
 		float hpM = c->getHPMax();
 		float uhp = c->getUHP();
@@ -60,9 +58,23 @@ void HUD::drawShapeStatus(sf::FloatRect box)
 		sf::Color s = B2toSF(c->getSecondary());
 		sf::Color t = B2toSF(c->getTertiary());
 
+		bool alive = c->getAlive();
+		float spawnProgress = (float)c->getSpawnTime() / (float)c->getSpawnTimeMax();
+
+		if (!alive)
+		{
+			p.a *= 1 - spawnProgress;
+			s.a *= 1 - spawnProgress;
+			t.a *= 1 - spawnProgress;
+
+			barBox.left += (barBox.width / 2) * (spawnProgress);
+			barBox.width -= (barBox.width) * (spawnProgress);
+		}
+
+
 		sf::Color tex = s;
 		
-		drawBar(box, hp, totM, p, t, s, 4);
+		drawBar(barBox, hp, totM, p, t, s, 4);
 
 		//sf::FloatRect fillRect(box);
 		//fillRect.left += line;
@@ -76,10 +88,10 @@ void HUD::drawShapeStatus(sf::FloatRect box)
 		{
 			//Append a rectangle of uhp 
 			sf::FloatRect uhpRect = sf::FloatRect(
-				(box.left + 4) + (box.width - 8) * (hp / (totM)),
-				box.top + 4,
-				(box.width - 8) * (uhp / (totM)),
-				box.height - 8);
+				(barBox.left + 4) + (barBox.width - 8) * (hp / (totM)),
+				barBox.top + 4,
+				(barBox.width - 8) * (uhp / (totM)),
+				barBox.height - 8);
 			//std::cout << uhp << std::endl;
 				drawRect(uhpRect, s);
 		}
@@ -90,7 +102,7 @@ void HUD::drawShapeStatus(sf::FloatRect box)
 	}
 }
 
-void HUD::drawWeaponStatus(sf::FloatRect box)
+void HUD::drawWeaponStatus(sf::FloatRect& const box)
 {
 	Shape* c = world_->getControlled();
 
@@ -132,7 +144,7 @@ void HUD::drawWeaponStatus(sf::FloatRect box)
 	}
 }
 
-void HUD::drawSideStatus(sf::FloatRect box)
+void HUD::drawSideStatus(sf::FloatRect& const box)
 {
 	Shape* c = world_->getControlled();
 
@@ -150,7 +162,7 @@ void HUD::drawSideStatus(sf::FloatRect box)
 	}
 }
 
-void HUD::drawDebugStatus(sf::FloatRect box)
+void HUD::drawDebugStatus(sf::FloatRect& const box)
 {
 	sf::FloatRect leftBox(box.left, box.top, box.width / 10, box.height);
 	sf::FloatRect rightBox(box.left + (box.width / 10), box.top, (box.width / 10) * 9, box.height);
@@ -184,6 +196,8 @@ void HUD::drawString(sf::FloatRect box, std::string info, sf::Color col, float s
 		sf::Color outlineCol = sf::Color::Black;
 		if ((col.r + col.g + col.b) < (128.f * 3.f))
 			outlineCol = sf::Color::White;
+
+		outlineCol.a = col.a;
 		
 		text_.setScale(sf::Vector2f(sizeScale * 1.2f, sizeScale * 1.2f));
 		sf::FloatRect txt = text_.getLocalBounds();
@@ -208,6 +222,8 @@ void HUD::drawStringLeft(sf::FloatRect box, std::string info, sf::Color col, flo
 		sf::Color outlineCol = sf::Color::Black;
 		if ((col.r + col.g + col.b) < (128.f * 3.f))
 			outlineCol = sf::Color::White;
+
+		outlineCol.a = col.a;
 
 		text_.setScale(sf::Vector2f(sizeScale * 1.2f, sizeScale * 1.2f));
 		float margin = text_.getCharacterSize() * sizeScale;
@@ -235,6 +251,9 @@ void HUD::drawStringRight(sf::FloatRect box, std::string info, sf::Color col, fl
 		sf::Color outlineCol = sf::Color::Black;
 		if ((col.r + col.g + col.b) < (128.f * 3.f))
 			outlineCol = sf::Color::White;
+
+
+		outlineCol.a = col.a;
 
 		text_.setScale(sf::Vector2f(sizeScale * 1.2f, sizeScale * 1.2f));
 		float margin = text_.getCharacterSize() * sizeScale;

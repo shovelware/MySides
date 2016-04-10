@@ -236,7 +236,7 @@ void Game::handleInput(sf::Time dt)
 	//F5 : Reset Level
 	if (key_.isKeyPressed(Key::F5))
 	{
-		world_->resetWorld();
+		world_->resetLevel();
 		camera_->setTarget(world_->getPlayer());
 		camera_->setCenter(sf::Vector2f(0, 0));
 	}
@@ -387,19 +387,20 @@ void Game::handleInput(sf::Time dt)
 		{
 			world_->dstr = "fungun";
 
-			int max = 11;
-			int i[11];
-			i[0] = 44;
-			i[1] = 42;
+			int max = 12;
+			int i[12];
+			i[0] = 42;
+			i[1] = 44;
 			i[2] = 47;
 			i[3] = 60;
 			i[4] = 88;
 			i[5] = 111;
-			i[6] = 250;
+			i[6] = 120;
 			i[7] = 404;
 			i[8] = 555;
 			i[9] = 666;
 			i[10] = 888;
+			i[11] = 999;
 
 			for (int w = 0; w < max; ++w)
 			{

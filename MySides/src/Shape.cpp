@@ -8,6 +8,8 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 	lastDamage_(b2Vec2_zero),
 	size_(def.size),
 	shapeVertices_(def.vertices),
+	verticesMIN_(def.verticesMin - 1),
+	verticesMAX_(def.verticesMax),
 	sideCallback_(callback),
 	hpScale_(def.hpScale),
 	collector_(false),
@@ -19,6 +21,11 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 	shapeFixDef_.friction = 0.8f;
 	shapeFixDef_.restitution = 0.3f;
 	faction_ = def.faction;
+
+	//Spawning
+	alive_ = false;
+	spawnTimeMAX_ = fmin(2500, fmax(def.size * 500, 500));
+	spawnTime_ = spawnTimeMAX_;
 
 	//Corrections
 	shapeVertices_ = fmax(3, fmin(shapeVertices_, 8));
@@ -55,6 +62,9 @@ Shape::~Shape()
 //Should only be called by set[shape] methods
 void Shape::setPoly(int vertices, float radius)
 {
+	//Sensor
+	shapeFixDef_.isSensor = !alive_;
+
 	//Shape data
 	b2PolygonShape shap;
 
@@ -105,11 +115,12 @@ void Shape::dropSide(b2Vec2 dir)
 
 	float rhs = std::sqrt((size_ * size_) + (size_ * size_) - (2 * size_ * size_) * cos(2 * M_PI / shapeVertices_));
 
-	SideDef newSide = SideDef(getPosition() + offset, dir, rhs, 5000.f * rhs);
+	SideDef newSide = SideDef(getPosition() + offset, dir, rhs, fmax(1000 + (1000.f * rhs), 10000));
 
 	newSide.colPrim = colSecn_;
 	newSide.colSecn = colPrim_;
 	newSide.colTert = colTert_;
+	newSide.faction = faction_;
 
 	sideCallback_(newSide);
 }
@@ -117,6 +128,9 @@ void Shape::dropSide(b2Vec2 dir)
 //Move in passed direction at constant speed
 void Shape::move(b2Vec2 direction)
 {
+	//Don't move if we're dead
+	if (!alive_) return;
+
 	//Normalise dir it if it's >1
 	if (!(direction == b2Vec2_zero))
 	{
@@ -163,6 +177,9 @@ void Shape::stopMove()
 
 void Shape::orient(b2Vec2 direction)
 {
+	//Don't turn if we're dead
+	if (!alive_) return;
+
 	float bodyAngle = body_->GetAngle();
 	float desiredAngle = atan2f(-direction.x, direction.y);
 	float nextAngle = body_->GetAngle() + body_->GetAngularVelocity() / _TICKTIME_;
@@ -196,6 +213,10 @@ b2Vec2 Shape::getOrientation() const
 	float r = body_->GetAngle();
 	return b2Vec2(-sin(r), cos(r));
 }
+
+int Shape::getSpawnTime() const { return spawnTime_; }
+
+int Shape::getSpawnTimeMax() const { return spawnTimeMAX_; }
 
 void Shape::heal(int health)
 {
@@ -273,7 +294,8 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 			break;
 		}
 	}
-
+	
+	//HP should be refilled in loop, this means we're actually dead
 	if (hp_ <= 0)
 	{
 		alive_ = false;
@@ -352,12 +374,16 @@ void Shape::setTertiary(b2Color col)
 int Shape::getHP() const 
 {
 	int hp = 0;
-	for (int vrts = vertices_ - 1; vrts > verticesMIN_; --vrts)
-	{
-		hp +=  vrts * hpScale_;
-	}
 
-	hp += hp_;
+	if (alive_)
+	{
+		for (int vrts = vertices_ - 1; vrts > verticesMIN_; --vrts)
+		{
+			hp += vrts * hpScale_;
+		}
+
+		hp += hp_;
+	}
 
 	return hp; 
 }
@@ -389,7 +415,7 @@ void Shape::explode()
 	{
 		b2PolygonShape* shape = static_cast<b2PolygonShape*>(body_->GetFixtureList()->GetShape());
 
-		for (int i = 0, count = vertices_; i < count; ++i)
+		for (int i = 0, count = shapeVertices_; i < count; ++i)
 		{
 			int a = i;
 			int b = (a + 1 != count ? a + 1 : 0);
@@ -483,6 +509,9 @@ void Shape::disarm()
 
 void Shape::trigger(b2Vec2& direction)
 {
+	//Don't fire if we're dead
+	if (!alive_) return;
+
 	b2Vec2 dir = direction;
 
 	//If there's no impulse, fire where we're looking
@@ -515,6 +544,9 @@ void Shape::release()
 
 void Shape::reup()
 {
+	//Don't reaload if we're dead
+	if (!alive_) return;
+
 	if (weapon_ != nullptr)
 	{
 		weapon_->reup();
@@ -548,6 +580,9 @@ int Shape::getWeaponBarMAX()
 bool Shape::collide(Entity* other, b2Contact& contact, std::string tag)
 {
 	bool handled = false;
+
+	if (active_ == false) return true;
+
 
 	if (tag == "projectile")
 	{
@@ -610,6 +645,19 @@ void Shape::update(int milliseconds)
 			syncHP();
 			syncPoly();
 		}//End alive
+
+		//Spawning
+		else if (spawnTime_ > 0)
+		{
+			spawnTime_ -= milliseconds;
+
+			if (spawnTime_ <= 0)
+			{
+				alive_ = true;
+				body_->GetFixtureList()->SetSensor(false);
+			}
+		}
+
 
 		//If dead
 		else

@@ -110,6 +110,9 @@ void GameRenderer::drawShape(Shape* const s)
 	float size = s->getSize();
 	float angle = body->GetAngle();
 
+	bool alive = s->getAlive();
+	float spawnRemaining = (float)s->getSpawnTime() / (float)s->getSpawnTimeMax();
+
 	sf::Vector2f pointing(sin(angle), -cos(angle));
 	pointing *= (float)(_SCALE_ * s->getSize() * 1.25);
 	
@@ -121,12 +124,19 @@ void GameRenderer::drawShape(Shape* const s)
 	sf::Color sec = B2toSF(s->getSecondary());
 	sf::Color ter = B2toSF(s->getTertiary());
 
+	//Spawning fade
+	if (!alive)
+	{
+		pri = tweakAlpha(pri, pri.a * (1.f - spawnRemaining));
+		sec = tweakAlpha(sec, sec.a * (1.f - spawnRemaining));
+		ter = tweakAlpha(ter, ter.a * (1.f - spawnRemaining));
+	}
+
 	//Convert verts
 	sf::Vector2f* verts = new sf::Vector2f[count];
 
 	for (int i = 0; i < count; ++i)
 	{
-		
 		verts[i] = B2toSF(body->GetWorldPoint(shape->GetVertex(i)), true);
 	}
 
@@ -142,9 +152,10 @@ void GameRenderer::drawShape(Shape* const s)
 	drawLine(pos, pos - vel, ter);
 
 	//Orientation circle
+	
 	drawCircle(pos - pointing, size * 4, (armed ? ter : tweakAlpha(ter, 64)), (armed ? sec : tweakAlpha(sec, 64)));
-	drawCircle(pos - (pointing *  2.f), size * 3, (armed ? tweakAlpha(ter, 128) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 128) : tweakAlpha(sec, 32)));
-	drawCircle(pos - (pointing *  3.f), size * 2, (armed ? tweakAlpha(ter, 196) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 196) : tweakAlpha(sec, 32)));
+	if (alive) drawCircle(pos - (pointing *  2.f), size * 3, (armed ? tweakAlpha(ter, 128) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 128) : tweakAlpha(sec, 32)));
+	if (alive) drawCircle(pos - (pointing *  3.f), size * 2, (armed ? tweakAlpha(ter, 196) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 196) : tweakAlpha(sec, 32)));
 	
 	//Actual shape
 	drawPolygon(verts, count, pri, sec);
@@ -156,18 +167,18 @@ void GameRenderer::drawShape(Shape* const s)
 	delete[] verts;
 }
 
-void GameRenderer::drawBounds(Bounds* const b)
+void GameRenderer::drawBounds(Bounds& const b)
 {
 	//Pull vars
-	b2Body* body = b->getBody();
+	b2Body* body = b.getBody();
 	b2Fixture* fix = body->GetFixtureList();
 	
-	sf::Vector2f pos = B2toSF(b->getPosition(), true);
-	float radius = b->getRadius();
+	sf::Vector2f pos = B2toSF(b.getPosition(), true);
+	float radius = b.getRadius();
 
-	sf::Color pri = B2toSF(b->getPrimary());
-	sf::Color sec = B2toSF(b->getSecondary());
-	sf::Color ter = B2toSF(b->getTertiary());
+	sf::Color pri = B2toSF(b.getPrimary());
+	sf::Color sec = B2toSF(b.getSecondary());
+	sf::Color ter = B2toSF(b.getTertiary());
 	
 	//It must be one of two
 	if (fix->GetUserData() != "bounds")

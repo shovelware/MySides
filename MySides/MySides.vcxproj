@@ -155,6 +155,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\SoundEffect.cpp" />
     <ClCompile Include="src\SoundSystem.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
+    <ClCompile Include="src\Wave.cpp" />
     <ClCompile Include="src\WeapAutoBat.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
     <ClCompile Include="src\WeapSemiBat.cpp" />
@@ -202,6 +203,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\SoundSystem.hpp" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\targetver.h" />
+    <ClInclude Include="include\Wave.hpp" />
     <ClInclude Include="include\WeapAutoBat.hpp" />
     <ClInclude Include="include\Weapon.hpp" />
     <ClInclude Include="include\WeapSemiBat.hpp" />

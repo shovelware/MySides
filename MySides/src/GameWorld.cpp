@@ -18,12 +18,12 @@ GameWorld::GameWorld() :
 	addProj_ = [this](ProjectileDef& def) { addProjectile(def); };
 	addSide_ = [this](SideDef& def) { addSide(def); };
 	fireWeap_ = [this](std::vector<ProjectileDef>& defs, std::string id) { fireWeapon(defs, id); };
-	addForce_ = [this](b2Vec2 pos, float force, float radius, int time) { addForce(pos, force, radius, time); };
+	addForce_ = [this](b2Vec2 pos, float force, float radius, int time, int faction) { addForce(pos, force, radius, time, faction); };
 	
 	boundsFriction_.localAnchorA = (b2Vec2(0, 0));
 	boundsFriction_.localAnchorB = (b2Vec2(0, 0));
 	boundsFriction_.bodyB = bounds_->getBody();
-	boundsFriction_.maxForce = 0.0025f;
+	boundsFriction_.maxForce = 0.003f;
 	boundsFriction_.maxTorque = 0.05f;
 	boundsFriction_.collideConnected = false;
 
@@ -75,7 +75,7 @@ GameWorld::GameWorld() :
 	
 	getControlled_ = std::bind(&GameWorld::getControlled, this);
 
-	loadTestLevel();
+	loadLevel(currentLevel_);
 	//resetWorld();
 }
 
@@ -298,22 +298,22 @@ void GameWorld::addShrapnel(Projectile* src)
 
 }
 
-void GameWorld::addForce(b2Vec2 pos, float force, float radius, int lifetime)
+void GameWorld::addForce(b2Vec2 pos, float force, float radius, int lifetime, int faction)
 {
 	if (radius > 0 && lifetime > 0)
 	{
-		Force * f =	new Force(addStaticBody(pos), force, radius, lifetime);
+		Force * f =	new Force(addStaticBody(pos), force, radius, lifetime, faction);
 		float col = randFloat(0.f, 0.25f);
 		float col2 = col * 2;
 		float col3 = col * 3;
 		float col4 = col * 4;
 
-		f->setPrimary(b2Color(col, col, col));
+		f->setPrimary(b2Color(col2, col2, col2));
 		f->setSecondary(b2Color(col3, col3, col3));
 		if (force < 0)
 			f->setTertiary(b2Color(col4, col4, col4));
 		else
-			f->setTertiary(b2Color(col2, col2, col2));
+			f->setTertiary(b2Color(col, col, col));
 
 		forces_.push_back(f);
 	}
@@ -688,13 +688,13 @@ void GameWorld::randomiseCol(Entity * e)
 	e->setTertiary(b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f)));
 }
 
-Bounds* GameWorld::getBounds() { return bounds_; }
 Shape* GameWorld::getPlayer() { return player_; }
-std::list<Enemy*>& GameWorld::getShapes() {	return shapes_; }
-std::list<Projectile*>& GameWorld::getProjectiles() { return projectiles_; }
-std::list<Side*>& GameWorld::getSides() { return sides_; }
-std::list<Pickup::PickupI*>& GameWorld::getPickups() { return pickups_; }
-std::list<Force*>& GameWorld::getForces() { return forces_; }
+Bounds& const GameWorld::getBounds() { return *bounds_; }
+std::list<Enemy*>& const GameWorld::getShapes() {	return shapes_; }
+std::list<Projectile*>& const GameWorld::getProjectiles() { return projectiles_; }
+std::list<Side*>& const GameWorld::getSides() { return sides_; }
+std::list<Pickup::PickupI*>& const GameWorld::getPickups() { return pickups_; }
+std::list<Force*>& const GameWorld::getForces() { return forces_; }
 
 Level & GameWorld::getCurrentLevel()
 {
@@ -913,7 +913,10 @@ void GameWorld::updateForce(int dt)
 
 void GameWorld::updateLevel(int dt)
 {
-	currentLevel_.update(dt);
+	if (player_->getAlive())
+	{
+		currentLevel_.update(dt);
+	}
 	////Basic difficulty ramp
 	//timeInLevel_ += dt;
 	//timeInLevel_ % UINT16_MAX;
@@ -998,7 +1001,7 @@ Shape * GameWorld::getControlled()
 //Handlers for game intent: Move, Fire, Trigger, release, reload
 void GameWorld::move(b2Vec2& direction)
 {
-	if (controlled_ != nullptr && (direction.x != 0 || direction.y != 0))
+	if (controlled_ != nullptr)
 	{
 		controlled_->move(direction);
 		leftHaptic_ = direction.Length() * 5;
@@ -1077,6 +1080,8 @@ void GameWorld::bomb(bool nuke)
 				}
 			}
 
+			addForce(player_->getPosition(), 0.2f, range, 200);
+			addForce(player_->getPosition(), -0.1f, range, 200);
 			audio_.playSFX("bomb", B2toSF(player_->getPosition(), true));
 			player_->bomb();
 		}
@@ -1294,7 +1299,7 @@ void GameWorld::f7()
 
 		enem.position = (b2Vec2(x, y));
 		enem.heading = (enem.position);
-
+		enem.ai = 1;
 
 		newDef.damage = 0;
 
@@ -1324,8 +1329,11 @@ void GameWorld::f9()
 	b2Vec2 pos(0, 0);
 	float radius = 20.f;
 	ShapeDef def;
-	int groups = 8;
-	int shapes = 10;
+	int groups = 10;
+	int shapes = 6;
+
+	int baseHPScale = 1.25;
+	float baseSize = 0.25f;
 
 	//for 4 sizes
 	for (float i = 1; i <= groups; ++i)
@@ -1334,23 +1342,27 @@ void GameWorld::f9()
 		centre.x = radius * (-sin((M_PI * 2) / groups * i));
 
 		//for 5 shape sizes
-		for (float j = 3, max = shapes + 2; j <= max; ++j)
+		for (float j = 1, max = shapes; j <= max; ++j)
 		{
 			float ang = atan2f(centre.y, centre.x);
-			pos.y = (radius / 4.f) * (cos((M_PI * 2)/ max * j));
-			pos.x = (radius / 4.f) * (-sin((M_PI * 2)/ max * j));
+			pos.y = 1.f * (cos((M_PI * 2)/ max * j));
+			pos.x = 1.f * (-sin((M_PI * 2)/ max * j));
 			
-			def.position = centre + pos;
+			def.size = i * baseSize;
 			def.heading =  pos + centre;
-			def.size = i * 0.25f;
 
-			def.vertices = (j < shapes ? j : 3 + (int)j % shapes);
-			def.hpScale = 5 * i;
-			def.colPrim = b2Color(0.2f * i, 0.1f * j, 1.f - j / 10, 1 - (0.1 * i));
-			def.colSecn = b2Color(0.2f * j, 0.1f * (i / j), 0.05f * (i + j), 1 - (0.1 * i));
-			def.colTert = b2Color(0.1f * i, 0.3f * i, 1.f * (j - i), 1 - (0.1 * i));
+			def.position = pos;
+			def.position *= (def.size * 2);
+			def.position += centre;
+
+			def.vertices = 3;
+			def.vertices  += (((int)j - 1) % 6);
+
+			def.hpScale = 5 * baseHPScale;
+			def.colPrim = b2Color(0.2f * i, 0.1f * j, 1.f - j / 10);
+			def.colSecn = b2Color(0.2f * j, 0.1f * (i / j), 0.05f * (i + j));
+			def.colTert = b2Color(0.1f * i, 0.3f * i, 1.f * (j - i));
 			def.ai = 1;
-			
 
 			addEnemy(def);
 		}

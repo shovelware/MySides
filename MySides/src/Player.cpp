@@ -9,6 +9,10 @@ Player::Player(b2Body* body, const ShapeDef& def, std::function<void(SideDef&)>&
 	bombTime_(0),
 	bombRange_(15)
 {
+	//We spawn faster
+	spawnTimeMAX_ /= 2;
+	spawnTime_ /= 2;
+
 	body_->GetFixtureList()->SetUserData("player");
 	shapeFixDef_.userData = "player";
 	collector_ = true;

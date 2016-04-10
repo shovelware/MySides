@@ -2,7 +2,7 @@
 #define MS_SHAPEDEF_HPP
 
 #include <stdafx.h>
-#include <Box2D\Common\b2Math.h>
+#include <Box2D\Box2D.h>
 
 class ShapeDef {
 public:
@@ -14,6 +14,8 @@ public:
 		size(1),
 		speedScale(1),
 		vertices(0),
+		verticesMin(3),
+		verticesMax(8),
 		faction(0),
 		ai(0),
 		colPrim(b2Color(.5f, .5f, .5f)),
@@ -29,6 +31,8 @@ public:
 		size(1),
 		speedScale(1),
 		vertices(vertices),
+		verticesMin(3),
+		verticesMax(8),
 		faction(0),
 		ai(0),
 		colPrim(b2Color(.5f, .5f, .5f)),
@@ -44,6 +48,8 @@ public:
 		size(sd.size),
 		speedScale(sd.speedScale),
 		vertices(sd.vertices),
+		verticesMin(sd.verticesMin),
+		verticesMax(sd.verticesMax),
 		faction(sd.faction),
 		ai(sd.ai),
 		colPrim(sd.colPrim),
@@ -61,7 +67,9 @@ public:
 
 	float speedScale;
 
-	int vertices;
+	unsigned int vertices;
+	unsigned int verticesMin;
+	unsigned int verticesMax;
 
 	int faction;
 	int ai;
@@ -71,6 +79,8 @@ public:
 	b2Color colSecn;
 	b2Color colTert;
 
-	bool isValid() const { return (2 < vertices && vertices < 9); }
+	bool isValid() const { 
+		return (verticesMin <= vertices && vertices <= verticesMax &&
+				2 < verticesMin && verticesMax < 9); }
 };
 #endif

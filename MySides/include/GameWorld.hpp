@@ -53,7 +53,7 @@ public:
 	void addSide(const SideDef& def);
 	void addPickup(Pickup::Type type, b2Vec2 position, int time, float strength = 0);
 	void addShrapnel(Projectile* src);
-	void addForce(b2Vec2 pos, float force, float radius, int time);
+	void addForce(b2Vec2 pos, float force, float radius, int time, int faction = 0);
 
 	//Called by updates
 	void removePlayer();
@@ -87,8 +87,6 @@ public:
 	void resetLevel();
 	void unloadLevel();
 
-	void loadTestLevel() { loadLevel(currentLevel_); } ////DEBUG
-
 	//Bounds manipulation
 	float getBoundsRadius();
 	void resizeBounds(float radius);
@@ -110,14 +108,14 @@ public:
 	void DrawDebugData();
 
 	//Return a reference to items for drawing
-	Bounds* getBounds();
 	Shape* getPlayer();
-	std::list<Enemy*>& getShapes();
-	std::list<Projectile*>& getProjectiles();
-	std::list<Side*>& getSides();
-	std::list<Pickup::PickupI*>& getPickups();
-	std::list<Force*>& getForces();
-	Level& getCurrentLevel();
+	Bounds& const getBounds();
+	std::list<Enemy*>& const getShapes();
+	std::list<Projectile*>& const getProjectiles();
+	std::list<Side*>& const getSides();
+	std::list<Pickup::PickupI*>& const getPickups();
+	std::list<Force*>& const getForces();
+	Level& const getCurrentLevel();
 
 	//Update & Pause
 	void step(int dt);
@@ -174,7 +172,7 @@ private:
 	std::function<void(ProjectileDef&)> addProj_;
 	std::function<void(std::vector<ProjectileDef>&, std::string)> fireWeap_;
 	std::function<void(SideDef&)> addSide_;
-	std::function<void(b2Vec2 pos, float force, float radius, int time)> addForce_;
+	std::function<void(b2Vec2 pos, float force, float radius, int time, int faction)> addForce_;
 	//std::function<void(ShapeDef &def)> addShape_;
 
 	//Entities

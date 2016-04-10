@@ -24,7 +24,7 @@ private:
 	GameWorld* world_;
 
 	void drawShape(Shape* const s);
-	void drawBounds(Bounds* const b);
+	void drawBounds(Bounds& const b);
 	void drawProjectile(Projectile* const p);
 	void drawSide(Side* const s);
 	void drawPickup(Pickup::PickupI* const p);

@@ -264,7 +264,7 @@ void Projectile::update(int milliseconds)
 
 		if (lastPen_.z != 0)
 		{
-			forceCallback_(b2Vec2(lastPen_.x, lastPen_.y), force_.force, force_.radius, force_.lifeTime);
+			forceCallback_(b2Vec2(lastPen_.x, lastPen_.y), force_.force, force_.radius, force_.lifeTime, faction_);
 			lastPen_.z = 0;
 		}
 
@@ -293,7 +293,7 @@ void Projectile::update(int milliseconds)
 	//Do our force once before we deactivate
 	else if (alive_ == false && active_ == true)
 	{
-		forceCallback_(body_->GetPosition(), force_.force, force_.radius, force_.lifeTime);
+		forceCallback_(body_->GetPosition(), force_.force, force_.radius, force_.lifeTime, faction_);
 		active_ = false;
 	}
 

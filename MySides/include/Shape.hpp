@@ -34,6 +34,10 @@ public:
 	void stopRotate();
 	b2Vec2 getOrientation() const;
 
+	//Spawning
+	int getSpawnTime() const;
+	int getSpawnTimeMax() const;
+
 	//State changers
 	void heal(int health);
 	bool syncHP();
@@ -77,6 +81,10 @@ protected:
 	/*const*/ float maxVel_;//maximum velocity
 	/*const*/ float maxRot_;//maximum rotation
 
+	//Spawn animation
+	int spawnTime_;
+	int spawnTimeMAX_;
+
 	//Add physics and shapes
 	void setPoly(int vertices, float radius);
 	void clearb2();
@@ -102,11 +110,12 @@ protected:
 	//Body tracking
 	int shapeVertices_;
 	int vertices_;
-	const unsigned int verticesMIN_ = 2;
-	const unsigned int verticesMAX_ = 8;
+	unsigned int verticesMIN_ = 2;
+	unsigned int verticesMAX_ = 8;
 	float size_;
 
-	int sides_; //!< Currency
+	//Sides collection
+	int sides_;
 	bool collector_;
 	bool hasCollected_;
 };

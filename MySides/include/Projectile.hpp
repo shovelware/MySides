@@ -6,7 +6,7 @@
 #include <functional>
 
 
-typedef std::function<void(b2Vec2 pos, float force, float radius, int time)> ForceFunc;
+typedef std::function<void(b2Vec2 pos, float force, float radius, int time, int faction)> ForceFunc;
 class Projectile : public Entity{
 public:
 	Projectile(b2Body* body, const ProjectileDef& def, ForceFunc& forceCallback);
@@ -42,7 +42,7 @@ private:
 	ProjectileDef::ProjDet force_;
 	ProjectileDef::ProjShrapnel shrapnel_;
 	ProjectileDef::ProjTracking tracking_;
-	std::function<void(b2Vec2 pos, float force, float radius, int time)> forceCallback_;
+	std::function<void(b2Vec2 pos, float force, float radius, int time, int faction)> forceCallback_;
 
 	Entity* owner_;
 	b2Vec2 origin_;
