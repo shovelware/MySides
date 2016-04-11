@@ -25,7 +25,7 @@ Side::Side(b2Body * body, const SideDef& def) :
 	//impulse.y = sinf(rotation + adjust);
 
 	impulse.Normalize();
-	impulse *= 0.25f;
+	impulse *= fminf(def.length * 0.05f, 0.25f);
 
 	float spin = randFloat(0.03f) * (dir ? 1 : -1);
 

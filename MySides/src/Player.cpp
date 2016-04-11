@@ -32,6 +32,8 @@ bool Player::collide(Entity * other, b2Contact& contact, std::string tag)
 
 float Player::getBombRange() const { return bombRange_; }
 bool Player::getBombReady() const { return bombTime_ == 0; }
+int Player::getBombTime() const { return bombTime_; }
+int Player::getBombTimeMax() const { return bombTimeMax_; }
 
 void Player::bomb()
 {

@@ -12,6 +12,9 @@ public:
 	
 	float getBombRange() const;
 	bool getBombReady() const;
+	int getBombTime() const;
+	int getBombTimeMax() const;
+
 
 	void bomb();
 	void update(int milliseconds);

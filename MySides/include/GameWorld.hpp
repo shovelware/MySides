@@ -25,16 +25,17 @@
 
 #include "Player.hpp"
 #include "Enemy.hpp"
-#include "Level.hpp"
 #include "Armory.hpp"
 
 #include "SideDef.hpp"
+
+#include "Level.hpp"
+#include "LevelWaveQueue.hpp"
 
 #include "Pickup.hpp"
 #include "Sight.hpp"
 #include "Shield.hpp"
 #include "Attractor.hpp"
-
 
 #include "SoundSystem.hpp"
 
@@ -79,11 +80,10 @@ public:
 	//
 
 	//Cleaning up
-	void resetWorld();
 	void clearWorld(bool clearPlayer = true);
 
 	//Level control
-	void loadLevel(Level& level);
+	void loadLevel(Level::LevelI& level);
 	void resetLevel();
 	void unloadLevel();
 
@@ -115,7 +115,7 @@ public:
 	std::list<Side*>& const getSides();
 	std::list<Pickup::PickupI*>& const getPickups();
 	std::list<Force*>& const getForces();
-	Level& const getCurrentLevel();
+	Level::LevelI& const getCurrentLevel();
 
 	//Update & Pause
 	void step(int dt);
@@ -136,9 +136,6 @@ public:
 
 	int enemies;
 	int freesides;
-
-	int maxTime = 120;
-	int getTimeInLevel() { return timeInLevel_ / 1000; }
 
 	/////Debug
 	//Debug vars
@@ -200,16 +197,10 @@ private:
 	void popInside(Entity* ent);
 
 	//Levels
-	Level currentLevel_;
+	Level::LevelI* currentLevel_;
 
 	//AI spawning
 	void spawnEnemy();
-	unsigned int lastSpawn_;
-	unsigned int spawnTime_;
-	unsigned int spawns_;
-
-	//Timing
-	unsigned int timeInLevel_;
 
 	//Updating
 	void updatePlayer(int dt);
@@ -230,6 +221,9 @@ private:
 
 	//Just for fun
 	void randomiseCol(Entity* e);
+
+	//DEBUG
+	bool dbgLevelUpdate_;
 };
 
 #endif

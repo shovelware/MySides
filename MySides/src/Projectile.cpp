@@ -10,11 +10,11 @@ Projectile::Projectile(b2Body* body, const ProjectileDef& def, ForceFunc& forceC
 	fired_(false),
 	oneHit_(def.oneHit),
 	origin_(def.origin), heading_(def.heading),
-	lastPen_ (0, 0, 0),
+	lastPen_(0, 0, 0),
 	maxHP_(def.hpMAX), hp_(def.hpMAX),
 	damage_(def.damage),
 	size_(def.width, def.height),
-	lifeTime_(def.lifeTime),
+	lifeTime_(def.lifeTime), lifeTimeMAX_(def.lifeTime),
 	owner_(def.owner), 
 	tracking_(def.tracking),
 	penetration_(def.penetration),
@@ -245,10 +245,20 @@ void Projectile::takeDamage(unsigned int damage)
 }
 
 int Projectile::getDamage() const { return damage_; }
+
 ProjectileDef::ProjShrapnel const& Projectile::getShrapnel() const { return shrapnel_; }
+
 Entity * Projectile::getOwner() { return owner_; }
 void Projectile::setOwner(Entity* o) {	owner_ = o; }
+
 b2Vec2 Projectile::getDirection() const { return heading_; }
+
+float Projectile::getNormalisedLifeTime()
+{
+	return (float)lifeTime_ / (float)lifeTimeMAX_;
+}
+
+
 
 void Projectile::update(int milliseconds)
 {

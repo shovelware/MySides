@@ -19,26 +19,40 @@ HUD::~HUD()
 
 void HUD::drawLevelStatus(sf::FloatRect& const box)
 {
-	Level& level = world_->getCurrentLevel();
+	//Pull info
+	Bounds& bounds = world_->getBounds();
+
+	//Level Info
+	Level::LevelI& level = world_->getCurrentLevel();
 	int limitMin = level.getLimit();
 	int limitMax = level.getLimitMAX();
 	int time = level.getTime();
+	int timeMax = level.getTimeMAX();
 
-	sf::Color p = sf::Color::Blue;
-	sf::Color s = sf::Color::Black;
-	sf::Color t = sf::Color::White;
+	//Bar colours
+	sf::Color p = B2toSF(bounds.getPrimary());
+	sf::Color s = B2toSF(bounds.getSecondary());
+	sf::Color t = B2toSF(bounds.getTertiary());
 
-	Bounds& bounds = world_->getBounds();
-		p = B2toSF(bounds.getPrimary());
-		s = B2toSF(bounds.getSecondary());
-		t = B2toSF(bounds.getTertiary());
-
+	//Rects
+	sf::FloatRect barBox(box);
 	sf::FloatRect eighthBox(box.left + box.width - (box.width / 8), box.height + (box.height / 2), box.width / 8, box.height / 8);
 
-	drawBar(box, limitMin, limitMax, s, p, t);
+	barBox.height *= 0.75;
+
+	sf::FloatRect bombBox(barBox.left, barBox.top + barBox.height - 2, barBox.width * 0.75f, box.height * 0.25f);
+
+	drawBar(bombBox, time, timeMax, s, p, t);
+
+	//Draw limit bar
+	drawBar(barBox, limitMin, limitMax, s, p, t);
+	
+	//Draw limits min and max
+	drawStringLeft(barBox, std::to_string(limitMin), t, 1.5f);
+	drawStringRight(barBox, std::to_string(limitMax), t, 1.5f);
+	
+	//Draw time
 	drawString(eighthBox, std::to_string((int)(time)), t, 1.f);
-	drawStringLeft(box, std::to_string(limitMin), t, 1.5f);
-	drawStringRight(box, std::to_string(limitMax), t, 1.5f);
 }
 
 void HUD::drawShapeStatus(sf::FloatRect& const box)
@@ -47,20 +61,29 @@ void HUD::drawShapeStatus(sf::FloatRect& const box)
 
 	if (c != nullptr)
 	{
-		sf::FloatRect barBox(box);
+		//Poll info
 		float hp = c->getHP();
 		float hpM = c->getHPMax();
 		float uhp = c->getUHP();
 		float uhpM = c->getUHPMax();
 		float totM = hpM + uhpM; //Total max health
 
+		//Bar colours
 		sf::Color p = B2toSF(c->getPrimary());
 		sf::Color s = B2toSF(c->getSecondary());
 		sf::Color t = B2toSF(c->getTertiary());
 
+		//Alive & spawn state
 		bool alive = c->getAlive();
 		float spawnProgress = (float)c->getSpawnTime() / (float)c->getSpawnTimeMax();
+		
+		//Text colour
+		//sf::Color tex = s;
 
+		//Rect
+		sf::FloatRect barBox(box);
+
+		//Adjust alpha and position for spawning animation
 		if (!alive)
 		{
 			p.a *= 1 - spawnProgress;
@@ -71,19 +94,11 @@ void HUD::drawShapeStatus(sf::FloatRect& const box)
 			barBox.width -= (barBox.width) * (spawnProgress);
 		}
 
-
-		sf::Color tex = s;
 		
+		//Draw HP Bar
 		drawBar(barBox, hp, totM, p, t, s, 4);
 
-		//sf::FloatRect fillRect(box);
-		//fillRect.left += line;
-		//fillRect.top += line;
-		//fillRect.height -= line * 2;
-		//fillRect.width -= line * 2;
-		//
-		//fillRect.width *= (min / max);
-
+		//Draw UHP
 		if (uhpM != 0 && uhp != 0)
 		{
 			//Append a rectangle of uhp 
@@ -95,7 +110,8 @@ void HUD::drawShapeStatus(sf::FloatRect& const box)
 			//std::cout << uhp << std::endl;
 				drawRect(uhpRect, s);
 		}
-		//drawRect(topBox + );
+
+		//Draw number values: HP, HP + UHP, HP
 		//drawStringLeft(box, std::to_string((int)(hp)), tex, 0.75f);
 		//drawString(box, std::to_string((int)(hp + uhp)), tex, 1.75f);
 		//drawStringRight(box, std::to_string((int)(uhp)), tex, 0.75f);
@@ -108,38 +124,56 @@ void HUD::drawWeaponStatus(sf::FloatRect& const box)
 
 	if (c != nullptr)
 	{
+		//Pull info
+
+		//Weapon Info
 		float min = c->getWeaponBar();
 		float max = c->getWeaponBarMAX();
 		bool ready = c->getWeaponReady();
 		bool loading = c->getWeaponLoading();
 		int level = c->getWeaponLevel();
-
+		
+		//Bar colour
 		sf::Color p = B2toSF(c->getPrimary());
 		sf::Color s = B2toSF(c->getSecondary());
 		sf::Color t = B2toSF(c->getTertiary());
 		
-		//HUD element indent
-		int dent = 2;
-		
-		//Replace bg and bars with this if you want no gaps
-		drawBar(box, min, max, t, p, s);
+		//Rects
+		sf::FloatRect barBox(box);
+		sf::FloatRect eighthBox(box.left, box.height + box.height / 2, box.width / 8, box.height / 8);
 
-		//Draw Ammo Number
+		//Text colour
 		sf::Color txtcol(p);
-		if (loading)
-			txtcol = t;
-		else if (ready)
-			txtcol = s;
-		drawString(box, std::to_string((int)min), txtcol, 2.f);
+		if (loading)	txtcol = t;
+		else if (ready)	txtcol = s;
 
-		//Draw level value
-		sf::FloatRect eighthBox(box.left, box.height + (box.height / 2), box.width / 8, box.height / 8);
-		//int powlv = pow(level, 2);
-		//if (level > 8) powlv = level; //Special weapons have special levels
-		//std::string lvlstr = std::string("V" + std::to_string(powlv % 10 > 1 ? powlv / 10 : 0) + "." + std::to_string(powlv % 10));
-		//lvlstr = std::to_string(powlv);
+		//Level string
 		int lv = (level < 10 ? level * 10 : level);
 		std::string lvlstr = std::to_string(lv / 10) + "." + std::to_string(lv % 10);
+
+
+		//Draw Stuff
+
+		//Draw bomb if we have it
+		if (Player* player = dynamic_cast<Player*>(c))
+		{
+			int bombTimeMax = player->getBombTimeMax();
+			int bombTime = bombTimeMax - player->getBombTime();
+
+			barBox.height *= 0.75;
+
+			sf::FloatRect bombBox(barBox.left + barBox.width / 4, barBox.top + barBox.height - 2, barBox.width * 0.75f, box.height * 0.25f);
+			
+			drawBar(bombBox, bombTime, bombTimeMax, t, p, s);
+		}
+
+		//Draw Ammo Bar
+		drawBar(barBox, min, max, t, p, s);
+
+		//Draw Ammo Number
+		drawString(barBox, std::to_string((int)min), txtcol, 1.5f);
+
+		//Draw Weapon Level
 		drawString(eighthBox, lvlstr, t, 1.f);
 	}
 }

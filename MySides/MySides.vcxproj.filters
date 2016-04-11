@@ -28,23 +28,8 @@
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{7a0e540d-d3f2-4d30-978e-798eaac0125e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\Entity">
-      <UniqueIdentifier>{120bf629-faa5-41e4-ae32-0fc40dd6f254}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Game">
       <UniqueIdentifier>{cd2fb43b-7734-488a-8303-04430a9eda59}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Game\Entity">
-      <UniqueIdentifier>{31c0a8fc-3c39-4c45-b21a-52f16bfdb560}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Game\Weapon">
-      <UniqueIdentifier>{3bb0ca03-7443-4560-bec4-98b675cf5e0c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Game\Weapon">
-      <UniqueIdentifier>{94ee5d4a-d44a-43d9-839d-98fe62dbed44}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Game\Entity\Def">
-      <UniqueIdentifier>{ab621d9e-a475-4cb8-b16e-f3ebc3796631}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Audio">
       <UniqueIdentifier>{1e4d9115-6a6e-4502-8561-b01781d6b8e7}</UniqueIdentifier>
@@ -52,37 +37,46 @@
     <Filter Include="Source Files\Audio">
       <UniqueIdentifier>{9875d0da-05c7-477b-9b54-8cb4dba03352}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Game\Entity\Pickup">
+    <Filter Include="Header Files\Game\World">
+      <UniqueIdentifier>{31c0a8fc-3c39-4c45-b21a-52f16bfdb560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\World\Def">
+      <UniqueIdentifier>{ab621d9e-a475-4cb8-b16e-f3ebc3796631}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\World\Pickup">
       <UniqueIdentifier>{ad250c8d-0cca-44aa-9c0f-9a9a9daab75d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\Entity\Pickup">
+    <Filter Include="Source Files\Game\World">
+      <UniqueIdentifier>{120bf629-faa5-41e4-ae32-0fc40dd6f254}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\World\Pickup">
       <UniqueIdentifier>{0692f418-456b-4bc1-877b-e6266736ab42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\World\Level">
+      <UniqueIdentifier>{e3a467f7-8c9b-455e-a122-179bfb659cd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\World\Level">
+      <UniqueIdentifier>{a4795bfa-7f88-4c52-9006-5ac49e189c2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\World\Entity">
+      <UniqueIdentifier>{adb8dc7f-c872-4014-b36a-0802f07d43eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\World\Weapon">
+      <UniqueIdentifier>{3bb0ca03-7443-4560-bec4-98b675cf5e0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\World\Weapon">
+      <UniqueIdentifier>{94ee5d4a-d44a-43d9-839d-98fe62dbed44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\World\Entity">
+      <UniqueIdentifier>{349309a0-f6ee-48c8-b1b9-9089d72916b6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Entity.cpp">
-      <Filter>Source Files\Game\Entity</Filter>
-    </ClCompile>
     <ClCompile Include="src\MySides.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
     <ClCompile Include="src\SFMLDebugDraw.cpp">
       <Filter>Source Files\System</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Shape.cpp">
-      <Filter>Source Files\Game\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Bounds.cpp">
-      <Filter>Source Files\Game\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Projectile.cpp">
-      <Filter>Source Files\Game\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameWorld.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ContactListener.cpp">
-      <Filter>Source Files\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\XController.cpp">
       <Filter>Source Files\System</Filter>
@@ -96,20 +90,11 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files\Game</Filter>
     </ClCompile>
-    <ClCompile Include="src\Side.cpp">
-      <Filter>Source Files\Game\Entity</Filter>
-    </ClCompile>
     <ClCompile Include="src\KeyInput.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
     <ClCompile Include="src\Weapon.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Enemy.cpp">
-      <Filter>Source Files\Game\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Player.cpp">
-      <Filter>Source Files\Game\Entity</Filter>
+      <Filter>Source Files\Game\World\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="src\SoundEffect.cpp">
       <Filter>Source Files\Audio</Filter>
@@ -127,55 +112,85 @@
       <Filter>Source Files\Render</Filter>
     </ClCompile>
     <ClCompile Include="src\Pickup.cpp">
-      <Filter>Source Files\Game\Entity\Pickup</Filter>
+      <Filter>Source Files\Game\World\Pickup</Filter>
     </ClCompile>
     <ClCompile Include="src\Sight.cpp">
-      <Filter>Source Files\Game\Entity\Pickup</Filter>
+      <Filter>Source Files\Game\World\Pickup</Filter>
     </ClCompile>
     <ClCompile Include="src\Shield.cpp">
-      <Filter>Source Files\Game\Entity\Pickup</Filter>
+      <Filter>Source Files\Game\World\Pickup</Filter>
     </ClCompile>
     <ClCompile Include="src\Attractor.cpp">
-      <Filter>Source Files\Game\Entity\Pickup</Filter>
+      <Filter>Source Files\Game\World\Pickup</Filter>
     </ClCompile>
     <ClCompile Include="src\Armory.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
+      <Filter>Source Files\Game\World\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="src\HUD.cpp">
       <Filter>Source Files\Render</Filter>
     </ClCompile>
-    <ClCompile Include="src\Force.cpp">
-      <Filter>Source Files\Game\Entity</Filter>
-    </ClCompile>
     <ClCompile Include="src\WeapSemiMag.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
+      <Filter>Source Files\Game\World\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="src\WeapAutoMag.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
+      <Filter>Source Files\Game\World\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="src\WeapAutoBat.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
+      <Filter>Source Files\Game\World\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="src\WeapSpreadMag.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
+      <Filter>Source Files\Game\World\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="src\WeapSemiBat.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
+      <Filter>Source Files\Game\World\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="src\WeapSpreadBat.cpp">
-      <Filter>Source Files\Game\Weapon</Filter>
+      <Filter>Source Files\Game\World\Weapon</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level.cpp">
-      <Filter>Source Files\Game</Filter>
+    <ClCompile Include="src\GameWorld.cpp">
+      <Filter>Source Files\Game\World</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ContactListener.cpp">
+      <Filter>Source Files\Game\World</Filter>
     </ClCompile>
     <ClCompile Include="src\Wave.cpp">
-      <Filter>Source Files\Game</Filter>
+      <Filter>Source Files\Game\World\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WaveGenQueue.cpp">
+      <Filter>Source Files\Game\World\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level.cpp">
+      <Filter>Source Files\Game\World\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bounds.cpp">
+      <Filter>Source Files\Game\World\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Enemy.cpp">
+      <Filter>Source Files\Game\World\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entity.cpp">
+      <Filter>Source Files\Game\World\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Force.cpp">
+      <Filter>Source Files\Game\World\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Player.cpp">
+      <Filter>Source Files\Game\World\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shape.cpp">
+      <Filter>Source Files\Game\World\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Side.cpp">
+      <Filter>Source Files\Game\World\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Projectile.cpp">
+      <Filter>Source Files\Game\World\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelWaveQueue.cpp">
+      <Filter>Source Files\Game\World\Level</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Entity.hpp">
-      <Filter>Header Files\Game\Entity</Filter>
-    </ClInclude>
     <ClInclude Include="include\XController.hpp">
       <Filter>Header Files\System</Filter>
     </ClInclude>
@@ -188,26 +203,11 @@
     <ClInclude Include="include\SFMLDebugDraw.h">
       <Filter>Header Files\System</Filter>
     </ClInclude>
-    <ClInclude Include="include\Shape.hpp">
-      <Filter>Header Files\Game\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Bounds.hpp">
-      <Filter>Header Files\Game\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Projectile.hpp">
-      <Filter>Header Files\Game\Entity</Filter>
-    </ClInclude>
     <ClInclude Include="include\stdafx.h">
       <Filter>Header Files\System</Filter>
     </ClInclude>
     <ClInclude Include="include\targetver.h">
       <Filter>Header Files\System</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameWorld.hpp">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ContactListener.hpp">
-      <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="include\Game.hpp">
       <Filter>Header Files\Game</Filter>
@@ -215,32 +215,23 @@
     <ClInclude Include="include\Camera.hpp">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
-    <ClInclude Include="include\Side.hpp">
-      <Filter>Header Files\Game\Entity</Filter>
-    </ClInclude>
     <ClInclude Include="include\KeyInput.hpp">
       <Filter>Header Files\System</Filter>
     </ClInclude>
     <ClInclude Include="include\Weapon.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
+      <Filter>Header Files\Game\World\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\Magazine.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
+      <Filter>Header Files\Game\World\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\ProjectileDef.hpp">
-      <Filter>Header Files\Game\Entity\Def</Filter>
+      <Filter>Header Files\Game\World\Def</Filter>
     </ClInclude>
     <ClInclude Include="include\ShapeDef.hpp">
-      <Filter>Header Files\Game\Entity\Def</Filter>
+      <Filter>Header Files\Game\World\Def</Filter>
     </ClInclude>
     <ClInclude Include="include\SideDef.hpp">
-      <Filter>Header Files\Game\Entity\Def</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Player.hpp">
-      <Filter>Header Files\Game\Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Enemy.hpp">
-      <Filter>Header Files\Game\Entity</Filter>
+      <Filter>Header Files\Game\World\Def</Filter>
     </ClInclude>
     <ClInclude Include="include\SoundSystem.hpp">
       <Filter>Header Files\Audio</Filter>
@@ -258,52 +249,88 @@
       <Filter>Header Files\Render</Filter>
     </ClInclude>
     <ClInclude Include="include\Pickup.hpp">
-      <Filter>Header Files\Game\Entity\Pickup</Filter>
+      <Filter>Header Files\Game\World\Pickup</Filter>
     </ClInclude>
     <ClInclude Include="include\Sight.hpp">
-      <Filter>Header Files\Game\Entity\Pickup</Filter>
+      <Filter>Header Files\Game\World\Pickup</Filter>
     </ClInclude>
     <ClInclude Include="include\Shield.hpp">
-      <Filter>Header Files\Game\Entity\Pickup</Filter>
+      <Filter>Header Files\Game\World\Pickup</Filter>
     </ClInclude>
     <ClInclude Include="include\Attractor.hpp">
-      <Filter>Header Files\Game\Entity\Pickup</Filter>
+      <Filter>Header Files\Game\World\Pickup</Filter>
     </ClInclude>
     <ClInclude Include="include\Battery.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
+      <Filter>Header Files\Game\World\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\Armory.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
+      <Filter>Header Files\Game\World\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\HUD.hpp">
       <Filter>Header Files\Render</Filter>
     </ClInclude>
-    <ClInclude Include="include\Force.hpp">
-      <Filter>Header Files\Game\Entity</Filter>
-    </ClInclude>
     <ClInclude Include="include\WeapSemiMag.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
+      <Filter>Header Files\Game\World\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\WeapAutoMag.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
+      <Filter>Header Files\Game\World\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\WeapAutoBat.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
+      <Filter>Header Files\Game\World\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\WeapSpreadMag.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
+      <Filter>Header Files\Game\World\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\WeapSemiBat.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
+      <Filter>Header Files\Game\World\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\WeapSpreadBat.hpp">
-      <Filter>Header Files\Game\Weapon</Filter>
+      <Filter>Header Files\Game\World\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="include\Level.hpp">
-      <Filter>Header Files\Game</Filter>
+      <Filter>Header Files\Game\World\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WaveGenerator.hpp">
+      <Filter>Header Files\Game\World\Level</Filter>
     </ClInclude>
     <ClInclude Include="include\Wave.hpp">
-      <Filter>Header Files\Game</Filter>
+      <Filter>Header Files\Game\World\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WaveGenQueue.hpp">
+      <Filter>Header Files\Game\World\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ContactListener.hpp">
+      <Filter>Header Files\Game\World</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameWorld.hpp">
+      <Filter>Header Files\Game\World</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Bounds.hpp">
+      <Filter>Header Files\Game\World\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Entity.hpp">
+      <Filter>Header Files\Game\World\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Enemy.hpp">
+      <Filter>Header Files\Game\World\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Force.hpp">
+      <Filter>Header Files\Game\World\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Player.hpp">
+      <Filter>Header Files\Game\World\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Projectile.hpp">
+      <Filter>Header Files\Game\World\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Shape.hpp">
+      <Filter>Header Files\Game\World\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Side.hpp">
+      <Filter>Header Files\Game\World\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LevelWaveQueue.hpp">
+      <Filter>Header Files\Game\World\Level</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

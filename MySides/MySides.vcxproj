@@ -142,6 +142,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\HUD.cpp" />
     <ClCompile Include="src\KeyInput.cpp" />
     <ClCompile Include="src\Level.cpp" />
+    <ClCompile Include="src\LevelWaveQueue.cpp" />
     <ClCompile Include="src\MySides.cpp" />
     <ClCompile Include="src\Pickup.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -156,6 +157,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\SoundSystem.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\Wave.cpp" />
+    <ClCompile Include="src\WaveGenQueue.cpp" />
     <ClCompile Include="src\WeapAutoBat.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
     <ClCompile Include="src\WeapSemiBat.cpp" />
@@ -185,6 +187,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\HUD.hpp" />
     <ClInclude Include="include\KeyInput.hpp" />
     <ClInclude Include="include\Level.hpp" />
+    <ClInclude Include="include\LevelWaveQueue.hpp" />
     <ClInclude Include="include\Log.hpp" />
     <ClInclude Include="include\Pickup.hpp" />
     <ClInclude Include="include\Renderer.hpp" />
@@ -201,9 +204,11 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\Sight.hpp" />
     <ClInclude Include="include\SoundEffect.hpp" />
     <ClInclude Include="include\SoundSystem.hpp" />
+    <ClInclude Include="include\WaveGenerator.hpp" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\Wave.hpp" />
+    <ClInclude Include="include\WaveGenQueue.hpp" />
     <ClInclude Include="include\WeapAutoBat.hpp" />
     <ClInclude Include="include\Weapon.hpp" />
     <ClInclude Include="include\WeapSemiBat.hpp" />

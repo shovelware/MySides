@@ -9,7 +9,7 @@ GameWorld::GameWorld() :
 	pause_(false),
 	dstr("X"),
 	di(-1),
-	currentLevel_(Level())
+	currentLevel_(nullptr)
 {
 	SetContactListener(&contactListener_);
 
@@ -31,6 +31,7 @@ GameWorld::GameWorld() :
 	armory_ = new Weapon::Armory(fireWeap_);
 
 	//Level
+#pragma region testlevel
 	ShapeDef play = ShapeDef(b2Vec2_zero, b2Vec2(0, -1), 6);
 	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
 	play.colSecn = b2Color(0.f, 1.f, 1.f);
@@ -38,12 +39,53 @@ GameWorld::GameWorld() :
 	play.upgrade = true;
 	play.faction = 1;
 	play.hpScale = 10;
-	currentLevel_ = Level(2 * 60 * 1000, play);
-	//currentLevel_.addAFX("../assets/spriterip.ogg", 1, 0.2, 400, 1024);
-	currentLevel_.addAFX("../assets/wind.ogg", 0, 1, 750, 1000);
-	currentLevel_.setPrimary(b2Color(0.1f, 0.5f, 0.9f));
-	currentLevel_.setSecondary(b2Color(0.9f, 0.5f, 0.9f));
-	currentLevel_.setTertiary(b2Color(0.4f, 0.9f, 0.6f));
+	Level::WaveQueue* test = new Level::WaveQueue(play);
+	//test_->addAFX("../assets/spriterip.ogg", 1, 0.2, 400, 1024);
+	test->addAFX("../assets/wind.ogg", 0, 1, 750, 1000);
+	test->setPrimary(b2Color(0.4f, 0.0f, 0.4f));
+	test->setSecondary(b2Color(0.1f, 0.1f, 0.1f));
+	test->setTertiary(b2Color(0.1f, 0.8f, 0.1f));
+
+	Wave wav = Wave();
+	ShapeDef enem;
+	for (int s = 3; s <= 8; ++s)
+	{
+		wav = Wave();
+		switch (s)
+		{
+		case 3:
+			enem = ShapeDef::triDef();
+			break;
+		case 4:
+			enem = ShapeDef::squDef();
+			break;
+		case 5:
+			enem = ShapeDef::penDef();
+			break;
+		case 6:
+			enem = ShapeDef::hexDef();
+			break;
+		case 7:
+			enem = ShapeDef::hepDef();
+			break;
+		case 8:
+			enem = ShapeDef::octDef();
+			break;
+		}
+
+		for (int w = s * 2; w > 0; --w)
+		{
+			enem.position = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
+			enem.position.Normalize();
+			enem.position *= 15.f;
+			wav.addEnemy(enem, "", 0);
+		}
+
+		test->addWaveToQueue(wav);
+	}
+
+#pragma endregion
+	currentLevel_ = test;
 
 	//AFX
 	audio_.addAFX("spriterip", "../assets/spriterip.ogg", 1, 0.2, 400, 1024);
@@ -75,13 +117,14 @@ GameWorld::GameWorld() :
 	
 	getControlled_ = std::bind(&GameWorld::getControlled, this);
 
-	loadLevel(currentLevel_);
+	loadLevel(*currentLevel_);
 	//resetWorld();
 }
 
 GameWorld::~GameWorld()
 {
 	clearWorld();
+	delete currentLevel_;
 	delete bounds_;
 	delete armory_;
 	delete player_;
@@ -333,7 +376,7 @@ void GameWorld::spawnEnemy()
 	c[7] = "thumper";
 	c[8] = "launcher";
 
-	for (int i = 0; i < spawns_; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
 		b2Vec2 pos;
 		float minRad = getBoundsRadius() * 0.5f;
@@ -479,38 +522,6 @@ void GameWorld::removeForce(Force* f)
 	delete f;
 }
 
-//Resets the level
-void GameWorld::resetWorld()
-{
-	//Clear world
-	clearWorld();
-	timeInLevel_ = 0;
-	lastSpawn_ = 0;
-	spawnTime_ = 15000;
-
-	bounds_->setSecondary(b2Color(0, 0, 0, 1));
-
-	//Add a new player
-	ShapeDef play = ShapeDef(b2Vec2_zero, b2Vec2(0, -1), 6);
-	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
-	play.colSecn = b2Color(0.f, 1.f, 1.f);
-	play.colTert = b2Color(1.f, 0.f, 0.f);
-	play.faction = 1;
-	play.hpScale = 10;
-	addPlayer(play);
-
-	spawns_ = 0;
-
-	//Restart bgm
-	//audio_.playAFX("spriterip");
-	audio_.playAFX("wind");
-
-	//Regenerate level somehow
-	hiSides = 0;
-	enemies = 0;
-	freesides = 0;
-}
-
 void GameWorld::clearWorld(bool clearPlayer)
 {
 	if (clearPlayer)
@@ -580,7 +591,7 @@ void GameWorld::clearWorld(bool clearPlayer)
 	forces_.clear();
 }
 
-void GameWorld::loadLevel(Level& level)
+void GameWorld::loadLevel(Level::LevelI& level)
 {
 	//unload current level
 	clearWorld();
@@ -602,12 +613,17 @@ void GameWorld::loadLevel(Level& level)
 
 	//Player
 	addPlayer(level.getPlayer(), armory_->requisition(level.getPlayerWeapon(), level.getPlayerWeaponLevel()));
+
+
+	hiSides = 0;
+	enemies = 0;
+	freesides = 0;
 }
 
 void GameWorld::resetLevel()
 {
 	//Reload current level
-	loadLevel(currentLevel_);
+	loadLevel(*currentLevel_);
 }
 
 void GameWorld::unloadLevel()
@@ -696,9 +712,9 @@ std::list<Side*>& const GameWorld::getSides() { return sides_; }
 std::list<Pickup::PickupI*>& const GameWorld::getPickups() { return pickups_; }
 std::list<Force*>& const GameWorld::getForces() { return forces_; }
 
-Level & GameWorld::getCurrentLevel()
+Level::LevelI& const GameWorld::getCurrentLevel()
 {
-	return currentLevel_;
+	return *currentLevel_;
 }
 
 void GameWorld::step(int dt)
@@ -732,14 +748,9 @@ void GameWorld::update(int dt)
 		//Spr3
 		if (hasControlled())
 		{
-			hiSides = player_->getSidesCollected();
-			hiTime = timeInLevel_;
+			hiSides = controlled_->getSidesCollected();
 
-			//2 minute time limit
-			if (timeInLevel_ >= maxTime * 1000)
-			{
-				removePlayer();
-			}
+			//Should a level decide to kill player on fail? PD:Z?
 		}
 
 		leftHaptic_ = 0;
@@ -913,27 +924,24 @@ void GameWorld::updateForce(int dt)
 
 void GameWorld::updateLevel(int dt)
 {
-	if (player_->getAlive())
+	bool player = (player_ != nullptr && player_->getAlive());
+	
+	currentLevel_->update(dt, player);
+	
+	static_cast<Level::WaveQueue*>(currentLevel_)->updateCurrentWaveCount(enemies);
+
+	//If there's a player and DEBUG and we're ready
+	if (player && dbgLevelUpdate_ && currentLevel_->getWaveReady())
 	{
-		currentLevel_.update(dt);
+		//Spawn a wave
+		Wave w = currentLevel_->getWave();
+		std::vector<Wave::ArmedShapeDef> wv = w.getWave();
+
+		for (auto iter = wv.begin(), end = wv.end(); iter != end; ++iter)
+		{
+			addEnemy(iter->shape);
+		}
 	}
-	////Basic difficulty ramp
-	//timeInLevel_ += dt;
-	//timeInLevel_ % UINT16_MAX;
-	//if (spawns_ > 0)
-	//{
-	//	if (((timeInLevel_ - lastSpawn_) % UINT16_MAX) > spawnTime_)
-	//	{
-	//		lastSpawn_ = timeInLevel_;
-	//
-	//		//if we want to do less than double the enemy number
-	//		if (enemies < spawns_ * 2)
-	//		{
-	//			spawnEnemy();
-	//			spawns_ = (spawns_ + 1 % UINT16_MAX > 10 ? 10 : spawns_ + 1 % UINT16_MAX);
-	//		}
-	//	}
-	//}
 }
 
 void GameWorld::cullWeapons()
@@ -1176,13 +1184,7 @@ void GameWorld::f3()
 
 void GameWorld::f4()
 {
-	if (spawns_ <= 0)
-	{
-		spawns_ = 1;
-		spawnEnemy();
-	}
-
-	else spawns_ = 0;
+	dbgLevelUpdate_ = !dbgLevelUpdate_;
 }
 
 void GameWorld::f5()

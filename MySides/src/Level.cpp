@@ -1,88 +1,106 @@
 #include "Level.hpp"
 
-Level::Level() :
-boundsPoints_(32),
-boundsRadius_(32),
-time_(0)
+namespace Level
 {
-}
+	LevelI::LevelI() :
+		boundsPoints_(32),
+		boundsRadius_(32),
+		time_(0),
+		timeMAX_(120 * 1000)
+	{
+	}
 
-Level::Level(int limit, ShapeDef player) :
-	player_(player),
-	timeMAX_(limit),
-	boundsPoints_(32),
-	boundsRadius_(32),
-	time_(0)
-{
+	LevelI::LevelI(ShapeDef player) :
+		player_(player),
+		boundsPoints_(32),
+		boundsRadius_(32),
+		timeMAX_(120 * 1000),
+		time_(0)
+	{
+
+	}
+
+	LevelI::~LevelI()
+	{
+	}
 	
-}
+	int LevelI::getLimit() const
+	{
+		return limit_;
+	}
 
-int Level::getLimit() const
-{
-	return time_ / 1000;
-}
+	int LevelI::getLimitMAX() const
+	{
+		return limitMAX_;
+	}
 
-int Level::getLimitMAX() const
-{
-	return timeMAX_ / 1000;
-}
+	bool LevelI::isComplete() const
+	{
+		return limit_ >= limitMAX_;
+	}
 
-int Level::getTime() const
-{
-	return time_ / 1000;
-}
+	int LevelI::getTime() const
+	{
+		return time_ / 1000;
+	}
 
-ShapeDef& Level::getPlayer()
-{
-	return player_;
-}
+	int LevelI::getTimeMAX() const
+	{
+		return timeMAX_ / 1000;
+	}
 
-void Level::setPlayerWeapon(std::string weapon)
-{
-	playerWeapon_ = weapon;
-}
+	ShapeDef& LevelI::getPlayer()
+	{
+		return player_;
+	}
 
-std::string Level::getPlayerWeapon() const
-{
-	return playerWeapon_;
-}
+	void LevelI::setPlayerWeapon(std::string weapon)
+	{
+		playerWeapon_ = weapon;
+	}
 
-void Level::setPlayerWeaponLevel(int level)
-{
-	playerWeaponLevel_ = level;
-}
+	std::string LevelI::getPlayerWeapon() const
+	{
+		return playerWeapon_;
+	}
 
-int Level::getPlayerWeaponLevel() const
-{
-	return playerWeaponLevel_;
-}
+	void LevelI::setPlayerWeaponLevel(int level)
+	{
+		playerWeaponLevel_ = level;
+	}
 
-void Level::addAFX(std::string path, float nearFactor, float farFactor, float nearDistance, float farDistance)
-{
-	AFXDef a;
-	a.path = path;
-	a.nearFactor = nearFactor;
-	a.farFactor = farFactor;
-	a.nearDistance = nearDistance;
-	a.farDistance = farDistance;
+	int LevelI::getPlayerWeaponLevel() const
+	{
+		return playerWeaponLevel_;
+	}
 
-	afx_.push(a);
-}
+	void LevelI::addAFX(std::string path, float nearFactor, float farFactor, float nearDistance, float farDistance)
+	{
+		AFXDef a;
+		a.path = path;
+		a.nearFactor = nearFactor;
+		a.farFactor = farFactor;
+		a.nearDistance = nearDistance;
+		a.farDistance = farDistance;
 
-std::queue<Level::AFXDef>& Level::getAFX()
-{
-	return afx_;
-}
+		afx_.push(a);
+	}
 
-b2Color Level::getPrimary() const { return colPrim_; }
-b2Color Level::getSecondary() const { return colSecn_; }
-b2Color Level::getTertiary() const { return colTert_; }
+	std::queue<Level::AFXDef>& LevelI::getAFX()
+	{
+		return afx_;
+	}
 
-void Level::setPrimary(b2Color col) { colPrim_ = col; }
-void Level::setSecondary(b2Color col) { colSecn_ = col; }
-void Level::setTertiary(b2Color col) { colTert_ = col; }
+	b2Color LevelI::getPrimary() const { return colPrim_; }
+	b2Color LevelI::getSecondary() const { return colSecn_; }
+	b2Color LevelI::getTertiary() const { return colTert_; }
 
-void Level::update(int milliseconds)
-{
-	time_ += milliseconds;
+	void LevelI::setPrimary(b2Color col) { colPrim_ = col; }
+	void LevelI::setSecondary(b2Color col) { colSecn_ = col; }
+	void LevelI::setTertiary(b2Color col) { colTert_ = col; }
+
+	void LevelI::update(int milliseconds, bool player)
+	{
+		time_ += milliseconds;
+	}
 }

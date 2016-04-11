@@ -15,13 +15,16 @@ void Wave::addEnemy(ShapeDef shape, std::string weapon, int weaponLevel)
 	vertsMinNum_ += shape.verticesMin;
 	vertsNum_ += shape.vertices;
 
+	wave_.push_back(newDef);
+
 	int count = wave_.size();
 
-	avgVertsMax_ = vertsMaxNum_ / count;
-	avgVertsMin_ = vertsMinNum_ / count;
-	avgVerts_ = vertsNum_ / count;
-
-	wave_.push_back(newDef);
+	if (count != 0)
+	{
+		avgVertsMax_ = vertsMaxNum_ / count;
+		avgVertsMin_ = vertsMinNum_ / count;
+		avgVerts_ = vertsNum_ / count;
+	}
 }
 
 void Wave::calculateStats()

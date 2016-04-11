@@ -5,12 +5,10 @@
 #include "ProjectileDef.hpp"
 #include <functional>
 
-
 typedef std::function<void(b2Vec2 pos, float force, float radius, int time, int faction)> ForceFunc;
 class Projectile : public Entity{
 public:
 	Projectile(b2Body* body, const ProjectileDef& def, ForceFunc& forceCallback);
-
 
 	void takeDamage(unsigned int damage);
 	int getDamage() const;
@@ -20,6 +18,8 @@ public:
 	void setOwner(Entity* o);
 
 	b2Vec2 getDirection() const;
+
+	float getNormalisedLifeTime();
 
 	void update(int milliseconds);
 	bool collide(Entity* other, b2Contact& contact, std::string tag);
@@ -50,6 +50,7 @@ private:
 	b2Vec3 lastPen_;
 
 	int lifeTime_;
+	int lifeTimeMAX_;
 
 	bool fired_;
 	bool oneHit_;

@@ -127,9 +127,9 @@ void GameRenderer::drawShape(Shape* const s)
 	//Spawning fade
 	if (!alive)
 	{
-		pri = tweakAlpha(pri, pri.a * (1.f - spawnRemaining));
-		sec = tweakAlpha(sec, sec.a * (1.f - spawnRemaining));
-		ter = tweakAlpha(ter, ter.a * (1.f - spawnRemaining));
+		pri.a *= (1.f - spawnRemaining);
+		sec.a *= (1.f - spawnRemaining);
+		ter.a *= (1.f - spawnRemaining);
 	}
 
 	//Convert verts
@@ -153,9 +153,9 @@ void GameRenderer::drawShape(Shape* const s)
 
 	//Orientation circle
 	
-	drawCircle(pos - pointing, size * 4, (armed ? ter : tweakAlpha(ter, 64)), (armed ? sec : tweakAlpha(sec, 64)));
-	if (alive) drawCircle(pos - (pointing *  2.f), size * 3, (armed ? tweakAlpha(ter, 128) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 128) : tweakAlpha(sec, 32)));
-	if (alive) drawCircle(pos - (pointing *  3.f), size * 2, (armed ? tweakAlpha(ter, 196) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 196) : tweakAlpha(sec, 32)));
+	drawCircle(pos - pointing, size * 4, (armed ? ter : tweakAlpha(ter, 64)), (armed ? sec : tweakAlpha(sec, 64)), 0);
+	if (alive) drawCircle(pos - (pointing *  2.f), size * 3, (armed ? tweakAlpha(ter, 128) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 128) : tweakAlpha(sec, 32)), -1);
+	if (alive) drawCircle(pos - (pointing *  3.f), size * 2, (armed ? tweakAlpha(ter, 196) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 196) : tweakAlpha(sec, 32)), 0);
 	
 	//Actual shape
 	drawPolygon(verts, count, pri, sec);
@@ -211,21 +211,28 @@ void GameRenderer::drawBounds(Bounds& const b)
 	drawPolygon(verts, count, sec, tweakAlpha(ter, 64), radius);
 
 	//Draw other layers, getting smaller
-	for (int l = 0; l <= layers - 1; ++l)
+	for (int l = 0; l <= layers - 2; ++l)
 	{
 		for (int v = 0; v < count; ++v)
 		{
 			subVerts[v] *= 0.9f;
 		}
 
-		drawPolygon(subVerts, count, (blend(pri, l + 1, sec, layers - 2)), tweakAlpha(ter, l* 4), 0);
+		drawPolygon(subVerts, count, (blend(pri, l + 1, sec, layers - 2)), tweakAlpha(ter, 48), -1);
 	}
 
-	//Centre circle
-	drawCircle(pos, radius, tweakAlpha(blend(pri, 1, ter, 1), 64), sec, 0);
+	//Web pattern
+	for (int v = 0; v < count; ++v)
+	{
+		drawLine(pos, verts[v], tweakAlpha(ter, 48));
+	}
+
+	//Last polygon
+	drawPolygon(subVerts, count, (blend(pri, layers, sec, layers - 2)), tweakAlpha(ter, 48), -1);
 
 	//Clean up
 	delete[] verts;
+	delete[] subVerts;
 }
 
 void GameRenderer::drawProjectile(Projectile* const p)
@@ -235,6 +242,8 @@ void GameRenderer::drawProjectile(Projectile* const p)
 
 	sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
 	sf::Vector2f vel = B2toSF(body->GetLinearVelocity(), true);
+	bool alive = p->getAlive();
+	float lifetime = p->getNormalisedLifeTime();
 	float length = thor::length(vel);
 	if (length > 4) 
 	{
@@ -244,12 +253,16 @@ void GameRenderer::drawProjectile(Projectile* const p)
 
 	vel *= (float)_SCALE_;
 	
-
 	//std::cout << thor::length(vel) << std::endl;
 
 	sf::Color pri = B2toSF(p->getPrimary());
 	sf::Color sec = B2toSF(p->getSecondary());
 	sf::Color ter = B2toSF(p->getTertiary());
+
+	pri.a *= (0.4f + (lifetime * 0.6f));
+	sec.a *= (0.4f + (lifetime * 0.6f));
+	ter.a *= (0.4f + (lifetime * 0.6f));
+
 	b2Fixture* fixture = p->getBody()->GetFixtureList();
 	if (fixture->GetUserData() == "projtracking")
 	{

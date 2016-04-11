@@ -1,8 +1,5 @@
 #include "Game.hpp"
 
-//Globally accessible logger, usage: extern Log l;
-Log l;
-
 //inline float random functions for now
 //inline float randFloat(float MAX) { return static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / MAX)); };
 //inline float randFloat(float MIN, float MAX) { return MIN + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (MAX - MIN))); };
@@ -37,10 +34,6 @@ int Game::run()
 	sf::Time frameTime = sf::Time::Zero;
 	sf::Time tickTime = sf::Time(sf::seconds(_TICKTIME_));
 	sf::Time accumulator = sf::Time::Zero;
-	
-	//Logging
-	Log* lptr = new Log();
-	l = *lptr;
 
 	//World
 	world_ = new GameWorld();
@@ -140,7 +133,6 @@ int Game::run()
 	//Free resources
 	delete world_;
 	delete render_;
-	delete lptr;
 	delete camera_;
 	delete hud_;
 
@@ -569,7 +561,7 @@ bool Game::checkController(sf::Time dt)
 
 void Game::update(sf::Time dt, bool force)
 {
-	bool hadTarget = world_->hasControlled();
+	bool hadControlled = world_->hasControlled();
 
 	//Forced updates or if we're not paused
 	if (force || !pause_)
@@ -586,25 +578,22 @@ void Game::update(sf::Time dt, bool force)
 	//Stop vibration when paused
 	else con_.stopVibration();
 
-	bool hasTarget = world_->hasControlled();
+	bool hasControlled = world_->hasControlled();
 	
 	//Move the camera to controlled
-	if (hasTarget)
+	if (hasControlled)
 		camera_->setTarget(world_->getControlled());
 
-	else if (!hasTarget && hadTarget)
+	else if (!hasControlled && hadControlled)
 	{
 		camera_->clearTarget(true);
+		pause_ = true;
 	}
 
 	camera_->update(dt.asMilliseconds());
 	sf::Listener::setPosition(sf::Vector3f(camera_->getCenter().x, camera_->getCenter().y, 0));
 
 	//End game pause
-	if (world_->hasControlled() == false && !pause_)
-	{
-		pause_ = true;
-	}
 
 	//Update counter
 	//static int x;
@@ -630,7 +619,7 @@ void Game::render()
 	if (renderCAM_)
 	{
 		camera_->drawHUD();
-		camera_->drawSpr3(world_->maxTime - world_->getTimeInLevel(), world_->enemies, world_->freesides);
+		camera_->drawSpr3(999, world_->enemies, world_->freesides);
 	}
 
 	//Draw HUD

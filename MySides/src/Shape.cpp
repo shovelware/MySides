@@ -375,7 +375,7 @@ int Shape::getHP() const
 {
 	int hp = 0;
 
-	if (alive_)
+	if (spawnTime_ > 0 || alive_)
 	{
 		for (int vrts = vertices_ - 1; vrts > verticesMIN_; --vrts)
 		{
