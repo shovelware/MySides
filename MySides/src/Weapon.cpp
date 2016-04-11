@@ -33,6 +33,9 @@ Weapon::WeaponI::WeaponI(FireFunc& callback, ProjectileDef const &ammo, std::str
 		output.colSecn = output_.colSecn;
 		output.colTert = output_.colTert;
 		output_ = output;
+
+		if (owner_ != nullptr) 
+			output_.damage *= owner_->getDamageScale();
 	}
 
 	void Weapon::WeaponI::setLevel(int level)
@@ -48,6 +51,8 @@ Weapon::WeaponI::WeaponI(FireFunc& callback, ProjectileDef const &ammo, std::str
 	void Weapon::WeaponI::setOwner(Shape* owner)
 	{
 		owner_ = owner;
+		if (owner_ != nullptr) 
+			output_.damage *= owner_->getDamageScale();
 	}
 
 	Shape* Weapon::WeaponI::getOwner() const { return owner_; }

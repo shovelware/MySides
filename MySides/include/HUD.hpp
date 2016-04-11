@@ -15,7 +15,8 @@ public:
 	void drawWeaponStatus(sf::FloatRect& const box);
 	void drawSideStatus(sf::FloatRect& const box);
 
-	void drawDebugStatus(sf::FloatRect& const box);
+	void drawDebugInfo(sf::FloatRect& const box);
+	void drawLevelInfo(sf::FloatRect& const box);
 	
 	void loadFont(std::string filename, unsigned int size);
 	void drawString(sf::FloatRect box, std::string info, sf::Color col = sf::Color::Green, float sizeScale = 1.f);

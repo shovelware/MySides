@@ -83,13 +83,13 @@ public:
 	void clearWorld(bool clearPlayer = true);
 
 	//Level control
-	void loadLevel(Level::LevelI& level);
+	void loadLevel(Level::LevelI* level);
+	void startLevel();
 	void resetLevel();
 	void unloadLevel();
+	void selectLevel(std::string name);
 
 	//Bounds manipulation
-	float getBoundsRadius();
-	void resizeBounds(float radius);
 	float getBoundsSide();
 
 	//Controlled manipulation
@@ -115,6 +115,7 @@ public:
 	std::list<Side*>& const getSides();
 	std::list<Pickup::PickupI*>& const getPickups();
 	std::list<Force*>& const getForces();
+	Level::LevelI& const getWorldLevel();
 	Level::LevelI& const getCurrentLevel();
 
 	//Update & Pause
@@ -129,11 +130,9 @@ public:
 	int getHapticR() const;
 
 	//////SPRINT 3 SLINGING
-	int hiSides;
-	unsigned int hiTime;
-
 	void bomb(bool nuke = false);
 
+	int hiSides;
 	int enemies;
 	int freesides;
 
@@ -165,13 +164,6 @@ private:
 	int leftHaptic_;
 	int rightHaptic_;
 	
-	//And callbacks for entities
-	std::function<void(ProjectileDef&)> addProj_;
-	std::function<void(std::vector<ProjectileDef>&, std::string)> fireWeap_;
-	std::function<void(SideDef&)> addSide_;
-	std::function<void(b2Vec2 pos, float force, float radius, int time, int faction)> addForce_;
-	//std::function<void(ShapeDef &def)> addShape_;
-
 	//Entities
 	Player* player_;
 	Bounds* bounds_;
@@ -182,12 +174,19 @@ private:
 	std::list<Pickup::PickupI*> pickups_;
 	std::list<Force*> forces_;
 
-	//Weapons
-	Weapon::Armory* armory_;
-	
 	//Controlled shape pointer
 	Shape* controlled_;
 
+	//Callbacks for entities
+	std::function<void(ProjectileDef&)> addProj_;
+	std::function<void(std::vector<ProjectileDef>&, std::string)> fireWeap_;
+	std::function<void(SideDef&)> addSide_;
+	std::function<void(b2Vec2 pos, float force, float radius, int time, int faction)> addForce_;
+	//std::function<void(ShapeDef &def)> addShape_;
+
+	//Weapons
+	Weapon::Armory* armory_;
+	
 	//Body creation
 	b2Body* addDynamicBody(const b2Vec2& pos);
 	b2Body* addStaticBody (const b2Vec2& pos);
@@ -197,7 +196,11 @@ private:
 	void popInside(Entity* ent);
 
 	//Levels
-	Level::LevelI* currentLevel_;
+	Level::LevelI* worldLevel_;
+	std::list<Level::LevelI*> levels_;
+	std::list<Level::LevelI*>::iterator currentLevel_;
+	void populateLevelList();
+	void clearLevelList();
 
 	//AI spawning
 	void spawnEnemy();

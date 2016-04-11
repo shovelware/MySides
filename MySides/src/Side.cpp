@@ -85,12 +85,12 @@ b2Vec2 Side::getHeading()
 
 float Side::getTimer() const
 {
-	return (lifeTime_ *1.f / lifeTimeMAX_ * 1.f);
+	return (lifeTime_ * 1.f / lifeTimeMAX_ * 1.f);
 }
 
 void Side::update(int milliseconds)
 {
-	lifeTime_ -= milliseconds;
+	lifeTime_ = (lifeTime_ - milliseconds > 0 ? lifeTime_ - milliseconds : 0);
 	if (alive_)
 	{
 		if (lifeTime_ <= 0)

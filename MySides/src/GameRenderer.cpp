@@ -108,7 +108,11 @@ void GameRenderer::drawShape(Shape* const s)
 	b2PolygonShape* shape = static_cast<b2PolygonShape*>(s->getBody()->GetFixtureList()->GetShape());
 	int count = shape->GetVertexCount();
 	float size = s->getSize();
+	float scaledSize = size * _SCALE_;
 	float angle = body->GetAngle();
+
+	int hp = s->getHP();
+	int hpm = s->getHPMax();
 
 	bool alive = s->getAlive();
 	float spawnRemaining = (float)s->getSpawnTime() / (float)s->getSpawnTimeMax();
@@ -130,6 +134,7 @@ void GameRenderer::drawShape(Shape* const s)
 		pri.a *= (1.f - spawnRemaining);
 		sec.a *= (1.f - spawnRemaining);
 		ter.a *= (1.f - spawnRemaining);
+		
 	}
 
 	//Convert verts
@@ -152,16 +157,37 @@ void GameRenderer::drawShape(Shape* const s)
 	drawLine(pos, pos - vel, ter);
 
 	//Orientation circle
-	
 	drawCircle(pos - pointing, size * 4, (armed ? ter : tweakAlpha(ter, 64)), (armed ? sec : tweakAlpha(sec, 64)), 0);
-	if (alive) drawCircle(pos - (pointing *  2.f), size * 3, (armed ? tweakAlpha(ter, 128) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 128) : tweakAlpha(sec, 32)), -1);
+	if (alive) drawCircle(pos - (pointing *  2.f), size * 3, (armed ? tweakAlpha(sec, 128) : tweakAlpha(sec, 32)), (armed ? tweakAlpha(ter, 128) : tweakAlpha(ter, 32)), 0);
 	if (alive) drawCircle(pos - (pointing *  3.f), size * 2, (armed ? tweakAlpha(ter, 196) : tweakAlpha(ter, 32)), (armed ? tweakAlpha(sec, 196) : tweakAlpha(sec, 32)), 0);
 	
 	//Actual shape
 	drawPolygon(verts, count, pri, sec);
 
 	//Centre circle
-	drawCircle(pos, size * 4, sec, sec, 0);
+	drawCircle(pos, scaledSize / 8, sec, sec, 0);
+
+	//Spawning shield
+	if (!alive)
+	{
+		for (int i = 0; i < count; ++i)
+		{
+			sf::Vector2f newVert(pos);
+			newVert = verts[i] - pos;
+			newVert *= 1.2f;
+			newVert += pos;
+			verts[i] = newVert;
+		}
+
+		if (hp > 0)
+		{
+			ter.a = 28 + 100 * spawnRemaining;
+			pri.a = 28 + 100 * spawnRemaining;
+
+
+			drawPolygon(verts, count, ter, pri, (-scaledSize * 0.5f * spawnRemaining));
+		}
+	}
 
 	//Clean up
 	delete[] verts;
@@ -304,7 +330,7 @@ void GameRenderer::drawSide(Side* const s)
 	//Pull vars
 	b2Body* body = s->getBody();
 	float length = s->getValue();
-	float alpha = s->getTimer();
+	float lifeTimeNorm = s->getTimer();
 	sf::Vector2f pos = B2toSF(s->getPosition(), true);
 	sf::Vector2f dir = B2toSF(s->getHeading(), true);
 
@@ -324,8 +350,8 @@ void GameRenderer::drawSide(Side* const s)
 	sf::Vector2f b = B2toSF(body->GetWorldPoint(shape->m_vertex2), true);
 
 	//Draw line
-	drawLine(a, b, tweakAlpha(pri, 255 * alpha));
-	drawCircle(pos, thor::length(dir), tweakAlpha(pri, 32 * alpha + .25f), tweakAlpha(sec, 64 * alpha + .5f));
+	drawLine(a, b, tweakAlpha(pri, 255 * lifeTimeNorm));
+	drawCircle(pos, thor::length(dir), tweakAlpha(pri, 32 * lifeTimeNorm + .25f), tweakAlpha(sec, 64 * lifeTimeNorm + .5f));
 	//drawCircle(pos, length, sec, pri, 0);
 }
 

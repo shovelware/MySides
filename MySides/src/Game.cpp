@@ -176,6 +176,8 @@ void Game::processEvents()
 void Game::handleInput(sf::Time dt)
 {
 	//Keyboard backup controls		
+	bool controlled = world_->hasControlled();
+
 	//W,A,S,D : Movement
 	b2Vec2 mv(0, 0);
 	if (key_.isKeyDown(Key::W)) { mv.y += -1; }
@@ -186,7 +188,12 @@ void Game::handleInput(sf::Time dt)
 	if (key_.isKeyDown(Key::LAlt)) { mv *= 0.25f; }
 
 	if (mv.Length() > 0)
-		world_->move(mv);
+	{
+		if (controlled)
+			world_->move(mv);
+
+		else camera_->lean(sf::Vector2f(mv.x * 10, mv.y * 10), true);
+	}
 
 	//Arrows : Look
 	b2Vec2 fr(0, 0);
@@ -195,11 +202,13 @@ void Game::handleInput(sf::Time dt)
 	if (key_.isKeyDown(Key::Left)) { fr.x += -1; }
 	if (key_.isKeyDown(Key::Right)) { fr.x += 1; }
 	world_->look(fr);
+	camera_->lean(sf::Vector2f(fr.x * 10, fr.y * 10), (pause_ || !controlled));
 
 	//Space : Fire
 	if (key_.isKeyDown(Key::Space))
 	{
 		world_->trigger(fr);
+		//Release is below
 	}
 
 	//U,H,J,K : Camera controls
@@ -208,8 +217,7 @@ void Game::handleInput(sf::Time dt)
 	if (key_.isKeyDown(Key::H)) { look.x -= 10; }
 	if (key_.isKeyDown(Key::J)) { look.y += 10; }
 	if (key_.isKeyDown(Key::K)) { look.x += 10; }
-	camera_->lean(look, pause_);
-
+	camera_->lean(look, (pause_ || !controlled));
 
 	//I,O,L : Camera controls
 	if (key_.isKeyDown(Key::I)) { camera_->zoomIn(); }
@@ -239,6 +247,7 @@ void Game::handleInput(sf::Time dt)
 		world_->bomb();
 	}
 
+#pragma region Debug controls
 	//1234567890 : Test functions
 	if (key_.isKeyPressed(Key::Num1)) { world_->f1(); }
 	if (key_.isKeyPressed(Key::Num2)) { world_->f2(); }
@@ -417,15 +426,24 @@ void Game::handleInput(sf::Time dt)
 			world_->requisition(world_->getPlayer(), world_->dstr, world_->di);
 		}
 
+		//A : Level Cycle
+		if (con_.checkPressed(XINPUT_GAMEPAD_A))
+		{
+			world_->f4();
+		}
+
 	}//end debug key check
+#pragma endregion
 
 	//Controller Controls
+
 	//LS : Move
-	world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
+	if (controlled) world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
+	else camera_->lean(sf::Vector2f(con_.checkLeftX() * 10, con_.checkLeftY() * 10), !controlled);
 
 	//RS : Look
 	world_->look(b2Vec2(con_.checkRightX(), con_.checkRightY()));
-	if (!pause_) camera_->lean(sf::Vector2f(con_.checkRightX() * 10, con_.checkRightY() * 10), pause_);
+	camera_->lean(sf::Vector2f(con_.checkRightX() * 10, con_.checkRightY() * 10), (pause_ || !controlled));
 
 	//RT : Trigger
 	if (con_.checkRightHairTrigger())
@@ -446,15 +464,15 @@ void Game::handleInput(sf::Time dt)
 		world_->bomb();
 	}
 
-	//A : Testing in world/resume
+	//A : 
 	if (con_.checkPressed(XINPUT_GAMEPAD_A))
 	{
-		world_->f9();
 	}
 
-	//B : Testing in player
+	//B : Start Level
 	if (con_.checkPressed(XINPUT_GAMEPAD_B))
 	{
+		world_->startLevel();
 	}
 
 	//X : Reup
@@ -524,7 +542,7 @@ void Game::handleInput(sf::Time dt)
 	if (con_.checkDown(XINPUT_GAMEPAD_DPAD_LEFT))	{ dlook.x -= 10; }
 	if (con_.checkDown(XINPUT_GAMEPAD_DPAD_DOWN))	{ dlook.y += 10; }
 	if (con_.checkDown(XINPUT_GAMEPAD_DPAD_UP))		{ dlook.y -= 10; }
-	if (thor::length(dlook) > 0) camera_->lean(dlook, pause_);
+	if (thor::length(dlook) > 0) camera_->lean(dlook, (pause_ || !controlled));
 
 	//Start : Pause
 	if (con_.checkPressed(XINPUT_GAMEPAD_START))
@@ -632,7 +650,8 @@ void Game::render()
 		hud_->drawShapeStatus(sf::FloatRect(size.x / 2.f - 200, 25, 400, 30));
 		hud_->drawSideStatus(sf::FloatRect(20, size.y - 40, size.x - 40, 20));
 		hud_->drawWeaponStatus(sf::FloatRect(size.x - 120, 20, 100, 40));
-		hud_->drawDebugStatus(sf::FloatRect(0, size.y - 120, size.x, 60));
+		hud_->drawDebugInfo(sf::FloatRect(0, size.y - 120, size.x, 60));
+		hud_->drawLevelInfo(sf::FloatRect(size.x * 0.75f, size.y - size.x / 12 - 80, size.x / 4, size.x / 12));
 	}
 
 	//Draw pause menu
@@ -643,7 +662,7 @@ void Game::render()
 			camera_->drawPause();
 		}
 
-		else camera_->drawOver(world_->hiSides, world_->hiTime);
+		else camera_->drawOver(world_->hiSides, 0);
 	}
 
 	window_.display();

@@ -57,7 +57,8 @@ public:
 	//Accessors
 	int getSidesCollected() const;
 	float getSize() const;
-	
+	float getDamageScale() const;
+
 	//Death
 	void explode();
 
@@ -106,6 +107,7 @@ protected:
 
 	//Weapon
 	Weapon::WeaponI* weapon_;
+	float damageScale_;
 
 	//Body tracking
 	int shapeVertices_;

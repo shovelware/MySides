@@ -92,7 +92,7 @@ void Weapon::SemiBat::setDischargeAmount(int amount)
 
 int Weapon::SemiBat::getBar() const
 {
-	return battery_.getPercent();
+	return 100 - battery_.getPercent();
 }
 
 int Weapon::SemiBat::getBarMAX() const

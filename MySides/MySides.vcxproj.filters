@@ -333,4 +333,9 @@
       <Filter>Header Files\Game\World\Level</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="include\GameWorld.inl">
+      <Filter>Header Files\Game\World\Weapon</Filter>
+    </None>
+  </ItemGroup>
 </Project>

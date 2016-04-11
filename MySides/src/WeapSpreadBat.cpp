@@ -178,7 +178,7 @@ void Weapon::SpreadBat::setSpreadScale(float spreadScale)
 
 int Weapon::SpreadBat::getBar() const
 {
-	return 100 - battery_.getPercent();
+	return battery_.getPercent();
 }
 
 int Weapon::SpreadBat::getBarMAX() const

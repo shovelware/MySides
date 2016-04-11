@@ -220,6 +220,9 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="include\GameWorld.inl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

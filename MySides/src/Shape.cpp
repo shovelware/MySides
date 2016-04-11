@@ -12,6 +12,7 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 	verticesMAX_(def.verticesMax),
 	sideCallback_(callback),
 	hpScale_(def.hpScale),
+	damageScale_(def.damageScale),
 	collector_(false),
 	sides_(0)
 {	
@@ -115,7 +116,7 @@ void Shape::dropSide(b2Vec2 dir)
 
 	float rhs = std::sqrt((size_ * size_) + (size_ * size_) - (2 * size_ * size_) * cos(2 * M_PI / shapeVertices_));
 
-	SideDef newSide = SideDef(getPosition() + offset, dir, rhs, fmax(1000 + (1000.f * rhs), 10000));
+	SideDef newSide = SideDef(getPosition() + offset, dir, rhs, fmin(1000 + (1000.f * rhs), 10000));
 
 	newSide.colPrim = colSecn_;
 	newSide.colSecn = colPrim_;
@@ -408,6 +409,8 @@ unsigned int Shape::getUHPMax() const { return uhpMAX_; }
 
 int Shape::getSidesCollected() const { return sides_; }
 float Shape::getSize() const { return size_; }
+
+float Shape::getDamageScale() const { return damageScale_; }
 
 void Shape::explode()
 {

@@ -19,20 +19,19 @@ HUD::~HUD()
 
 void HUD::drawLevelStatus(sf::FloatRect& const box)
 {
-	//Pull info
-	Bounds& bounds = world_->getBounds();
-
 	//Level Info
-	Level::LevelI& level = world_->getCurrentLevel();
+	Level::LevelI& level = world_->getWorldLevel();
 	int limitMin = level.getLimit();
 	int limitMax = level.getLimitMAX();
+	int waveLimitMin = level.getWaveLimit();
+	int waveLimitMax = level.getWaveLimitMax();
 	int time = level.getTime();
 	int timeMax = level.getTimeMAX();
 
 	//Bar colours
-	sf::Color p = B2toSF(bounds.getPrimary());
-	sf::Color s = B2toSF(bounds.getSecondary());
-	sf::Color t = B2toSF(bounds.getTertiary());
+	sf::Color p = B2toSF(level.getPrimary());
+	sf::Color s = B2toSF(level.getSecondary());
+	sf::Color t = B2toSF(level.getTertiary());
 
 	//Rects
 	sf::FloatRect barBox(box);
@@ -40,9 +39,13 @@ void HUD::drawLevelStatus(sf::FloatRect& const box)
 
 	barBox.height *= 0.75;
 
-	sf::FloatRect bombBox(barBox.left, barBox.top + barBox.height - 2, barBox.width * 0.75f, box.height * 0.25f);
+	sf::FloatRect timeBox(barBox.left, barBox.top + barBox.height - 2, barBox.width * 0.75f, box.height * 0.25f);
+	sf::FloatRect botBox(box.left, box.height + (box.height / 2), box.width, box.height / 8);
 
-	drawBar(bombBox, time, timeMax, s, p, t);
+	drawStringLeft(botBox, std::to_string(waveLimitMin), t, 1.f);
+	drawString(botBox, std::to_string(waveLimitMax), t, 1.f);
+	//Draw time
+	drawBar(timeBox, time, timeMax, s, p, t);
 
 	//Draw limit bar
 	drawBar(barBox, limitMin, limitMax, s, p, t);
@@ -196,13 +199,55 @@ void HUD::drawSideStatus(sf::FloatRect& const box)
 	}
 }
 
-void HUD::drawDebugStatus(sf::FloatRect& const box)
+void HUD::drawDebugInfo(sf::FloatRect& const box)
 {
 	sf::FloatRect leftBox(box.left, box.top, box.width / 10, box.height);
 	sf::FloatRect rightBox(box.left + (box.width / 10), box.top, (box.width / 10) * 9, box.height);
 
 	drawString(leftBox, std::to_string(world_->di));
 	drawStringLeft(rightBox, world_->dstr);
+	drawString(rightBox, world_->getCurrentLevel().getID());
+}
+
+void HUD::drawLevelInfo(sf::FloatRect& const box)
+{
+	//Level Info
+	Level::LevelI& level = world_->getWorldLevel();
+	std::string id = level.getID();
+	bool started = level.getStarted();
+	bool complete = level.getComplete();
+	int timeComplete = level.getTimeComplete();
+	bool timeStandard = level.getTimeStandard();
+
+	//Bar colours
+	sf::Color p = B2toSF(level.getPrimary());
+	sf::Color s = B2toSF(level.getSecondary());
+	sf::Color t = B2toSF(level.getTertiary());
+
+	//Rects
+	sf::FloatRect infoBox(box);
+	sf::FloatRect nameBox(box.left, box.top, box.width, box.height * 0.6f);
+	sf::FloatRect numBox(box.left + box.width * 0.1f, box.top + box.height * 0.6f, box.width * 0.8f, box.height * 0.2f);
+
+	sf::Color fill = s;
+	sf::Color out = t;
+
+	if (!started)
+	{
+		fill = s;
+		out = p;
+	}
+
+	else if (complete)
+	{
+		fill = t;
+		out = s;
+	}
+
+	drawRect(infoBox, fill, out, -2);
+	drawString(nameBox, id, p, 1.5f);
+	drawStringLeft(numBox, "T" + std::to_string(timeComplete), p, 1.5f);
+	drawStringRight(numBox, "S" + std::to_string(timeStandard), p, 1.5f);
 }
 
 void HUD::loadFont(std::string filename, unsigned int size)
@@ -241,7 +286,7 @@ void HUD::drawString(sf::FloatRect box, std::string info, sf::Color col, float s
 		text_.setColor(outlineCol);
 		trg_.draw(text_);
 
-		text_.setScale(sf::Vector2f(sizeScale, sizeScale));
+		text_.setScale(sf::Vector2f(sizeScale * 1.15f, sizeScale));
 		text_.setColor(col);
 		trg_.draw(text_);
 	}
@@ -268,7 +313,7 @@ void HUD::drawStringLeft(sf::FloatRect box, std::string info, sf::Color col, flo
 		text_.setColor(outlineCol);
 		trg_.draw(text_);
 
-		text_.setScale(sf::Vector2f(sizeScale, sizeScale));
+		text_.setScale(sf::Vector2f(sizeScale * 1.15f, sizeScale));
 
 		text_.setColor(col);
 		trg_.draw(text_);
@@ -298,7 +343,7 @@ void HUD::drawStringRight(sf::FloatRect box, std::string info, sf::Color col, fl
 		text_.setColor(outlineCol);
 		trg_.draw(text_);
 
-		text_.setScale(sf::Vector2f(sizeScale, sizeScale));
+		text_.setScale(sf::Vector2f(sizeScale * 1.15f, sizeScale));
 		text_.setColor(col);
 		trg_.draw(text_);
 
@@ -316,9 +361,9 @@ void HUD::drawBar(sf::FloatRect box, float min, float max, sf::Color fill, sf::C
 	fillRect.width -= line * 2;
 
 	//Draw fill bars if we're fillable
-	if (max > 0)
+	if (max > -1)
 	{
-		if (max >= min)
+		if (max >= min && max != 0)
 		{
 			sf::FloatRect barBox(box.left + line, box.top + line, box.width - line * 2, box.height - line * 2);
 

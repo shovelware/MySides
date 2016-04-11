@@ -175,7 +175,7 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 		laser.damage = 80.f;
 		laser.hpMAX = 20;
 		laser.lifeTime = 5000;
-		laser.height = 50.f;
+		laser.height = 25.f;
 		laser.width = 200.f;
 		laser.penetration = 100;
 		

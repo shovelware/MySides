@@ -13,6 +13,7 @@ public:
 		upgrade(true),
 		size(1),
 		speedScale(1),
+		damageScale(1),
 		vertices(0),
 		verticesMin(3),
 		verticesMax(8),
@@ -30,6 +31,7 @@ public:
 		upgrade(true),
 		size(1),
 		speedScale(1),
+		damageScale(1),
 		vertices(vertices),
 		verticesMin(3),
 		verticesMax(8),
@@ -47,6 +49,7 @@ public:
 		upgrade(sd.upgrade),
 		size(sd.size),
 		speedScale(sd.speedScale),
+		damageScale(sd.damageScale),
 		vertices(sd.vertices),
 		verticesMin(sd.verticesMin),
 		verticesMax(sd.verticesMax),
@@ -66,6 +69,7 @@ public:
 	float size;
 
 	float speedScale;
+	float damageScale;
 
 	unsigned int vertices;
 	unsigned int verticesMin;
@@ -91,8 +95,8 @@ public:
 		tri.vertices = 3;
 		tri.verticesMax = 3;
 		tri.ai = 2;
-		tri.colPrim = b2Color(0.7f, 0.5f, 0.5f);
-		tri.colSecn = b2Color(0.4f, 0.3f, 0.3f);
+		tri.colPrim = b2Color(0.4f, 0.3f, 0.3f);
+		tri.colSecn = b2Color(0.7f, 0.5f, 0.5f);
 		tri.colTert = b2Color(0.9f, 1, 0);
 		tri.faction = 1;
 		tri.hpScale = 3;
@@ -110,8 +114,8 @@ public:
 		squ.vertices = 4;
 		squ.verticesMax = 4;
 		squ.ai = 2;
-		squ.colPrim = b2Color(0, 0, 0.7f);
-		squ.colSecn = b2Color(0, 0, 0.4f);
+		squ.colPrim = b2Color(0, 0, 0.4f);
+		squ.colSecn = b2Color(0, 0, 0.7f);
 		squ.colTert = b2Color(0, 0.9f, 0);
 		squ.faction = 1;
 		squ.hpScale = 4;
@@ -129,8 +133,8 @@ public:
 		pen.vertices = 5;
 		pen.verticesMax = 5;
 		pen.ai = 2;
-		pen.colPrim = b2Color(0.6f, 0.6f, 0);
-		pen.colSecn = b2Color(0.3f, 0.3f, 0);
+		pen.colPrim = b2Color(0.3f, 0.3f, 0);
+		pen.colSecn = b2Color(0.6f, 0.6f, 0);
 		pen.colTert = b2Color(0, 0, 0.9f);
 		pen.faction = 1;
 		pen.hpScale = 5;
@@ -148,8 +152,8 @@ public:
 		hex.vertices = 6;
 		hex.verticesMax = 6;
 		hex.ai = 2;
-		hex.colPrim = b2Color(0.9f, 0, 0);
-		hex.colSecn = b2Color(0.4f, 0, 0);
+		hex.colPrim = b2Color(0.4f, 0, 0);
+		hex.colSecn = b2Color(0.9f, 0, 0);
 		hex.colTert = b2Color(0, 0, 0);
 		hex.faction = 1;
 		hex.hpScale = 6;
@@ -167,7 +171,7 @@ public:
 		hep.vertices = 7;
 		hep.verticesMax = 7;
 		hep.ai = 2;
-		hep.colPrim = b2Color(0, 0.9f, 0.9f);
+		hep.colPrim = b2Color(0, 0.4f, 0.4f);
 		hep.colSecn = b2Color(0, 0.9f, 0.9f);
 		hep.colTert = b2Color(1, 1, 1);
 		hep.faction = 1;
@@ -180,7 +184,7 @@ public:
 
 	static ShapeDef octDef() 
 	{
-		//Black Heptagon
+		//Black Octagon
 		ShapeDef oct = ShapeDef(b2Vec2_zero, b2Vec2(0, -1), 3);
 		oct.verticesMin = 8;
 		oct.vertices = 8;
