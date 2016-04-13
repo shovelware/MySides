@@ -5,7 +5,8 @@
 #include <Box2D\Box2D.h>
 #include <queue>
 
-#include "Armory.hpp"
+#include "EnemyDef.hpp"
+#include "PlayerDef.hpp"
 #include "SideDef.hpp"
 #include "ProjectileDef.hpp"
 
@@ -13,18 +14,18 @@
 
 namespace Level {
 
-		struct AFXDef {
-			std::string path = "";
-			float nearFactor = 0;
-			float farFactor = 0;
-			float nearDistance = 0;
-			float farDistance = 0;
-		};
+	struct AFXDef {
+		std::string path = "";
+		float nearFactor = 0;
+		float farFactor = 0;
+		float nearDistance = 0;
+		float farDistance = 0;
+	};
 
 	class LevelI {
 	public:
 		LevelI(std::string id);
-		LevelI(std::string id, ShapeDef player);
+		LevelI(std::string id, const PlayerDef& player);
 
 		LevelI(const LevelI& other);
 		virtual LevelI* clone() = 0;
@@ -36,10 +37,12 @@ namespace Level {
 		void start();
 		bool getStarted() const;
 
+		//Limit for completion
 		int getLimit() const;
 		int getLimitMAX() const;
 		bool isComplete() const;
 
+		//Limit for spawning a new wave
 		int getWaveLimit() const;
 		int getWaveLimitMax() const;
 
@@ -55,16 +58,14 @@ namespace Level {
 		void setBoundsPoints(int points);
 		int getBoundsPoints() const;
 
-		ShapeDef const & const getPlayer() const;
+		void setRespiteTimeMAX(int time);
+		int getRespiteTimeMAX() const;
+		int getRespiteTime() const;
 
-		void setPlayerWeapon(std::string weapon);
-		std::string getPlayerWeapon() const;
-
-		void setPlayerWeaponLevel(int level);
-		int getPlayerWeaponLevel() const;
+		PlayerDef const & const getPlayer() const;
 
 		void addAFX(std::string path, float nearFactor, float farFactor, float nearDistance, float farDistance);
-		std::queue<AFXDef>const & const getAFX() const;
+		std::queue<AFXDef>const &const getAFX() const;
 
 		b2Color getPrimary() const;
 		b2Color getSecondary() const;
@@ -77,7 +78,9 @@ namespace Level {
 		virtual bool getWaveReady() const = 0;
 		virtual Wave getWave() = 0;
 
-		virtual void update(int milliseconds, bool player);
+		virtual void updateStatus(int sides, int enemies, bool player) = 0;
+
+		virtual void update(int milliseconds);
 	protected:
 		std::queue<Level::AFXDef> afx_;
 
@@ -86,10 +89,12 @@ namespace Level {
 		int time_;
 		int timeMAX_;
 		int timeComplete_;
-
+		
+		//For use as ref in derived, what marks the level as "complete"
 		int limit_;
 		int limitMAX_;
 
+		//For use as ref in derived, what triggers a new wave to spawn
 		int waveLimit_;
 		int waveLimitMAX_;
 
@@ -97,12 +102,14 @@ namespace Level {
 		b2Color colSecn_;
 		b2Color colTert_;
 
+		int respiteTimeMAX_;
+		int respiteTime_;
+
 		float boundsRadius_;
 		int boundsPoints_;
-
-		ShapeDef player_;
-		std::string playerWeapon_;
-		int playerWeaponLevel_;
+		
+		bool playerAlive_;
+		PlayerDef player_;
 
 		std::string id_;
 	};

@@ -9,7 +9,7 @@ GameWorld::GameWorld() :
 	pause_(false),
 	dstr("X"),
 	di(-1),
-	worldLevel_(new Level::WaveQueue("default", ShapeDef()))
+	worldLevel_(new Level::WaveQueue("default", PlayerDef()))
 {
 	SetContactListener(&contactListener_);
 
@@ -123,7 +123,7 @@ b2Body * GameWorld::addBulletBody(const b2Vec2& pos)
 }
 
 //Adds a player to the world 
-void GameWorld::addPlayer(const ShapeDef& def, Weapon::WeaponI* weapon)
+void GameWorld::addPlayer(const PlayerDef& def)
 {
 	if (player_ != nullptr) 
 		removePlayer();
@@ -139,10 +139,10 @@ void GameWorld::addPlayer(const ShapeDef& def, Weapon::WeaponI* weapon)
 		player_ = new Player(body, def, addSide_);
 		pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), -1, 5.f, 3.f));
 		pickups_.push_back(new Pickup::Attractor(addDynamicBody(def.position), -1, 15.f, 1.f));
-		addPickup(Pickup::Type::SIGHT, def.position, -1, 10.f);
 		
 		audio_.playSFX("spawn", B2toSF(b2Vec2_zero, true));
 
+		Weapon::WeaponI* weapon = armory_->requisition(def.weapon, def.weaponLevel);
 		if (weapon != nullptr)
 			armShape(player_, weapon);
 	}
@@ -150,7 +150,7 @@ void GameWorld::addPlayer(const ShapeDef& def, Weapon::WeaponI* weapon)
 	controlled_ = player_;
 }
 
-void GameWorld::addEnemy(const ShapeDef& def, Weapon::WeaponI* weapon)
+void GameWorld::addEnemy(const EnemyDef& def)
 {
 	if (def.isValid())
 	{
@@ -163,7 +163,7 @@ void GameWorld::addEnemy(const ShapeDef& def, Weapon::WeaponI* weapon)
 
 		Enemy* enem = new Enemy(body, def, addSide_, getControlled_);
 
-		//p. sure this is broke
+		Weapon::WeaponI* weapon = armory_->requisition(def.weapon, def.weaponLevel);
 		if (weapon != nullptr)
 			armShape(enem, weapon);
 
@@ -419,28 +419,34 @@ void GameWorld::clearWorld(bool clearPlayer)
 void GameWorld::populateLevelList()
 {
 	//Player
-	ShapeDef play = ShapeDef(b2Vec2_zero, b2Vec2(0, -1), 6);
-	play.colPrim = b2Color(0.6f, 0.3f, 0.9f);
-	play.colSecn = b2Color(0.f, 1.f, 1.f);
-	play.colTert = b2Color(1.f, 0.f, 0.f);
-	play.upgrade = true;
-	play.faction = 1;
-	play.hpScale = 10;
+	PlayerDef bplay = PlayerDef();
+	bplay.vertices = 6;
+	bplay.colPrim = b2Color(0.6f, 0.3f, 0.9f);
+	bplay.colSecn = b2Color(0.f, 1.f, 1.f);
+	bplay.colTert = b2Color(1.f, 0.f, 0.f);
+	bplay.upgrade = true;
+	bplay.faction = 1;
+	bplay.hpScale = 10;
 	
 	//Test Queue level
 	{
+		PlayerDef play(bplay);
+		play.weapon = "fungun";
+		play.weaponLevel = 42;
+		play.bombTime = 20000;
+		play.bombRadius = 15.f;
+
+
 		Level::WaveQueue* qlvl = new Level::WaveQueue("testqueue", play);
 		float radius = 64.f;
 		Wave wav = Wave();
-		ShapeDef enem;
+		EnemyDef enem;
 
 		//qlvl_->addAFX("../assets/spriterip.ogg", 1, 0.2, 400, 1024);
 		qlvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
 		qlvl->setPrimary(b2Color(0.4f, 0.0f, 0.4f));
 		qlvl->setSecondary(b2Color(0.1f, 0.1f, 0.1f));
 		qlvl->setTertiary(b2Color(0.1f, 0.8f, 0.1f));
-		qlvl->setPlayerWeapon("fungun");
-		qlvl->setPlayerWeaponLevel(42);
 		qlvl->setBoundsRadius(radius);
 		qlvl->setBoundsPoints(32);
 
@@ -450,22 +456,22 @@ void GameWorld::populateLevelList()
 			switch (s)
 			{
 			case 3:
-				enem = ShapeDef::triDef();
+				enem = EnemyDef::triDef();
 				break;
 			case 4:
-				enem = ShapeDef::squDef();
+				enem = EnemyDef::squDef();
 				break;
 			case 5:
-				enem = ShapeDef::penDef();
+				enem = EnemyDef::penDef();
 				break;
 			case 6:
-				enem = ShapeDef::hexDef();
+				enem = EnemyDef::hexDef();
 				break;
 			case 7:
-				enem = ShapeDef::hepDef();
+				enem = EnemyDef::hepDef();
 				break;
 			case 8:
-				enem = ShapeDef::octDef();
+				enem = EnemyDef::octDef();
 				break;
 			}
 
@@ -477,7 +483,7 @@ void GameWorld::populateLevelList()
 
 				enem.hpScale *= 1;
 
-				wav.addEnemy(enem, "", 0);
+				wav.addEnemy(enem);
 			}
 
 			qlvl->addWaveToQueue(wav);
@@ -488,20 +494,24 @@ void GameWorld::populateLevelList()
 
 	//Test weapon level
 	{
+		PlayerDef play(bplay);
+		play.weapon = "fungun";
+		play.weaponLevel = 999;
+		play.bombTime = 1000;
+		play.bombRadius = 15.f;
+
 		Level::WaveQueue* weaplvl = new Level::WaveQueue("testweap", play);
 		float radius = 64.f;
 		Wave wav = Wave();
 		std::string weap = "";
-		ShapeDef enem;
+		EnemyDef enem;
 		float x, y;
 
 		weaplvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
 		weaplvl->setPrimary(b2Color(0.6f, 0.6f, 0.6f));
 		weaplvl->setSecondary(b2Color(0.1f, 0.1f, 0.1f));
 		weaplvl->setTertiary(b2Color(0.9f, 0.9f, 0.1f));
-		weaplvl->setRespiteTime(1000);
-		weaplvl->setPlayerWeapon("fungun");
-		weaplvl->setPlayerWeaponLevel(999);
+		weaplvl->setRespiteTimeMAX(1000);
 		weaplvl->setBoundsRadius(radius);
 		weaplvl->setBoundsPoints(16);
 
@@ -510,7 +520,8 @@ void GameWorld::populateLevelList()
 			wav = Wave();
 			for (int s = 0; s < 9; ++s)
 			{
-				enem = ShapeDef(b2Vec2_zero, b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
+				enem = EnemyDef();
+				enem.vertices = static_cast<int>(randFloat(3, 8) + 1);
 
 				switch (s)
 				{
@@ -584,8 +595,11 @@ void GameWorld::populateLevelList()
 				enem.heading = (enem.position);
 				enem.ai = 1;
 				enem.hpScale = l;
+				enem.damageScale = 0;
+				enem.weapon = weap;
+				enem.weaponLevel = l;
 
-				wav.addEnemy(enem, weap, l);
+				wav.addEnemy(enem);
 			}
 
 			weaplvl->addWaveToQueue(wav);
@@ -596,13 +610,19 @@ void GameWorld::populateLevelList()
 
 	//Layer level
 	{
+		PlayerDef play(bplay);
+		play.weapon = "fungun";
+		play.weaponLevel = 999;
+		play.bombTime = 15000;
+		play.bombRadius = 15.f;
+
 		Level::WaveQueue* laylvl = new Level::WaveQueue("testlayer", play);
 		Wave wav = Wave();
 		float radius = 32;
 		b2Vec2 centre(0, 0);
 		b2Vec2 pos(0, 0);
 		float spawnradius = 20.f;
-		ShapeDef def;
+		EnemyDef def;
 		int groups = 10;
 		int shapes = 6;
 
@@ -613,9 +633,7 @@ void GameWorld::populateLevelList()
 		laylvl->setPrimary(b2Color(0.9f, 0.6f, 0.4f));
 		laylvl->setSecondary(b2Color(0.5f, 0.1f, 1.f));
 		laylvl->setTertiary(b2Color(0.7f, 0.3f, 0.4f));
-		laylvl->setRespiteTime(1000);
-		laylvl->setPlayerWeapon("fungun");
-		laylvl->setPlayerWeaponLevel(999);
+		laylvl->setRespiteTimeMAX(1000);
 		laylvl->setBoundsRadius(radius);
 		laylvl->setBoundsPoints(24);
 
@@ -646,14 +664,57 @@ void GameWorld::populateLevelList()
 				def.colPrim = b2Color(0.2f * i, 0.1f * j, 1.f - j / 10);
 				def.colSecn = b2Color(0.2f * j, 0.1f * (i / j), 0.05f * (i + j));
 				def.colTert = b2Color(0.1f * i, 0.3f * i, 1.f * (j - i));
-				def.ai = 1;
+				def.ai = 2;
 
-				wav.addEnemy(def, "", 0);
+				wav.addEnemy(def);
 			}
 		}
 
 		laylvl->addWaveToQueue(wav);
 		levels_.push_back(laylvl);
+	}
+
+	//Size test level
+	{
+		PlayerDef play(bplay);
+		play.weapon = "fungun";
+		play.weaponLevel = 42;
+		play.bombTime = 5000;
+		play.bombRadius = 15.f;
+
+		Level::WaveQueue* sizelvl = new Level::WaveQueue("testsize", play);
+		Wave wav = Wave();
+		float radius = 32;
+		b2Vec2 pos(0, 0);
+		EnemyDef def;
+
+		sizelvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
+		sizelvl->setPrimary(b2Color(0.1f, 0.3f, 0.8f));
+		sizelvl->setSecondary(b2Color(0.2f, 0.7f, 7.f));
+		sizelvl->setTertiary(b2Color(0.7f, 0.5f, 0.1f));
+		sizelvl->setRespiteTimeMAX(1000);
+		sizelvl->setBoundsRadius(radius);
+		sizelvl->setBoundsPoints(16);
+		
+		for (int i = 1; i < 7; ++i)
+		{
+			for (int j = 1; j < 7; ++j)
+			{
+				b2Vec2 pos(-17.5 + j * 5, 2 - i * pow(1.25, i));
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero + pos, i + 2));
+				e.size = 0.5 * i;
+				e.hpScale = 5 * (j - 1);
+				e.colPrim = b2Color(0.1 * i, 0.05 * j, 0.4);
+				e.colSecn = b2Color(0.7, 0.4 + (0.05 * i), 0.9 - (0.1 * j));
+				e.colTert = b2Color(1 - (0.05 * (i + j)), 0.7, 0.025 * (i * j));
+				e.ai = 2;
+
+				wav.addEnemy(e);
+			}
+
+			sizelvl->addWaveToQueue(wav);
+		}
+		levels_.push_back(sizelvl);
 	}
 
 	//Test sloop level
@@ -696,7 +757,8 @@ void GameWorld::loadLevel(Level::LevelI* level)
 	bounds_->resize(worldLevel_->getBoundsRadius(), worldLevel_->getBoundsPoints());
 
 	//Player
-	addPlayer(worldLevel_->getPlayer(), armory_->requisition(worldLevel_->getPlayerWeapon(), worldLevel_->getPlayerWeaponLevel()));
+	PlayerDef p = worldLevel_->getPlayer();
+	addPlayer(p);
 
 	hiSides = 0;
 	enemies = 0;
@@ -762,7 +824,7 @@ void GameWorld::spawnEnemy()
 
 		pos *= randFloat(minRad, rad);
 
-		ShapeDef enem = ShapeDef(pos, pos, randFloat(3, 6));
+		EnemyDef enem = ShapeDef(pos, pos, randFloat(3, 6));
 		enem.hpScale = randFloat(2, 5);
 		enem.speedScale = 0.5f;
 		enem.size = randFloat(0.5f, 1.5f);
@@ -773,9 +835,10 @@ void GameWorld::spawnEnemy()
 		enem.colTert = b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f));
 		enem.faction = 2;
 
-		Weapon::WeaponI* weap = armory_->requisition(c[(int)std::floor(randFloat(0, 4))], (int)std::floor(randFloat(0, 4)));
+		enem.weapon = c[(int)std::floor(randFloat(0, 4))];
+		enem.weaponLevel = (int)std::floor(randFloat(0, 4));
 
-		addEnemy(enem, weap);
+		addEnemy(enem);
 	}
 }
 
@@ -1128,21 +1191,21 @@ void GameWorld::updateForce(int dt)
 void GameWorld::updateLevel(int dt)
 {
 	bool player = (player_ != nullptr && player_->getAlive());
-	
-	worldLevel_->update(dt, player);
-	
-	static_cast<Level::WaveQueue*>(worldLevel_)->updateCurrentWaveCount(enemies);
+	int sides = player ? player_->getSidesCollected() : 0;
+
+	worldLevel_->updateStatus(sides, enemies, player);
+	worldLevel_->update(dt);
 
 	//If there's a player and DEBUG and we're ready
 	if (player && worldLevel_->getStarted() && worldLevel_->getWaveReady())
 	{
 		//Spawn a wave
 		Wave w = worldLevel_->getWave();
-		std::vector<Wave::ArmedShapeDef> wv = w.getWave();
+		std::vector<EnemyDef> wv = w.getWave();
 
 		for (auto iter = wv.begin(), end = wv.end(); iter != end; ++iter)
 		{
-			addEnemy(iter->shape);
+			addEnemy(*iter);
 		}
 	}
 }
@@ -1262,7 +1325,7 @@ void GameWorld::bomb(bool nuke)
 	{
 		if (player_->getBombReady())
 		{
-			float range = player_->getBombRange();
+			float range = player_->getBombRadius();
 			//Explode shapes
 			if (shapes_.empty() == false)
 			{
@@ -1333,7 +1396,7 @@ void GameWorld::f1()
 	//std::cout << nom / 255.f << std::endl;
 	for (int i = 0; i < 8; ++i)
 	{
-		ShapeDef enem = ShapeDef(b2Vec2(-20 + 5 * i, 15), b2Vec2(0, -1), std::max(i, 3));
+		EnemyDef enem = ShapeDef(b2Vec2(-20 + 5 * i, 15), b2Vec2(0, -1), std::max(i, 3));
 		
 
 		float e = (nom / 255.f) - i * 3 * (nom / 255);
@@ -1344,34 +1407,16 @@ void GameWorld::f1()
 		enem.colSecn = b2Color(s, s, 0);
 		enem.colTert = b2Color(1, 0, t);
 		enem.ai = 1;
-		
-		std::string wn = dstr;
+		enem.weapon = dstr;
+		enem.weaponLevel = i;
 
-		Weapon::WeaponI* newWeap = armory_->requisition(wn, i);
-
-		addEnemy(enem, newWeap);
+		addEnemy(enem);
 
 	}
 }
 
 void GameWorld::f2()
 {
-	for (int i = 1; i < 7; ++i)
-	{
-		for (int j = 1; j < 7; ++j)
-		{
-			b2Vec2 pos(-17.5 + j * 5,  2 - i * pow(1.25, i));
-			ShapeDef e(pos, b2Vec2_zero + pos, i + 2);
-			e.size = 0.5 * i;
-			e.hpScale = 5 * (j -1);
-			e.colPrim = b2Color(0.1 * i, 0.05 * j, 0.4);
-			e.colSecn = b2Color(0.7, 0.4 + (0.05 * i), 0.9 - (0.1 * j));
-			e.colTert = b2Color(1 - (0.05 * (i + j)), 0.7, 0.025 * (i * j));
-			e.ai = 2;
-
-			addEnemy(e);
-		}
-	}
 }
 
 void GameWorld::f3()

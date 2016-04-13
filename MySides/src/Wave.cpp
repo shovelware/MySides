@@ -1,21 +1,15 @@
 #include "Wave.hpp"
 
 Wave::Wave()
+{}
+
+void Wave::addEnemy(EnemyDef enemy)
 {
-}
+	vertsMaxNum_ += enemy.verticesMax;
+	vertsMinNum_ += enemy.verticesMin;
+	vertsNum_ += enemy.vertices;
 
-void Wave::addEnemy(ShapeDef shape, std::string weapon, int weaponLevel)
-{
-	ArmedShapeDef newDef;
-	newDef.shape = shape;
-	newDef.weapon = weapon;
-	newDef.weaponLevel = weaponLevel;
-
-	vertsMaxNum_ += shape.verticesMax;
-	vertsMinNum_ += shape.verticesMin;
-	vertsNum_ += shape.vertices;
-
-	wave_.push_back(newDef);
+	wave_.push_back(enemy);
 
 	int count = wave_.size();
 
@@ -37,11 +31,11 @@ void Wave::calculateStats()
 		int vertMaxNum = 0;
 		int vertNum = 0;
 
-		for (std::vector<ArmedShapeDef>::const_iterator iter = wave_.begin(), end = wave_.end(); iter != end; ++iter)
+		for (std::vector<EnemyDef>::const_iterator iter = wave_.begin(), end = wave_.end(); iter != end; ++iter)
 		{
-			vertMaxNum += iter->shape.verticesMax;
-			vertMinNum += iter->shape.verticesMin;
-			vertNum += iter->shape.vertices;
+			vertMaxNum += iter->verticesMax;
+			vertMinNum += iter->verticesMin;
+			vertNum += iter->vertices;
 		}
 
 		avgVertsMax_ = std::ceil(vertMaxNum / cnt);
@@ -54,7 +48,7 @@ int Wave::getAverageVertsMax() const { return avgVertsMax_; }
 int Wave::getAverageVertsMin() const { return avgVertsMin_; }
 int Wave::getAverageVerts() const {	return avgVerts_; }
 
-std::vector<Wave::ArmedShapeDef>& const Wave::getWave()
+std::vector<EnemyDef>& const Wave::getWave()
 {
 	return wave_;
 }

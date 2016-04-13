@@ -48,8 +48,8 @@ public:
 	bool hasControlled();
 
 	//Spawning works off definitions
-	void addPlayer(const ShapeDef& def, Weapon::WeaponI* weapon = nullptr);
-	void addEnemy(const ShapeDef& def, Weapon::WeaponI* weapon = nullptr);
+	void addPlayer(const PlayerDef& def);
+	void addEnemy(const EnemyDef& def);
 	void addProjectile(const ProjectileDef& def);
 	void addSide(const SideDef& def);
 	void addPickup(Pickup::Type type, b2Vec2 position, int time, float strength = 0);

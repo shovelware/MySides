@@ -27,7 +27,7 @@ public:
 		colTert(b2Color(1.f, 1.f, 1.f))
 	{}
 
-	SideDef(const SideDef &sd) :
+	SideDef(const SideDef& sd) :
 		position(sd.position),
 		normal(sd.normal),
 		length(sd.length),

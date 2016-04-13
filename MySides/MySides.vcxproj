@@ -179,6 +179,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\Camera.hpp" />
     <ClInclude Include="include\ContactListener.hpp" />
     <ClInclude Include="include\Enemy.hpp" />
+    <ClInclude Include="include\EnemyDef.hpp" />
     <ClInclude Include="include\Entity.hpp" />
     <ClInclude Include="include\Force.hpp" />
     <ClInclude Include="include\Game.hpp" />
@@ -190,6 +191,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\LevelWaveQueue.hpp" />
     <ClInclude Include="include\Log.hpp" />
     <ClInclude Include="include\Pickup.hpp" />
+    <ClInclude Include="include\PlayerDef.hpp" />
     <ClInclude Include="include\Renderer.hpp" />
     <ClInclude Include="include\Magazine.hpp" />
     <ClInclude Include="include\Player.hpp" />

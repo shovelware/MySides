@@ -17,16 +17,19 @@ HUD::~HUD()
 	}
 }
 
-void HUD::drawLevelStatus(sf::FloatRect& const box)
+void HUD::drawLevelStatus(sf::FloatRect const& box)
 {
-	//Level Info
+	//Level Info: Waves, limits, respite
 	Level::LevelI& level = world_->getWorldLevel();
+
 	int limitMin = level.getLimit();
 	int limitMax = level.getLimitMAX();
+
 	int waveLimitMin = level.getWaveLimit();
 	int waveLimitMax = level.getWaveLimitMax();
-	int time = level.getTime();
-	int timeMax = level.getTimeMAX();
+	
+	int respiteTime = level.getRespiteTime();
+	int respiteTimeMax = level.getRespiteTimeMAX();
 
 	//Bar colours
 	sf::Color p = B2toSF(level.getPrimary());
@@ -39,26 +42,25 @@ void HUD::drawLevelStatus(sf::FloatRect& const box)
 
 	barBox.height *= 0.75;
 
-	sf::FloatRect timeBox(barBox.left, barBox.top + barBox.height - 2, barBox.width * 0.75f, box.height * 0.25f);
-	sf::FloatRect botBox(box.left, box.height + (box.height / 2), box.width, box.height / 8);
-
-	drawStringLeft(botBox, std::to_string(waveLimitMin), t, 1.f);
-	drawString(botBox, std::to_string(waveLimitMax), t, 1.f);
-	//Draw time
-	drawBar(timeBox, time, timeMax, s, p, t);
+	sf::FloatRect waveBox(barBox.left, barBox.top + barBox.height - 2, barBox.width * 0.75f, box.height * 0.25f);
+	sf::FloatRect botBox(box.left, box.height + box.height * 0.75, box.width, box.height / 8);
 
 	//Draw limit bar
 	drawBar(barBox, limitMin, limitMax, s, p, t);
-	
+
+	//Draw respite bar if we must
+	drawStringLeft(botBox, std::to_string(waveLimitMin), t, 1.f);
+	drawString(botBox, std::to_string(waveLimitMax), t, 1.f);
+
+	if (respiteTime > 0) { drawBar(waveBox, respiteTimeMax - respiteTime, respiteTimeMax, s, p, t, 2); }
+	else drawBar(waveBox, waveLimitMin, waveLimitMax, s, p, t, 2);
+
 	//Draw limits min and max
-	drawStringLeft(barBox, std::to_string(limitMin), t, 1.5f);
-	drawStringRight(barBox, std::to_string(limitMax), t, 1.5f);
-	
-	//Draw time
-	drawString(eighthBox, std::to_string((int)(time)), t, 1.f);
+	drawStringLeft(barBox, std::to_string(limitMin), t, 1.f);
+	drawStringRight(barBox, std::to_string(limitMax), t, 1.f);
 }
 
-void HUD::drawShapeStatus(sf::FloatRect& const box)
+void HUD::drawShapeStatus(sf::FloatRect const& box)
 {
 	Shape* c = world_->getControlled();
 
@@ -121,7 +123,7 @@ void HUD::drawShapeStatus(sf::FloatRect& const box)
 	}
 }
 
-void HUD::drawWeaponStatus(sf::FloatRect& const box)
+void HUD::drawWeaponStatus(sf::FloatRect const& box)
 {
 	Shape* c = world_->getControlled();
 
@@ -181,7 +183,7 @@ void HUD::drawWeaponStatus(sf::FloatRect& const box)
 	}
 }
 
-void HUD::drawSideStatus(sf::FloatRect& const box)
+void HUD::drawSideStatus(sf::FloatRect const& box)
 {
 	Shape* c = world_->getControlled();
 
@@ -199,7 +201,7 @@ void HUD::drawSideStatus(sf::FloatRect& const box)
 	}
 }
 
-void HUD::drawDebugInfo(sf::FloatRect& const box)
+void HUD::drawDebugInfo(sf::FloatRect const& box)
 {
 	sf::FloatRect leftBox(box.left, box.top, box.width / 10, box.height);
 	sf::FloatRect rightBox(box.left + (box.width / 10), box.top, (box.width / 10) * 9, box.height);
@@ -209,13 +211,18 @@ void HUD::drawDebugInfo(sf::FloatRect& const box)
 	drawString(rightBox, world_->getCurrentLevel().getID());
 }
 
-void HUD::drawLevelInfo(sf::FloatRect& const box)
+void HUD::drawLevelInfo(sf::FloatRect const& box)
 {
-	//Level Info
+	//Level Info: Time, completion, name
 	Level::LevelI& level = world_->getWorldLevel();
 	std::string id = level.getID();
+
 	bool started = level.getStarted();
 	bool complete = level.getComplete();
+
+	int time = level.getTime();
+	int timeMax = level.getTimeMAX();
+
 	int timeComplete = level.getTimeComplete();
 	bool timeStandard = level.getTimeStandard();
 
@@ -228,6 +235,7 @@ void HUD::drawLevelInfo(sf::FloatRect& const box)
 	sf::FloatRect infoBox(box);
 	sf::FloatRect nameBox(box.left, box.top, box.width, box.height * 0.6f);
 	sf::FloatRect numBox(box.left + box.width * 0.1f, box.top + box.height * 0.6f, box.width * 0.8f, box.height * 0.2f);
+	sf::FloatRect timeBox(box.left, box.top * box.height * 0.9f, box.width, box.height * 0.1f);
 
 	sf::Color fill = s;
 	sf::Color out = t;
@@ -243,11 +251,17 @@ void HUD::drawLevelInfo(sf::FloatRect& const box)
 		fill = t;
 		out = s;
 	}
-
+	
 	drawRect(infoBox, fill, out, -2);
 	drawString(nameBox, id, p, 1.5f);
-	drawStringLeft(numBox, "T" + std::to_string(timeComplete), p, 1.5f);
-	drawStringRight(numBox, "S" + std::to_string(timeStandard), p, 1.5f);
+	drawStringLeft(numBox, "T" + std::to_string(time), p, 1.f);
+	drawString(numBox, "C" + std::to_string(timeComplete), p, 1.f);
+	drawStringRight(numBox, "S" + std::to_string(timeStandard), p, 1.f);
+
+	if (started) //Draw time
+	{
+		drawBar(timeBox, time, timeMax, s, p, t);
+	}
 }
 
 void HUD::loadFont(std::string filename, unsigned int size)

@@ -4,19 +4,13 @@
 #include <string>
 #include <vector>
 
-#include "ShapeDef.hpp"
+#include "EnemyDef.hpp"
 
 class Wave {
 public:
-	struct ArmedShapeDef {
-		ShapeDef shape = ShapeDef();
-		//AIDef brain AIDef();
-		std::string weapon = "";
-		int weaponLevel = 0;
-	};
 	Wave();
 
-	void addEnemy(ShapeDef shape, std::string weapon, int weaponLevel);	//void addEnemy(ShapeDef shape, AIDef brain, std::string weapon, int weaponLevel);
+	void addEnemy(EnemyDef enemy);
 
 	void calculateStats();
 
@@ -24,9 +18,9 @@ public:
 	int getAverageVertsMin() const;
 	int getAverageVerts() const;
 
-	std::vector<ArmedShapeDef>& const getWave();
+	std::vector<EnemyDef>& const getWave();
 private:
-	std::vector<ArmedShapeDef> wave_;
+	std::vector<EnemyDef> wave_;
 
 	int vertsMaxNum_;
 	int vertsMinNum_;

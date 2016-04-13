@@ -1,14 +1,12 @@
 #include "..\include\LevelWaveQueue.hpp"
 namespace Level {
-	WaveQueue::WaveQueue(std::string id, ShapeDef player) :
+	WaveQueue::WaveQueue(std::string id, const PlayerDef& player) :
 		LevelI(id, player),
 		waves_(0),
 		curWaveCountFull_(waveLimitMAX_),
 		curWaveCount_(waveLimit_),
 		wavesMAX_(limitMAX_),
-		wavesComplete_(limit_),
-		respiteTime_(0),
-		respiteTimeMAX_(5000)
+		wavesComplete_(limit_)
 	{
 		limit_ = 0;
 		limitMAX_ = 0;
@@ -24,8 +22,6 @@ namespace Level {
 		curWaveCount_(waveLimit_),
 		wavesMAX_(limitMAX_),
 		wavesComplete_(limit_),
-		respiteTimeMAX_(other.respiteTimeMAX_),
-		respiteTime_(other.respiteTime_),
 		minEnemies_(other.minEnemies_),
 		waveGen_(new WaveGen::WaveGeneratorQueue(*other.waveGen_))
 	{
@@ -53,9 +49,10 @@ namespace Level {
 		limitMAX_++;
 	}
 
-	void WaveQueue::updateCurrentWaveCount(int count)
+	void WaveQueue::updateStatus(int sides, int enemies, bool player)
 	{
-		curWaveCount_ = count;
+		Level::LevelI::updateStatus(sides, enemies, player);
+		curWaveCount_ = enemies;
 		
 		//Add to our waves cleared, record our complete time, start respite
 		if (curWaveCountFull_ != 0 && wavesComplete_ != wavesMAX_ && curWaveCount_ == 0)
@@ -63,18 +60,16 @@ namespace Level {
 			wavesComplete_ = (wavesComplete_ + 1 < wavesMAX_ ? wavesComplete_ + 1 : wavesMAX_);
 
 			curWaveCountFull_ = 0;
-			respiteTime_ = respiteTimeMAX_;
 
+			//If we're finished
 			if (wavesComplete_ == wavesMAX_)
 			{
 				timeComplete_ = time_;
 			}
+			
+			//Else prepare next wave
+			else respiteTime_ = respiteTimeMAX_;
 		}
-	}
-
-	void WaveQueue::setRespiteTime(int time)
-	{
-		respiteTimeMAX_ = time > 0 ? time : respiteTimeMAX_;
 	}
 
 	bool WaveQueue::getWaveReady() const
@@ -95,11 +90,11 @@ namespace Level {
 		else return Wave();
 	}
 
-	void WaveQueue::update(int milliseconds, bool player)
+	void WaveQueue::update(int milliseconds)
 	{
-		LevelI::update(milliseconds, player);
+		LevelI::update(milliseconds);
 
-		if (player)
+		if (playerAlive_)
 		{
 			//Time down our respite between waves
 			if (respiteTime_ != 0)

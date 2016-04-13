@@ -16,7 +16,6 @@ Pickup::Sight::Sight(b2Body* body, int time, float length) :
 void Pickup::Sight::onCollect()
 {
 	body_->DestroyFixture(body_->GetFixtureList());
-	body_->SetFixedRotation(true);
 	body_->SetTransform(owner_->getBody()->GetPosition(), body_->GetAngle());
 
 	b2FixtureDef def;
@@ -31,17 +30,17 @@ void Pickup::Sight::onCollect()
 	def.shape = &shape;
 
 
-	//b2RevoluteJointDef dis;
-	//dis.localAnchorA = b2Vec2(0, 0);
-	//dis.localAnchorB = b2Vec2(0, 0);
-	//dis.bodyA = owner_->getBody();
-	//dis.bodyB = body_;
-	//dis.enableLimit = true;
-	//dis.lowerAngle = 0;
-	//dis.upperAngle = 0;
-	//dis.collideConnected = false;
-	//
-	//body_->GetWorld()->CreateJoint(&dis);
+	b2RevoluteJointDef dis;
+	dis.localAnchorA = b2Vec2(0, 0);
+	dis.localAnchorB = b2Vec2(0, 0);
+	dis.bodyA = owner_->getBody();
+	dis.bodyB = body_;
+	dis.enableLimit = true;
+	dis.lowerAngle = 0;
+	dis.upperAngle = 0;
+	dis.collideConnected = false;
+	
+	body_->GetWorld()->CreateJoint(&dis);
 	body_->CreateFixture(&def);
 
 	float angle = owner_->getBody()->GetAngle();
@@ -101,8 +100,8 @@ void Pickup::Sight::update(int milliseconds)
 	{
 		if (owner_ != nullptr)
 		{
-			float angle = owner_->getBody()->GetAngle();
-			body_->SetTransform(owner_->getBody()->GetPosition(), angle);
+			//float angle = owner_->getBody()->GetAngle();
+			//body_->SetTransform(owner_->getBody()->GetPosition(), angle);
 
 			contact_ = false;
 
@@ -147,7 +146,7 @@ void Pickup::Sight::update(int milliseconds)
 
 		else
 		{
-			time_ == 0;
+			time_ = 0;
 		}
 
 	}

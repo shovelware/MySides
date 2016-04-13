@@ -34,9 +34,6 @@
     <Filter Include="Header Files\Audio">
       <UniqueIdentifier>{1e4d9115-6a6e-4502-8561-b01781d6b8e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Audio">
-      <UniqueIdentifier>{9875d0da-05c7-477b-9b54-8cb4dba03352}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Game\World">
       <UniqueIdentifier>{31c0a8fc-3c39-4c45-b21a-52f16bfdb560}</UniqueIdentifier>
     </Filter>
@@ -69,6 +66,9 @@
     </Filter>
     <Filter Include="Source Files\Game\World\Entity">
       <UniqueIdentifier>{349309a0-f6ee-48c8-b1b9-9089d72916b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Audio">
+      <UniqueIdentifier>{9875d0da-05c7-477b-9b54-8cb4dba03352}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -331,6 +331,12 @@
     </ClInclude>
     <ClInclude Include="include\LevelWaveQueue.hpp">
       <Filter>Header Files\Game\World\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlayerDef.hpp">
+      <Filter>Header Files\Game\World\Def</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EnemyDef.hpp">
+      <Filter>Header Files\Game\World\Def</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

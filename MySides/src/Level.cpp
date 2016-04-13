@@ -8,25 +8,31 @@ namespace Level
 		boundsRadius_(32),
 		time_(0),
 		timeMAX_(0),
+		timeComplete_(-1),
 		limit_(0),
 		limitMAX_(0),
 		waveLimit_(0),
 		waveLimitMAX_(0),
+		respiteTime_(0),
+		respiteTimeMAX_(2000),
 		started_(false)
 	{
 	}
 
-	LevelI::LevelI(std::string id, ShapeDef player) :
+	LevelI::LevelI(std::string id, const PlayerDef& player) :
 		id_(id),
 		player_(player),
 		boundsPoints_(32),
 		boundsRadius_(32),
 		time_(0),
 		timeMAX_(0),
+		timeComplete_(-1),
 		limit_(0),
 		limitMAX_(0),
 		waveLimit_(0),
 		waveLimitMAX_(0),
+		respiteTime_(0),
+		respiteTimeMAX_(2000),
 		started_(false)
 	{
 
@@ -41,14 +47,14 @@ namespace Level
 		limitMAX_(other.limitMAX_),
 		waveLimit_(other.waveLimit_),
 		waveLimitMAX_(other.waveLimitMAX_),
+		respiteTimeMAX_(other.respiteTimeMAX_),
+		respiteTime_(other.respiteTime_),
 		colPrim_(other.colPrim_),
 		colSecn_(other.colSecn_),
 		colTert_(other.colTert_),
 		boundsRadius_(other.boundsRadius_),
 		boundsPoints_(other.boundsPoints_),
 		player_(other.player_),
-		playerWeapon_(other.playerWeapon_),
-		playerWeaponLevel_(other.playerWeaponLevel_),
 		id_(other.id_)
 	{
 	}
@@ -134,31 +140,26 @@ namespace Level
 	void LevelI::setBoundsPoints(int points) { boundsPoints_ = (points > 2 ? points : boundsPoints_); }
 	int LevelI::getBoundsPoints() const { return boundsPoints_; }
 
-	ShapeDef const & const LevelI::getPlayer() const
+	void LevelI::setRespiteTimeMAX(int time)
+	{
+		respiteTimeMAX_ = time > 0 ? time : respiteTimeMAX_;
+	}
+
+	int LevelI::getRespiteTimeMAX() const
+	{
+		return respiteTimeMAX_;
+	}
+
+	int LevelI::getRespiteTime() const
+	{
+		return respiteTime_;
+	}
+
+	PlayerDef const & const LevelI::getPlayer() const
 	{
 		return player_;
 	}
-
-	void LevelI::setPlayerWeapon(std::string weapon)
-	{
-		playerWeapon_ = weapon;
-	}
-
-	std::string LevelI::getPlayerWeapon() const
-	{
-		return playerWeapon_;
-	}
-
-	void LevelI::setPlayerWeaponLevel(int level)
-	{
-		playerWeaponLevel_ = level;
-	}
-
-	int LevelI::getPlayerWeaponLevel() const
-	{
-		return playerWeaponLevel_;
-	}
-
+	
 	void LevelI::addAFX(std::string path, float nearFactor, float farFactor, float nearDistance, float farDistance)
 	{
 		AFXDef a;
@@ -184,8 +185,14 @@ namespace Level
 	void LevelI::setSecondary(b2Color col) { colSecn_ = col; }
 	void LevelI::setTertiary(b2Color col) { colTert_ = col; }
 
-	void LevelI::update(int milliseconds, bool player)
+	void LevelI::updateStatus(int sides, int enemies, bool player)
 	{
-		time_ += milliseconds;
+		playerAlive_ = player;
+	}
+
+	void LevelI::update(int milliseconds)
+	{
+		if (started_ && timeComplete_ < 0)
+			time_ += milliseconds;
 	}
 }

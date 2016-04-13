@@ -1,10 +1,16 @@
 #include "Enemy.hpp"
-#include "Bounds.hpp"
-#include "Projectile.hpp"
-#include "Side.hpp"
-#include "Pickup.hpp"
+
 
 Enemy::Enemy(b2Body* body, const ShapeDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) :
+	Shape(body, def, callback),
+	getPlayer_(player),
+	aistate(0)
+{
+	body_->GetFixtureList()->SetUserData("enemy");
+	shapeFixDef_.userData = "enemy";
+}
+
+Enemy::Enemy(b2Body* body, const EnemyDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) :
 	Shape(body, def, callback),
 	getPlayer_(player),
 	aistate(def.ai)

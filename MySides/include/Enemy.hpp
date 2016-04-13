@@ -1,14 +1,16 @@
 #ifndef MS_ENEMY_HPP
 #define MS_ENEMY_HPP
 
-#include "Shape.hpp"
 #include <list>
 #include <functional>
 
+#include "Shape.hpp"
+#include "EnemyDef.hpp"
 class Enemy : public Shape
 {
 public:
-	Enemy(b2Body* body,const ShapeDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player);
+	Enemy(b2Body* body, const ShapeDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player);
+	Enemy(b2Body* body, const EnemyDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player);
 
 	void update(int milliseconds);
 	void setCollector(bool collect);
