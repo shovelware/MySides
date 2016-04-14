@@ -443,7 +443,7 @@ void Game::handleInput(sf::Time dt)
 
 	//RS : Look
 	world_->look(b2Vec2(con_.checkRightX(), con_.checkRightY()));
-	camera_->lean(sf::Vector2f(con_.checkRightX() * 10, con_.checkRightY() * 10), (pause_ || !controlled));
+	camera_->lean(sf::Vector2f(con_.checkRightX() * 50, con_.checkRightY() * 50), (pause_ || !controlled));
 
 	//RT : Trigger
 	if (con_.checkRightHairTrigger())

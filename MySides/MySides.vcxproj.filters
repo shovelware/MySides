@@ -189,6 +189,12 @@
     <ClCompile Include="src\LevelWaveQueue.cpp">
       <Filter>Source Files\Game\World\Level</Filter>
     </ClCompile>
+    <ClCompile Include="src\WaveGenSLoop.cpp">
+      <Filter>Source Files\Game\World\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelSurvival.cpp">
+      <Filter>Source Files\Game\World\Level</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\XController.hpp">
@@ -329,14 +335,20 @@
     <ClInclude Include="include\Side.hpp">
       <Filter>Header Files\Game\World\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="include\LevelWaveQueue.hpp">
-      <Filter>Header Files\Game\World\Level</Filter>
-    </ClInclude>
     <ClInclude Include="include\PlayerDef.hpp">
       <Filter>Header Files\Game\World\Def</Filter>
     </ClInclude>
     <ClInclude Include="include\EnemyDef.hpp">
       <Filter>Header Files\Game\World\Def</Filter>
+    </ClInclude>
+    <ClInclude Include="include\WaveGenSLoop.hpp">
+      <Filter>Header Files\Game\World\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LevelWaveQueue.hpp">
+      <Filter>Header Files\Game\World\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LevelSurvival.hpp">
+      <Filter>Header Files\Game\World\Level</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

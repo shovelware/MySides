@@ -1,34 +1,42 @@
-#include "..\include\LevelWaveQueue.hpp"
+#include "LevelWaveQueue.hpp"
+
 namespace Level {
 	WaveQueue::WaveQueue(std::string id, const PlayerDef& player) :
 		LevelI(id, player),
 		waves_(0),
-		curWaveCountFull_(waveLimitMAX_),
-		curWaveCount_(waveLimit_),
+		curWaveCountFull_(levelInfoGamma_),
+		curWaveCount_(levelInfoBeta_),
+		curWaveThreshold_(levelInfoAlpha_),
+		leftovers_(0),
 		wavesMAX_(limitMAX_),
-		wavesComplete_(limit_)
+		wavesComplete_(limit_),
+		waveGen_(WaveGen::WaveGeneratorQueue())
 	{
-		limit_ = 0;
-		limitMAX_ = 0;
-		waveLimit_ = 0;
-		waveLimitMAX_ = 0;
-		waveGen_ = new WaveGen::WaveGeneratorQueue();
+		waves_ = 0;
+		wavesMAX_ = 0;
+		curWaveThreshold_ = 0;
+		curWaveCount_ = 0;
+		curWaveCountFull_ = 0;
 	}
 
 	WaveQueue::WaveQueue(const WaveQueue& other) :
 		LevelI(other),
 		waves_(other.waves_),
-		curWaveCountFull_(waveLimitMAX_),
-		curWaveCount_(waveLimit_),
+		curWaveCountFull_(levelInfoGamma_),
+		curWaveCount_(levelInfoBeta_),
+		curWaveThreshold_(levelInfoAlpha_),
+		leftovers_(other.leftovers_),
 		wavesMAX_(limitMAX_),
 		wavesComplete_(limit_),
-		minEnemies_(other.minEnemies_),
-		waveGen_(new WaveGen::WaveGeneratorQueue(*other.waveGen_))
+		minEnemyRatio_(other.minEnemyRatio_),
+		waveGen_(WaveGen::WaveGeneratorQueue(other.waveGen_))
 	{
-		waveLimitMAX_ = other.curWaveCountFull_;
-		waveLimit_ = other.curWaveCount_;
+		levelInfoGamma_ = other.curWaveCountFull_;
+		levelInfoBeta_ = other.curWaveCount_;
+
 		limitMAX_ = other.wavesMAX_;
 		limit_ = other.wavesComplete_;
+		levelInfoAlpha_ = other.levelInfoAlpha_;
 	}
 
 	//inherited virtual clone function
@@ -37,16 +45,11 @@ namespace Level {
 		return static_cast<LevelI*>(new WaveQueue(*this));
 	}
 
-	WaveQueue::~WaveQueue()
-	{
-		delete waveGen_;
-	}
-
 	void WaveQueue::addWaveToQueue(Wave& const wave)
 	{
-		waveGen_->pushWave(wave);
+		waveGen_.pushWave(wave);
 		waves_++;
-		limitMAX_++;
+		wavesMAX_++;
 	}
 
 	void WaveQueue::updateStatus(int sides, int enemies, bool player)
@@ -55,39 +58,55 @@ namespace Level {
 		curWaveCount_ = enemies;
 		
 		//Add to our waves cleared, record our complete time, start respite
-		if (curWaveCountFull_ != 0 && wavesComplete_ != wavesMAX_ && curWaveCount_ == 0)
+		if (curWaveCountFull_ != 0 && wavesComplete_ != wavesMAX_ && curWaveCount_ <= curWaveThreshold_)
 		{
-			wavesComplete_ = (wavesComplete_ + 1 < wavesMAX_ ? wavesComplete_ + 1 : wavesMAX_);
-
-			curWaveCountFull_ = 0;
-
-			//If we're finished
-			if (wavesComplete_ == wavesMAX_)
+			//If we're moving up
+			if (wavesComplete_ + 1 < wavesMAX_)
 			{
-				timeComplete_ = time_;
+				wavesComplete_ = wavesComplete_ + 1;
+
+				curWaveCountFull_ = 0;
+				leftovers_ = curWaveCount_;
+				respiteTime_ = respiteTimeMAX_;
+			}
+
+			//If we're finishing
+			else if (wavesComplete_ + 1 <= wavesMAX_)
+			{
+				//Only finish if the last wave is done
+				if (curWaveCount_ == 0)
+				{
+					wavesComplete_ = wavesMAX_;
+					timeComplete_ = time_;
+				}
 			}
 			
 			//Else prepare next wave
-			else respiteTime_ = respiteTimeMAX_;
 		}
 	}
 
 	bool WaveQueue::getWaveReady() const
 	{
-		return (curWaveCount_ == 0 && respiteTime_ == 0 && !waveGen_->isEmpty());
+		return (curWaveCount_ <= leftovers_ && respiteTime_ == 0 && !waveGen_.isEmpty());
 	}
 
 	Wave WaveQueue::getWave()
 	{
-		if (!waveGen_->isEmpty())
+		if (!waveGen_.isEmpty())
 		{
-			Wave w = waveGen_->getWave();
-			curWaveCountFull_ = w.getWave().size();
+			Wave w = waveGen_.getWave();
+			curWaveCountFull_ = w.getCount();
 			curWaveCount_ = curWaveCountFull_;
+			curWaveThreshold_ = std::ceil((curWaveCountFull_ * minEnemyRatio_));
 			return w;
 		}
 
 		else return Wave();
+	}
+
+	void WaveQueue::setMinEnemyRatio(float ratio)
+	{
+		minEnemyRatio_ = ((0 <= ratio && ratio <= 1) ? ratio : minEnemyRatio_);
 	}
 
 	void WaveQueue::update(int milliseconds)

@@ -9,8 +9,9 @@
 class Wave {
 public:
 	Wave();
+	Wave(const Wave& other);
 
-	void addEnemy(EnemyDef enemy);
+	void addEnemy(EnemyDef enemy, int amount = 1);
 
 	void calculateStats();
 
@@ -18,9 +19,13 @@ public:
 	int getAverageVertsMin() const;
 	int getAverageVerts() const;
 
-	std::vector<EnemyDef>& const getWave();
+	int getCount() const;
+
+	std::vector<std::pair<EnemyDef, int>>& getWave();
 private:
-	std::vector<EnemyDef> wave_;
+	std::vector<std::pair<EnemyDef, int>> wave_;
+
+	int count_;
 
 	int vertsMaxNum_;
 	int vertsMinNum_;

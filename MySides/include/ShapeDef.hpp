@@ -9,9 +9,9 @@ public:
 	ShapeDef() :
 		position(b2Vec2_zero),
 		heading(b2Vec2_zero),
-		hpScale(1),
-		upgrade(true),
 		size(1),
+		upgrade(true),
+		hpScale(1),
 		speedScale(1),
 		damageScale(1),
 		vertices(0),
@@ -26,9 +26,9 @@ public:
 	ShapeDef(b2Vec2 position, b2Vec2 heading, int vertices) :
 		position(position),
 		heading(heading),
-		hpScale(10),
-		upgrade(true),
 		size(1),
+		upgrade(true),
+		hpScale(10),
 		speedScale(1),
 		damageScale(1),
 		vertices(vertices),
@@ -43,9 +43,9 @@ public:
 	ShapeDef(const ShapeDef& sd) :
 		position(sd.position),
 		heading(sd.heading),
-		hpScale(sd.hpScale),
-		upgrade(sd.upgrade),
 		size(sd.size),
+		upgrade(sd.upgrade),
+		hpScale(sd.hpScale),
 		speedScale(sd.speedScale),
 		damageScale(sd.damageScale),
 		vertices(sd.vertices),
@@ -60,11 +60,10 @@ public:
 	b2Vec2 position;
 	b2Vec2 heading;
 
-	int hpScale;
+	float size;
 	bool upgrade;
 
-	float size;
-
+	int hpScale;
 	float speedScale;
 	float damageScale;
 

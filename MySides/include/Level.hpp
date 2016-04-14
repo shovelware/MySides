@@ -9,8 +9,7 @@
 #include "PlayerDef.hpp"
 #include "SideDef.hpp"
 #include "ProjectileDef.hpp"
-
-#include "WaveGenQueue.hpp"
+#include "WaveGenerator.hpp"
 
 namespace Level {
 
@@ -30,11 +29,9 @@ namespace Level {
 		LevelI(const LevelI& other);
 		virtual LevelI* clone() = 0;
 
-		~LevelI();
-
 		std::string getID() const;
 
-		void start();
+		virtual void start();
 		bool getStarted() const;
 
 		//Limit for completion
@@ -42,9 +39,10 @@ namespace Level {
 		int getLimitMAX() const;
 		bool isComplete() const;
 
-		//Limit for spawning a new wave
-		int getWaveLimit() const;
-		int getWaveLimitMax() const;
+		//Wave information
+		int getInfoAlpha() const;
+		int getInfoBeta() const;
+		int getInfoGamma() const;
 
 		int getTime() const;
 		int getTimeMAX() const;
@@ -61,6 +59,7 @@ namespace Level {
 		void setRespiteTimeMAX(int time);
 		int getRespiteTimeMAX() const;
 		int getRespiteTime() const;
+		void forceWave();
 
 		PlayerDef const & const getPlayer() const;
 
@@ -94,14 +93,16 @@ namespace Level {
 		int limit_;
 		int limitMAX_;
 
-		//For use as ref in derived, what triggers a new wave to spawn
-		int waveLimit_;
-		int waveLimitMAX_;
+		//For use as ref in derived, level info
+		int levelInfoAlpha_;
+		int levelInfoBeta_;
+		int levelInfoGamma_;
 
 		b2Color colPrim_;
 		b2Color colSecn_;
 		b2Color colTert_;
 
+		//Time between waves
 		int respiteTimeMAX_;
 		int respiteTime_;
 

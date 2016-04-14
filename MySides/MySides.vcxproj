@@ -63,7 +63,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
@@ -142,6 +142,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\HUD.cpp" />
     <ClCompile Include="src\KeyInput.cpp" />
     <ClCompile Include="src\Level.cpp" />
+    <ClCompile Include="src\LevelSurvival.cpp" />
     <ClCompile Include="src\LevelWaveQueue.cpp" />
     <ClCompile Include="src\MySides.cpp" />
     <ClCompile Include="src\Pickup.cpp" />
@@ -158,6 +159,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\stdafx.cpp" />
     <ClCompile Include="src\Wave.cpp" />
     <ClCompile Include="src\WaveGenQueue.cpp" />
+    <ClCompile Include="src\WaveGenSLoop.cpp" />
     <ClCompile Include="src\WeapAutoBat.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
     <ClCompile Include="src\WeapSemiBat.cpp" />
@@ -188,6 +190,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\HUD.hpp" />
     <ClInclude Include="include\KeyInput.hpp" />
     <ClInclude Include="include\Level.hpp" />
+    <ClInclude Include="include\LevelSurvival.hpp" />
     <ClInclude Include="include\LevelWaveQueue.hpp" />
     <ClInclude Include="include\Log.hpp" />
     <ClInclude Include="include\Pickup.hpp" />
@@ -211,6 +214,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\targetver.h" />
     <ClInclude Include="include\Wave.hpp" />
     <ClInclude Include="include\WaveGenQueue.hpp" />
+    <ClInclude Include="include\WaveGenSLoop.hpp" />
     <ClInclude Include="include\WeapAutoBat.hpp" />
     <ClInclude Include="include\Weapon.hpp" />
     <ClInclude Include="include\WeapSemiBat.hpp" />

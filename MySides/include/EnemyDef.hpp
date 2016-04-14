@@ -32,6 +32,42 @@ public:
 	std::string weapon = "";
 	int weaponLevel = 0;
 
+	static EnemyDef baseDef()
+	{
+		EnemyDef base = EnemyDef();
+		base.hpScale = 1;
+		base.speedScale = 1;
+		base.damageScale = 1;
+
+		return base;
+	}
+
+	static EnemyDef modDef()
+	{
+		EnemyDef mod = EnemyDef();
+		mod.verticesMin = 0;
+		mod.verticesMax = 0;
+		mod.vertices = 0;
+
+		mod.size = 0;
+
+		mod.hpScale = 0;
+		mod.speedScale = 0;
+		mod.damageScale = 0;
+		
+		return mod;
+	}
+
+	static EnemyDef maxDef()
+	{
+		EnemyDef modmax = EnemyDef();
+		modmax.verticesMin = 0;
+		modmax.verticesMax = 0;
+		modmax.vertices = 0;
+
+		return modmax;
+	}
+
 	static EnemyDef triDef()
 	{
 		//Pink triangle

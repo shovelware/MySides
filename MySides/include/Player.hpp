@@ -22,9 +22,6 @@ public:
 	void bomb();
 
 	void update(int milliseconds);
-
-	bool getCollected() const;
-
 private:
 	float bombRadius_;
 	int bombTime_;

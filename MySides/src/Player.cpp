@@ -62,10 +62,4 @@ void Player::update(int milliseconds)
 {
 	Shape::update(milliseconds);
 	bombTime_ = (bombTime_ - milliseconds >= 0 ? bombTime_ - milliseconds : 0);
-	hasCollected_ = false;
-}
-
-bool Player::getCollected() const
-{
-	return hasCollected_;
 }

@@ -39,7 +39,7 @@ const double _TICKTIME_ = 1.f / 60.f;
 const double _SCALE_ = 32.f;
 
 //Helpful functions
-static float	tickToSec(unsigned int ticks) { return _TICKTIME_ * ticks; }
+static double	tickToSec(unsigned int ticks) { return _TICKTIME_ * ticks; }
 static float	randFloat(float MAX) { return static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / MAX)); };
 static float	randFloat(float MIN, float MAX) { return MIN + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (MAX - MIN))); };
 static bool		coinFlip() { return ((rand() % 2) == 0); }

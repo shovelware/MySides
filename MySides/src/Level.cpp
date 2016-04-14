@@ -11,8 +11,9 @@ namespace Level
 		timeComplete_(-1),
 		limit_(0),
 		limitMAX_(0),
-		waveLimit_(0),
-		waveLimitMAX_(0),
+		levelInfoAlpha_(0),
+		levelInfoBeta_(0),
+		levelInfoGamma_(0),
 		respiteTime_(0),
 		respiteTimeMAX_(2000),
 		started_(false)
@@ -29,8 +30,9 @@ namespace Level
 		timeComplete_(-1),
 		limit_(0),
 		limitMAX_(0),
-		waveLimit_(0),
-		waveLimitMAX_(0),
+		levelInfoAlpha_(0),
+		levelInfoBeta_(0),
+		levelInfoGamma_(0),
 		respiteTime_(0),
 		respiteTimeMAX_(2000),
 		started_(false)
@@ -45,8 +47,8 @@ namespace Level
 		timeComplete_(other.timeComplete_),
 		limit_(other.limit_),
 		limitMAX_(other.limitMAX_),
-		waveLimit_(other.waveLimit_),
-		waveLimitMAX_(other.waveLimitMAX_),
+		levelInfoBeta_(other.levelInfoBeta_),
+		levelInfoGamma_(other.levelInfoGamma_),
 		respiteTimeMAX_(other.respiteTimeMAX_),
 		respiteTime_(other.respiteTime_),
 		colPrim_(other.colPrim_),
@@ -56,10 +58,6 @@ namespace Level
 		boundsPoints_(other.boundsPoints_),
 		player_(other.player_),
 		id_(other.id_)
-	{
-	}
-
-	LevelI::~LevelI()
 	{
 	}
 
@@ -93,14 +91,19 @@ namespace Level
 		return limit_ >= limitMAX_;
 	}
 
-	int LevelI::getWaveLimit() const
+	int LevelI::getInfoAlpha() const
 	{
-		return waveLimit_;
+		return levelInfoAlpha_;
 	}
 
-	int LevelI::getWaveLimitMax() const
+	int LevelI::getInfoBeta() const
 	{
-		return waveLimitMAX_;
+		return levelInfoBeta_;
+	}
+
+	int LevelI::getInfoGamma() const
+	{
+		return levelInfoGamma_;
 	}
 
 	int LevelI::getTime() const
@@ -153,6 +156,12 @@ namespace Level
 	int LevelI::getRespiteTime() const
 	{
 		return respiteTime_;
+	}
+
+	void LevelI::forceWave()
+	{
+		if (respiteTime_ > 0)
+			respiteTime_ = 0;
 	}
 
 	PlayerDef const & const LevelI::getPlayer() const

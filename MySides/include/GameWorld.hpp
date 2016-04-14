@@ -31,6 +31,7 @@
 
 #include "Level.hpp"
 #include "LevelWaveQueue.hpp"
+#include "LevelSurvival.hpp"
 
 #include "Pickup.hpp"
 #include "Sight.hpp"
@@ -202,9 +203,6 @@ private:
 	void populateLevelList();
 	void clearLevelList();
 
-	//AI spawning
-	void spawnEnemy();
-
 	//Updating
 	void updatePlayer(int dt);
 	void updateEnemy(int dt);
@@ -221,12 +219,10 @@ private:
 	//SFX & Music
 	sf::Vector2f B2toSF(const b2Vec2& vec, bool scale) const;
 	SoundSystem audio_;
+	int lastSides_; //For detecting collection
 
 	//Just for fun
 	void randomiseCol(Entity* e);
-
-	//DEBUG
-	bool dbgLevelUpdate_;
 };
 
 #endif

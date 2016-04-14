@@ -25,8 +25,9 @@ void HUD::drawLevelStatus(sf::FloatRect const& box)
 	int limitMin = level.getLimit();
 	int limitMax = level.getLimitMAX();
 
-	int waveLimitMin = level.getWaveLimit();
-	int waveLimitMax = level.getWaveLimitMax();
+	int alpha = level.getInfoAlpha();
+	int beta = level.getInfoBeta();
+	int gamma = level.getInfoGamma();
 	
 	int respiteTime = level.getRespiteTime();
 	int respiteTimeMax = level.getRespiteTimeMAX();
@@ -48,12 +49,14 @@ void HUD::drawLevelStatus(sf::FloatRect const& box)
 	//Draw limit bar
 	drawBar(barBox, limitMin, limitMax, s, p, t);
 
-	//Draw respite bar if we must
-	drawStringLeft(botBox, std::to_string(waveLimitMin), t, 1.f);
-	drawString(botBox, std::to_string(waveLimitMax), t, 1.f);
+	//Draw enemy counts
+	drawStringLeft(botBox, std::to_string(alpha), t, 1.f);
+	drawString(botBox, std::to_string(beta), t, 1.25f);
+	drawStringRight(botBox, std::to_string(gamma), t, 1.f);
 
+	//Draw respite bar if we must, or wave limit
 	if (respiteTime > 0) { drawBar(waveBox, respiteTimeMax - respiteTime, respiteTimeMax, s, p, t, 2); }
-	else drawBar(waveBox, waveLimitMin, waveLimitMax, s, p, t, 2);
+	else drawBar(waveBox, beta - alpha, gamma - alpha, s, p, t, 2);
 
 	//Draw limits min and max
 	drawStringLeft(barBox, std::to_string(limitMin), t, 1.f);

@@ -75,8 +75,8 @@ void Shape::setPoly(int vertices, float radius)
 
 		for (int i = 0; i < vertices; ++i)
 		{
-			pnts[i].y = radius * (cos(DR * 360 / vertices * i));
-			pnts[i].x = radius * (-sin(DR * 360 / vertices * i));
+			pnts[i].y = radius * (cos(M_PI * 2 / vertices * i));
+			pnts[i].x = radius * (-sin(M_PI * 2 / vertices * i));
 		}
 
 		shapeVertices_ = vertices;
@@ -437,6 +437,7 @@ void Shape::explode()
 
 		body_->GetFixtureList()->SetSensor(true);
 		kill();
+		spawnTime_ = 0;
 		vertices_ = 0;
 	}
 }
@@ -614,8 +615,6 @@ bool Shape::collide(Entity* other, b2Contact& contact, std::string tag)
 			heal(std::ceil(side->getValue()) * fmaxf(1.f, (hpScale_ / 2)));
 			
 			side->collect();
-			
-			hasCollected_ = true;
 		}
 
 		handled = true;
