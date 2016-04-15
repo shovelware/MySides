@@ -263,7 +263,7 @@ void Game::handleInput(sf::Time dt)
 	//Debug controls
 	if (key_.isKeyDown(Key::BackSpace) || (0.5f <= con_.checkLeftTrigger() && con_.checkLeftTrigger() <= 1.f))
 	{
-		//Y : Toggle through rendering
+		//LC : Toggle through rendering
 		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
 		{
 			if (renderDD_ && renderGAME_)
@@ -320,8 +320,8 @@ void Game::handleInput(sf::Time dt)
 			world_->di = -1;
 		}
 
-		// RShift : Advance one step (B)
-		if (key_.isKeyPressed(Key::RShift) || con_.checkPressed(XINPUT_GAMEPAD_B))
+		// RShift / A : Advance one step (A)
+		if (key_.isKeyPressed(Key::RShift) || con_.checkPressed(XINPUT_GAMEPAD_A))
 		{
 			world_->step(_TICKTIME_ * 1000);
 			update(sf::Time(sf::seconds(_TICKTIME_)), true);

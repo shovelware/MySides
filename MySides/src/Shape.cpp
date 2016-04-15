@@ -221,6 +221,8 @@ int Shape::getSpawnTimeMax() const { return spawnTimeMAX_; }
 
 void Shape::heal(int health)
 {
+	if (!alive_) return;
+
 	for (int hlt = health, max = getHPMax(); hlt > 0 && (hp_ + uhp_ < max); --hlt) 
 	{
 		//Overhealing
@@ -252,6 +254,7 @@ void Shape::heal(int health)
 
 void Shape::takeDamage(int damage, b2Vec2 direction)
 {
+	if (!alive_) return;
 	lastDamage_ = direction;
 	lastDamage_.Normalize();
 
@@ -295,7 +298,7 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 			break;
 		}
 	}
-	
+
 	//HP should be refilled in loop, this means we're actually dead
 	if (hp_ <= 0)
 	{
