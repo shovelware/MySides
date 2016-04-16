@@ -7,6 +7,7 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 	weapon_(nullptr),
 	lastDamage_(b2Vec2_zero),
 	size_(def.size),
+	drop_(def.drop),
 	shapeVertices_(def.vertices),
 	verticesMIN_(def.verticesMin - 1),
 	verticesMAX_(def.verticesMax),
@@ -110,6 +111,8 @@ void Shape::clearb2()
 //Uses a callback to drop a side
 void Shape::dropSide(b2Vec2 dir)
 {
+	if (!drop_) return;
+
 	b2Vec2 offset = dir;
 	offset.Normalize();
 	offset *= getSize();

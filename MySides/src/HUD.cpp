@@ -267,6 +267,13 @@ void HUD::drawLevelInfo(sf::FloatRect const& box)
 	}
 }
 
+void HUD::drawTransitionSquare(sf::FloatRect const& win)
+{
+	//Start 0 -> 1 Finish
+	float trans = world_->getTransitionProgress();
+	drawRect(win, sf::Color(0, 0, 0, trans * 255));
+}
+
 void HUD::loadFont(std::string filename, unsigned int size)
 {
 	sf::Font* fnt = new sf::Font();

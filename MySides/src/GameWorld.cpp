@@ -7,9 +7,13 @@ GameWorld::GameWorld() :
 	player_(nullptr),
 	controlled_(nullptr),
 	pause_(false),
+	worldLevel_(nullptr),
+	menuLevel_(nullptr),
+	menu_(true),
+	transitionTime_(0),
+	transitionTimeMAX_(2000),
 	dstr("X"),
-	di(-1),
-	worldLevel_(new Level::WaveQueue("default", PlayerDef()))
+	di(-1)
 {
 	SetContactListener(&contactListener_);
 
@@ -30,8 +34,6 @@ GameWorld::GameWorld() :
 	//armory
 	armory_ = new Weapon::Armory(fireWeap_);
 
-	//Level
-	populateLevelList();
 
 	//Weapon noises
 	audio_.addSFX("shotgun", "../assets/nsnd/shotty.wav", 8);
@@ -61,14 +63,18 @@ GameWorld::GameWorld() :
 	
 	getControlled_ = std::bind(&GameWorld::getControlled, this);
 
-	currentLevel_ = (--levels_.end());
-	loadLevel(*currentLevel_);
+	//Level
+	populateLevelList();
+	selectedLevel_ = (--levels_.end());
+	loadMenu();
 }
 
 GameWorld::~GameWorld()
 {
 	clearWorld();
+	unloadLevel();
 	clearLevelList();
+	delete menuLevel_;
 	delete bounds_;
 	delete armory_;
 	delete player_;
@@ -182,6 +188,9 @@ void GameWorld::addProjectile(const ProjectileDef& def)
 //Adds a side to game world via definition
 void GameWorld::addSide(const SideDef& def)
 {
+	//No sides in menu
+	if (menu_) return;
+
 	b2Body* body = addDynamicBody(def.position);
 
 	sides_.push_back(new Side(body, def));
@@ -309,6 +318,11 @@ void GameWorld::removeEnemy(Enemy* e)
 	DestroyBody(e->getBody());
 	cleanPickups(e);
 
+	if (menu_)
+	{
+		menuLevel_->updateSelection(e->getFaction());
+	}
+
 	delete e;
 
 	enemies--;
@@ -355,13 +369,8 @@ void GameWorld::removeForce(Force* f)
 }
 #pragma endregion
 
-void GameWorld::clearWorld(bool clearPlayer)
+void GameWorld::clearEnemies()
 {
-	if (clearPlayer)
-	{
-		removePlayer();
-	}
-
 	if (shapes_.empty() == false)
 	{
 		for (std::list<Enemy*>::iterator e = shapes_.begin();
@@ -371,6 +380,16 @@ void GameWorld::clearWorld(bool clearPlayer)
 		}
 	}
 	shapes_.clear();
+}
+
+void GameWorld::clearWorld(bool clearPlayer)
+{
+	if (clearPlayer)
+	{
+		removePlayer();
+	}
+
+	clearEnemies();
 
 	if (projectiles_.empty() == false)
 	{
@@ -426,365 +445,37 @@ void GameWorld::clearWorld(bool clearPlayer)
 
 void GameWorld::populateLevelList()
 {
-	//Player
-	PlayerDef bplay = PlayerDef();
-	bplay.vertices = 6;
-	bplay.colPrim = b2Color(0.6f, 0.3f, 0.9f);
-	bplay.colSecn = b2Color(0.f, 1.f, 1.f);
-	bplay.colTert = b2Color(1.f, 0.f, 0.f);
-	bplay.upgrade = true;
-	bplay.faction = 1;
-	bplay.hpScale = 10;
+	levels_.push_back(Level::Atlas::testQueue());
+	levels_.push_back(Level::Atlas::testWeapon());
+	levels_.push_back(Level::Atlas::testSize());
+	levels_.push_back(Level::Atlas::testLayer());
+	levels_.push_back(Level::Atlas::testSurv());
 	
-	//Test Queue level
+	//Menu Level
 	{
-		PlayerDef play(bplay);
-		play.weapon = "fungun";
-		play.weaponLevel = 47;
-		play.bombTime = 20000;
-		play.bombRadius = 15.f;
-
-
-		Level::WaveQueue* qlvl = new Level::WaveQueue("testqueue", play);
-		float radius = 64.f;
-		Wave wav = Wave();
-		EnemyDef enem;
-
-		//qlvl_->addAFX("../assets/spriterip.ogg", 1, 0.2, 400, 1024);
-		qlvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
-		qlvl->setPrimary(b2Color(0.4f, 0.0f, 0.4f));
-		qlvl->setSecondary(b2Color(0.1f, 0.1f, 0.1f));
-		qlvl->setTertiary(b2Color(0.1f, 0.8f, 0.1f));
-		qlvl->setBoundsRadius(radius);
-		qlvl->setBoundsPoints(32);
-		qlvl->setMinEnemyRatio(0.1f);
-
-		for (int s = 3; s <= 8; ++s)
-		{
-			wav = Wave();
-			switch (s)
-			{
-			case 3:
-				enem = EnemyDef::triDef();
-				break;
-			case 4:
-				enem = EnemyDef::squDef();
-				break;
-			case 5:
-				enem = EnemyDef::penDef();
-				break;
-			case 6:
-				enem = EnemyDef::hexDef();
-				break;
-			case 7:
-				enem = EnemyDef::hepDef();
-				break;
-			case 8:
-				enem = EnemyDef::octDef();
-				break;
-			}
-
-			enem.position = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
-			enem.position.Normalize();
-			enem.position *= radius * 0.4;
-
-			enem.hpScale *= 1;
-
-			wav.addEnemy(enem, s*2);
-
-			qlvl->addWaveToQueue(wav);
-		}
-
-		levels_.push_back(qlvl);
-	}
-
-	//Test weapon level
-	{
-		PlayerDef play(bplay);
+		PlayerDef play(Level::Atlas::basePlayer());
 		play.weapon = "fungun";
 		play.weaponLevel = 999;
 		play.bombTime = 1000;
-		play.bombRadius = 15.f;
+		play.bombRadius = 64.f;
 
-		Level::WaveQueue* weaplvl = new Level::WaveQueue("testweap", play);
-		float radius = 64.f;
-		Wave wav = Wave();
-		std::string weap = "";
-		EnemyDef enem;
-		float x, y;
-
-		weaplvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
-		weaplvl->setPrimary(b2Color(0.6f, 0.6f, 0.6f));
-		weaplvl->setSecondary(b2Color(0.1f, 0.1f, 0.1f));
-		weaplvl->setTertiary(b2Color(0.9f, 0.9f, 0.1f));
-		weaplvl->setRespiteTimeMAX(1000);
-		weaplvl->setBoundsRadius(radius);
-		weaplvl->setBoundsPoints(16);
-
-		for (int l = 0; l < 9; ++l)
-		{
-			wav = Wave();
-			for (int s = 0; s < 9; ++s)
-			{
-				enem = EnemyDef();
-				enem.vertices = static_cast<int>(randFloat(3, 8) + 1);
-
-				switch (s)
-				{
-				case 0:
-					weap = "shotgun";
-					enem.colPrim = b2Color(.75f, .75f, .75f);
-					enem.colSecn = b2Color(.5f, .5f, .5f);
-					enem.colTert = b2Color(.75f, .75f, .75f);
-					break;
-
-				case 1:
-					weap = "pistol";
-					enem.colPrim = b2Color(1, .5f, 0);
-					enem.colSecn = b2Color(.75f, .25f, 0);
-					enem.colTert = b2Color(1, .5f, 0);
-					break;
-
-				case 2:
-					weap = "rifle";
-					enem.colPrim = b2Color(1, 1, 0);
-					enem.colSecn = b2Color(.75f, .75f, 0);
-					enem.colTert = b2Color(1, 1, 0);
-					break;
-
-				case 3:
-					weap = "cannon";
-					enem.colPrim = b2Color(0.2f, 0.2f, 0.2f);
-					enem.colSecn = b2Color(.1f, .1f, .1f);
-					enem.colTert = b2Color(0.2f, 0.2f, 0.2f);
-					break;
-
-				case 4:
-					weap = "thumper";
-					enem.colPrim = b2Color(0, 0.75f, 0);
-					enem.colSecn = b2Color(0, 0.5f, 0);
-					enem.colTert = b2Color(0, 0.75f, 0);
-					break;
-
-				case 5:
-					weap = "launcher";
-					enem.colPrim = b2Color(0.7f, 0, 0);
-					enem.colSecn = b2Color(0.5f, 0, 0);
-					enem.colTert = b2Color(0.7f, 0, 0);
-					break;
-
-				case 6:
-					weap = "coilgun";
-					enem.colPrim = b2Color(0, 0, 1);
-					enem.colSecn = b2Color(0, 0, .7f);
-					enem.colTert = b2Color(0, 0, 1);
-					break;
-
-				case 7:
-					weap = "railgun";
-					enem.colPrim = b2Color(0, 1.f, 1.f);
-					enem.colSecn = b2Color(0.7f, 0.7f, 0.7f);
-					enem.colTert = b2Color(0.7f, 0.8f, 0.1f);
-					break;
-
-				case 8:
-					weap = "werfer";
-					enem.colPrim = b2Color(0.8f, 0.5f, 0.1f);
-					enem.colSecn = b2Color(0.7f, 0.8f, 0.1f);
-					enem.colTert = b2Color(0.2f, 0, 0);
-				}
-
-				y = -(cos((2 * M_PI) * s / 9)) * 5;
-				x = -(sin((2 * M_PI) * s / 9)) * 5;
-
-				enem.position = (b2Vec2(x, y));
-				enem.heading = (enem.position);
-				enem.ai = 1;
-				enem.hpScale = l;
-				enem.damageScale = 0;
-				enem.weapon = weap;
-				enem.weaponLevel = l;
-
-				wav.addEnemy(enem);
-			}
-
-			weaplvl->addWaveToQueue(wav);
-		}
-
-		levels_.push_back(weaplvl);
-	}
-
-	//Layer level
-	{
-		PlayerDef play(bplay);
-		play.weapon = "fungun";
-		play.weaponLevel = 999;
-		play.bombTime = 15000;
-		play.bombRadius = 15.f;
-
-		Level::WaveQueue* laylvl = new Level::WaveQueue("testlayer", play);
-		Wave wav = Wave();
+		menuLevel_ = new Level::Menu("testmenu", play, levels_.size());
 		float radius = 32;
-		b2Vec2 centre(0, 0);
-		b2Vec2 pos(0, 0);
-		float spawnradius = 20.f;
-		EnemyDef def;
-		int groups = 10;
-		int shapes = 6;
 
-		int baseHPScale = 1.25;
-		float baseSize = 0.25f;
+		menuLevel_->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
+		menuLevel_->setPrimary(b2Color(0.f, 0.f, 0.f));
+		menuLevel_->setSecondary(b2Color(1.f, 1.f, 1.f));
+		menuLevel_->setTertiary(b2Color(0.4f, 0.f, 0.4f));
+		menuLevel_->setBoundsRadius(radius);
+		menuLevel_->setBoundsPoints(32);
 
-		laylvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
-		laylvl->setPrimary(b2Color(0.9f, 0.6f, 0.4f));
-		laylvl->setSecondary(b2Color(0.5f, 0.1f, 1.f));
-		laylvl->setTertiary(b2Color(0.7f, 0.3f, 0.4f));
-		laylvl->setRespiteTimeMAX(1000);
-		laylvl->setBoundsRadius(radius);
-		laylvl->setBoundsPoints(24);
-
-		//for 4 sizes
-		for (float i = 1; i <= groups; ++i)
+		if (!levels_.empty())
 		{
-			centre.y = spawnradius * (cos((M_PI * 2) / groups * i));
-			centre.x = spawnradius * (-sin((M_PI * 2) / groups * i));
-
-			//for 5 shape sizes
-			for (float j = 1, max = shapes; j <= max; ++j)
+			for (std::list<Level::LevelI*>::iterator iter = levels_.begin(), end = levels_.end(); iter != end; ++iter)
 			{
-				float ang = atan2f(centre.y, centre.x);
-				pos.y = 1.f * (cos((M_PI * 2) / max * j));
-				pos.x = 1.f * (-sin((M_PI * 2) / max * j));
-
-				def.size = i * baseSize;
-				def.heading = pos + centre;
-
-				def.position = pos;
-				def.position *= (def.size * 2);
-				def.position += centre;
-
-				def.vertices = 3;
-				def.vertices += (((int)j - 1) % 6);
-
-				def.hpScale = 5 * baseHPScale;
-				def.colPrim = b2Color(0.2f * i, 0.1f * j, 1.f - j / 10);
-				def.colSecn = b2Color(0.2f * j, 0.1f * (i / j), 0.05f * (i + j));
-				def.colTert = b2Color(0.1f * i, 0.3f * i, 1.f * (j - i));
-				def.ai = 2;
-
-				wav.addEnemy(def);
+				menuLevel_->addLevel(*(*iter));
 			}
 		}
-
-		laylvl->addWaveToQueue(wav);
-		levels_.push_back(laylvl);
-	}
-
-	//Size test level
-	{
-		PlayerDef play(bplay);
-		play.weapon = "fungun";
-		play.weaponLevel = 42;
-		play.bombTime = 5000;
-		play.bombRadius = 15.f;
-
-		Level::WaveQueue* sizelvl = new Level::WaveQueue("testsize", play);
-		Wave wav = Wave();
-		float radius = 32;
-		b2Vec2 pos(0, 0);
-		EnemyDef def;
-
-		sizelvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
-		sizelvl->setPrimary(b2Color(0.1f, 0.3f, 0.8f));
-		sizelvl->setSecondary(b2Color(0.2f, 0.7f, 7.f));
-		sizelvl->setTertiary(b2Color(0.7f, 0.5f, 0.1f));
-		sizelvl->setRespiteTimeMAX(1000);
-		sizelvl->setBoundsRadius(radius);
-		sizelvl->setBoundsPoints(16);
-		
-		for (int i = 1; i < 7; ++i)
-		{
-			for (int j = 1; j < 7; ++j)
-			{
-				b2Vec2 pos(-17.5 + j * 5, 2 - i * pow(1.25, i));
-				EnemyDef e(ShapeDef(pos, b2Vec2_zero + pos, i + 2));
-				e.size = 0.5 * i;
-				e.hpScale = 5 * (j - 1);
-				e.colPrim = b2Color(0.1 * i, 0.05 * j, 0.4);
-				e.colSecn = b2Color(0.7, 0.4 + (0.05 * i), 0.9 - (0.1 * j));
-				e.colTert = b2Color(1 - (0.05 * (i + j)), 0.7, 0.025 * (i * j));
-				e.ai = 2;
-
-				wav.addEnemy(e);
-			}
-
-			sizelvl->addWaveToQueue(wav);
-		}
-		levels_.push_back(sizelvl);
-	}
-
-	//Test sloop level
-	{
-		PlayerDef play(bplay);
-		play.weapon = "shotgun";
-		play.weaponLevel = 8;
-		play.bombTime = 2500;
-		play.bombRadius = 20.f;
-		play.size = 3.f;
-
-		Level::Survival* survlvl = new Level::Survival("testsurv", play);
-		Wave wav = Wave();
-		float radius = 32;
-		b2Vec2 pos(0, 0);
-		EnemyDef def;
-
-		survlvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
-		survlvl->setPrimary(b2Color(0.01f, 0.02f, 0.1f));
-		survlvl->setSecondary(b2Color(0.2f, 0.1f, 5.f));
-		survlvl->setTertiary(b2Color(0.7f, 0.7f, 0.1f));
-		survlvl->setRespiteTimeMAX(5000);
-		survlvl->setBoundsRadius(radius);
-		survlvl->setBoundsPoints(32);
-
-		survlvl->setSurvivalTime(120);
-		survlvl->setWaveSizeMod(1.f);
-		survlvl->setWaveSizeMAX(10.f);
-
-		EnemyDef mod = EnemyDef::modDef();
-		mod.vertices = 1;
-		mod.verticesMax = 1;
-		mod.verticesMin = 1;
-		mod.size = 0.25f;
-
-		survlvl->setMod(mod);
-
-		EnemyDef modMax = EnemyDef::maxDef();
-		modMax.vertices = 5;
-		modMax.verticesMax = 5;
-		modMax.verticesMin = 5;
-		modMax.size = 1.5f;
-
-		survlvl->setModMAX(modMax);
-
-		for (int i = 1; i < 6; ++i)
-		{
-			wav = Wave();
-			for (int j = i; j > 0; --j)
-			{
-				b2Vec2 pos(0, 2.5f * j);
-				EnemyDef e(ShapeDef(pos, b2Vec2_zero + pos, j + 2));
-				e.size = 0.5;
-				e.hpScale = 1;
-				e.colPrim = b2Color(0.1 * i, 0.05 * i * i, 0.4 * i);
-				e.colSecn = b2Color(0.7, 0.4 + (0.15 * i), 0.9 - (0.1 * i));
-				e.colTert = b2Color(1 - (0.05 * (i + i)), 0.7, 0.025 * (i * i));
-				e.ai = 2;
-
-				wav.addEnemy(e);
-			}
-			survlvl->addPaletteWave(wav);
-		}
-		levels_.push_back(survlvl);
 	}
 }
 
@@ -798,8 +489,51 @@ void GameWorld::clearLevelList()
 	levels_.clear();
 }
 
+void GameWorld::loadMenu()
+{
+	if (worldLevel_ != nullptr && worldLevel_ != menuLevel_)
+		unloadLevel();
+	
+	clearWorld();
+
+	menuLevel_->reset();
+	worldLevel_ = menuLevel_;
+	
+	//AFX
+	std::queue<Level::AFXDef> afx(worldLevel_->getAFX());
+	for (int i = 0, max = afx.size(); i < max; ++i)
+	{
+		Level::AFXDef& a = afx.front();
+		audio_.addAFX(std::string("levelAFX" + std::to_string(i)), a.path, a.nearFactor, a.farFactor, a.nearDistance, a.farDistance);
+		audio_.playAFX(std::string("levelAFX" + std::to_string(i)));
+		afx.pop();
+	}
+
+	//Bounds
+	bounds_->setPrimary(worldLevel_->getPrimary());
+	bounds_->setSecondary(worldLevel_->getSecondary());
+	bounds_->setTertiary(worldLevel_->getTertiary());
+	bounds_->resize(worldLevel_->getBoundsRadius(), worldLevel_->getBoundsPoints());
+
+	//Player
+	PlayerDef p = worldLevel_->getPlayer();
+	addPlayer(p);
+	addPickup(Pickup::Type::SIGHT, p.position, -1, 32.f);
+
+	hiSides = 0;
+	enemies = 0;
+	freesides = 0;
+
+	//Start fade in	
+	transitionDir_ = 1;
+	transitionTime_ = transitionTimeMAX_;
+}
+
 void GameWorld::loadLevel(Level::LevelI* level)
 {
+	//Don't load menu through normal means
+	if (level == menuLevel_) return;
+
 	//unload current level
 	if (worldLevel_ != nullptr)
 		unloadLevel();
@@ -807,7 +541,7 @@ void GameWorld::loadLevel(Level::LevelI* level)
 	clearWorld();
 
 	worldLevel_ = level->clone();
-	
+
 	//AFX
 	std::queue<Level::AFXDef> afx(worldLevel_->getAFX());
 	for (int i = 0, max = afx.size(); i < max; ++i)
@@ -831,19 +565,24 @@ void GameWorld::loadLevel(Level::LevelI* level)
 	hiSides = 0;
 	enemies = 0;
 	freesides = 0;
+	
+	//Start fade in	
+	transitionDir_ = 1;
+	transitionTime_ = transitionTimeMAX_;
 }
 
 void GameWorld::startLevel()
 {
 	if (!worldLevel_->getStarted())	worldLevel_->start();
-	else worldLevel_->forceWave();
+	else worldLevel_->forceWave(); ////DEBUG-ISH
 	
 }
 
 void GameWorld::resetLevel()
 {
 	//Reload current level
-	loadLevel(*currentLevel_);
+	if (!menu_)
+		loadLevel(*selectedLevel_);
 }
 
 //Cleans up after our level afx
@@ -857,7 +596,8 @@ void GameWorld::unloadLevel()
 		afx.pop();
 	}
 
-	delete worldLevel_;
+	if (worldLevel_ != menuLevel_)
+		delete worldLevel_;
 }
 
 void GameWorld::selectLevel(std::string name)
@@ -866,7 +606,43 @@ void GameWorld::selectLevel(std::string name)
 	
 	if (find != levels_.end())
 	{
-		currentLevel_ = find;
+		selectedLevel_ = find;
+	}
+}
+
+void GameWorld::selectLevel(int index)
+{
+	if (0 <= index && index < levels_.size())
+	{
+		selectedLevel_ = levels_.begin();
+
+		for (int i = 0; i < index; ++i)
+		{
+			selectedLevel_++;
+		}
+	}
+}
+
+void GameWorld::menuToLevel()
+{
+	if (worldLevel_ == menuLevel_ && menu_)
+	{
+		worldLevel_->stop();
+		menu_ = false;
+		transitionDir_ = -1;
+		selectLevel(menuLevel_->getSelection());
+		if (transitionTime_ == 0) transitionTime_ = transitionTimeMAX_;
+	}
+}
+
+void GameWorld::returnToMenu()
+{
+	if (worldLevel_ != menuLevel_ && !menu_)
+	{
+		worldLevel_->stop();
+		menu_ = true;
+		transitionDir_ = -1;
+		transitionTime_ = transitionTimeMAX_;
 	}
 }
 
@@ -998,9 +774,11 @@ void GameWorld::randomiseCol(Entity * e)
 	e->setTertiary(b2Color(randFloat(0.f, 1.f), randFloat(0.f, 1.f), randFloat(0.f, 1.f)));
 }
 
-bool GameWorld::hasControlled() { return (controlled_ != nullptr); }
+bool GameWorld::hasControlled() const { return (controlled_ != nullptr); }
 Shape * GameWorld::getControlled() { return controlled_; }
+bool GameWorld::inMenu() const { return worldLevel_ == menuLevel_; }
 
+//Rendering helpers
 Shape* GameWorld::getPlayer() { return player_; }
 Bounds& const GameWorld::getBounds() { return *bounds_; }
 std::list<Enemy*>& const GameWorld::getShapes() {	return shapes_; }
@@ -1009,7 +787,11 @@ std::list<Side*>& const GameWorld::getSides() { return sides_; }
 std::list<Pickup::PickupI*>& const GameWorld::getPickups() { return pickups_; }
 std::list<Force*>& const GameWorld::getForces() { return forces_; }
 Level::LevelI& const GameWorld::getWorldLevel() {	return *worldLevel_; }
-Level::LevelI & const GameWorld::getCurrentLevel() { return *(*currentLevel_); }
+Level::LevelI & const GameWorld::getCurrentLevel() { return *(*selectedLevel_); }
+float GameWorld::getTransitionProgress()
+{
+	return (float)transitionDir_ * ((float)transitionTime_ / (float)transitionTimeMAX_);
+}
 
 void GameWorld::step(int dt)
 {
@@ -1021,6 +803,34 @@ void GameWorld::update(int dt)
 {
 	if (!pause_)
 	{
+		if (transitionTime_ > 0)
+		{
+			//If there's time to take
+			if (transitionTime_ - dt > 0)
+			{
+				transitionTime_ = transitionTime_ - dt;
+			}
+
+			//Else we're done, do loading
+			else
+			{
+				transitionTime_ = 0;
+				transitionDir_ = 0;
+
+				if (!menu_ && worldLevel_ == menuLevel_)
+				{
+					loadLevel(*selectedLevel_);
+				}
+
+				else if (menu_ && worldLevel_ != menuLevel_)
+				{
+					loadMenu();
+				}
+
+				else worldLevel_->start();
+			}
+		}
+
 		//step(dt);
 		updatePlayer(dt);
 		updateEnemy(dt);
@@ -1028,7 +838,9 @@ void GameWorld::update(int dt)
 		updateSide(dt);
 		updatePickup(dt);
 		updateForce(dt);
-		updateLevel(dt);
+
+		if (!menu_)	updateLevel(dt);
+		else updateMenu(dt);
 		
 		//Sound
 		if (player_ != nullptr && player_->getSidesCollected() > lastSides_)
@@ -1217,6 +1029,46 @@ void GameWorld::updateForce(int dt)
 	}
 }
 
+void GameWorld::updateMenu(int dt)
+{
+	bool player = (player_ != nullptr && player_->getAlive());
+	int sides = player ? player_->getSidesCollected() : 0;
+
+	menuLevel_->updateStatus(sides, enemies, player);
+	menuLevel_->update(dt);
+
+	//Start transition if we complete
+	if (menuLevel_->getComplete() && transitionTime_ == 0)
+	{
+		menu_ = false;
+		transitionDir_ = -1;
+		transitionTime_ = transitionTimeMAX_;
+	}
+
+	//If there's a player and DEBUG and we're ready
+	if (player && menuLevel_->getStarted() && menuLevel_->getWaveReady())
+	{
+		//Selection is detected in removeEnemy if menu is true
+		//Clearworld calls removeEnemy, so we can't have it overriding our selection
+		menu_ = false;
+		clearWorld(false);
+		menu_ = true;
+
+		selectLevel(menuLevel_->getSelection());
+		//Spawn a wave
+		Wave w = menuLevel_->getWave();
+		std::vector<std::pair<EnemyDef, int>> wv = w.getWave();
+
+		for (auto iter = wv.begin(), end = wv.end(); iter != end; ++iter)
+		{
+			for (int i = 0, max = iter->second; i < max; ++i)
+			{
+				addEnemy(iter->first);
+			}
+		}
+	}
+}
+
 void GameWorld::updateLevel(int dt)
 {
 	bool player = (player_ != nullptr && player_->getAlive());
@@ -1224,8 +1076,14 @@ void GameWorld::updateLevel(int dt)
 
 	worldLevel_->updateStatus(sides, enemies, player);
 	worldLevel_->update(dt);
+	
+	//Start transition if we complete
+	if (worldLevel_->getComplete() && transitionTime_ == 0)
+	{
+		returnToMenu();
+	}
 
-	//If there's a player and DEBUG and we're ready
+	//If there's a player and level is started and we're ready
 	if (player && worldLevel_->getStarted() && worldLevel_->getWaveReady())
 	{
 		//Spawn a wave
@@ -1247,7 +1105,7 @@ void GameWorld::updateLevel(int dt)
 					b2Vec2 pos = iter->first.position;
 					float dist = pos.Length();
 					float angle = atan2f(pos.y, pos.x);
-					float increm = (M_PI * 2 / max * i);
+					float increm = ((M_PI * 2 / max) * i);
 
 					pos.y = dist * ( cos(increm));
 					pos.x = dist * (-sin(increm));
@@ -1376,6 +1234,11 @@ void GameWorld::bomb(bool nuke)
 	{
 		if (player_->getBombReady())
 		{
+			if (menu_)
+			{
+				menuLevel_->complete();
+			}
+
 			float range = player_->getBombRadius();
 			//Explode shapes
 			if (shapes_.empty() == false)
@@ -1492,9 +1355,9 @@ void GameWorld::f3()
 
 void GameWorld::f4()
 {
-	currentLevel_++;
-	if (currentLevel_ == levels_.end())
-		currentLevel_ = levels_.begin();
+	selectedLevel_++;
+	if (selectedLevel_ == levels_.end())
+		selectedLevel_ = levels_.begin();
 }
 
 void GameWorld::f5()

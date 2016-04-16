@@ -142,6 +142,7 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClCompile Include="src\HUD.cpp" />
     <ClCompile Include="src\KeyInput.cpp" />
     <ClCompile Include="src\Level.cpp" />
+    <ClCompile Include="src\LevelMenu.cpp" />
     <ClCompile Include="src\LevelSurvival.cpp" />
     <ClCompile Include="src\LevelWaveQueue.cpp" />
     <ClCompile Include="src\MySides.cpp" />
@@ -184,15 +185,18 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     <ClInclude Include="include\EnemyDef.hpp" />
     <ClInclude Include="include\Entity.hpp" />
     <ClInclude Include="include\Force.hpp" />
+    <ClInclude Include="include\ForceDef.hpp" />
     <ClInclude Include="include\Game.hpp" />
     <ClInclude Include="include\GameRenderer.hpp" />
     <ClInclude Include="include\GameWorld.hpp" />
     <ClInclude Include="include\HUD.hpp" />
     <ClInclude Include="include\KeyInput.hpp" />
     <ClInclude Include="include\Level.hpp" />
+    <ClInclude Include="include\Levels.hpp" />
     <ClInclude Include="include\LevelSurvival.hpp" />
     <ClInclude Include="include\LevelWaveQueue.hpp" />
     <ClInclude Include="include\Log.hpp" />
+    <ClInclude Include="include\LevelMenu.hpp" />
     <ClInclude Include="include\Pickup.hpp" />
     <ClInclude Include="include\PlayerDef.hpp" />
     <ClInclude Include="include\Renderer.hpp" />

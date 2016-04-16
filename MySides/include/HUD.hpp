@@ -17,6 +17,8 @@ public:
 
 	void drawDebugInfo(sf::FloatRect const& box);
 	void drawLevelInfo(sf::FloatRect const& box);
+
+	void drawTransitionSquare(sf::FloatRect const& win);
 	
 	void loadFont(std::string filename, unsigned int size);
 	void drawString(sf::FloatRect box, std::string info, sf::Color col = sf::Color::Green, float sizeScale = 1.f);

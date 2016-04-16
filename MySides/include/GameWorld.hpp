@@ -30,9 +30,8 @@
 #include "SideDef.hpp"
 #include "ForceDef.hpp"
 
-#include "Level.hpp"
-#include "LevelWaveQueue.hpp"
-#include "LevelSurvival.hpp"
+#include "LevelMenu.hpp"
+#include "Levels.hpp"
 
 #include "Pickup.hpp"
 #include "Sight.hpp"
@@ -47,7 +46,8 @@ public:
 	~GameWorld();
 
 	Shape* getControlled();
-	bool hasControlled();
+	bool hasControlled() const;
+	bool inMenu() const;
 
 	//Spawning works off definitions
 	void addPlayer(const PlayerDef& def);
@@ -83,14 +83,19 @@ public:
 	//
 
 	//Cleaning up
+	void clearEnemies();
 	void clearWorld(bool clearPlayer = true);
 
 	//Level control
+	void loadMenu();
 	void loadLevel(Level::LevelI* level);
 	void startLevel();
 	void resetLevel();
 	void unloadLevel();
 	void selectLevel(std::string name);
+	void selectLevel(int index);
+	void menuToLevel();
+	void returnToMenu();
 
 	//Bounds manipulation
 	float getBoundsSide();
@@ -120,6 +125,8 @@ public:
 	std::list<Force*>& const getForces();
 	Level::LevelI& const getWorldLevel();
 	Level::LevelI& const getCurrentLevel();
+	float getTransitionProgress();
+
 
 	//Update & Pause
 	void step(int dt);
@@ -132,15 +139,15 @@ public:
 	int getHapticL() const;
 	int getHapticR() const;
 
-	//////SPRINT 3 SLINGING
+	//Bomb
 	void bomb(bool nuke = false);
 
+	//Entity tracking
 	int hiSides;
 	int enemies;
 	int freesides;
 
 	/////Debug
-	//Debug vars
 	std::string dstr;
 	int di;
 	void testBed();
@@ -199,10 +206,11 @@ private:
 	void popInside(Entity* ent);
 
 	//Levels
-	Level::LevelI* menuLevel_;
+	bool menu_;
+	Level::Menu* menuLevel_;
 	Level::LevelI* worldLevel_;
 	std::list<Level::LevelI*> levels_;
-	std::list<Level::LevelI*>::iterator currentLevel_;
+	std::list<Level::LevelI*>::iterator selectedLevel_;
 	void populateLevelList();
 	void clearLevelList();
 
@@ -212,6 +220,7 @@ private:
 	void updateProjectile(int dt);
 	void updateSide(int dt);
 	void updatePickup(int dt);
+	void updateMenu(int dt);
 	void updateLevel(int dt);
 	void updateForce(int dt);
 
@@ -223,6 +232,11 @@ private:
 	sf::Vector2f B2toSF(const b2Vec2& vec, bool scale) const;
 	SoundSystem audio_;
 	int lastSides_; //For detecting collection
+
+	//Transitions
+	int transitionDir_;
+	int transitionTime_;
+	int transitionTimeMAX_;
 
 	//Just for fun
 	void randomiseCol(Entity* e);

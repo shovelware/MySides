@@ -98,7 +98,6 @@ void GameRenderer::render()
 				drawForce(force);
 		}
 	}
-
 }
 
 void GameRenderer::drawShape(Shape* const s)

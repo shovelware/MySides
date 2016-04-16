@@ -459,7 +459,7 @@ void Game::handleInput(sf::Time dt)
 
 	//LT + RC : Bomb
 	if (con_.checkLeftHairTrigger() &&
-		con_.checkDown(XINPUT_GAMEPAD_RIGHT_THUMB))
+		con_.checkPressed(XINPUT_GAMEPAD_RIGHT_THUMB))
 	{
 		world_->bomb();
 	}
@@ -555,7 +555,14 @@ void Game::handleInput(sf::Time dt)
 	{
 		if (pause_)
 		{
-			quit_ = true;
+			if (world_->inMenu())
+				quit_ = true;
+
+			else
+			{
+				world_->returnToMenu();
+				pause_ = false;
+			}
 		}
 	}
 }
@@ -652,6 +659,7 @@ void Game::render()
 		hud_->drawWeaponStatus(sf::FloatRect(size.x - 120, 20, 100, 40));
 		hud_->drawDebugInfo(sf::FloatRect(0, size.y - 120, size.x, 60));
 		hud_->drawLevelInfo(sf::FloatRect(size.x * 0.75f, size.y - size.x / 12 - 80, size.x / 4, size.x / 12));
+		hud_->drawTransitionSquare(sf::FloatRect(0, 0, size.x, size.y));
 	}
 
 	//Draw pause menu

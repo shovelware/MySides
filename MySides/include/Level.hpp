@@ -32,6 +32,7 @@ namespace Level {
 		std::string getID() const;
 
 		virtual void start();
+		virtual void stop();
 		bool getStarted() const;
 
 		//Limit for completion

@@ -119,6 +119,7 @@ protected:
 	//Sides collection
 	int sides_;
 	bool collector_;
+	bool drop_;
 };
 
 #endif

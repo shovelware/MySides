@@ -71,6 +71,11 @@ namespace Level
 		if (!started_) started_ = true;
 	}
 
+	void LevelI::stop()
+	{
+		started_ = false;
+	}
+
 	bool LevelI::getStarted() const
 	{
 		return started_;

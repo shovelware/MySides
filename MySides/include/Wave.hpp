@@ -11,7 +11,7 @@ public:
 	Wave();
 	Wave(const Wave& other);
 
-	void addEnemy(EnemyDef enemy, int amount = 1);
+	void addEnemy(const EnemyDef& enemy, int amount = 1);
 
 	void calculateStats();
 

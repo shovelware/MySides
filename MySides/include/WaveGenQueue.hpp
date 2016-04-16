@@ -2,12 +2,11 @@
 #define MS_WAVEGENQ_HPP
 
 #include <queue>
-
 #include "WaveGenerator.hpp"
 
 namespace WaveGen
 {
-	class WaveGeneratorQueue : public WaveGen::WaveGeneratorI {
+	class WaveGeneratorQueue : public WaveGeneratorI {
 	public:
 		WaveGeneratorQueue();
 		WaveGeneratorQueue(const WaveGeneratorQueue& other);

@@ -29,13 +29,15 @@ Wave::Wave(const Wave& other) :
 {}
 
 
-void Wave::addEnemy(EnemyDef enemy, int amount)
+void Wave::addEnemy(const EnemyDef& enemy, int amount)
 {
 	vertsMaxNum_ += enemy.verticesMax * amount;
 	vertsMinNum_ += enemy.verticesMin * amount;
 	vertsNum_ += enemy.vertices * amount;
 
-	wave_.push_back(std::make_pair(enemy, amount));
+	EnemyDef e(enemy);
+
+	wave_.push_back(std::make_pair(e, amount));
 
 	count_ += amount;
 

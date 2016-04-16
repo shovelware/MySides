@@ -11,6 +11,7 @@ public:
 		heading(b2Vec2_zero),
 		size(1),
 		upgrade(true),
+		drop(true),
 		hpScale(1),
 		speedScale(1),
 		damageScale(1),
@@ -28,6 +29,7 @@ public:
 		heading(heading),
 		size(1),
 		upgrade(true),
+		drop(true),
 		hpScale(10),
 		speedScale(1),
 		damageScale(1),
@@ -45,6 +47,7 @@ public:
 		heading(sd.heading),
 		size(sd.size),
 		upgrade(sd.upgrade),
+		drop(sd.drop),
 		hpScale(sd.hpScale),
 		speedScale(sd.speedScale),
 		damageScale(sd.damageScale),
@@ -62,6 +65,7 @@ public:
 
 	float size;
 	bool upgrade;
+	bool drop;
 
 	int hpScale;
 	float speedScale;
