@@ -5,9 +5,31 @@ Force::Force(b2Body * body, float force, float radius, int lifeTime, int faction
 	force_(force),
 	radius_(radius),
 	lifeTimeMAX_(lifeTime),
-	lifeTime_(lifeTime)
+	lifeTime_(lifeTime),
+	shapes_(true),
+	sides_(true),
+	projectiles_(false),
+	pickups_(false)
 {
 	faction_ = faction;
+	createBody(radius_);
+}
+
+Force::Force(b2Body * body, const ForceDef& def) :
+	Entity(body),
+	force_(def.force),
+	radius_(def.radius),
+	lifeTimeMAX_(def.lifeTime),
+	lifeTime_(def.lifeTime),
+	shapes_(def.shapes),
+	sides_(def.sides),
+	projectiles_(def.projectiles),
+	pickups_(def.pickups)
+{
+	faction_ = def.faction;
+	colPrim_ = def.primary;
+	colSecn_ = def.secondary;
+	colTert_ = def.tertiary;
 	createBody(radius_);
 }
 
@@ -43,11 +65,18 @@ void Force::update(int milliseconds)
 
 		tagA = static_cast<char*>(ed->contact->GetFixtureA()->GetUserData());
 		tagB = static_cast<char*>(ed->contact->GetFixtureB()->GetUserData());
-		if ((tagA == "enemy" || tagA == "player" || tagA == "pickup" || tagA == "side"))
+
+		if ((shapes_ && (tagA == "enemy" || tagA == "player" )) || 
+			(pickups_ && tagA == "pickup") ||
+			(sides_ && tagA == "side") ||
+			(projectiles_ && tagA == "projectile"))
 			e = static_cast<Entity*>(ed->contact->GetFixtureA()->GetBody()->GetUserData());
 
 
-		else if ((tagB == "enemy" || tagB == "player" || tagB == "pickup" || tagB == "side"))
+		else if ((shapes_ && (tagB == "enemy" || tagB == "player")) ||
+				(pickups_ && tagB == "pickup") ||
+				(sides_ && tagB == "side") ||
+				(projectiles_ && tagB == "projectile"))
 			e = static_cast<Entity*>(ed->contact->GetFixtureB()->GetBody()->GetUserData());
 
 		if (e != nullptr)

@@ -269,6 +269,14 @@ void GameWorld::addForce(b2Vec2 pos, float force, float radius, int lifetime, in
 	}
 }
 
+void GameWorld::addForce(const ForceDef & def)
+{
+	if (def.isValid())
+	{
+		forces_.push_back(new Force(addStaticBody(def.pos), def));
+	}
+}
+
 //Removes the player from the game world
 void GameWorld::removePlayer()
 {
@@ -722,6 +730,7 @@ void GameWorld::populateLevelList()
 		play.weaponLevel = 8;
 		play.bombTime = 2500;
 		play.bombRadius = 20.f;
+		play.size = 3.f;
 
 		Level::Survival* survlvl = new Level::Survival("testsurv", play);
 		Wave wav = Wave();
@@ -735,7 +744,7 @@ void GameWorld::populateLevelList()
 		survlvl->setTertiary(b2Color(0.7f, 0.7f, 0.1f));
 		survlvl->setRespiteTimeMAX(5000);
 		survlvl->setBoundsRadius(radius);
-		survlvl->setBoundsPoints(64);
+		survlvl->setBoundsPoints(32);
 
 		survlvl->setSurvivalTime(120);
 		survlvl->setWaveSizeMod(1.f);
@@ -1229,12 +1238,20 @@ void GameWorld::updateLevel(int dt)
 			{
 				if (iter->second > 1)
 				{
+					//angle = atan2(y, x);
+					//length = sqrt(x * x + y * y);
+					//angle += 1;
+					//new_x = length * cos(angle);
+					//new_y = length * sin(angle);
+
 					b2Vec2 pos = iter->first.position;
 					float dist = pos.Length();
 					float angle = atan2f(pos.y, pos.x);
+					float increm = (M_PI * 2 / max * i);
 
-					pos.y = dist * (cos(M_PI * 2 / max * i));
-					pos.x = dist * (-sin(M_PI * 2 / max * i));
+					pos.y = dist * ( cos(increm));
+					pos.x = dist * (-sin(increm));
+
 					iter->first.position = pos;
 				}
 
@@ -1383,8 +1400,22 @@ void GameWorld::bomb(bool nuke)
 				}
 			}
 
-			addForce(player_->getPosition(), 0.2f, range, 200);
-			addForce(player_->getPosition(), -0.1f, range, 200);
+			ForceDef bombDef = ForceDef();
+			bombDef.pos = player_->getPosition();
+			bombDef.force = 0.2f;
+			bombDef.radius = range;
+			bombDef.faction = player_->getFaction();
+			bombDef.primary = player_->getTertiary();
+			bombDef.secondary = player_->getPrimary();
+			bombDef.tertiary = player_->getSecondary();
+			bombDef.lifeTime = 200;
+			bombDef.shapes = true;
+			bombDef.projectiles = true;
+			bombDef.sides = false;
+			bombDef.pickups = false;
+
+			addForce(bombDef);
+
 			audio_.playSFX("bomb", B2toSF(player_->getPosition(), true));
 			player_->bomb();
 		}

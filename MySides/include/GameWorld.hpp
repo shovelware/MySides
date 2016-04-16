@@ -28,6 +28,7 @@
 #include "Armory.hpp"
 
 #include "SideDef.hpp"
+#include "ForceDef.hpp"
 
 #include "Level.hpp"
 #include "LevelWaveQueue.hpp"
@@ -56,6 +57,7 @@ public:
 	void addPickup(Pickup::Type type, b2Vec2 position, int time, float strength = 0);
 	void addShrapnel(Projectile* src);
 	void addForce(b2Vec2 pos, float force, float radius, int time, int faction = 0);
+	void addForce(const ForceDef& def);
 
 	//Called by updates
 	void removePlayer();
@@ -197,6 +199,7 @@ private:
 	void popInside(Entity* ent);
 
 	//Levels
+	Level::LevelI* menuLevel_;
 	Level::LevelI* worldLevel_;
 	std::list<Level::LevelI*> levels_;
 	std::list<Level::LevelI*>::iterator currentLevel_;

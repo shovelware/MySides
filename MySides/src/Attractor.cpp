@@ -95,7 +95,6 @@ void Pickup::Attractor::update(int milliseconds)
 					float dist = dir.Length();
 					if (dist < radius_)
 					{
-						
 						dir.Normalize();
 						dir *= 0.05f * ((dist / radius_)) * strengthScale_;
 						b2Vec2 vel = s->GetLinearVelocity();
