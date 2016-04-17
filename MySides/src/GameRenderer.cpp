@@ -112,6 +112,7 @@ void GameRenderer::drawShape(Shape* const s)
 
 	int hp = s->getHP();
 	int hpm = s->getHPMax();
+	bool dmg = s->wasDamaged();
 
 	bool alive = s->getAlive();
 	float spawnRemaining = (float)s->getSpawnTime() / (float)s->getSpawnTimeMax();
@@ -133,7 +134,13 @@ void GameRenderer::drawShape(Shape* const s)
 		pri.a *= (1.f - spawnRemaining);
 		sec.a *= (1.f - spawnRemaining);
 		ter.a *= (1.f - spawnRemaining);
-		
+	}
+
+	else if (dmg)
+	{
+		pri = blend(pri, 3, sf::Color::White, 1);
+		sec = blend(sec, 3, sf::Color::White, 1);
+		ter = blend(ter, 3, sf::Color::White, 1);
 	}
 
 	//Convert verts

@@ -65,7 +65,7 @@ GameWorld::GameWorld() :
 
 	//Level
 	populateLevelList();
-	selectedLevel_ = (--levels_.end());
+	selectedLevel_ = levels_.end();
 	loadMenu();
 }
 
@@ -450,6 +450,7 @@ void GameWorld::populateLevelList()
 	levels_.push_back(Level::Atlas::testSize());
 	levels_.push_back(Level::Atlas::testLayer());
 	levels_.push_back(Level::Atlas::testSurv());
+	levels_.push_back(Level::Atlas::testComplete());
 	
 	//Menu Level
 	{
@@ -527,6 +528,9 @@ void GameWorld::loadMenu()
 	//Start fade in	
 	transitionDir_ = 1;
 	transitionTime_ = transitionTimeMAX_;
+
+	//Deselect
+	selectedLevel_ = levels_.end();
 }
 
 void GameWorld::loadLevel(Level::LevelI* level)
@@ -787,7 +791,13 @@ std::list<Side*>& const GameWorld::getSides() { return sides_; }
 std::list<Pickup::PickupI*>& const GameWorld::getPickups() { return pickups_; }
 std::list<Force*>& const GameWorld::getForces() { return forces_; }
 Level::LevelI& const GameWorld::getWorldLevel() {	return *worldLevel_; }
-Level::LevelI & const GameWorld::getCurrentLevel() { return *(*selectedLevel_); }
+
+Level::LevelI& const GameWorld::getSelectedLevel() 
+{ 
+	if (selectedLevel_ != levels_.end()) return *(*selectedLevel_);
+	else return *menuLevel_;
+}
+
 float GameWorld::getTransitionProgress()
 {
 	return (float)transitionDir_ * ((float)transitionTime_ / (float)transitionTimeMAX_);
@@ -839,8 +849,8 @@ void GameWorld::update(int dt)
 		updatePickup(dt);
 		updateForce(dt);
 
-		if (!menu_)	updateLevel(dt);
-		else updateMenu(dt);
+		if (worldLevel_ == menuLevel_) updateMenu(dt);
+		else updateLevel(dt);
 		
 		//Sound
 		if (player_ != nullptr && player_->getSidesCollected() > lastSides_)
@@ -1048,14 +1058,16 @@ void GameWorld::updateMenu(int dt)
 	//If there's a player and DEBUG and we're ready
 	if (player && menuLevel_->getStarted() && menuLevel_->getWaveReady())
 	{
-		//Selection is detected in removeEnemy if menu is true
-		//Clearworld calls removeEnemy, so we can't have it overriding our selection
+		//Selection is detected in removeEnemy() if menu_ is true
+		//CleareEnemies() calls removeEnemy(), so we can't have it overriding our selection
 		menu_ = false;
-		clearWorld(false);
+		clearEnemies();
 		menu_ = true;
+		
+		if (menuLevel_->getSelection() >= 0)
+			selectLevel(menuLevel_->getSelection());
 
-		selectLevel(menuLevel_->getSelection());
-		//Spawn a wave
+		//Respawn the menu
 		Wave w = menuLevel_->getWave();
 		std::vector<std::pair<EnemyDef, int>> wv = w.getWave();
 
@@ -1230,7 +1242,9 @@ void GameWorld::reup()
 
 void GameWorld::bomb(bool nuke)
 {
-	if (!nuke && player_ != nullptr)
+	if (menu_ && selectedLevel_ == levels_.end());
+
+	else if (!nuke && player_ != nullptr)
 	{
 		if (player_->getBombReady())
 		{

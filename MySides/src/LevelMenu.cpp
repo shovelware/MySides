@@ -4,7 +4,7 @@ namespace Level {
 	Menu::Menu(std::string id, const PlayerDef & player, int levelCount) :
 		Level::LevelI(id, player),
 		levels_(Wave()),
-		selection_(0),
+		selection_(-1),
 		spawned_(false),
 		fullWaveCount_(limitMAX_),
 		currentWaveCount_(0)
@@ -42,7 +42,7 @@ namespace Level {
 		enemy.colSecn = level.getSecondary();
 		enemy.colTert = level.getTertiary();
 
-		enemy.size = fminf(10.f / fmaxf(count * 1.f, 1.f), 3.f);
+		enemy.size = fminf(10.f / fmaxf(count * 1.f, 1.f), 2.f);
 		int verts = fmax(3, fmin(std::ceil(randFloat(3, 8)),8));
 		enemy.verticesMin = 3;
 		enemy.verticesMax = 3;
@@ -52,7 +52,7 @@ namespace Level {
 
 		float increm = (((22.f/7.f) * 2.f / fullWaveCount_) * count);
 		b2Vec2 pos;
-		pos.y = rad * (cos(increm));
+		pos.y = rad * (-cos(increm));
 		pos.x = rad * (sin(increm));
 
 		enemy.position = pos;

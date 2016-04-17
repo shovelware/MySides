@@ -211,7 +211,7 @@ void HUD::drawDebugInfo(sf::FloatRect const& box)
 
 	drawString(leftBox, std::to_string(world_->di));
 	drawStringLeft(rightBox, world_->dstr);
-	drawString(rightBox, world_->getCurrentLevel().getID());
+	drawString(rightBox, world_->getSelectedLevel().getID());
 }
 
 void HUD::drawLevelInfo(sf::FloatRect const& box)

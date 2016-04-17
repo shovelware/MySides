@@ -40,9 +40,9 @@ public:
 
 	//State changers
 	void heal(int health);
+	void takeDamage(int damage, b2Vec2 direction);
 	bool syncHP();
 	void syncPoly();
-	void takeDamage(int damage, b2Vec2 direction);
 	void collect(int value);
 	void setPrimary(b2Color col);
 	void setSecondary(b2Color col);
@@ -59,7 +59,8 @@ public:
 	float getSize() const;
 	float getDamageScale() const;
 
-	//Death
+	//Damage and Death
+	bool wasDamaged();
 	void explode();
 
 	//New weapons system
@@ -104,6 +105,8 @@ protected:
 	int uhp_;
 	unsigned int uhpMAX_;
 	int uhpScale_;
+
+	int lastHealth_;
 
 	//Weapon
 	Weapon::WeaponI* weapon_;

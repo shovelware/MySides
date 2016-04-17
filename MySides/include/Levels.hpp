@@ -378,6 +378,49 @@ namespace Level {
 
 			return survlvl;
 		}
+
+		static Level::LevelI* testComplete()
+		{
+
+			PlayerDef play(basePlayer());
+			play.weapon = "rifle";
+			play.weaponLevel = 4;
+			play.bombTime = 2500;
+			play.bombRadius = 20.f;
+
+			Level::WaveQueue* testlvl = new Level::WaveQueue("testcomp", play);
+			Wave wav = Wave();
+			float radius = 32;
+			b2Vec2 pos(0, 0);
+			EnemyDef def;
+
+			testlvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
+			testlvl->setPrimary(b2Color(1.0f, 0.25f, 0.5f));
+			testlvl->setSecondary(b2Color(0.25f, 0.15f, 1.f));
+			testlvl->setTertiary(b2Color(0.3f, 0.3f, 0.6f));
+			testlvl->setRespiteTimeMAX(5000);
+			testlvl->setBoundsRadius(radius);
+			testlvl->setBoundsPoints(8);
+
+			for (int i = 1; i < 3; ++i)
+			{
+				wav = Wave();
+				b2Vec2 pos(0, 4.f);
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero + pos, i + 2));
+				e.size = 1.5f;
+				e.hpScale = 5;
+				e.colPrim = b2Color(0.1 * i, 0.05 * i * i, 0.4 * i);
+				e.colSecn = b2Color(0.7, 0.4 + (0.15 * i), 0.9 - (0.1 * i));
+				e.colTert = b2Color(1 - (0.05 * (i + i)), 0.7, 0.025 * (i * i));
+				e.ai = 2;
+
+				wav.addEnemy(e, 4);
+
+				testlvl->addWaveToQueue(wav);
+			}
+
+			return testlvl;
+		}
 	}
 }
 #endif

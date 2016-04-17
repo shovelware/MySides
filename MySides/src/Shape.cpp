@@ -418,6 +418,11 @@ float Shape::getSize() const { return size_; }
 
 float Shape::getDamageScale() const { return damageScale_; }
 
+bool Shape::wasDamaged()
+{
+	return lastHealth_ > getHP();
+}
+
 void Shape::explode()
 {
 	if (vertices_ > 0)
@@ -652,6 +657,7 @@ void Shape::update(int milliseconds)
 
 			syncHP();
 			syncPoly();
+			lastHealth_ = getHP();
 		}//End alive
 
 		//Spawning

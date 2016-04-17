@@ -124,7 +124,7 @@ public:
 	std::list<Pickup::PickupI*>& const getPickups();
 	std::list<Force*>& const getForces();
 	Level::LevelI& const getWorldLevel();
-	Level::LevelI& const getCurrentLevel();
+	Level::LevelI& const getSelectedLevel();
 	float getTransitionProgress();
 
 

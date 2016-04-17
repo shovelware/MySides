@@ -438,12 +438,12 @@ void Game::handleInput(sf::Time dt)
 	//Controller Controls
 
 	//LS : Move
-	if (controlled) world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
-	else camera_->lean(sf::Vector2f(con_.checkLeftX() * 10, con_.checkLeftY() * 10), !controlled);
+	world_->move(b2Vec2(con_.checkLeftX(), con_.checkLeftY()));
+	camera_->lean(sf::Vector2f(con_.checkLeftX() * 10, con_.checkLeftY() * 10), (pause_ || !controlled));
 
 	//RS : Look
 	world_->look(b2Vec2(con_.checkRightX(), con_.checkRightY()));
-	camera_->lean(sf::Vector2f(con_.checkRightX() * 50, con_.checkRightY() * 50), (pause_ || !controlled));
+	camera_->lean(sf::Vector2f(con_.checkRightX() * 50, con_.checkRightY() * 50));
 
 	//RT : Trigger
 	if (con_.checkRightHairTrigger())
