@@ -37,7 +37,7 @@ Weapon::WeaponI::WeaponI(FireFunc& callback, ProjectileDef const &ammo, std::str
 		if (owner_ != nullptr) 
 			output_.damage *= owner_->getDamageScale();
 	}
-
+	
 	void Weapon::WeaponI::setLevel(int level)
 	{
 		level_ = level;

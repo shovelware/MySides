@@ -6,6 +6,9 @@
 
 #include "Shape.hpp"
 #include "EnemyDef.hpp"
+
+#include  <opensteer\Vec3.h>
+
 class Enemy : public Shape
 {
 public:
@@ -13,9 +16,16 @@ public:
 	Enemy(b2Body* body, const EnemyDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player);
 
 	void update(int milliseconds);
-	void setCollector(bool collect);
 
 	bool collide(Entity* other, b2Contact& contact, std::string tag);
+
+	//AI Behaviours
+	void arrive(b2Vec2 position);
+	void seek(b2Vec2 target);
+	void flee(b2Vec2 pursuer);
+
+	void pursue(b2Vec2 target);
+	void evade(b2Vec2 pursuer);
 
 	//Debug
 	int aistate;

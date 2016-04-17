@@ -44,8 +44,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)include;$(SFML_SDK)\include;$(BOX2D)</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SFML_SDK)\lib;$(BOX2D)\Debug</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)include;$(SFML_SDK)\include;$(BOX2D);$(ProjectDir)opensteer;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SFML_SDK)\lib;$(ProjectDir)lib;$(BOX2D)\Debug</LibraryPath>
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <ExtensionsToDeleteOnClean>*.dll;*.jpg;*.png;*.ttf;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
     <IntDir>build\$(Configuration)\</IntDir>
@@ -53,8 +53,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)include;$(SFML_SDK)/include;$(BOX2D)</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SFML_SDK)\lib;$(BOX2D)\Release</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)include;$(SFML_SDK)\include;$(BOX2D);$(ProjectDir)opensteer;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SFML_SDK)\lib;$(ProjectDir)lib;$(BOX2D)\Release</LibraryPath>
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <ExtensionsToDeleteOnClean>$(TargetDir)Assets;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
     <IntDir>build\$(Configuration)\</IntDir>
@@ -86,6 +86,8 @@ xcopy "$(SFML_SDK)\bin\sfml-window-d-2.dll" "$(TargetDir)" /Q /D /Y /F
 xcopy "$(SFML_SDK)\bin\thor-d.dll" "$(TargetDir)" /Q /D /Y /F
 
 xcopy "$(SolutionDir)Assets" "$(TargetDir)..\Assets" /S /E /D /Y /I /F
+
+xcopy "$(ProjectDir)opensteer\lib" $(TargetDir) /S /E /D /Y /I /F
 
 xcopy "$(Box2D)\Box2D" "$(TargetDir)Box2D" /S /E /D /Y /I /F
 xcopy "$(Box2D)\Debug" "$(TargetDir)" /Q /D /Y /F</Command>
@@ -121,6 +123,8 @@ xcopy "$(SFML_SDK)\bin\sfml-window-2.dll" "$(TargetDir)" /Q /D /Y
 xcopy "$(SFML_SDK)\bin\thor.dll" "$(TargetDir)" /Q /D /Y
 
 xcopy "$(SolutionDir)Assets" "$(TargetDir)Assets" /S /E /D /Y /I /F
+
+xcopy "$(ProjectDir)opensteer\lib" $(TargetDir) /S /E /D /Y /I /F
 
 xcopy "$(Box2D)\Box2D" "$(TargetDir)Box2D" /S /E /D /Y /I /F
 xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>

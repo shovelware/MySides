@@ -912,7 +912,7 @@ void Weapon::Armory::upgradeShotgun(Weapon::SpreadMag* shotgun, int level, int p
 	//Set base attributes
 	shotgun->setMagSize(8, true);
 	shotgun->setResetTime(200);
-	shotgun->setReloadTime(1500);
+	shotgun->setReloadTime(1000);
 	shotgun->setPellets(6);
 	shotgun->setSpread(.3f);
 
@@ -935,7 +935,7 @@ void Weapon::Armory::upgradeShotgun(Weapon::SpreadMag* shotgun, int level, int p
 	if (level > 5) { shotgun->setSpread(.15f); }
 
 	//L7F : ReloadTime-
-	if (level > 6) { shotgun->setReloadTime(750); }
+	if (level > 6) { shotgun->setReloadTime(500); }
 
 	//L8S : Mag+
 	if (level > 7) { shotgun->setMagSize(16, true); }

@@ -82,8 +82,8 @@ namespace Level {
 
 			return qlvl;
 		}
-
-		//Test weapon level
+		
+		//Test Weapons level
 		static Level::LevelI* testWeapon()
 		{
 			PlayerDef play(basePlayer());
@@ -186,8 +186,9 @@ namespace Level {
 					enem.position = (b2Vec2(x, y));
 					enem.heading = (enem.position);
 					enem.ai = 1;
-					enem.hpScale = l;
+					enem.hpScale = l + 1;
 					enem.damageScale = 0;
+					enem.faction = 0;
 					enem.weapon = weap;
 					enem.weaponLevel = l;
 
@@ -200,7 +201,7 @@ namespace Level {
 			return weaplvl;
 		}
 
-		//Layer level
+		//Test Layer level
 		static Level::LevelI* testLayer()
 		{
 			PlayerDef play(basePlayer());
@@ -268,7 +269,7 @@ namespace Level {
 			return laylvl;
 		}
 
-		//Size test level
+		//Test size level
 		static Level::LevelI* testSize()
 		{
 			PlayerDef play(basePlayer());
@@ -321,7 +322,7 @@ namespace Level {
 			play.weaponLevel = 8;
 			play.bombTime = 2500;
 			play.bombRadius = 20.f;
-			play.size = 3.f;
+			play.size = 2.f;
 
 			Level::Survival* survlvl = new Level::Survival("testsurv", play);
 			Wave wav = Wave();
@@ -331,7 +332,7 @@ namespace Level {
 
 			survlvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
 			survlvl->setPrimary(b2Color(0.01f, 0.02f, 0.1f));
-			survlvl->setSecondary(b2Color(0.2f, 0.1f, 5.f));
+			survlvl->setSecondary(b2Color(0.2f, 0.1f, 0.5f));
 			survlvl->setTertiary(b2Color(0.7f, 0.7f, 0.1f));
 			survlvl->setRespiteTimeMAX(5000);
 			survlvl->setBoundsRadius(radius);
@@ -379,6 +380,85 @@ namespace Level {
 			return survlvl;
 		}
 
+		//Test AI level
+		static Level::LevelI* testAI()
+		{
+			PlayerDef play(basePlayer());
+			play.weapon = "shotgun";
+			play.weaponLevel = 4;
+			play.bombTime = 5000;
+			play.bombRadius = 20.f;
+			play.size = 1.f;
+
+			Level::Survival* survlvl = new Level::Survival("testAI", play);
+			Wave wav = Wave();
+			float radius = 32;
+			b2Vec2 pos(0, 0);
+			EnemyDef def;
+
+			survlvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
+			survlvl->setPrimary(b2Color(1.f, 0.3f, 0.f));
+			survlvl->setSecondary(b2Color(0.7f, 0.1f, 0.5f));
+			survlvl->setTertiary(b2Color(0.1f, 0.3f, 0.1f));
+			survlvl->setRespiteTimeMAX(15000);
+			survlvl->setBoundsRadius(radius);
+			survlvl->setBoundsPoints(32);
+
+			survlvl->setSurvivalTime(120);
+			survlvl->setWaveSizeMod(1.f);
+			survlvl->setWaveSizeMAX(10.f);
+
+			EnemyDef mod = EnemyDef::modDef();
+			mod.vertices = 1;
+			mod.verticesMax = 1;
+			mod.verticesMin = 1;
+			mod.hpScale = 1;
+			mod.size = 0.25f;
+			mod.weaponLevel = 1;
+
+			survlvl->setMod(mod);
+
+			EnemyDef modMax = EnemyDef::maxDef();
+			modMax.vertices = 5;
+			modMax.verticesMax = 8;
+			modMax.verticesMin = 8;
+			modMax.hpScale = 15;
+			modMax.size = 1.5f;
+			modMax.weaponLevel = 4;
+
+			survlvl->setModMAX(modMax);
+
+			for (int i = 1; i < 6; ++i)
+			{
+				wav = Wave();
+				b2Vec2 pos(0, radius * 0.75f);
+				EnemyDef e(ShapeDef(pos, - pos, i + 2));
+				e.size = 0.75;
+				e.hpScale = 5;
+				e.speedScale = 0.5f;
+				e.colPrim = b2Color(0.1 * i, 0.05 * i * i, 0.4 * i);
+				e.colSecn = b2Color(0.7, 0.4 + (0.15 * i), 0.9 - (0.1 * i));
+				e.colTert = b2Color(1 - (0.05 * (i + i)), 0.7, 0.025 * (i * i));
+				e.ai = 2;
+				e.weaponLevel = 1;
+
+				switch (i)
+				{
+				case 1:	e.weapon = "pistol";	break;
+				case 2: e.weapon = "rifle";		break;
+				case 3: e.weapon = "coilgun";	break;
+				case 4: e.weapon = "cannon";	break;
+				case 5:	e.weapon = "railgun";	break;
+				}
+
+				wav.addEnemy(e, 6 - i);
+				survlvl->addPaletteWave(wav);
+			}
+
+			return survlvl;
+		}
+
+		//Test completion level
 		static Level::LevelI* testComplete()
 		{
 
@@ -421,6 +501,7 @@ namespace Level {
 
 			return testlvl;
 		}
-	}
-}
+	
+}//end atlas
+}//end level
 #endif

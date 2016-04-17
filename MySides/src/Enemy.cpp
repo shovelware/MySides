@@ -1,6 +1,5 @@
 #include "Enemy.hpp"
 
-
 Enemy::Enemy(b2Body* body, const ShapeDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) :
 	Shape(body, def, callback),
 	getPlayer_(player),
@@ -59,12 +58,14 @@ void Enemy::update(int milliseconds)
 			b2Vec2 ePos = getPosition();
 			b2Vec2 between = playerPos - ePos;
 
+			//In long distance, look
 			if (between.Length() < 40 || between.Length() < 4.f)
 			{
 				orient(between);
 			}
 
-			if (between.Length() < 25 && (getHP() >= getHPMax() / 2))
+			//In med distance, move towards, shoot at
+			if (between.Length() < 25 && (getHP() >= verticesMIN_ * hpScale_))
 			{
 				if (getArmed())
 				{
@@ -79,10 +80,12 @@ void Enemy::update(int milliseconds)
 						trigger(between);
 					}
 					else release();
+
+
 				}
 			}
 
-			else if (getArmed() && between.Length() < 0.1f * (getHPMax() - getHP()) / hpScale_) 
+			else if (getArmed() && between.Length() < verticesMIN_ * hpScale_)
 			{
 				orient(-between);
 				move(-between);
@@ -96,11 +99,6 @@ void Enemy::update(int milliseconds)
 			else move(b2Vec2_zero);
 		}
 	}
-}
-
-void Enemy::setCollector(bool collect)
-{
-	collector_ = collect;
 }
 
 //Only deals with the effects of this collision on this entity

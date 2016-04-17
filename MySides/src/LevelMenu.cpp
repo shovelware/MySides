@@ -84,6 +84,7 @@ namespace Level {
 	{
 		LevelI::isComplete();
 		timeComplete_ = -1;
+		selection_ = -1;
 		started_ = false;
 		spawned_ = false;
 		limit_ = 0;
