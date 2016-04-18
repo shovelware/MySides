@@ -7,8 +7,6 @@
 #include "Shape.hpp"
 #include "EnemyDef.hpp"
 
-//#include <opensteer\simplevehicle.h>
-
 class Enemy : public Shape
 {
 public:
@@ -31,14 +29,16 @@ public:
 
 	//Debug
 	int aistate;
-	//OpenSteer::SimpleVehicle* steer_;
+
 private:
-	static std::list<Enemy*> others_; //Provision for swarming
+	static std::list<Enemy*> swarm_; //Provision for swarming
+
+	b2Vec2 Enemy::LenardJonesPotential(const Shape* const other, int& count) const;
+	b2Vec2 Enemy::FiringPotential(const Shape* const other) const;
 
 	std::function<Shape*()>& getPlayer_;
-	
-	void createSteering();
-
+	Shape* swarmTarget_;
+	float visRange = 10.f;
 };
 
 #endif

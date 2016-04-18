@@ -128,7 +128,7 @@ namespace Level
 
 	bool LevelI::getComplete() const
 	{
-		return (limit_ >= limitMAX_);
+		return (limit_ >= limitMAX_ && limitMAX_ > 0);
 	}
 
 	bool LevelI::getTimeStandard() const
@@ -150,7 +150,7 @@ namespace Level
 
 	void LevelI::setRespiteTimeMAX(int time)
 	{
-		respiteTimeMAX_ = time > 0 ? time : respiteTimeMAX_;
+		respiteTimeMAX_ = time >= -1 ? time : respiteTimeMAX_;
 	}
 
 	int LevelI::getRespiteTimeMAX() const
@@ -165,7 +165,7 @@ namespace Level
 
 	void LevelI::forceWave()
 	{
-		if (respiteTime_ > 0)
+		if (respiteTime_ != 0)
 			respiteTime_ = 0;
 	}
 

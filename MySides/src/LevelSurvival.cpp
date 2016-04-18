@@ -1,5 +1,4 @@
 #include "LevelSurvival.hpp"
-#include "..\include\LevelSurvival.hpp"
 
 namespace Level {
 	Survival::Survival(std::string id, const PlayerDef& player) :
@@ -78,7 +77,7 @@ namespace Level {
 
 	void Survival::setSurvivalTime(int seconds)
 	{
-		timeSurvivedMAX_ = seconds > 0 ? seconds : timeSurvivedMAX_;
+		timeSurvivedMAX_ = seconds >= -1 ? seconds : timeSurvivedMAX_;
 	}
 
 	void Survival::updateStatus(int sides, int enemies, bool player)
@@ -89,7 +88,7 @@ namespace Level {
 
 	bool Survival::getWaveReady() const
 	{
-		return (respiteTime_ == 0 && !waveGen_.isEmpty() && timeSurvived_ < timeSurvivedMAX_);
+		return (respiteTime_ == 0 && !waveGen_.isEmpty() && (timeSurvived_ < timeSurvivedMAX_ || timeSurvivedMAX_ == -1));
 	}
 
 	Wave Survival::getWave()
@@ -116,7 +115,7 @@ namespace Level {
 		if (playerAlive_)
 		{
 			//Time down our respite between waves
-			if (respiteTime_ != 0)
+			if (respiteTime_ >= 0)
 			{
 				respiteTime_ = (respiteTime_ - milliseconds > 0 ? respiteTime_ - milliseconds : 0);
 			}

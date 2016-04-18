@@ -432,7 +432,7 @@ namespace Level {
 			for (int i = 1; i < 6; ++i)
 			{
 				wav = Wave();
-				b2Vec2 pos(0, radius * 0.75f);
+				pos = b2Vec2(0, radius * 0.75f);
 				EnemyDef e(ShapeDef(pos, - pos, i + 2));
 				e.size = 0.75;
 				e.hpScale = 5;
@@ -472,7 +472,7 @@ namespace Level {
 			Level::WaveQueue* testlvl = new Level::WaveQueue("testcomp", play);
 			Wave wav = Wave();
 			float radius = 32;
-			b2Vec2 pos(0, 0);
+			b2Vec2 pos(0, 4.f);
 			EnemyDef def;
 
 			testlvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
@@ -486,7 +486,6 @@ namespace Level {
 			for (int i = 1; i < 3; ++i)
 			{
 				wav = Wave();
-				b2Vec2 pos(0, 4.f);
 				EnemyDef e(ShapeDef(pos, b2Vec2_zero + pos, i + 2));
 				e.size = 1.5f;
 				e.hpScale = 5;
@@ -502,7 +501,48 @@ namespace Level {
 
 			return testlvl;
 		}
-	
-}//end atlas
+
+		//Test steering level
+		static Level::LevelI* testSteer()
+		{
+			PlayerDef play(basePlayer());
+			play.weapon = "coilgun";
+			play.weaponLevel = 5;
+			play.bombRadius = 32;
+			play.bombTime = 1000;
+
+			Level::Survival* steerlvl = new Level::Survival("teststeer", play);
+			
+			Wave wav = Wave();
+			float radius = 32;
+
+			steerlvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
+			steerlvl->setPrimary(b2Color(0.5f, 0.05f, 0.1f));
+			steerlvl->setSecondary(b2Color(0.5f, 0.25f, 0.35f));
+			steerlvl->setTertiary(b2Color(0.0f, 0.0f, 0.0f));
+			steerlvl->setBoundsRadius(radius);
+			steerlvl->setBoundsPoints(12);
+
+			steerlvl->setSurvivalTime(-1);
+			steerlvl->setRespiteTimeMAX(-1);
+
+			EnemyDef e(ShapeDef(b2Vec2_zero, b2Vec2_zero, 3));
+			e.damageScale = 0;
+			e.ai = 3;
+			e.faction = 1;
+			e.colPrim = b2Color(1.f, 0.f, 0.f);
+			e.colSecn = b2Color(1.f, 1.f, 0.f);
+			e.colTert = b2Color(0, 0, 0);
+			e.hpScale = 5;
+			e.speedScale = 0.5;
+			e.weapon = "pistol";
+			e.weaponLevel = 0;
+
+			wav.addEnemy(e);
+
+			steerlvl->addPaletteWave(wav);
+			return steerlvl;
+		}
+	}//end atlas
 }//end level
 #endif

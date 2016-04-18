@@ -11,7 +11,7 @@ GameWorld::GameWorld() :
 	menuLevel_(nullptr),
 	menu_(true),
 	transitionTime_(0),
-	transitionTimeMAX_(2000),
+	transitionTimeMAX_(1000),
 	dstr("X"),
 	di(-1)
 {
@@ -65,8 +65,12 @@ GameWorld::GameWorld() :
 
 	//Level
 	populateLevelList();
-	selectedLevel_ = levels_.end();
-	loadMenu();
+	//selectedLevel_ = levels_.end();
+	//loadMenu();
+
+	menu_ = false;
+	selectedLevel_ = --levels_.end();
+	loadLevel(*selectedLevel_);
 }
 
 GameWorld::~GameWorld()
@@ -452,6 +456,7 @@ void GameWorld::populateLevelList()
 	levels_.push_back(Level::Atlas::testSurv());
 	levels_.push_back(Level::Atlas::testComplete());
 	levels_.push_back(Level::Atlas::testAI());
+	levels_.push_back(Level::Atlas::testSteer());
 	
 	//Menu Level
 	{

@@ -44,8 +44,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)include;$(SFML_SDK)\include;$(BOX2D);$(ProjectDir)opensteer;$(IncludePath)</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SFML_SDK)\lib;$(ProjectDir)lib;$(BOX2D)\Debug</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)include;$(SFML_SDK)\include;$(BOX2D);$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SFML_SDK)\lib;$(BOX2D)\Debug</LibraryPath>
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <ExtensionsToDeleteOnClean>*.dll;*.jpg;*.png;*.ttf;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
     <IntDir>build\$(Configuration)\</IntDir>
@@ -53,8 +53,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)include;$(SFML_SDK)\include;$(BOX2D);$(ProjectDir)opensteer;$(IncludePath)</IncludePath>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SFML_SDK)\lib;$(ProjectDir)lib;$(BOX2D)\Release</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)include;$(SFML_SDK)\include;$(BOX2D);$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SFML_SDK)\lib;$(BOX2D)\Release</LibraryPath>
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <ExtensionsToDeleteOnClean>$(TargetDir)Assets;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
     <IntDir>build\$(Configuration)\</IntDir>
@@ -80,14 +80,12 @@
     <PreBuildEvent>
       <Command>xcopy "$(SolutionDir)Assets" "$(TargetDir)..\Assets" /E /D /Y /I /F
 
-xcopy "$(SFML_SDK)bin\sfml-audio-d-2.dll" "$(TargetDir)" /D /Y /F
-xcopy "$(SFML_SDK)bin\sfml-graphics-d-2.dll" "$(TargetDir)" /D /Y /F
-xcopy "$(SFML_SDK)bin\sfml-network-d-2.dll" "$(TargetDir)" /D /Y /F
-xcopy "$(SFML_SDK)bin\sfml-system-d-2.dll" "$(TargetDir)" /D /Y /F
-xcopy "$(SFML_SDK)bin\sfml-window-d-2.dll" "$(TargetDir)"  /D /Y /F
-xcopy "$(SFML_SDK)bin\thor-d.dll" "$(TargetDir)" /Q /D /Y /F
-
-xcopy "$(ProjectDir)lib\opensteer-d.*" $(TargetDir)  /D /Y /F
+xcopy "$(SFML_SDK)\bin\sfml-audio-d-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)\bin\sfml-graphics-d-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)\bin\sfml-network-d-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)\bin\sfml-system-d-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)\bin\sfml-window-d-2.dll" "$(TargetDir)"  /D /Y /F
+xcopy "$(SFML_SDK)\bin\thor-d.dll" "$(TargetDir)" /Q /D /Y /F
 
 xcopy "$(Box2D)\Debug" "$(TargetDir)" /D /Y /F</Command>
     </PreBuildEvent>
@@ -116,14 +114,12 @@ xcopy "$(Box2D)\Debug" "$(TargetDir)" /D /Y /F</Command>
     <PreBuildEvent>
       <Command>xcopy "$(SolutionDir)Assets" "$(TargetDir)..\Assets" /E /D /Y /I /F
 
-xcopy "$(SFML_SDK)bin\sfml-audio-2.dll" "$(TargetDir)" /D /Y /F
-xcopy "$(SFML_SDK)bin\sfml-graphics-2.dll" "$(TargetDir)" /D /Y /F
-xcopy "$(SFML_SDK)bin\sfml-network-2.dll" "$(TargetDir)" /D /Y /F
-xcopy "$(SFML_SDK)bin\sfml-system-2.dll" "$(TargetDir)" /D /Y /F
-xcopy "$(SFML_SDK)bin\sfml-window-2.dll" "$(TargetDir)"  /D /Y /F
-xcopy "$(SFML_SDK)bin\thor.dll" "$(TargetDir)" /Q /D /Y /F
-
-xcopy "$(ProjectDir)lib\opensteer.*" $(TargetDir)  /D /Y /F
+xcopy "$(SFML_SDK)\bin\sfml-audio-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)\bin\sfml-graphics-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)\bin\sfml-network-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)\bin\sfml-system-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)\bin\sfml-window-2.dll" "$(TargetDir)"  /D /Y /F
+xcopy "$(SFML_SDK)\bin\thor.dll" "$(TargetDir)" /Q /D /Y /F
 
 xcopy "$(Box2D)\Release" "$(TargetDir)" /D /Y /F</Command>
     </PreBuildEvent>

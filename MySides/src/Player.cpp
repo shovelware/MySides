@@ -3,21 +3,6 @@
 #include "Projectile.hpp"
 #include "Side.hpp"
 
-Player::Player(b2Body* body, const ShapeDef& def, std::function<void(SideDef&)>& callback) :
-	Shape(body, def, callback),
-	bombTimeMax_(-1),
-	bombTime_(0),
-	bombRadius_(0)
-{
-	//We spawn faster
-	spawnTimeMAX_ /= 2;
-	spawnTime_ /= 2;
-
-	body_->GetFixtureList()->SetUserData("player");
-	shapeFixDef_.userData = "player";
-	collector_ = true;
-}
-
 Player::Player(b2Body* body, const PlayerDef & def, std::function<void(SideDef&)>& callback) :
 	Shape(body, def, callback),
 	bombTimeMax_(def.bombTime),
@@ -31,6 +16,11 @@ Player::Player(b2Body* body, const PlayerDef & def, std::function<void(SideDef&)
 	body_->GetFixtureList()->SetUserData("player");
 	shapeFixDef_.userData = "player";
 	collector_ = true;
+}
+
+Player::~Player()
+{
+	Shape::~Shape();
 }
 
 //Only deals with the effects of this collision on this entity

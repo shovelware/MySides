@@ -4,11 +4,15 @@
 #include "Shape.hpp"
 #include "PlayerDef.hpp"
 
+#include "opensteer\SimpleVehicle.h"
+
 class Player : public Shape 
 {
 public:
 	Player(b2Body* body, const ShapeDef& def, std::function<void(SideDef&)>& callback);
 	Player(b2Body* body, const PlayerDef& def, std::function<void(SideDef&)>& callback);
+
+	~Player();
 
 	bool collide(Entity* other, b2Contact& contact, std::string tag);
 	
