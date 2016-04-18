@@ -4,18 +4,36 @@ Enemy::Enemy(b2Body* body, const ShapeDef& def, std::function<void(SideDef&)>& c
 	Shape(body, def, callback),
 	getPlayer_(player),
 	aistate(0)
+	//steer_(new OpenSteer::SimpleVehicle())
 {
 	body_->GetFixtureList()->SetUserData("enemy");
 	shapeFixDef_.userData = "enemy";
+
+	createSteering();
 }
 
 Enemy::Enemy(b2Body* body, const EnemyDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) :
 	Shape(body, def, callback),
 	getPlayer_(player),
 	aistate(def.ai)
+	//steer_(new OpenSteer::SimpleVehicle())
 {
 	body_->GetFixtureList()->SetUserData("enemy");
 	shapeFixDef_.userData = "enemy";
+
+	createSteering();
+}
+
+Enemy::~Enemy()
+{
+	//delete steer_;
+	Shape::~Shape();
+}
+
+void Enemy::createSteering()
+{
+	//steer_->setMaxSpeed(maxVel_);
+//	steer_->setMaxForce(maxVel_);
 }
 
 void Enemy::update(int milliseconds)
@@ -73,7 +91,6 @@ void Enemy::update(int milliseconds)
 					orient(between);
 					if (getWeaponReady())
 					{
-
 						float rotation = atan2f(between.y, between.x);
 						float adjust = randFloat(-0.4, 0.4);
 						b2Vec2 newDir(cosf(rotation + adjust), sinf(rotation + adjust));
@@ -111,3 +128,4 @@ bool Enemy::collide(Entity * other, b2Contact& contact, std::string tag)
 
 	return handled;
 }
+

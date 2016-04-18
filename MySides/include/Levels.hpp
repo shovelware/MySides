@@ -11,6 +11,7 @@ namespace Level {
 		static PlayerDef basePlayer() {
 			//Player
 			PlayerDef bplay = PlayerDef();
+			bplay.heading = b2Vec2(0, -1);
 			bplay.vertices = 6;
 			bplay.colPrim = b2Color(0.6f, 0.3f, 0.9f);
 			bplay.colSecn = b2Color(0.f, 1.f, 1.f);

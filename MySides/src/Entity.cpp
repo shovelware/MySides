@@ -23,6 +23,7 @@ void Entity::setRotation(float rotation)
 	body_->SetTransform(body_->GetTransform().p, rotation);
 }
 
+
 //Returns position
 b2Vec2 Entity::getPosition() const
 {

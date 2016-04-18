@@ -96,6 +96,5 @@ private:
 
 	//Testing
 	bool debug_;
-
 };
 #endif

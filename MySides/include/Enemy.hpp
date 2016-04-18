@@ -7,12 +7,15 @@
 #include "Shape.hpp"
 #include "EnemyDef.hpp"
 
+//#include <opensteer\simplevehicle.h>
 
 class Enemy : public Shape
 {
 public:
 	Enemy(b2Body* body, const ShapeDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player);
 	Enemy(b2Body* body, const EnemyDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player);
+
+	~Enemy();
 
 	void update(int milliseconds);
 
@@ -28,12 +31,14 @@ public:
 
 	//Debug
 	int aistate;
-
+	//OpenSteer::SimpleVehicle* steer_;
 private:
 	static std::list<Enemy*> others_; //Provision for swarming
 
 	std::function<Shape*()>& getPlayer_;
 	
+	void createSteering();
+
 };
 
 #endif

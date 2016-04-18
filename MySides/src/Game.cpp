@@ -104,6 +104,7 @@ int Game::run()
 			continue;
 		}
 
+		//Else add it on and do accumulator things
 		accumulator += frameTime;
 		
 		//Update to number of physics steps
@@ -256,7 +257,8 @@ void Game::handleInput(sf::Time dt)
 	}
 
 #pragma region Debug controls
-	if (key_.isKeyDown(Key::BackSpace) && key_.isKeyDown(Key::BackSlash)) { debug_ = true; }
+	if (!debug_ && key_.isKeyDown(Key::BackSpace) && key_.isKeyDown(Key::BackSlash)) { debug_ = true; }
+	if (!debug_ && con_.checkDown(XINPUT_GAMEPAD_DPAD_DOWN) && con_.checkDown(XINPUT_GAMEPAD_LEFT_THUMB)) { debug_ = true; }
 
 	if (debug_)
 	{
@@ -434,14 +436,7 @@ void Game::handleInput(sf::Time dt)
 			//R/Y : Requisition
 			if (key_.isKeyPressed(Key::R) || con_.checkPressed(XINPUT_GAMEPAD_Y))
 			{
-
 				world_->requisition(world_->getPlayer(), world_->dstr, world_->di);
-			}
-
-			//A : Level Cycle
-			if (con_.checkPressed(XINPUT_GAMEPAD_A))
-			{
-				world_->f4();
 			}
 
 		}//end debug key check
@@ -701,7 +696,14 @@ void Game::toggleFullscreen()
 
 		window_.create(fsmode, "My Sides!", sf::Style::Fullscreen, contextSettings_);
 
-		screenSizeBox_ = sf::FloatRect((1 - fswf) / 2, 0, fswf, 1);
+		screenSizeBox_ = sf::FloatRect((fsw - fsh) / 2, 0, fsh, fsh);
+		levelBarBox_ = sf::FloatRect(20, 20, 100, 40);
+		shapeBarBox_ = sf::FloatRect(fsw / 2.f - 200, 25, 400, 30);
+		sideBarBox_ = sf::FloatRect(20, fsh - 40, fsw - 40, 20);
+		weaponBarBox_ = sf::FloatRect(fsw - 120, 20, 100, 40);
+		debugBox_ = sf::FloatRect(0, fsh - 120, fsw, 60);
+		levelInfoBox_ = sf::FloatRect(fsw * 0.75f, fsh - fsw / 12 - 80, fsw / 4, fsw  / 12);
+
 		camera_->setViewport(sf::FloatRect((1 - fswf) / 2, 0, fswf, 1));
 		camera_->updateBounds(sf::Vector2f(fsmode.width, fsmode.height));
 		window_.setMouseCursorVisible(false);
@@ -713,8 +715,16 @@ void Game::toggleFullscreen()
 	else if (fullscreen_)
 	{
 		window_.create(videoMode_, "My Sides!", sf::Style::Titlebar, contextSettings_);
-		
+
 		screenSizeBox_ = sf::FloatRect(0, 0, videoMode_.width, videoMode_.height);
+		levelBarBox_ = sf::FloatRect(20, 20, 100, 40);
+		shapeBarBox_ = sf::FloatRect(screenSizeBox_.width / 2.f - 200, 25, 400, 30);
+		sideBarBox_ = sf::FloatRect(20, screenSizeBox_.height - 40, screenSizeBox_.width - 40, 20);
+		weaponBarBox_ = sf::FloatRect(screenSizeBox_.width - 120, 20, 100, 40);
+		debugBox_ = sf::FloatRect(0, screenSizeBox_.height - 120, screenSizeBox_.width, 60);
+		levelInfoBox_ = sf::FloatRect(screenSizeBox_.width * 0.75f, screenSizeBox_.height - screenSizeBox_.width / 12 - 80, screenSizeBox_.width / 4, screenSizeBox_.width / 12);
+		screenSizeBox_ = sf::FloatRect(0, 0, screenSizeBox_.width, screenSizeBox_.height);
+
 		camera_->setViewport(sf::FloatRect(0, 0, 1, 1));
 		camera_->updateBounds(sf::Vector2f(videoMode_.width, videoMode_.height));
 		window_.setMouseCursorVisible(true);
