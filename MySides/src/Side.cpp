@@ -55,17 +55,6 @@ void Side::setShape(float size)
 	lineDef.density = 5.0f;
 	lineDef.friction = 0.0f;
 	lineDef.restitution = 1.0f;
-
-	//Border box, slightly bigger than side
-	b2PolygonShape box;
-	box.SetAsBox(size * 0.55f, size * 0.05f);
-	b2FixtureDef boxDef;
-	boxDef.shape = &box;
-	boxDef.userData = "sidebox";
-	boxDef.isSensor = true;
-
-	//Create and add fixture using body's factory
-	body_->CreateFixture(&boxDef);
 }
 
 void Side::collect()

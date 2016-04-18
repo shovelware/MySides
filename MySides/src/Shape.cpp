@@ -231,7 +231,6 @@ void Shape::heal(int health)
 		//Overhealing
 		if (uhpMAX_ != 0 && hp_ == hpMAX_)
 		{
-
 			//If we can go up
 			if (uhp_ + 1 <= uhpMAX_) uhp_++;
 
@@ -615,18 +614,12 @@ bool Shape::collide(Entity* other, b2Contact& contact, std::string tag)
 
 	else if (tag == "side" && collector_)
 	{
-		char* tagA = static_cast<char*>(contact.GetFixtureA()->GetUserData());
-		char* tagB = static_cast<char*>(contact.GetFixtureB()->GetUserData());
-		
-		if (tagA == "side" || tagB == "side")
-		{
-			Side* side = static_cast<Side*>(other);
+		Side* side = static_cast<Side*>(other);
 
-			collect(side->getValue());
-			heal(std::ceil(side->getValue()) * fmaxf(1.f, (hpScale_ / 2)));
+		collect(side->getValue());
+		heal(std::ceil(side->getValue()) * fmaxf(1.f, (hpScale_ / 2)));
 			
-			side->collect();
-		}
+		side->collect();
 
 		handled = true;
 	}

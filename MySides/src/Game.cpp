@@ -44,6 +44,14 @@ int Game::run()
 	//hud_->loadFont("game_over.ttf", 36);
 	hud_->loadFont("pixelmix.ttf", 12);
 
+	levelBarBox_ = sf::FloatRect(20, 20, 100, 40);
+	shapeBarBox_ = sf::FloatRect(windowSize.x / 2.f - 200, 25, 400, 30);
+	sideBarBox_ = sf::FloatRect(20, windowSize.y - 40, windowSize.x - 40, 20);
+	weaponBarBox_ = sf::FloatRect(windowSize.x - 120, 20, 100, 40);
+	debugBox_ = sf::FloatRect(0, windowSize.y - 120, windowSize.x, 60);
+	levelInfoBox_ = sf::FloatRect(windowSize.x * 0.75f, windowSize.y - windowSize.x / 12 - 80, windowSize.x / 4, windowSize.x / 12);
+	screenSizeBox_ = sf::FloatRect(0, 0, windowSize.x, windowSize.y);
+
 	//Start fullscreen
 	//toggleFullscreen();
 
@@ -248,191 +256,196 @@ void Game::handleInput(sf::Time dt)
 	}
 
 #pragma region Debug controls
-	//1234567890 : Test functions
-	if (key_.isKeyPressed(Key::Num1)) { world_->f1(); }
-	if (key_.isKeyPressed(Key::Num2)) { world_->f2(); }
-	if (key_.isKeyPressed(Key::Num3)) { world_->f3(); }
-	if (key_.isKeyPressed(Key::Num4)) { world_->f4(); }
-	if (key_.isKeyPressed(Key::Num5)) { world_->f5(); }
-	if (key_.isKeyPressed(Key::Num6)) { world_->f6(); }
-	if (key_.isKeyPressed(Key::Num7)) { world_->f7(); }
-	if (key_.isKeyPressed(Key::Num8)) { world_->f8(); }
-	if (key_.isKeyPressed(Key::Num9)) { world_->f9(); }
-	if (key_.isKeyPressed(Key::Num0)) { world_->f0(); }
+	if (key_.isKeyDown(Key::BackSpace) && key_.isKeyDown(Key::BackSlash)) { debug_ = true; }
 
-	//Debug controls
-	if (key_.isKeyDown(Key::BackSpace) || (0.5f <= con_.checkLeftTrigger() && con_.checkLeftTrigger() <= 1.f))
+	if (debug_)
 	{
-		//LC : Toggle through rendering
-		if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
+		//1234567890 : Test functions
+		if (key_.isKeyPressed(Key::Num1)) { world_->f1(); }
+		if (key_.isKeyPressed(Key::Num2)) { world_->f2(); }
+		if (key_.isKeyPressed(Key::Num3)) { world_->f3(); }
+		if (key_.isKeyPressed(Key::Num4)) { world_->f4(); }
+		if (key_.isKeyPressed(Key::Num5)) { world_->f5(); }
+		if (key_.isKeyPressed(Key::Num6)) { world_->f6(); }
+		if (key_.isKeyPressed(Key::Num7)) { world_->f7(); }
+		if (key_.isKeyPressed(Key::Num8)) { world_->f8(); }
+		if (key_.isKeyPressed(Key::Num9)) { world_->f9(); }
+		if (key_.isKeyPressed(Key::Num0)) { world_->f0(); }
+
+		//Debug controls
+		if (key_.isKeyDown(Key::BackSpace) || (0.5f <= con_.checkLeftTrigger() && con_.checkLeftTrigger() <= 1.f))
 		{
-			if (renderDD_ && renderGAME_)
+			//LC : Toggle through rendering
+			if (con_.checkPressed(XINPUT_GAMEPAD_LEFT_THUMB))
 			{
-				renderGAME_ = false;
-			}
-
-			else if (renderDD_)
-			{
-				renderDD_ = false; 
-				renderGAME_ = true;
-			}
-
-			else if (renderGAME_)
-			{
-				renderDD_ = true;
-			}
-		}
-
-		// < : Render debugDraw
-		if (key_.isKeyPressed(Key::Comma) )
-		{
-			renderDD_ = !renderDD_;
-		}
-		
-		// > : Render Graphics
-		if (key_.isKeyPressed(Key::Period))
-		{
-			renderGAME_ = !renderGAME_;
-		}
-
-		// ? : Render HUD 
-		if (key_.isKeyPressed(Key::Slash))
-		{
-			renderHUD_ = !renderHUD_;
-		}
-
-		// : : Render Camera Info
-		if (key_.isKeyPressed(Key::SemiColon))
-		{
-			renderCAM_ = !renderCAM_;
-		}
-
-		// Insert : Reset debug string
-		if (key_.isKeyPressed(Key::Insert))
-		{
-			world_->dstr = "X";
-			//std::cout << world_->di << " | " << world_->dstr << std::endl;
-		}
-
-		// Del : Reset debug int
-		if (key_.isKeyPressed(Key::Delete))
-		{
-			world_->di = -1;
-		}
-
-		// RShift / A : Advance one step (A)
-		if (key_.isKeyPressed(Key::RShift) || con_.checkPressed(XINPUT_GAMEPAD_A))
-		{
-			world_->step(_TICKTIME_ * 1000);
-			update(sf::Time(sf::seconds(_TICKTIME_)), true);
-		}
-
-		// X : Nuke world
-		if (key_.isKeyPressed(Key::X))
-		{
-			world_->bomb(true);
-		}
-
-		// T : Clear map
-		if (key_.isKeyPressed(Key::T))
-		{
-			world_->clearWorld(false);
-		}
-
-		// - : Debug int decrement
-		if (key_.isKeyPressed(Key::Dash)  || 
-			con_.checkDown(XINPUT_GAMEPAD_DPAD_LEFT))
-		{
-			int time = (con_.checkTimeHeld(XINPUT_GAMEPAD_DPAD_LEFT) - 400);
-
-			if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT) ||
-				(time > 0 && time % 160 == 0))
-			{
-				world_->di--;
-			}
-		}
-
-		// + : Debug int increment
-		if (key_.isKeyPressed(Key::Equal) ||
-			con_.checkDown(XINPUT_GAMEPAD_DPAD_RIGHT))
-		{
-			int time = (con_.checkTimeHeld(XINPUT_GAMEPAD_DPAD_RIGHT) - 400);
-
-			if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT) ||
-				(time > 0 && time % 160 == 0))
-			{
-				world_->di++;
-			}
-		}
-
-		//G : Scrolling Weapon Select
-		if (key_.isKeyPressed(Key::G) || con_.checkPressed(XINPUT_GAMEPAD_DPAD_DOWN))
-		{
-			if (world_->dstr == "launcher" || world_->dstr == "fungun" || world_->dstr == "X") world_->dstr = "pistol";
-			else if (world_->dstr == "pistol") world_->dstr = "rifle";
-			else if (world_->dstr == "rifle") world_->dstr = "shotgun";
-			else if (world_->dstr == "shotgun") world_->dstr = "cannon";
-			else if (world_->dstr == "cannon") world_->dstr = "coilgun";
-			else if (world_->dstr == "coilgun") world_->dstr = "railgun";
-			else if (world_->dstr == "railgun") world_->dstr = "werfer";
-			else if (world_->dstr == "werfer") world_->dstr = "thumper";
-			else if (world_->dstr == "thumper") world_->dstr = "launcher";
-			else world_->dstr == "launcher";
-
-			if (world_->di > 8)
-				world_->di = 0;
-		}
-
-		//Scrolling fun select
-		if (key_.isKeyPressed(Key::F)|| con_.checkPressed(XINPUT_GAMEPAD_DPAD_UP))
-		{
-			world_->dstr = "fungun";
-
-			int max = 12;
-			int i[12];
-			i[0] = 42;
-			i[1] = 44;
-			i[2] = 47;
-			i[3] = 60;
-			i[4] = 88;
-			i[5] = 111;
-			i[6] = 120;
-			i[7] = 404;
-			i[8] = 555;
-			i[9] = 666;
-			i[10] = 888;
-			i[11] = 999;
-
-			for (int w = 0; w < max; ++w)
-			{
-				if (w == max -1)
+				if (renderDD_ && renderGAME_)
 				{
-					world_->di = i[0];
-					break;
+					renderGAME_ = false;
 				}
 
-				if (world_->di == i[w])
+				else if (renderDD_)
 				{
-					world_->di = i[w + 1];
-					break;
+					renderDD_ = false;
+					renderGAME_ = true;
+				}
+
+				else if (renderGAME_)
+				{
+					renderDD_ = true;
 				}
 			}
-		}
 
-		//R/Y : Requisition
-		if (key_.isKeyPressed(Key::R) || con_.checkPressed(XINPUT_GAMEPAD_Y))
-		{
+			// < : Render debugDraw
+			if (key_.isKeyPressed(Key::Comma))
+			{
+				renderDD_ = !renderDD_;
+			}
 
-			world_->requisition(world_->getPlayer(), world_->dstr, world_->di);
-		}
+			// > : Render Graphics
+			if (key_.isKeyPressed(Key::Period))
+			{
+				renderGAME_ = !renderGAME_;
+			}
 
-		//A : Level Cycle
-		if (con_.checkPressed(XINPUT_GAMEPAD_A))
-		{
-			world_->f4();
-		}
+			// ? : Render HUD 
+			if (key_.isKeyPressed(Key::Slash))
+			{
+				renderHUD_ = !renderHUD_;
+			}
 
-	}//end debug key check
+			// : : Render Camera Info
+			if (key_.isKeyPressed(Key::SemiColon))
+			{
+				renderCAM_ = !renderCAM_;
+			}
+
+			// Insert : Reset debug string
+			if (key_.isKeyPressed(Key::Insert))
+			{
+				world_->dstr = "X";
+				//std::cout << world_->di << " | " << world_->dstr << std::endl;
+			}
+
+			// Del : Reset debug int
+			if (key_.isKeyPressed(Key::Delete))
+			{
+				world_->di = -1;
+			}
+
+			// RShift / A : Advance one step (A)
+			if (key_.isKeyPressed(Key::RShift) || con_.checkPressed(XINPUT_GAMEPAD_A))
+			{
+				world_->step(_TICKTIME_ * 1000);
+				update(sf::Time(sf::seconds(_TICKTIME_)), true);
+			}
+
+			// X : Nuke world
+			if (key_.isKeyPressed(Key::X))
+			{
+				world_->bomb(true);
+			}
+
+			// T : Clear map
+			if (key_.isKeyPressed(Key::T))
+			{
+				world_->clearWorld(false);
+			}
+
+			// - : Debug int decrement
+			if (key_.isKeyPressed(Key::Dash) ||
+				con_.checkDown(XINPUT_GAMEPAD_DPAD_LEFT))
+			{
+				int time = (con_.checkTimeHeld(XINPUT_GAMEPAD_DPAD_LEFT) - 400);
+
+				if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT) ||
+					(time > 0 && time % 160 == 0))
+				{
+					world_->di--;
+				}
+			}
+
+			// + : Debug int increment
+			if (key_.isKeyPressed(Key::Equal) ||
+				con_.checkDown(XINPUT_GAMEPAD_DPAD_RIGHT))
+			{
+				int time = (con_.checkTimeHeld(XINPUT_GAMEPAD_DPAD_RIGHT) - 400);
+
+				if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT) ||
+					(time > 0 && time % 160 == 0))
+				{
+					world_->di++;
+				}
+			}
+
+			//G : Scrolling Weapon Select
+			if (key_.isKeyPressed(Key::G) || con_.checkPressed(XINPUT_GAMEPAD_DPAD_DOWN))
+			{
+				if (world_->dstr == "launcher" || world_->dstr == "fungun" || world_->dstr == "X") world_->dstr = "pistol";
+				else if (world_->dstr == "pistol") world_->dstr = "rifle";
+				else if (world_->dstr == "rifle") world_->dstr = "shotgun";
+				else if (world_->dstr == "shotgun") world_->dstr = "cannon";
+				else if (world_->dstr == "cannon") world_->dstr = "coilgun";
+				else if (world_->dstr == "coilgun") world_->dstr = "railgun";
+				else if (world_->dstr == "railgun") world_->dstr = "werfer";
+				else if (world_->dstr == "werfer") world_->dstr = "thumper";
+				else if (world_->dstr == "thumper") world_->dstr = "launcher";
+				else world_->dstr == "launcher";
+
+				if (world_->di > 8)
+					world_->di = 0;
+			}
+
+			//Scrolling fun select
+			if (key_.isKeyPressed(Key::F) || con_.checkPressed(XINPUT_GAMEPAD_DPAD_UP))
+			{
+				world_->dstr = "fungun";
+
+				int max = 12;
+				int i[12];
+				i[0] = 42;
+				i[1] = 44;
+				i[2] = 47;
+				i[3] = 60;
+				i[4] = 88;
+				i[5] = 111;
+				i[6] = 120;
+				i[7] = 404;
+				i[8] = 555;
+				i[9] = 666;
+				i[10] = 888;
+				i[11] = 999;
+
+				for (int w = 0; w < max; ++w)
+				{
+					if (w == max - 1)
+					{
+						world_->di = i[0];
+						break;
+					}
+
+					if (world_->di == i[w])
+					{
+						world_->di = i[w + 1];
+						break;
+					}
+				}
+			}
+
+			//R/Y : Requisition
+			if (key_.isKeyPressed(Key::R) || con_.checkPressed(XINPUT_GAMEPAD_Y))
+			{
+
+				world_->requisition(world_->getPlayer(), world_->dstr, world_->di);
+			}
+
+			//A : Level Cycle
+			if (con_.checkPressed(XINPUT_GAMEPAD_A))
+			{
+				world_->f4();
+			}
+
+		}//end debug key check
+	}//End debug var check
 #pragma endregion
 
 	//Controller Controls
@@ -653,13 +666,13 @@ void Game::render()
 	{
 		sf::Vector2u size = window_.getSize();
 
-		hud_->drawLevelStatus(sf::FloatRect(20, 20, 100, 40));
-		hud_->drawShapeStatus(sf::FloatRect(size.x / 2.f - 200, 25, 400, 30));
-		hud_->drawSideStatus(sf::FloatRect(20, size.y - 40, size.x - 40, 20));
-		hud_->drawWeaponStatus(sf::FloatRect(size.x - 120, 20, 100, 40));
-		hud_->drawDebugInfo(sf::FloatRect(0, size.y - 120, size.x, 60));
-		hud_->drawLevelInfo(sf::FloatRect(size.x * 0.75f, size.y - size.x / 12 - 80, size.x / 4, size.x / 12));
-		hud_->drawTransitionSquare(sf::FloatRect(0, 0, size.x, size.y));
+		hud_->drawLevelStatus(levelBarBox_);
+		hud_->drawShapeStatus(shapeBarBox_);
+		hud_->drawSideStatus(sideBarBox_);
+		hud_->drawWeaponStatus(weaponBarBox_);
+		if (debug_) hud_->drawDebugInfo(debugBox_);
+		hud_->drawLevelInfo(levelInfoBox_);
+		hud_->drawTransitionSquare(screenSizeBox_);
 	}
 
 	//Draw pause menu
@@ -688,6 +701,7 @@ void Game::toggleFullscreen()
 
 		window_.create(fsmode, "My Sides!", sf::Style::Fullscreen, contextSettings_);
 
+		screenSizeBox_ = sf::FloatRect((1 - fswf) / 2, 0, fswf, 1);
 		camera_->setViewport(sf::FloatRect((1 - fswf) / 2, 0, fswf, 1));
 		camera_->updateBounds(sf::Vector2f(fsmode.width, fsmode.height));
 		window_.setMouseCursorVisible(false);
@@ -700,6 +714,7 @@ void Game::toggleFullscreen()
 	{
 		window_.create(videoMode_, "My Sides!", sf::Style::Titlebar, contextSettings_);
 		
+		screenSizeBox_ = sf::FloatRect(0, 0, videoMode_.width, videoMode_.height);
 		camera_->setViewport(sf::FloatRect(0, 0, 1, 1));
 		camera_->updateBounds(sf::Vector2f(videoMode_.width, videoMode_.height));
 		window_.setMouseCursorVisible(true);

@@ -7,7 +7,6 @@
 #include "Shape.hpp"
 #include "EnemyDef.hpp"
 
-#include  <opensteer\Vec3.h>
 
 class Enemy : public Shape
 {

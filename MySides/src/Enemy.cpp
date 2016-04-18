@@ -80,8 +80,6 @@ void Enemy::update(int milliseconds)
 						trigger(between);
 					}
 					else release();
-
-
 				}
 			}
 

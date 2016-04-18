@@ -345,10 +345,7 @@ void GameRenderer::drawSide(Side* const s)
 	sf::Color ter = B2toSF(s->getTertiary());
 
 	b2Fixture* fix = body->GetFixtureList();
-
-	//It must be one of two
-	if (fix->GetUserData() != "side") {	fix = fix->GetNext(); }
-
+	
 	//Pull other vars
 	b2EdgeShape* shape = static_cast<b2EdgeShape*>(fix->GetShape());
 

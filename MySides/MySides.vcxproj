@@ -78,19 +78,18 @@
       </AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy "$(SFML_SDK)\bin\sfml-audio-d-2.dll" "$(TargetDir)" /Q /D /Y /F
-xcopy "$(SFML_SDK)\bin\sfml-graphics-d-2.dll" "$(TargetDir)" /Q /D /Y /F
-xcopy "$(SFML_SDK)\bin\sfml-network-d-2.dll" "$(TargetDir)" /Q /D /Y /F
-xcopy "$(SFML_SDK)\bin\sfml-system-d-2.dll" "$(TargetDir)" /Q /D /Y /F
-xcopy "$(SFML_SDK)\bin\sfml-window-d-2.dll" "$(TargetDir)" /Q /D /Y /F
-xcopy "$(SFML_SDK)\bin\thor-d.dll" "$(TargetDir)" /Q /D /Y /F
+      <Command>xcopy "$(SolutionDir)Assets" "$(TargetDir)..\Assets" /E /D /Y /I /F
 
-xcopy "$(SolutionDir)Assets" "$(TargetDir)..\Assets" /S /E /D /Y /I /F
+xcopy "$(SFML_SDK)bin\sfml-audio-d-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)bin\sfml-graphics-d-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)bin\sfml-network-d-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)bin\sfml-system-d-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)bin\sfml-window-d-2.dll" "$(TargetDir)"  /D /Y /F
+xcopy "$(SFML_SDK)bin\thor-d.dll" "$(TargetDir)" /Q /D /Y /F
 
-xcopy "$(ProjectDir)opensteer\lib" $(TargetDir) /S /E /D /Y /I /F
+xcopy "$(ProjectDir)lib\opensteer-d.*" $(TargetDir)  /D /Y /F
 
-xcopy "$(Box2D)\Box2D" "$(TargetDir)Box2D" /S /E /D /Y /I /F
-xcopy "$(Box2D)\Debug" "$(TargetDir)" /Q /D /Y /F</Command>
+xcopy "$(Box2D)\Debug" "$(TargetDir)" /D /Y /F</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -115,22 +114,53 @@ xcopy "$(Box2D)\Debug" "$(TargetDir)" /Q /D /Y /F</Command>
       </AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy "$(SFML_SDK)\bin\sfml-audio-2.dll" "$(TargetDir)" /Q /D /Y
-xcopy "$(SFML_SDK)\bin\sfml-graphics-2.dll" "$(TargetDir)" /Q /D /Y
-xcopy "$(SFML_SDK)\bin\sfml-network-2.dll" "$(TargetDir)" /Q /D /Y
-xcopy "$(SFML_SDK)\bin\sfml-system-2.dll" "$(TargetDir)" /Q /D /Y
-xcopy "$(SFML_SDK)\bin\sfml-window-2.dll" "$(TargetDir)" /Q /D /Y
-xcopy "$(SFML_SDK)\bin\thor.dll" "$(TargetDir)" /Q /D /Y
+      <Command>xcopy "$(SolutionDir)Assets" "$(TargetDir)..\Assets" /E /D /Y /I /F
 
-xcopy "$(SolutionDir)Assets" "$(TargetDir)Assets" /S /E /D /Y /I /F
+xcopy "$(SFML_SDK)bin\sfml-audio-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)bin\sfml-graphics-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)bin\sfml-network-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)bin\sfml-system-2.dll" "$(TargetDir)" /D /Y /F
+xcopy "$(SFML_SDK)bin\sfml-window-2.dll" "$(TargetDir)"  /D /Y /F
+xcopy "$(SFML_SDK)bin\thor.dll" "$(TargetDir)" /Q /D /Y /F
 
-xcopy "$(ProjectDir)opensteer\lib" $(TargetDir) /S /E /D /Y /I /F
+xcopy "$(ProjectDir)lib\opensteer.*" $(TargetDir)  /D /Y /F
 
-xcopy "$(Box2D)\Box2D" "$(TargetDir)Box2D" /S /E /D /Y /I /F
-xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
+xcopy "$(Box2D)\Release" "$(TargetDir)" /D /Y /F</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ARC\plugins\Boids.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ARC\plugins\CaptureTheFlag.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ARC\plugins\LowSpeedTurn.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ARC\plugins\MapDrive.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ARC\plugins\MultiplePursuit.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ARC\plugins\OneTurning.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ARC\plugins\Pedestrian.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ARC\plugins\Soccer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\AmbientEffect.cpp" />
     <ClCompile Include="src\Armory.cpp" />
     <ClCompile Include="src\Attractor.cpp" />
@@ -177,6 +207,10 @@ xcopy "$(Box2D)\Release" "$(TargetDir)" /Q /D /Y /F</Command>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ARC\plugins\OpenSteerDemo.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="CodePallet.h" />
     <ClInclude Include="include\AmbientEffect.hpp" />
     <ClInclude Include="include\Armory.hpp" />

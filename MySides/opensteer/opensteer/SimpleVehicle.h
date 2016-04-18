@@ -66,7 +66,6 @@
 
 #include "AbstractVehicle.h"
 #include "SteerLibrary.h"
-#include "Annotation.h"
 
 
 namespace OpenSteer {
@@ -80,7 +79,8 @@ namespace OpenSteer {
 
 
     // SimpleVehicle_2 adds concrete annotation methods to SimpleVehicle_1
-    typedef AnnotationMixin<SimpleVehicle_1> SimpleVehicle_2;
+	//HAHA NAH ANNOTATIONS REQUIRE DRAWING CODE WHICH IS GONE -Shovel
+    typedef SimpleVehicle_1 SimpleVehicle_2;
 
 
     // SimpleVehicle_3 adds concrete steering methods to SimpleVehicle_2

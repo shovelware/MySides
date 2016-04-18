@@ -75,6 +75,15 @@ private:
 
 	//HUD
 	HUD* hud_;
+	sf::FloatRect levelBarBox_;
+	sf::FloatRect shapeBarBox_;
+	sf::FloatRect sideBarBox_;
+	sf::FloatRect weaponBarBox_;
+	sf::FloatRect debugBox_;
+	sf::FloatRect levelInfoBox_;
+	sf::FloatRect screenSizeBox_;
+
+
 
 	//DebugDraw
 	SFMLDebugDraw dd_;
@@ -86,6 +95,7 @@ private:
 	bool haptics_;
 
 	//Testing
+	bool debug_;
 
 };
 #endif
