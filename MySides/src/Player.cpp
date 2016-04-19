@@ -3,7 +3,7 @@
 #include "Projectile.hpp"
 #include "Side.hpp"
 
-Player::Player(b2Body* body, const PlayerDef & def, std::function<void(SideDef&)>& callback) :
+Player::Player(b2Body* body, const PlayerDef& def, std::function<void(SideDef&)>& callback) :
 	Shape(body, def, callback),
 	bombTimeMax_(def.bombTime),
 	bombTime_(0),

@@ -11,6 +11,7 @@ namespace Pickup {
 		void update(int milliseconds);
 
 		bool getContact() const;
+		b2Vec2 getEnd() const;
 
 		bool collide(Entity* other, b2Contact& contact, std::string tag);
 	private:

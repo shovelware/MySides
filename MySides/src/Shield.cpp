@@ -125,7 +125,5 @@ void Pickup::Shield::update(int milliseconds)
 	}
 }
 
-float Pickup::Shield::getStrength()
-{
-	return strength_;
-}
+float Pickup::Shield::getStrength() const {	return strength_; }
+float Pickup::Shield::getRadius() const { return radius_; }

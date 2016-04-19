@@ -80,7 +80,7 @@ public:
 		tri.colTert = b2Color(0.9f, 1, 0);
 		tri.faction = 1;
 		tri.hpScale = 3;
-		tri.upgrade = false;
+		tri.upgradeSides = false;
 		tri.size = 0.5f;
 
 		return tri;
@@ -98,7 +98,7 @@ public:
 		squ.colTert = b2Color(0, 0.9f, 0);
 		squ.faction = 1;
 		squ.hpScale = 4;
-		squ.upgrade = false;
+		squ.upgradeSides = false;
 		squ.size = 0.75f;
 
 		return squ;
@@ -116,7 +116,7 @@ public:
 		pen.colTert = b2Color(0, 0, 0.9f);
 		pen.faction = 1;
 		pen.hpScale = 5;
-		pen.upgrade = false;
+		pen.upgradeSides = false;
 		pen.size = 1.f;
 
 		return pen;
@@ -134,7 +134,7 @@ public:
 		hex.colTert = b2Color(0, 0, 0);
 		hex.faction = 1;
 		hex.hpScale = 6;
-		hex.upgrade = false;
+		hex.upgradeSides = false;
 		hex.size = 1.25f;
 
 		return hex;
@@ -152,7 +152,7 @@ public:
 		hep.colTert = b2Color(1, 1, 1);
 		hep.faction = 1;
 		hep.hpScale = 7;
-		hep.upgrade = false;
+		hep.upgradeSides = false;
 		hep.size = 1.5f;
 
 		return hep;
@@ -170,7 +170,7 @@ public:
 		oct.colTert = b2Color(0, 1, 0);
 		oct.faction = 1;
 		oct.hpScale = 8;
-		oct.upgrade = false;
+		oct.upgradeSides = false;
 		oct.size = 1.75f;
 
 		return oct;

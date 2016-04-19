@@ -30,6 +30,8 @@ namespace Weapon {
 		void release();						//!< Releases the trigger, for weapons that need it
 
 		virtual void reup(bool instant = false) = 0;//!< Manual reload, if available
+
+		float getRange() const;
 		void setProjectile(ProjectileDef const &pd);//!< Sets the passed Projectile to be the Weapon's output
 
 		void setLevel(int level);		//!< Sets weapon level

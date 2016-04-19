@@ -7,7 +7,7 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 	weapon_(nullptr),
 	lastDamage_(b2Vec2_zero),
 	size_(def.size),
-	drop_(def.drop),
+	drop_(def.dropSides),
 	shapeVertices_(def.vertices),
 	verticesMIN_(def.verticesMin - 1),
 	verticesMAX_(def.verticesMax),
@@ -26,9 +26,13 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 
 	//Spawning
 	alive_ = false;
-	spawnTimeMAX_ = fmin(2500, fmax(def.size * 500, 500));
-	spawnTime_ = spawnTimeMAX_;
+	spawnTimeMAX_ =  fmin(2500, fmax(def.size * 500, 500));
+	if (def.spawnProtection > 0 && def.spawnProtection <= 1.f)
+	{
+		spawnTimeMAX_ *= def.spawnProtection;
+	}
 
+	spawnTime_ = spawnTimeMAX_;
 	//Corrections
 	shapeVertices_ = fmax(3, fmin(shapeVertices_, 8));
 	vertices_ = shapeVertices_;
@@ -47,7 +51,7 @@ Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& c
 
 	hpMAX_ = vertices_ * hpScale_;
 	hp_ = hpMAX_;
-	uhpScale_ = (def.upgrade ? hpScale_ : 0);
+	uhpScale_ = (def.upgradeSides ? hpScale_ : 0);
 	uhpMAX_ = ((vertices_ + 1) * uhpScale_);
 	uhp_ = 0;
 }
@@ -417,7 +421,7 @@ float Shape::getSize() const { return size_; }
 
 float Shape::getDamageScale() const { return damageScale_; }
 
-bool Shape::wasDamaged()
+bool Shape::wasDamaged() const
 {
 	return lastHealth_ > getHP();
 }
@@ -452,7 +456,7 @@ void Shape::explode()
 	}
 }
 
-bool Shape::getArmed()
+bool Shape::getArmed() const
 {
 	return (weapon_ != nullptr);
 }
@@ -567,7 +571,7 @@ void Shape::reup()
 	}
 }
 
-int Shape::getWeaponBar()
+int Shape::getWeaponBar() const
 {
 	int bar = 0;
 
@@ -579,7 +583,7 @@ int Shape::getWeaponBar()
 	return bar;
 }
 
-int Shape::getWeaponBarMAX()
+int Shape::getWeaponBarMAX() const
 {
 	int max = -1;
 

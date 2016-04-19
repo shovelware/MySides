@@ -16,7 +16,7 @@ namespace Level {
 			bplay.colPrim = b2Color(0.6f, 0.3f, 0.9f);
 			bplay.colSecn = b2Color(0.f, 1.f, 1.f);
 			bplay.colTert = b2Color(1.f, 0.f, 0.f);
-			bplay.upgrade = true;
+			bplay.upgradeSides = true;
 			bplay.faction = 1;
 			bplay.hpScale = 10;
 			return bplay;
@@ -72,7 +72,7 @@ namespace Level {
 
 				enem.position = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
 				enem.position.Normalize();
-				enem.position *= radius * 0.4;
+				enem.position *= radius * 0.4f;
 
 				enem.hpScale *= 1;
 
@@ -181,8 +181,8 @@ namespace Level {
 						enem.colTert = b2Color(0.2f, 0, 0);
 					}
 
-					y = -(cos((2 * M_PI) * s / 9)) * 5;
-					x = -(sin((2 * M_PI) * s / 9)) * 5;
+					y = -(cos((2.f * M_PI) * s / 9.f)) * 5.f;
+					x = -(sin((2.f * M_PI) * s / 9.f)) * 5.f;
 
 					enem.position = (b2Vec2(x, y));
 					enem.heading = (enem.position);
@@ -221,7 +221,7 @@ namespace Level {
 			int groups = 10;
 			int shapes = 6;
 
-			int baseHPScale = 1.25;
+			int baseHPScale = 1.25f;
 			float baseSize = 0.25f;
 
 			laylvl->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
@@ -235,15 +235,15 @@ namespace Level {
 			//for 4 sizes
 			for (float i = 1; i <= groups; ++i)
 			{
-				centre.y = spawnradius * (cos((M_PI * 2) / groups * i));
-				centre.x = spawnradius * (-sin((M_PI * 2) / groups * i));
+				centre.y = spawnradius * (cos((M_PI * 2.f) / groups * i));
+				centre.x = spawnradius * (-sin((M_PI * 2.f) / groups * i));
 
 				//for 5 shape sizes
-				for (float j = 1, max = shapes; j <= max; ++j)
+				for (float j = 1.f, max = shapes; j <= max; ++j)
 				{
 					float ang = atan2f(centre.y, centre.x);
-					pos.y = 1.f * (cos((M_PI * 2) / max * j));
-					pos.x = 1.f * (-sin((M_PI * 2) / max * j));
+					pos.y = 1.f * (cos((M_PI * 2.f) / max * j));
+					pos.x = 1.f * (-sin((M_PI * 2.f) / max * j));
 
 					def.size = i * baseSize;
 					def.heading = pos + centre;

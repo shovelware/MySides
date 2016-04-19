@@ -790,15 +790,15 @@ bool GameWorld::inMenu() const { return worldLevel_ == menuLevel_; }
 
 //Rendering helpers
 Shape* GameWorld::getPlayer() { return player_; }
-Bounds& const GameWorld::getBounds() { return *bounds_; }
-std::list<Enemy*>& const GameWorld::getShapes() {	return shapes_; }
-std::list<Projectile*>& const GameWorld::getProjectiles() { return projectiles_; }
-std::list<Side*>& const GameWorld::getSides() { return sides_; }
-std::list<Pickup::PickupI*>& const GameWorld::getPickups() { return pickups_; }
-std::list<Force*>& const GameWorld::getForces() { return forces_; }
-Level::LevelI& const GameWorld::getWorldLevel() {	return *worldLevel_; }
+const Bounds& GameWorld::getBounds() { return *bounds_; }
+const std::list<Enemy*>& GameWorld::getShapes() {	return shapes_; }
+const std::list<Projectile*>& GameWorld::getProjectiles() { return projectiles_; }
+const std::list<Side*>& GameWorld::getSides() { return sides_; }
+const std::list<Pickup::PickupI*>& GameWorld::getPickups() { return pickups_; }
+const std::list<Force*>& GameWorld::getForces() { return forces_; }
+const Level::LevelI& GameWorld::getWorldLevel() {	return *worldLevel_; }
 
-Level::LevelI& const GameWorld::getSelectedLevel() 
+const Level::LevelI& GameWorld::getSelectedLevel() 
 { 
 	if (selectedLevel_ != levels_.end()) return *(*selectedLevel_);
 	else return *menuLevel_;
@@ -1304,7 +1304,7 @@ void GameWorld::bomb(bool nuke)
 		}
 	}
 
-	else if (nuke = true)
+	else if (nuke == true)
 	{
 		//Explode shapes
 		if (shapes_.empty() == false)
@@ -1326,7 +1326,8 @@ void GameWorld::bomb(bool nuke)
 			}
 		}
 
-		audio_.playSFX("bomb", B2toSF(player_->getPosition(), true));
+		if (player_ != nullptr)
+			audio_.playSFX("bomb", B2toSF(player_->getPosition(), true));
 	}
 }
 
@@ -1365,45 +1366,184 @@ void GameWorld::f1()
 
 void GameWorld::f2()
 {
+	EnemyDef e = EnemyDef::triDef();
+	b2Vec2 pos(0, 0);
+
+	switch (di)
+	{
+	case 4:
+		e = EnemyDef::squDef();
+		break;
+	case 5:
+		e = EnemyDef::penDef();
+		break;
+	case 6:
+		e = EnemyDef::hexDef();
+		break;
+	case 7:
+		e = EnemyDef::hepDef();
+		break;
+	case 8:
+		e = EnemyDef::octDef();
+		break;
+	}
+
+	if (player_ != nullptr)
+	{
+		pos = player_->getOrientation();
+		pos *= player_->getSize() * 1.1f;
+		pos += player_->getPosition();
+	}
+
+	e.verticesMin = 3;
+	e.ai = 2;
+	e.speedScale = 0.5f;
+	e.damageScale = 0.f;
+	e.weapon = dstr;
+
+	addEnemy(e);
 }
 
 void GameWorld::f3()
 {
+	EnemyDef e = EnemyDef::triDef();
+	b2Vec2 pos(0, 0);
+
+	switch (di)
+	{
+	case 4:
+		e = EnemyDef::squDef();
+		break;
+	case 5:
+		e = EnemyDef::penDef();
+		break;
+	case 6:
+		e = EnemyDef::hexDef();
+		break;
+	case 7:
+		e = EnemyDef::hepDef();
+		break;
+	case 8:
+		e = EnemyDef::octDef();
+		break;
+	}
+
 	if (player_ != nullptr)
-		addPickup(Pickup::Type::ATTRACT, player_->getPosition(), 5000, 64.f);
+	{
+		pos = player_->getOrientation();
+		pos *= player_->getSize() * 1.1f;
+		pos += player_->getPosition();
+	}
+
+	e.verticesMin = 3;
+	e.ai = 3;
+	e.speedScale = 0.5f;
+	e.damageScale = 0.f;
+	e.weapon = dstr;
+
+	addEnemy(e);
 }
 
 void GameWorld::f4()
 {
-	selectedLevel_++;
-	if (selectedLevel_ == levels_.end())
-		selectedLevel_ = levels_.begin();
+	EnemyDef e = EnemyDef::triDef();
+	b2Vec2 pos(0, 0);
+
+	switch (di)
+	{
+	case 4:
+		e = EnemyDef::squDef();
+		break;
+	case 5:
+		e = EnemyDef::penDef();
+		break;
+	case 6:
+		e = EnemyDef::hexDef();
+		break;
+	case 7:
+		e = EnemyDef::hepDef();
+		break;
+	case 8:
+		e = EnemyDef::octDef();
+		break;
+	}
+
+	if (player_ != nullptr)
+	{
+		pos = player_->getOrientation();
+		pos *= player_->getSize() * 1.1f;
+		pos += player_->getPosition();
+	}
+
+	e.verticesMin = 3;
+	e.ai = 4;
+	e.speedScale = 0.5f;
+	e.damageScale = 0.f;
+	e.weapon = dstr;
+
+	addEnemy(e);
 }
 
 void GameWorld::f5()
 {
-	if (bounds_ != nullptr)
-		randomiseCol(bounds_);
+	EnemyDef e = EnemyDef::triDef();
+	b2Vec2 pos(0, 0);
+
+	switch (di)
+	{
+	case 4:
+		e = EnemyDef::squDef();
+		break;
+	case 5:
+		e = EnemyDef::penDef();
+		break;
+	case 6:
+		e = EnemyDef::hexDef();
+		break;
+	case 7:
+		e = EnemyDef::hepDef();
+		break;
+	case 8:
+		e = EnemyDef::octDef();
+		break;
+	}
+
+	if (player_ != nullptr)
+	{
+		pos = player_->getOrientation();
+		pos *= player_->getSize() * 1.1f;
+		pos += player_->getPosition();
+	}
+
+	e.verticesMin = 3;
+	e.ai = 5;
+	e.speedScale = 0.5f;
+	e.damageScale = 0.f;
+	e.weapon = dstr;
+
+	addEnemy(e);
 }
 
 void GameWorld::f6()
 {
-	if (player_ != nullptr)
-		randomiseCol(player_);
 }
 
 void GameWorld::f7()
-{
-}
-
-void GameWorld::f8()
 {
 	addPickup(Pickup::Type::SHIELD, b2Vec2(-10, 0), 20000);
 	addPickup(Pickup::Type::SIGHT, b2Vec2(10, 0), 20000);
 }
 
+void GameWorld::f8()
+{
+	if (player_ != nullptr)
+		randomiseCol(player_);
+}
+
 void GameWorld::f9()
 {
+	if (bounds_ != nullptr)
+		randomiseCol(bounds_);
 }
 
 void GameWorld::f0()
@@ -1423,18 +1563,22 @@ void GameWorld::f0()
 		pos += player_->getPosition();
 	}
 
-	ShapeDef enem = ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1));
+	EnemyDef enem(ShapeDef(pos, b2Vec2_zero, static_cast<int>(randFloat(3, 8) + 1)));
 	//ShapeDef enem = ShapeDef(b2Vec2(x, y), b2Vec2_zero, -1);
+	
+	enem.ai = 3;
 	enem.size = .5f;
 	enem.speedScale = .5f;
 	enem.hpScale = 5;
-	enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
-	enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
-	enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.1f, 0.3f), randFloat(0.1f, 0.3f));
+	//enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
+	//enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
+	//enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.1f, 0.3f), randFloat(0.1f, 0.3f));
+
+	float vert = enem.vertices;
+
+	enem.colPrim = b2Color(0.1f * vert,			0.5f - vert * 0.05f,		1.f - vert * 0.1f);
+	enem.colSecn = b2Color(0.2f * vert,			0.1f * vert,				0.2f * vert);
+	enem.colTert = b2Color(0.9f - vert * 0.1f,	1.f / vert,					1.f - vert * 0.1f);
 
 	addEnemy(enem);
-}
-
-void GameWorld::testBed()
-{
 }

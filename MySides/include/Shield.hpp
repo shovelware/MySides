@@ -10,7 +10,8 @@ namespace Pickup {
 
 		void update(int milliseconds);
 
-		float getStrength();
+		float getStrength() const;
+		float getRadius() const;
 
 		bool collide(Entity* other, b2Contact& contact, std::string tag);
 	private:

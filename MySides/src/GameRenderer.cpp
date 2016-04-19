@@ -40,7 +40,7 @@ void GameRenderer::render()
 {
 	drawBounds(world_->getBounds());
 
-	std::list<Side*>& sides = world_->getSides();
+	const std::list<Side*>& sides = world_->getSides();
 	if (!sides.empty())
 	{
 		for (Side* sd : sides)
@@ -50,7 +50,7 @@ void GameRenderer::render()
 		}
 	}
 	
-	std::list<Projectile*>& projs = world_->getProjectiles();
+	const std::list<Projectile*>& projs = world_->getProjectiles();
 	if (!projs.empty())
 	{
 		for (Projectile* prj : projs)
@@ -61,7 +61,7 @@ void GameRenderer::render()
 	}
 
 
-	std::list<Enemy*>& shapes = world_->getShapes();
+	const std::list<Enemy*>& shapes = world_->getShapes();
 	if (!shapes.empty())
 	{
 		for (Enemy* shp : shapes)
@@ -78,7 +78,7 @@ void GameRenderer::render()
 			drawShape(player);
 	}
 
-	std::list<Pickup::PickupI*>& pickups = world_->getPickups();
+	const std::list<Pickup::PickupI*>& pickups = world_->getPickups();
 	
 	if (!pickups.empty())
 	{
@@ -89,7 +89,7 @@ void GameRenderer::render()
 		}
 	}
 
-	std::list<Force*>& forces = world_->getForces();
+	const std::list<Force*>& forces = world_->getForces();
 	if (!forces.empty())
 	{
 		for (Force* force : forces)
@@ -100,7 +100,7 @@ void GameRenderer::render()
 	}
 }
 
-void GameRenderer::drawShape(Shape* const s)
+void GameRenderer::drawShape(const Shape* s)
 {
 	//Pull vars
 	b2Body* body = s->getBody();
@@ -199,12 +199,10 @@ void GameRenderer::drawShape(Shape* const s)
 	delete[] verts;
 }
 
-void GameRenderer::drawBounds(Bounds& const b)
+void GameRenderer::drawBounds(const Bounds& b)
 {
 	//Pull vars
 	b2Body* body = b.getBody();
-	b2Fixture* fix = body->GetFixtureList();
-	
 	sf::Vector2f pos = B2toSF(b.getPosition(), true);
 	float radius = b.getRadius();
 
@@ -212,14 +210,15 @@ void GameRenderer::drawBounds(Bounds& const b)
 	sf::Color sec = B2toSF(b.getSecondary());
 	sf::Color ter = B2toSF(b.getTertiary());
 	
-	//It must be one of two
-	if (fix->GetUserData() != "bounds")
+	//Pull other vars
+	b2ChainShape* shape = b.getPoly();
+
+	if (shape == nullptr)
 	{
-		fix = fix->GetNext();
+		drawCircle(pos, radius, pri, ter, 2);
+		return;
 	}
 
-	//Pull other vars
-	b2ChainShape* shape = static_cast<b2ChainShape*>(fix->GetShape());
 	int count = shape->m_count;
 
 	//Convert verts
@@ -267,7 +266,7 @@ void GameRenderer::drawBounds(Bounds& const b)
 	delete[] subVerts;
 }
 
-void GameRenderer::drawProjectile(Projectile* const p)
+void GameRenderer::drawProjectile(const Projectile* p)
 {
 	//Pull vars
 	b2Body* body = p->getBody();
@@ -331,7 +330,7 @@ void GameRenderer::drawProjectile(Projectile* const p)
 	}
 }
 
-void GameRenderer::drawSide(Side* const s)
+void GameRenderer::drawSide(const Side* s)
 {
 	//Pull vars
 	b2Body* body = s->getBody();
@@ -358,20 +357,18 @@ void GameRenderer::drawSide(Side* const s)
 	//drawCircle(pos, length, sec, pri, 0);
 }
 
-void GameRenderer::drawPickup(Pickup::PickupI * const p)
+void GameRenderer::drawPickup(const Pickup::PickupI* p)
 {
 	if (p->getCollected() == false)
 	{
-		b2Body* body = p->getBody();
-
-		sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
+		sf::Vector2f pos = B2toSF(p->getPosition(), true);
 
 		sf::Color pri = B2toSF(p->getPrimary());
 		sf::Color sec = B2toSF(p->getSecondary());
 		sf::Color ter = B2toSF(p->getTertiary());
 
-		b2CircleShape* shape = static_cast<b2CircleShape*>(p->getBody()->GetFixtureList()->GetShape());
-		float rad = shape->m_radius * _SCALE_;
+		
+		float rad = p->getCapsuleRadius() * _SCALE_;
 
 		drawCircle(pos, rad, pri, sec);
 		drawCircle(pos, rad / 2, sec, ter);
@@ -379,12 +376,10 @@ void GameRenderer::drawPickup(Pickup::PickupI * const p)
 
 	else
 	{
-		if (Pickup::Sight* s = dynamic_cast<Pickup::Sight*>(p))
+		if (const Pickup::Sight* s = dynamic_cast<const Pickup::Sight*>(p))
 		{
-			b2Body* body = p->getBody();
-			b2EdgeShape* ed = static_cast<b2EdgeShape*>(s->getBody()->GetFixtureList()->GetShape());
 			sf::Vector2f end = B2toSF(s->getPosition(), true);
-			sf::Vector2f beg = B2toSF(body->GetWorldPoint(ed->m_vertex2), true);
+			sf::Vector2f beg = B2toSF(s->getEnd(), true);
 			sf::Vector2f mid = end - beg;
 			bool contact = s->getContact();
 
@@ -397,18 +392,15 @@ void GameRenderer::drawPickup(Pickup::PickupI * const p)
 			drawLine(end, beg, tweakAlpha((contact ? ter : sec), 32));
 		}
 
-		else if (Pickup::Shield* s = dynamic_cast<Pickup::Shield*>(p))
+		else if (const Pickup::Shield* s = dynamic_cast<const Pickup::Shield*>(p))
 		{
-			b2Body* body = p->getBody();
-
-			sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
+			sf::Vector2f pos = B2toSF(s->getPosition(), true);
 
 			sf::Color pri = B2toSF(p->getPrimary());
 			sf::Color sec = B2toSF(p->getSecondary());
 			sf::Color ter = B2toSF(p->getTertiary());
 
-			b2CircleShape* shape = static_cast<b2CircleShape*>(p->getBody()->GetFixtureList()->GetShape());
-			float rad = shape->m_radius * _SCALE_;
+			float rad = s->getRadius();
 
 			drawCircle(pos, rad, tweakAlpha(pri,128), tweakAlpha(sec, 128));
 		}
@@ -416,12 +408,10 @@ void GameRenderer::drawPickup(Pickup::PickupI * const p)
 
 }
 
-void GameRenderer::drawForce(Force* const f)
+void GameRenderer::drawForce(const Force* f)
 {
 	//Pull vars
-	b2Body* body = f->getBody();
-
-	sf::Vector2f pos = B2toSF(body->GetWorldCenter(), true);
+	sf::Vector2f pos = B2toSF(f->getPosition(), true);
 
 	float rad = f->getRadius() * _SCALE_;
 	float force = f->getForce();

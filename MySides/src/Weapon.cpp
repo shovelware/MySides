@@ -26,6 +26,11 @@ Weapon::WeaponI::WeaponI(FireFunc& callback, ProjectileDef const &ammo, std::str
 		pin_ = false;
 	}
 
+	float Weapon::WeaponI::getRange() const
+	{
+		return output_.getRange();
+	}
+
 	void Weapon::WeaponI::setProjectile(ProjectileDef const &pd)
 	{
 		ProjectileDef output = ProjectileDef(pd);

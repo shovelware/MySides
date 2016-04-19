@@ -70,7 +70,7 @@ public:
 
 	int getCount() const { return count_; }
 	int getCountMAX() const { return countMAX_; }
-	int getPercent() const { return ((float)count_ / (float)countMAX_) * 100.f; }
+	int getPercent() const { return float((float)count_ / (float)countMAX_) * 100.f; }
 	bool checkFull() const { return count_ == countMAX_; }
 	bool checkEmpty() const {	return (count_ <= 0); }
 };

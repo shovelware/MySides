@@ -36,8 +36,13 @@ float Entity::getRotation() const
 	return body_->GetAngle();
 }
 
+b2Vec2 Entity::getVelocity() const
+{
+	return body_->GetLinearVelocity();
+}
+
 //Returns a pointer to the Entity's body
-b2Body * Entity::getBody()
+b2Body* Entity::getBody() const
 {
 	return body_;
 }

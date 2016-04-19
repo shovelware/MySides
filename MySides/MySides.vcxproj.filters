@@ -198,30 +198,6 @@
     <ClCompile Include="src\LevelMenu.cpp">
       <Filter>Source Files\Game\World\Level</Filter>
     </ClCompile>
-    <ClCompile Include="ARC\plugins\Boids.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ARC\plugins\CaptureTheFlag.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ARC\plugins\LowSpeedTurn.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ARC\plugins\MapDrive.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ARC\plugins\MultiplePursuit.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ARC\plugins\OneTurning.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ARC\plugins\Pedestrian.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ARC\plugins\Soccer.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\XController.hpp">
@@ -385,9 +361,6 @@
     </ClInclude>
     <ClInclude Include="include\Levels.hpp">
       <Filter>Header Files\Game\World\Level</Filter>
-    </ClInclude>
-    <ClInclude Include="ARC\plugins\OpenSteerDemo.h">
-      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

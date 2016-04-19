@@ -80,7 +80,7 @@ void Bounds::resize(float radius, int points)
 }
 
 //Returns the friction circle rather than bounds for testPoint
-b2CircleShape* Bounds::getCircleShape()
+b2CircleShape* Bounds::getCircleShape() const
 {
 	for (b2Fixture* fix = body_->GetFixtureList(); fix; fix = fix->GetNext())
 	{
@@ -93,7 +93,7 @@ b2CircleShape* Bounds::getCircleShape()
 	return nullptr;
 }
 
-b2ChainShape* Bounds::getPoly()
+b2ChainShape* Bounds::getPoly() const
 {
 	for (b2Fixture* fix = body_->GetFixtureList(); fix; fix = fix->GetNext())
 	{
@@ -107,12 +107,12 @@ b2ChainShape* Bounds::getPoly()
 }
 
 //Gets radius of bounds
-float Bounds::getRadius()
+float Bounds::getRadius() const
 {
 	return radius_;
 }
 
-float Bounds::getSideLength()
+float Bounds::getSideLength() const
 {
 	//a^2 = b^2 + c^2 -2bc cosA
 	float rhs = (radius_ * radius_) + (radius_ * radius_) - (2 * radius_ * radius_) * cos(2 * M_PI / points_);

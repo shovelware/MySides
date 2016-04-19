@@ -63,3 +63,8 @@ bool Pickup::PickupI::getCollected() const
 {
 	return collected_;
 }
+
+float Pickup::PickupI::getCapsuleRadius() const
+{
+	return 0.5f;
+}

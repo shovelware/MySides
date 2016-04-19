@@ -20,7 +20,7 @@ HUD::~HUD()
 void HUD::drawLevelStatus(sf::FloatRect const& box)
 {
 	//Level Info: Waves, limits, respite
-	Level::LevelI& level = world_->getWorldLevel();
+	const Level::LevelI& level = world_->getWorldLevel();
 
 	int limitMin = level.getLimit();
 	int limitMax = level.getLimitMAX();
@@ -217,7 +217,7 @@ void HUD::drawDebugInfo(sf::FloatRect const& box)
 void HUD::drawLevelInfo(sf::FloatRect const& box)
 {
 	//Level Info: Time, completion, name
-	Level::LevelI& level = world_->getWorldLevel();
+	const Level::LevelI& level = world_->getWorldLevel();
 	std::string id = level.getID();
 
 	bool started = level.getStarted();

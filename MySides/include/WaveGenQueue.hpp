@@ -14,7 +14,7 @@ namespace WaveGen
 		Wave getWave();
 		bool isEmpty() const;
 
-		void pushWave(Wave& const wave);
+		void pushWave(const Wave& wave);
 	private:
 		std::queue<Wave> waves_;
 	};

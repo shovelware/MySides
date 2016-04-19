@@ -28,7 +28,9 @@ public:
 	b2Vec2 getPosition() const;	//!< Gets position of b2Body
 	float getRotation() const;	//!< Gets rotation of b2Body
 
-	b2Body * getBody();	//!< Gets a pointer to attached b2Body
+	b2Vec2 getVelocity() const; //!< Gets velocity of b2Body
+
+	b2Body* getBody() const;	//!< Gets a pointer to attached b2Body
 
 	bool getAlive() const;	//!< Gets alive status
 	bool getActive() const;	//!< Gets active status

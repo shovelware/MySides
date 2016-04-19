@@ -135,8 +135,8 @@ namespace Level
 	{
 		if (limit_ >= limitMAX_ && timeComplete_ > -1)
 		{
-			if (timeMAX_ == 0) return true;
-			else if (timeComplete_ < timeMAX_) return true;
+			if (timeMAX_ == 0 || timeComplete_ < timeMAX_) 
+				return true;
 		}
 
 		else return false;
@@ -169,7 +169,7 @@ namespace Level
 			respiteTime_ = 0;
 	}
 
-	PlayerDef const & const LevelI::getPlayer() const
+	const PlayerDef& LevelI::getPlayer() const
 	{
 		return player_;
 	}
@@ -186,7 +186,7 @@ namespace Level
 		afx_.push(a);
 	}
 
-	std::queue<Level::AFXDef>const & const LevelI::getAFX() const
+	const std::queue<Level::AFXDef>& LevelI::getAFX() const
 	{
 		return afx_;
 	}

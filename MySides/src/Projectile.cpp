@@ -253,7 +253,7 @@ void Projectile::setOwner(Entity* o) {	owner_ = o; }
 
 b2Vec2 Projectile::getDirection() const { return heading_; }
 
-float Projectile::getNormalisedLifeTime()
+float Projectile::getNormalisedLifeTime() const
 {
 	return (float)lifeTime_ / (float)lifeTimeMAX_;
 }

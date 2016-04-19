@@ -60,13 +60,13 @@ public:
 	float getDamageScale() const;
 
 	//Damage and Death
-	bool wasDamaged();
+	bool wasDamaged() const;
 	void explode();
 
 	//New weapons system
 	void arm(Weapon::WeaponI* weapon);
 	void disarm();
-	bool getArmed();
+	bool getArmed() const;
 	Weapon::WeaponI* getWeapon() const;//???
 	bool getWeaponReady() const;
 	bool getWeaponLoading() const;
@@ -74,8 +74,8 @@ public:
 	void trigger(b2Vec2& direction);
 	void release();
 	void reup();
-	int getWeaponBar();
-	int getWeaponBarMAX();
+	int getWeaponBar() const;
+	int getWeaponBarMAX() const;
 
 	bool collide(Entity* other, b2Contact& contact, std::string tag);
 	void update(int milliseconds);

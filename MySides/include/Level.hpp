@@ -62,10 +62,10 @@ namespace Level {
 		int getRespiteTime() const;
 		void forceWave();
 
-		PlayerDef const & const getPlayer() const;
+		const PlayerDef & getPlayer() const;
 
 		void addAFX(std::string path, float nearFactor, float farFactor, float nearDistance, float farDistance);
-		std::queue<AFXDef>const &const getAFX() const;
+		const std::queue<AFXDef>& getAFX() const;
 
 		b2Color getPrimary() const;
 		b2Color getSecondary() const;

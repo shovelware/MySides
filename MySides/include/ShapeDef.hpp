@@ -10,8 +10,9 @@ public:
 		position(b2Vec2_zero),
 		heading(b2Vec2_zero),
 		size(1),
-		upgrade(true),
-		drop(true),
+		upgradeSides(true),
+		dropSides(true),
+		spawnProtection(1.f),
 		hpScale(1),
 		speedScale(1),
 		damageScale(1),
@@ -28,8 +29,9 @@ public:
 		position(position),
 		heading(heading),
 		size(1),
-		upgrade(true),
-		drop(true),
+		upgradeSides(true),
+		dropSides(true),
+		spawnProtection(1.f),
 		hpScale(10),
 		speedScale(1),
 		damageScale(1),
@@ -46,8 +48,9 @@ public:
 		position(sd.position),
 		heading(sd.heading),
 		size(sd.size),
-		upgrade(sd.upgrade),
-		drop(sd.drop),
+		upgradeSides(sd.upgradeSides),
+		dropSides(sd.dropSides),
+		spawnProtection(sd.spawnProtection),
 		hpScale(sd.hpScale),
 		speedScale(sd.speedScale),
 		damageScale(sd.damageScale),
@@ -64,8 +67,9 @@ public:
 	b2Vec2 heading;
 
 	float size;
-	bool upgrade;
-	bool drop;
+	bool upgradeSides;
+	bool dropSides;
+	float spawnProtection;
 
 	int hpScale;
 	float speedScale;

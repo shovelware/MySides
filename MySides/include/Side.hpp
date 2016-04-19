@@ -10,9 +10,9 @@ public:
 	Side(b2Body* body, const SideDef& def);
 
 	void collect();
-	float getValue();
+	float getValue() const;
 
-	b2Vec2 getHeading();
+	b2Vec2 getHeading() const;
 	float getTimer() const;
 	
 	void update(int milliseconds);

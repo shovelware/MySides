@@ -38,19 +38,20 @@ namespace Level {
 		EnemyDef enemy;
 		enemy.ai = 2;
 		enemy.damageScale = 0;
+		enemy.spawnProtection = 0.1f;
 		enemy.colPrim = level.getPrimary();
 		enemy.colSecn = level.getSecondary();
 		enemy.colTert = level.getTertiary();
 
-		enemy.size = fminf(10.f / fmaxf(count * 1.f, 1.f), 2.f);
+		enemy.size = fminf(10.f / fmaxf(fullWaveCount_ * 1.f, 1.f), 2.f);
 		int verts = fmax(3, fmin(std::ceil(randFloat(3, 8)),8));
 		enemy.verticesMin = 3;
 		enemy.verticesMax = 3;
 		enemy.vertices = 3;
 		enemy.hpScale = 1;
-		enemy.drop = false;
+		enemy.dropSides = false;
 
-		float increm = (((22.f/7.f) * 2.f / fullWaveCount_) * count);
+		float increm = ((b2_pi * 2.f / fullWaveCount_) * count);
 		b2Vec2 pos;
 		pos.y = rad * (-cos(increm));
 		pos.x = rad * (sin(increm));

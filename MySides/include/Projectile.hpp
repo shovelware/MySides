@@ -19,7 +19,7 @@ public:
 
 	b2Vec2 getDirection() const;
 
-	float getNormalisedLifeTime();
+	float getNormalisedLifeTime() const;
 
 	void update(int milliseconds);
 	bool collide(Entity* other, b2Contact& contact, std::string tag);

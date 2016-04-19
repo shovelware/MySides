@@ -59,7 +59,7 @@ public:
 
 	int getCharge() const { return charge_; }
 	int getChargeMAX() const { return chargeMAX_; }
-	int getPercent() const { return ((float)charge_ / (float)chargeMAX_) * 100.f; }
+	float getPercent() const { return ((float)charge_ / (float)chargeMAX_) * 100.f; }
 	bool checkFull() const { return charge_ == chargeMAX_; }
 	bool checkEmpty() const { return charge_ == 0; }
 };

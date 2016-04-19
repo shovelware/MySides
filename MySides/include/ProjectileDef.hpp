@@ -130,6 +130,28 @@ public:
 	Entity* owner;
 
 	bool isValid() const { return lifeTime >= 0; }
+
+	float getRange() const {
+		float dist = 0;
+		float speed = 0;
+
+		if (height != 0)
+		{
+			speed = 0.05f * (width * height);
+			speed *= velScale;
+
+			dist = lifeTime * speed;
+		}
+
+		else {
+			speed = 0.05f * (b2_pi * (width * width));
+			speed *= velScale;
+
+			dist = lifeTime * speed;
+		}
+
+		return dist;
+	}
 };
 
 #endif

@@ -86,6 +86,13 @@ bool Pickup::Sight::collide(Entity* other, b2Contact& contact, std::string tag)
 }
 bool Pickup::Sight::getContact() const { return contact_; }
 
+b2Vec2 Pickup::Sight::getEnd() const
+{
+	b2EdgeShape* ed = static_cast<b2EdgeShape*>(body_->GetFixtureList()->GetShape());
+	b2Vec2 beg = body_->GetWorldPoint(ed->m_vertex2);
+	return beg;
+}
+
 void Pickup::Sight::update(int milliseconds)
 {
 	Pickup::PickupI::update(milliseconds);

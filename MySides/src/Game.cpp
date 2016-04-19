@@ -87,9 +87,7 @@ int Game::run()
 	//Game loop
 	while (!quit_)
 	{
-		//Take inputs, hand other events to a vector
-		//process these events in processevents later
-		//processEvents(inputManager.update());?
+		//Process window events
 		processEvents();
 
 		update_ = (window_.hasFocus());// && mousein_);
@@ -129,8 +127,9 @@ int Game::run()
 
 		if (!pause_)
 			world_->step(frameTime.asMilliseconds());
-
+			
 		render();
+
 	}
 #pragma endregion
 
@@ -397,7 +396,7 @@ void Game::handleInput(sf::Time dt)
 					world_->di = 0;
 			}
 
-			//Scrolling fun select
+			//F : Scrolling fun select
 			if (key_.isKeyPressed(Key::F) || con_.checkPressed(XINPUT_GAMEPAD_DPAD_UP))
 			{
 				world_->dstr = "fungun";

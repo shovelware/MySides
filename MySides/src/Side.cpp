@@ -62,12 +62,12 @@ void Side::collect()
 	setActive(false);
 }
 
-float Side::getValue()
+float Side::getValue() const
 {
 	return std::ceil(length_); //Round up as some shapes can drop sides of <1 length
 }
 
-b2Vec2 Side::getHeading()
+b2Vec2 Side::getHeading() const
 {
 	return heading_;
 }

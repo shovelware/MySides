@@ -24,7 +24,7 @@ namespace WaveGen {
 		return waves_.size() == 0;
 	}
 
-	void WaveGeneratorQueue::pushWave(Wave& const wave)
+	void WaveGeneratorQueue::pushWave(const Wave& wave)
 	{
 		waves_.push(wave);
 	}

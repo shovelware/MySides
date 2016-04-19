@@ -23,12 +23,12 @@ private:
 
 	GameWorld* world_;
 
-	void drawShape(Shape* const s);
-	void drawBounds(Bounds& const b);
-	void drawProjectile(Projectile* const p);
-	void drawSide(Side* const s);
-	void drawPickup(Pickup::PickupI* const p);
-	void drawForce(Force* const f);
+	void drawShape(const Shape* s);
+	void drawBounds(const Bounds& b);
+	void drawProjectile(const Projectile* p);
+	void drawSide(const Side* s);
+	void drawPickup(const Pickup::PickupI* p);
+	void drawForce( const Force*f);
 };
 
 #endif

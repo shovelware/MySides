@@ -30,6 +30,7 @@ namespace Pickup
 		Shape* getOwner() const;
 		bool getCollected() const;
 
+		float getCapsuleRadius() const;
 
 	protected:
 		PickupI(b2Body* body, int time);

@@ -117,14 +117,14 @@ public:
 
 	//Return a reference to items for drawing
 	Shape* getPlayer();
-	Bounds& const getBounds();
-	std::list<Enemy*>& const getShapes();
-	std::list<Projectile*>& const getProjectiles();
-	std::list<Side*>& const getSides();
-	std::list<Pickup::PickupI*>& const getPickups();
-	std::list<Force*>& const getForces();
-	Level::LevelI& const getWorldLevel();
-	Level::LevelI& const getSelectedLevel();
+	const Bounds& getBounds();
+	const std::list<Enemy*>& getShapes();
+	const std::list<Projectile*>& getProjectiles();
+	const std::list<Side*>& getSides();
+	const std::list<Pickup::PickupI*>& getPickups();
+	const std::list<Force*>& getForces();
+	const Level::LevelI& getWorldLevel();
+	const Level::LevelI& getSelectedLevel();
 	float getTransitionProgress();
 
 
@@ -150,7 +150,6 @@ public:
 	/////Debug
 	std::string dstr;
 	int di;
-	void testBed();
 	void f1();
 	void f2();
 	void f3();
