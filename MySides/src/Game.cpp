@@ -376,31 +376,16 @@ void Game::handleInput(sf::Time dt)
 
 			// - : Debug int decrement
 			if (key_.isKeyPressed(Key::Dash) ||
-				con_.checkDown(XINPUT_GAMEPAD_DPAD_LEFT))
+				con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT))
 			{
-				int time = (con_.checkTimeHeld(XINPUT_GAMEPAD_DPAD_LEFT) - 400);
-
-				if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_LEFT) ||
-					(time > 0 && time % 160 == 0))
-				{
-					world_->di--;
-				}
-				else world_->di--;
+				world_->di--;
 			}
 
 			// + : Debug int increment
 			if (key_.isKeyPressed(Key::Equal) ||
-				con_.checkDown(XINPUT_GAMEPAD_DPAD_RIGHT))
+				con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT))
 			{
-				int time = (con_.checkTimeHeld(XINPUT_GAMEPAD_DPAD_RIGHT) - 400);
-
-				if (con_.checkPressed(XINPUT_GAMEPAD_DPAD_RIGHT) ||
-					(time > 0 && time % 160 == 0))
-				{
-					world_->di++;
-				}
-
-				else world_->di++;
+				world_->di++;
 			}
 
 			//G : Scrolling Weapon Select

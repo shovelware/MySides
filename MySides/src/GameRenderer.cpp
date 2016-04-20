@@ -21,13 +21,23 @@ sf::Color GameRenderer::tweakAlpha(const sf::Color & col, int alpha) const
 
 sf::Color GameRenderer::blend(const sf::Color& a, int aParts, const sf::Color& b, int bParts) const
 {
-	
+	sf::Color total;
 	int totalParts = aParts + bParts;
 
-	sf::Color total(
-		(a.r * aParts + b.r * bParts) / totalParts,
-		(a.g * aParts + b.g * bParts) / totalParts,
-		(a.b * aParts + b.b * bParts) / totalParts);
+	if (aParts > 0 && bParts > 0)
+		total = sf::Color(
+			(a.r * aParts + b.r * bParts) / totalParts,
+			(a.g * aParts + b.g * bParts) / totalParts,
+			(a.b * aParts + b.b * bParts) / totalParts);
+
+	else if (aParts == 0 && bParts == 0)
+		total = sf::Color::White;
+
+	else if (aParts == 0)
+		total = b;
+
+	else if (bParts == 0)
+		total = a;
 
 		return total;
 }
@@ -112,6 +122,9 @@ void GameRenderer::drawShape(const Shape* s)
 
 	int hp = s->getHP();
 	int hpm = s->getHPMax();
+	int hpcm = s->getCurrentHPMax();
+	float hpp = (float)hp / (float)hpm;
+	float hpcp = (float)hp / (float)hpcm;
 	bool dmg = s->wasDamaged();
 
 	bool alive = s->getAlive();
@@ -171,7 +184,47 @@ void GameRenderer::drawShape(const Shape* s)
 	drawPolygon(verts, count, pri, sec);
 
 	//Centre circle
-	drawCircle(pos, scaledSize / 8, sec, sec, 0);
+	sf::Color circFCol = sec;
+	sf::Color circOCol = pri;
+	float rad = scaledSize / 8;
+	float dent = 0;
+
+	//Indicate enemy mood
+	if (const Enemy* e = dynamic_cast<const Enemy*>(s))
+	{
+		int state = e->getStateOfMind();
+		if (state == 8)
+		{
+			circFCol = sf::Color::Black;
+			circOCol = sf::Color::White;
+		}
+
+		else if (state == -1)
+		{
+			circFCol = pri;
+			circOCol = sec;
+			
+		}
+
+		else if (state == 0)
+		{
+			float temp = e->getTemp();
+			if (temp < 0)
+				circFCol = blend(ter, abs(temp), sec, abs(temp / 2));
+			else if (temp > 0)
+				circFCol = blend(sec, abs(temp), ter, abs(temp / 2));
+
+			else circFCol = blend(ter, 1, sec, 1);
+		}
+
+		else if (state == 1)
+		{
+			circFCol = ter;
+			circOCol = sec;
+		}
+	}
+
+	drawCircle(pos, rad, circFCol, circOCol, dent);
 
 	//Spawning shield
 	if (!alive)

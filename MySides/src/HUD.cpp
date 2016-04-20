@@ -217,9 +217,12 @@ void HUD::drawDebugInfo(sf::FloatRect const& box)
 void HUD::drawLevelInfo(sf::FloatRect const& box)
 {
 	//Level Info: Time, completion, name
-	const Level::LevelI& level = world_->getWorldLevel();
-	std::string id = level.getID();
+	const Level::LevelI& wlevel = world_->getWorldLevel();
+	const Level::LevelI& slevel = world_->getSelectedLevel();
 
+	const Level::LevelI& level = world_->inMenu() ? slevel : wlevel;
+	std::string id = level.getID();
+	
 	bool started = level.getStarted();
 	bool complete = level.getComplete();
 

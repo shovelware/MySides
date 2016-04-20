@@ -11,7 +11,7 @@ Bounds::Bounds(b2Body* body, float radius) :
 	b2ChainShape chain;
 	fillChain(chain, radius, points_);
 	boundsDef_.shape = &chain;
-	boundsDef_.isSensor = false;
+	boundsDef_.isSensor = true;
 
 	//Add material properties to the fixture
 	boundsDef_.density = 0.0f;

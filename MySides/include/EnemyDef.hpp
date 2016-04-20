@@ -2,6 +2,7 @@
 #define MS_ENEMYDEF_HPP
 
 #include "ShapeDef.hpp"
+#include "AIDef.hpp"
 
 class EnemyDef : public ShapeDef {
 public:
@@ -9,6 +10,7 @@ public:
 		ShapeDef(ShapeDef()),
 		weapon(""),
 		weaponLevel(0),
+		brain(AIDef()),
 		ai(0)
 	{}
 
@@ -16,6 +18,7 @@ public:
 		ShapeDef(sd),
 		weapon(""),
 		weaponLevel(0),
+		brain(AIDef()),
 		ai(0)
 	{}
 
@@ -23,11 +26,12 @@ public:
 		ShapeDef(ed),
 		weapon(ed.weapon),
 		weaponLevel(ed.weaponLevel),
+		brain(ed.brain),
 		ai(ed.ai)
 	{}
 
 	int ai;
-	//AIDef brain AIDef();
+	AIDef brain;
 
 	std::string weapon = "";
 	int weaponLevel = 0;

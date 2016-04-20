@@ -315,7 +315,7 @@ Weapon::WeaponI* Weapon::Armory::getFun(int type)
 	case 666:
 	{
 		ProjectileDef wave = ProjectileDef();
-		wave.velScale = 0.5f;
+		wave.velScale = 0.75f;
 		wave.width = 2.5f;
 		wave.height = 1.5f;
 		wave.bounce = 1.f;

@@ -50,6 +50,7 @@ public:
 
 	//HP values
 	int getHP() const;
+	unsigned int getCurrentHPMax() const;
 	unsigned int getHPMax() const;
 	int getUHP() const;
 	unsigned int getUHPMax() const;

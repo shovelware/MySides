@@ -45,9 +45,9 @@ public:
 	b2Color getSecondary() const;
 	b2Color getTertiary() const;
 
-	void setPrimary(b2Color col);
-	void setSecondary(b2Color col);
-	void setTertiary(b2Color col);
+	virtual void setPrimary(b2Color col);
+	virtual void setSecondary(b2Color col);
+	virtual void setTertiary(b2Color col);
 
 	virtual void kill();
 

@@ -78,7 +78,7 @@ namespace Level {
 
 				enem.position = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
 				enem.position.Normalize();
-				enem.position *= radius * 0.1f;
+				enem.position *= radius * 0.4f;
 				enem.ai = 3;
 				enem.speedScale = 0.5f;
 				enem.faction = 2;
@@ -518,9 +518,9 @@ namespace Level {
 		static Level::LevelI* testSteer()
 		{
 			PlayerDef play(basePlayer());
-			play.weapon = "coilgun";
+			play.weapon = "pistol";
 			play.weaponLevel = 5;
-			play.bombRadius = 32;
+			play.bombRadius = 64;
 			play.bombTime = 1000;
 
 			Level::Survival* steerlvl = new Level::Survival("teststeer", play);
@@ -538,15 +538,15 @@ namespace Level {
 			steerlvl->setSurvivalTime(-1);
 			steerlvl->setRespiteTimeMAX(-1);
 
-			EnemyDef e(ShapeDef(b2Vec2_zero, b2Vec2_zero, 3));
+			EnemyDef e(ShapeDef(b2Vec2_zero, b2Vec2_zero, 5));
 			e.damageScale = 0;
-			e.ai = 3;
+			e.ai = 5;
 			e.faction = 2;
 			e.colPrim = b2Color(1.f, 0.f, 0.f);
 			e.colSecn = b2Color(1.f, 1.f, 0.f);
 			e.colTert = b2Color(0, 0, 0);
 			e.hpScale = 5;
-			e.speedScale = 0.5;
+			e.speedScale = 0.75f;
 			e.weapon = "pistol";
 			e.weaponLevel = 0;
 

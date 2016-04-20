@@ -64,7 +64,7 @@ GameWorld::GameWorld() :
 	getControlled_ = std::bind(&GameWorld::getControlled, this);
 
 	//Level
-	//populateLevelList();
+	populateLevelList();
 	//selectedLevel_ = levels_.end();
 	//loadMenu();
 
@@ -457,7 +457,7 @@ void GameWorld::populateLevelList()
 	levels_.push_back(Level::Atlas::testComplete());
 	levels_.push_back(Level::Atlas::testAI());
 	levels_.push_back(Level::Atlas::testSteer());
-	
+
 	//Menu Level
 	{
 		PlayerDef play(Level::Atlas::basePlayer());
@@ -727,7 +727,10 @@ void GameWorld::popInside(Entity * ent)
 		//ent->setPosition(between);
 
 		//Push inside
-		between *= 0.5f;
+		between *= 0.25f;
+
+		if (ent == player_)
+			between *= 0.5f;
 
 		ent->getBody()->ApplyForceToCenter(-between, true);
 	}
@@ -942,7 +945,7 @@ void GameWorld::updateProjectile(int dt)
 
 			prj->update(dt);
 
-			bool inside = prj->getPosition().Length() < bounds_->getRadius();
+			bool inside = prj->getPosition().Length() < bounds_->getRadius() * 1.1f;
 
 			//If we're not active, or outside the bounds increment by deleting
 			if (prj->getActive() == false || !inside)
@@ -1110,6 +1113,8 @@ void GameWorld::updateLevel(int dt)
 
 		for (auto iter = wv.begin(), end = wv.end(); iter != end; ++iter)
 		{
+			b2Vec2 pos = iter->first.position;
+
 			for (int i = 0, max = iter->second; i < max; ++i)
 			{
 				if (iter->second > 1)
@@ -1120,15 +1125,16 @@ void GameWorld::updateLevel(int dt)
 					//new_x = length * cos(angle);
 					//new_y = length * sin(angle);
 
-					b2Vec2 pos = iter->first.position;
-					float dist = pos.Length();
-					float angle = atan2f(pos.y, pos.x);
-					float increm = ((M_PI * 2 / max) * i);
+					b2Vec2 adjust(randFloat(-iter->first.size * iter->second, iter->first.size * iter->second), 
+									randFloat(-iter->first.size * iter->second, iter->first.size * iter->second));
+					adjust.Normalize();
+					//float angle = atan2f(pos.y, pos.x);
+					//float increm = ((M_PI * 2 / max) * i);
+					//
+					//pos.y = dist * ( cos(increm));
+					//pos.x = dist * (-sin(increm));
 
-					pos.y = dist * ( cos(increm));
-					pos.x = dist * (-sin(increm));
-
-					iter->first.position = pos;
+					iter->first.position = pos + adjust;
 				}
 
 				addEnemy(iter->first);
@@ -1358,6 +1364,7 @@ void GameWorld::f1()
 		enem.ai = 1;
 		enem.weapon = dstr;
 		enem.weaponLevel = i;
+		enem.faction = 2;
 
 		addEnemy(enem);
 
@@ -1400,6 +1407,7 @@ void GameWorld::f2()
 	e.speedScale = 0.5f;
 	e.damageScale = 0.f;
 	e.weapon = dstr;
+	e.faction = 2;
 
 	addEnemy(e);
 }
@@ -1440,6 +1448,7 @@ void GameWorld::f3()
 	e.speedScale = 0.5f;
 	e.damageScale = 0.f;
 	e.weapon = dstr;
+	e.faction = 2;
 
 	addEnemy(e);
 }
@@ -1480,6 +1489,7 @@ void GameWorld::f4()
 	e.speedScale = 0.5f;
 	e.damageScale = 0.f;
 	e.weapon = dstr;
+	e.faction = 2;
 
 	addEnemy(e);
 }
@@ -1520,6 +1530,7 @@ void GameWorld::f5()
 	e.speedScale = 0.5f;
 	e.damageScale = 0.f;
 	e.weapon = dstr;
+	e.faction = 2;
 
 	addEnemy(e);
 }
@@ -1570,6 +1581,7 @@ void GameWorld::f0()
 	enem.size = .5f;
 	enem.speedScale = .5f;
 	enem.hpScale = 5;
+	enem.size = randFloat(0.5f, 1.5f);
 	//enem.colPrim = b2Color(randFloat(0.9f, 1.f), randFloat(0.f, 1.f), 0.f);
 	//enem.colSecn = b2Color(randFloat(0.6f, 1.f), randFloat(0.6f, 1.f), 0.f);
 	//enem.colTert = b2Color(randFloat(0.5f, 1.f), randFloat(0.1f, 0.3f), randFloat(0.1f, 0.3f));

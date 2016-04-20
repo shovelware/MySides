@@ -362,6 +362,9 @@
     <ClInclude Include="include\Levels.hpp">
       <Filter>Header Files\Game\World\Level</Filter>
     </ClInclude>
+    <ClInclude Include="include\AIDef.hpp">
+      <Filter>Header Files\Game\World\Def</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\GameWorld.inl">

@@ -43,8 +43,8 @@ namespace Level {
 		enemy.colSecn = level.getSecondary();
 		enemy.colTert = level.getTertiary();
 
-		enemy.size = fminf(10.f / fmaxf(fullWaveCount_ * 1.f, 1.f), 2.f);
-		int verts = fmax(3, fmin(std::ceil(randFloat(3, 8)),8));
+		enemy.size = fmaxf(10.f / fmaxf(fullWaveCount_ * 1.f, 1.f), 2.f);
+		int verts = fmax(3, fminf(std::ceil(randFloat(3, 8)),8));
 		enemy.verticesMin = 3;
 		enemy.verticesMax = 3;
 		enemy.vertices = 3;

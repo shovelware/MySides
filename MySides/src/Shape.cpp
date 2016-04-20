@@ -398,6 +398,19 @@ int Shape::getHP() const
 	return hp; 
 }
 
+unsigned int Shape::getCurrentHPMax() const
+{
+	int mhp = 0;
+	int vertmax = vertices_;
+
+	for (int vrts = vertmax; vrts > verticesMIN_; --vrts)
+	{
+		mhp += vrts * hpScale_;
+	}
+
+	return mhp;
+}
+
 unsigned int Shape::getHPMax() const 
 {
 	int mhp = 0;
@@ -541,7 +554,7 @@ void Shape::trigger(b2Vec2& direction)
 	}
 
 	//Otherwise face towards new direction
-	else orient(dir);
+	//else orient(dir);
 
 	//If we can fire, do so
 	if (weapon_ != nullptr)
