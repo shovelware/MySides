@@ -47,13 +47,21 @@ private:
 
 	//Struct for holding flocking vars ? 
 	struct LJVal {
+		LJVal(float a, float b, float n, float m) :
+			attractForce(a),
+			sepForce(b),
+			attrAtten(n),
+			sepAtten(m)
+		{}
+
+
 		float attractForce = 0;
 		float sepForce = 0;
 		float attrAtten = 0;
 		float sepAtten = 0;
 	};
 
-	//AI Profiles
+	//AI Tests
 	void blindFire();
 	void classicAI();
 	void flockTest();
@@ -105,60 +113,74 @@ private:
 
 	b2Vec2 LenardJonesPotential(const Shape* const other, int& count) const;
 
-	//Testing ai
-	void ai3();
-	void ai4();
-	void ai5();
-	void ai6();
-	void ai7();
-	void ai8();
-	void ai9();
-
 	//Mindist betwen shape and self
 	float minDist(Shape* other);
 	b2Vec2 between(Shape* other);
 
 	//AI Variables
 	State stateOfMind_;
-
+	int startingHP_;
+	bool fired_; //If we've fired
+	bool panic_;
 	AIDef brainStem_;
 
+	//Player awareness
+	Shape* player_;
+	bool play_ = false;
+
 	//Ranges for actions
-	float flockRange_ = 10.f; //Flocking range
-	float visRange_ = 20.f; //Vision range
 
-	float chaseRange_ = 10.f; //Chase Player range
-	float chaseMAXRange_ = 20.f; //Stop Chase Player range
-
-	bool panic_ = false;
-	float fearRange_ = 10.f; //Flee player range
-	float fearRangeMIN_ = 15; //Stop Flee Player range
-
-	float minDist_ = 0;
-
-	float accuracy_ = 0.4f; //Spread of fire
-	bool fired_; //If we've fired
-	
-	//LastDamage in enemy
-	int startingHP_;
+	//Flocking range
+	float flockRange_ = 10.f; 
 
 	//Temperature control
 	float angry_ = 0;
-	float boilingPoint_ = 50.f;
-	float angryMAX_ = 100.f;
+	const static int boilingPoint_ = 50;
+	const static int angryMAX_ = 100;
 	
-	float triggerSatisfaction_ = 4.f;
-
 	float chill_ = 0;
-	float freezingPoint_ = -50.f;
-	float chillMIN_ = -100.f;
+	const static int freezingPoint_ = -50;
+	const static int chillMIN_ = -100;
 
-	float ouch_ = 0.2f; //When to flee
+	//Vision range
+	const static float visRange_[5];
 
+	//Chase Player range
+	const static float chaseRange_[5];
+	//Stop Chase Player range
+	const static float chaseRangeMAX_[5];
+
+	//Flee player range
+	const static float fearRange_[5];
+	//Stop Flee Player range
+	const static float fearRangeMIN_[5];
+
+	//Flock attenuation
+	const static float flockN_[5];
+
+	//Mood multipliers
+	const static float moodMult_[5];
+
+	//Spread of fire
+	const static float accuracy_[5];
+	
+	//Firing cooldown
+	const static float triggerSatisfaction_[5];
+	
+	//Flee health percentage
+	const static float ouch_[5];
+
+	//Dance speed
+	const static float dance_[5];
+
+	const static LJVal fireLJ;
+	const static LJVal sepOnlyLJ;
+	const static LJVal flockSameLJ;
+	const static LJVal fleeSameLJ;
+	const static LJVal fleeOtherLJ;
+
+	//Legay AI
 	bool chasing_ = false;
-
-	Shape* player_;
-	bool play_ = false;
 };
 
 #endif

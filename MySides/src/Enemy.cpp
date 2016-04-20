@@ -2,12 +2,39 @@
 
 std::list<Enemy*> Enemy::swarm_ = std::list<Enemy*>();
 
+float const Enemy::visRange_[5] = { 16.f, 18.f, 20.f, 22.f, 24.f };
+
+float const Enemy::chaseRange_[5] = { 1.f, 2.f, 4.f, 6.f, 8.f };
+float const Enemy::chaseRangeMAX_[5] = { 8.f, 10.f, 12.f, 14.f, 16.f};
+
+float const Enemy::fearRange_[5] = { 0.f, 2.f, 4.f, 6.f, 8.f };
+float const Enemy::fearRangeMIN_[5] = { 8.f, 9.f, 10.f, 12.f, 14.f };
+
+float const Enemy::flockN_[5] = { 1.8f, 1.4f, 1.2f, 1.0f, 0.9f };
+
+float const Enemy::moodMult_[5] = { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f };
+
+float const Enemy::accuracy_[5] = { 0.5f, 0.4f, 0.3f, 0.2f, 0.1f };
+float const Enemy::triggerSatisfaction_[5] = { 50.f, 20.f, 10.f, 4.f, 1.f };
+
+float const Enemy::ouch_[5] = { 0.5f, 0.4f, 0.2f, 0.1f, 0 };
+
+float const Enemy::dance_[5] = { 0.025f, 0.05f, 0.1f, 0.2f, 0.5f };
+
+Enemy::LJVal const Enemy::sepOnlyLJ = Enemy::LJVal(0, 100, 0, 1.8f);
+Enemy::LJVal const Enemy::flockSameLJ = Enemy::LJVal(75, 300, 1.0, 1.8f);
+Enemy::LJVal const Enemy::fleeSameLJ = Enemy::LJVal(75, 200, 1.0, 1.8f);
+Enemy::LJVal const Enemy::fleeOtherLJ = Enemy::LJVal(75, 100, 0.5, 1.8f);
+
 Enemy::Enemy(b2Body* body, const EnemyDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) :
 	Shape(body, def, callback),
 	getPlayer_(player),
 	aistate(def.ai),
 	brainStem_(def.brain),
-	stateOfMind_(IDLE)
+	stateOfMind_(IDLE),
+	panic_(false),
+	chasing_(false),
+	fired_(false)
 {
 	imprint(brainStem_);
 	startingHP_ = getHP();
@@ -32,8 +59,11 @@ float Enemy::getRange() const {	return (getArmed() ? weapon_->getRange() : 0.f);
 //Gets the current vertices
 int Enemy::getVertices() const { return vertices_; }
 
-void Enemy::imprint(const AIDef & def)
+void Enemy::imprint(const AIDef& def)
 {
+	brainStem_ = def;
+	brainStem_.validate();
+
 }
 
 int Enemy::getStateOfMind() const
@@ -69,17 +99,8 @@ void Enemy::update(int milliseconds)
 	//Classic AI
 	else if (aistate == 2) classicAI();
 
-	//Testing funcs
-	else if (aistate == 3) ai3();
-	else if (aistate == 4) ai4();
-	
-	//Come on baby, daddy needs a 2:1
-	else if (aistate == 5) ai5();
-
-	else if (aistate == 6) ai6();
-	else if (aistate == 7) ai7();
-	else if (aistate == 8) ai8();
-	else if (aistate == 9) ai9();
+	//Noveaux Inteilligience Aritificiele
+	else execute(ruminate());
 }
 
 //Only deals with the effects of this collision on this entity
@@ -94,57 +115,6 @@ bool Enemy::collide(Entity * other, b2Contact& contact, std::string tag)
 
 	return handled;
 }
-
-#pragma region Testing AIs
-
-void Enemy::ai3()
-{
-	ljpTest();
-}
-
-void Enemy::ai4()
-{
-	b2Vec2 steer;
-	Shape* player = getPlayer_();
-	float dist = visRange_ * 2;
-	
-	if (player)
-	{
-		dist = (player->getPosition() - getPosition()).Length();
-
-		if (dist < visRange_)
-		{
-			steer = pursue(player->getPosition(), player->getVelocity(), minDist(player));
-		}
-	}
-
-	if (dist > visRange_)
-	{
-		steer = wander(getOrientation(), 1.f);
-	}
-
-	move(steer);
-	orient(steer);
-}
-
-void Enemy::ai5()
-{
-	execute(ruminate());
-}
-
-void Enemy::ai6()
-{}
-
-void Enemy::ai7()
-{}
-
-void Enemy::ai8()
-{}
-
-void Enemy::ai9()
-{}
-
-#pragma endregion
 
 #pragma region AI Profiles
 //Fire forward and brake
@@ -237,7 +207,7 @@ void Enemy::flockTest()
 	Shape* player = getPlayer_();
 	if (player)
 	{
-		if ((player->getPosition() - getPosition()).Length() < visRange_)
+		if ((player->getPosition() - getPosition()).Length() < visRange_[3])
 		{
 			//swarmTarget_ = player;
 			//sum += LenardJonesPotential(player, count);
@@ -270,7 +240,7 @@ void Enemy::flockTest()
 	}
 }
 
-//AI 3
+//Behaviour based AI
 void Enemy::behavTest()
 {
 	Shape* player = getPlayer_();
@@ -283,11 +253,11 @@ void Enemy::behavTest()
 
 		b2Vec2 steer = pursue(pos, vel, dist);
 		move(steer);
-		orient(toward);
+		orient(-toward);
 	}
 }
 
-//AI 4
+//Lennard-Jones based AI
 void Enemy::ljpTest()
 {
 	b2Vec2 sum(0, 0);
@@ -304,12 +274,12 @@ void Enemy::ljpTest()
 		b2Vec2 between = (pPos - myPos);
 		float dist = between.Length();
 
-		if (!chasing_ && dist < chaseRange_)
+		if (!chasing_ && dist < chaseRange_[3])
 		{
 			chasing_ = true;
 		}
 
-		if (chasing_ && dist < chaseMAXRange_)
+		if (chasing_ && dist < chaseRangeMAX_[4])
 		{
 			chase = LJP(pPos, 100.f, 200.f, 1.0, 1.8);
 		}
@@ -317,7 +287,7 @@ void Enemy::ljpTest()
 		else chasing_ = false;
 
 		//Fire if in visible range
-		if (dist < visRange_)
+		if (dist < visRange_[3])
 		{
 			fire = LJP(pPos, 100, 0, 2.0, 0);
 		}
@@ -370,7 +340,7 @@ void Enemy::ljpTest()
 	float seePlayer = fire.Length();
 	if (seePlayer == 0)
 	{
-		angry_ -= angryMAX_ / triggerSatisfaction_;
+		angry_ -= angryMAX_ / triggerSatisfaction_[4];
 	}
 
 	else
@@ -386,8 +356,7 @@ void Enemy::ljpTest()
 	{
 		if (fireAt(fire, 0.2f))
 		{
-			fired_ = true;
-			angry_ -= triggerSatisfaction_;
+			angry_ -= triggerSatisfaction_[4];
 		}
 		else release();
 
@@ -436,7 +405,7 @@ void Enemy::execute(const Reaction& reaction)
 	move(reaction.move);
 
 	if (reaction.fire)
-		fireAt(reaction.look, accuracy_); //*// Weapon training
+		fireAt(reaction.look, accuracy_[brainStem_.weapon_training]); //*// Weapon training
 
 	else orient(reaction.look);
 }
@@ -455,44 +424,44 @@ Enemy::Reaction Enemy::ruminate()
 	float between = FLT_MAX;
 	if (play_) between = (getPosition() - player_->getPosition()).Length();
 
+	//If the player's dead, hang ten
+	if (!play_) stateOfMind_ = IDLE;
+
 	//Flee if hurt
-	if (hpf < ouch_) stateOfMind_ = FLEE;
+	else if (hpf < ouch_[brainStem_.pain_tolerance]) stateOfMind_ = FLEE;
 
 	//Otherwise think about what we should do
 	else switch (stateOfMind_)
 	{
 	//If we're running, check if we're healthy enough to stop
 	case FLEE:
-		if (hpf > ouch_) stateOfMind_ = IDLE;
+		if (hpf > ouch_[brainStem_.pain_tolerance]) stateOfMind_ = IDLE;
 		
 	//If we're chilling, check if the player is messing with the bull
 	case IDLE:
-		if (play_ && between < 128 && between <= chaseRange_) stateOfMind_ = CHASE;
+		if (play_ && between < 128 && between <= chaseRange_[brainStem_.personal_space] * size_ || angry_ == angryMAX_) stateOfMind_ = CHASE;
 	
 	//If we're chasing, make sure we can still see him
 	case CHASE:
-			if (play_ && between > chaseMAXRange_) stateOfMind_ = IDLE;
+			if (play_ && between > chaseRangeMAX_[brainStem_.perserverance] * size_) stateOfMind_ = IDLE;
 	}
-	
-	std::cout << hpf << " " << ouch_ << std::endl;
 
 	//Execute our current mood
 	switch (stateOfMind_)
 	{
 	case IDLE:
-		std::cout << "idle" << std::endl;
+		//std::cout << "idle" << std::endl;
 		return idle();
 		break;
 	case CHASE:
-		std::cout << "chase" << std::endl;
+		//std::cout << "chase" << std::endl;
 		return chase();
 		break;
 	case FLEE:
-		std::cout << "flee" << std::endl;
+		//std::cout << "flee" << std::endl;
 		return flee();
 		break;
 	}
-
 
 	return Reaction();
 }
@@ -506,10 +475,10 @@ Enemy::Reaction Enemy::idle()
 
 	if (r.look.Length() <= 0)
 	{
-		r.look = spin(-0.05f);
+		r.look = spin(dance_[brainStem_.dancer] * brainStem_.CCW ? -1 : 1);
 	}
 	
-	//std::cout << "A" << angry_ << " C " << chill_ << std::endl;
+	std::cout << "A" << angry_ << " C " << chill_ << std::endl;
 
 	return r;
 }
@@ -528,16 +497,16 @@ Enemy::Reaction Enemy::flee()
 	float dist = (pPos - getPosition()).Length();
 
 	//If we're scared but out of range
-	if (panic_ && dist >= fearRangeMIN_) panic_ = false;
+	if (panic_ && dist >= fearRangeMIN_[brainStem_.paranoia]) panic_ = false;
 
 	//Or scared and still in range
-	else if (panic_ && dist < fearRangeMIN_)
+	else if (panic_ && dist < fearRangeMIN_[brainStem_.paranoia])
 	{
 		rFleeV = LJP(pPos, 0, 300, 0, 1.0);
 	}
 
 	//If we're not scared and she's RIGHT THERE ARGH
-	else if (!panic_ && dist < fearRange_)
+	else if (!panic_ && dist < fearRange_[brainStem_.evasiveness])
 	{
 		rFleeV = LJP(pPos, 0, 300, 0, 1.0);
 		panic_ = true;
@@ -573,6 +542,7 @@ Enemy::Reaction Enemy::chase()
 	return r;
 }
 
+//Idle flocking
 b2Vec2 Enemy::idleFlock()
 {	
 	b2Vec2 sum(0, 0);
@@ -595,10 +565,14 @@ b2Vec2 Enemy::idleFlock()
 
 				//If we're same, attract
 				if (v->getVertices() == vertices_)
-					steer = LJP(theirPos, 75.f, 300.f, 1.0f, 1.8f); //*//Friendliness 
+				{
+					LJVal val(flockSameLJ);
+					val.attrAtten *= flockN_[brainStem_.friendliness];
+					steer = LJP(theirPos, val); //*//Friendliness 
+				}
 				
 				//Otherwise just separate
-				else steer = LJP(theirPos, 0, 100.f, 0, 1.8f); //*//personal space?
+				else steer = LJP(theirPos, sepOnlyLJ); 
 
 				if (steer.x != 0 && steer.y != 0)
 				{
@@ -622,6 +596,7 @@ b2Vec2 Enemy::idleFlock()
 	return sum;
 }
 
+//Chase flocking
 b2Vec2 Enemy::chaseFlock()
 {	
 	b2Vec2 sum(0, 0);
@@ -643,9 +618,9 @@ b2Vec2 Enemy::chaseFlock()
 				b2Vec2 steer(0, 0);
 
 				if (v->getVertices() == vertices_)
-					steer = LJP(theirPos, 0, 100.f, 0, 1.8f); //*//friendliness?
+					steer = LJP(theirPos, sepOnlyLJ); //*//friendliness?
 
-				else steer = LJP(theirPos, 0, 100.f, 0, 1.8f); //*// personal space?
+				else steer = LJP(theirPos, sepOnlyLJ); //*// personal space?
 
 				if (steer.x != 0 && steer.y != 0)
 				{
@@ -669,147 +644,7 @@ b2Vec2 Enemy::chaseFlock()
 	return sum;
 }
 
-bool Enemy::idleFire(b2Vec2& rFireV)
-{
-	bool trigger = false;
-
-	//Did we fire?
-	if (fired_)
-	{
-		angry_ = fmaxf(angry_ - triggerSatisfaction_, 0);
-		fired_ = false;
-	}
-
-	//Fire at player?
-	if (play_)
-	{
-		b2Vec2 myPos = getPosition();
-		b2Vec2 pPos = player_->getPosition();
-		b2Vec2 between = (pPos - myPos);
-		float dist = between.Length();
-
-		//Fire if in visible range and 
-		if (dist < visRange_ && chill_ > freezingPoint_)
-		{
-			rFireV = LJP(pPos, 50, 0, 2.0, 0); //*//Fire LJP const?
-		}
-	}
-
-	//DECIDE TO FIRE
-	float seePlayer = rFireV.Length();
-	float ammo = (float)getWeaponBar() / (float)getWeaponBarMAX();
-
-	//If we didn't want to fire, ccool down fasst
-	if (seePlayer == 0)	angry_ = fmaxf(angry_ - angryMAX_ / triggerSatisfaction_, 0);
-
-	//Otherwise, heat up, chill first
-	else
-	{
-		orient(rFireV);
-		if (chill_ != 0) chill_ = fminf(chill_ += seePlayer, 0);
-		else angry_ = fminf(angry_ + seePlayer, angryMAX_);
-	}
-
-	//If we're mad enough and we can see the player, fire
-	if (angry_ > boilingPoint_ && seePlayer != 0)
-	{
-		trigger = true;
-	}
-
-	//Reload if we're cool enough
-	if (angry_ - boilingPoint_ > (angryMAX_ - boilingPoint_) * 0.5f) //*//weapon training, aggression
-	{
-		if (ammo < 0.1f) //*// weapon training
-			reup();
-	}
-
-	//Chill out when idle
-	if (angry_ == 0 && seePlayer == 0)
-	{
-		chill_ -= 1;
-
-		if (chill_ <= freezingPoint_)
-		{
-			if (ammo < 1.f)
-				reup();
-
-			spin(-0.05f);
-		}
-	}
-	chill_ = fmax(chill_, chillMIN_);
-
-	return trigger;
-}
-
-bool Enemy::chaseFire(b2Vec2 & rFireV)
-{
-	bool trigger = false;
-
-	//Did we fire?
-	if (fired_)
-	{
-		angry_ = fmaxf(angry_ - triggerSatisfaction_, 0);
-		fired_ = false;
-	}
-
-	//Fire at player?
-	if (play_)
-	{
-		b2Vec2 myPos = getPosition();
-		b2Vec2 pPos = player_->getPosition();
-		b2Vec2 between = (pPos - myPos);
-		float dist = between.Length();
-
-		//Fire if in visible range and 
-		if (dist < visRange_ && chill_ > freezingPoint_)
-		{
-			rFireV = LJP(pPos, 50, 0, 2.0, 0); //*//Fire LJP const?
-		}
-	}
-
-	//DECIDE TO FIRE
-	float seePlayer = rFireV.Length();
-	float ammo = (float)getWeaponBar() / (float)getWeaponBarMAX();
-
-	//Otherwise, heat up, chill first
-	if (seePlayer != 0)
-	{
-		orient(rFireV);
-		if (chill_ != 0) chill_ = fminf(chill_ += seePlayer * 2, 0);
-		else angry_ = fminf(angry_ + seePlayer, angryMAX_);
-	}
-
-	//If we're mad enough and we can see the player, fire
-	if (angry_ > boilingPoint_ && seePlayer != 0)
-	{
-		trigger = true;
-	}
-
-	//Reload if we're cool enough
-	if (angry_ - boilingPoint_ > (angryMAX_ - boilingPoint_) * 0.75f) //*//weapon training, aggression
-	{
-		if (ammo < 0.1f) //*// weapon training
-			reup();
-	}
-
-	//Chill out when idle
-	if (angry_ == 0 && seePlayer == 0)
-	{
-		chill_ -= 1;
-
-		if (chill_ <= freezingPoint_)
-		{
-			if (ammo < 1.f)
-				reup();
-
-			spin(-0.05f);
-		}
-	}
-	chill_ = fmax(chill_, chillMIN_);
-
-	return trigger;
-}
-
+//Flee flocking
 b2Vec2 Enemy::fleeFlock()
 {
 	b2Vec2 sum(0, 0);
@@ -831,10 +666,10 @@ b2Vec2 Enemy::fleeFlock()
 
 				//If we're same, attract
 				if (v->getVertices() == vertices_)
-					steer = LJP(theirPos, 75.f, 200.f, 1.0f, 1.8f); //*//Friendliness 
+					steer = LJP(theirPos, fleeSameLJ); //*//Friendliness 
 
-																	//Otherwise just separate
-				else steer = LJP(theirPos, 75.f, 100.f, 0.5f, 1.8f); //*//personal space?
+				//Otherwise just separate
+				else steer = LJP(theirPos, fleeOtherLJ); //*//personal space?
 
 				if (steer.x != 0 && steer.y != 0)
 				{
@@ -858,6 +693,150 @@ b2Vec2 Enemy::fleeFlock()
 	return sum;
 }
 
+//Idle firing
+bool Enemy::idleFire(b2Vec2& rFireV)
+{
+	bool trigger = false;
+
+	//Did we fire?
+	if (fired_)
+	{
+		angry_ = fmaxf(angry_ - triggerSatisfaction_[brainStem_.weapon_training], 0);
+		fired_ = false;
+	}
+
+	//Fire at player?
+	if (play_)
+	{
+		b2Vec2 myPos = getPosition();
+		b2Vec2 pPos = player_->getPosition();
+		b2Vec2 between = (pPos - myPos);
+		float dist = between.Length();
+
+		//Fire if in visible range and 
+		if (dist < visRange_[brainStem_.sensitivity])
+		{
+			rFireV = LJP(pPos, 100, 0, 2.0, 0); //*//Fire LJP const?
+		}
+	}
+
+	//DECIDE TO FIRE
+	float seePlayer = rFireV.Length();
+	float ammo = (float)getWeaponBar() / (float)getWeaponBarMAX();
+
+	//If we didn't want to fire, ccool down fasst
+	if (seePlayer == 0)	angry_ = fmaxf(angry_ - angryMAX_ / triggerSatisfaction_[brainStem_.weapon_training], 0);
+
+	//Otherwise, heat up, chill first
+	else
+	{
+		orient(rFireV);
+		if (chill_ != 0) chill_ = fminf(chill_ += seePlayer * moodMult_[brainStem_.aggression] * 2, 0);
+		else angry_ = fminf(angry_ + seePlayer * moodMult_[brainStem_.aggression], angryMAX_);
+	}
+
+	//If we're mad enough and we can see the player, fire
+	if (angry_ > boilingPoint_ && seePlayer != 0)
+	{
+		trigger = true;
+	}
+
+	//Reload if we're cool enough
+	if (angry_ - boilingPoint_ > (angryMAX_ - boilingPoint_) * accuracy_[brainStem_.weapon_training] * moodMult_[brainStem_.aggression]) //*//weapon training, aggression
+	{
+		if (ammo < accuracy_[brainStem_.weapon_training]) //*// weapon training causes later reloads
+			reup();
+	}
+
+	//Chill out when idle
+	if (angry_ == 0 && seePlayer == 0)
+	{
+		chill_ -= 1 * moodMult_[brainStem_.inner_peace];
+
+		if (chill_ <= freezingPoint_)
+		{
+			if (ammo < 1.f)
+				reup();
+
+			spin(-0.05f);
+		}
+	}
+	chill_ = fmax(chill_, chillMIN_);
+
+
+	std::cout << seePlayer << "\t" << angry_ << "\t" << chill_ << std::endl;
+	return trigger;
+}
+
+//Chase firing
+bool Enemy::chaseFire(b2Vec2 & rFireV)
+{
+	bool trigger = false;
+
+	//Did we fire?
+	if (fired_)
+	{
+		angry_ = fmaxf(angry_ - triggerSatisfaction_[brainStem_.weapon_training], 0);
+		fired_ = false;
+	}
+
+	//Fire at player?
+	if (play_)
+	{
+		b2Vec2 myPos = getPosition();
+		b2Vec2 pPos = player_->getPosition();
+		b2Vec2 between = (pPos - myPos);
+		float dist = between.Length();
+
+		//Fire if in visible range and 
+		if (dist < visRange_[brainStem_.sensitivity] && chill_ > freezingPoint_)
+		{
+			rFireV = LJP(pPos, 100, 0, 2.0, 0); //*//Fire LJP const?
+		}
+	}
+
+	//DECIDE TO FIRE
+	float seePlayer = rFireV.Length();
+	float ammo = (float)getWeaponBar() / (float)getWeaponBarMAX();
+
+	//Otherwise, heat up, chill first
+	if (seePlayer != 0)
+	{
+		orient(rFireV);
+		if (chill_ != 0) chill_ = fminf(chill_ += seePlayer * 4 * moodMult_[brainStem_.aggression], 0);
+		else angry_ = fminf(angry_ + seePlayer * moodMult_[brainStem_.aggression], angryMAX_);
+	}
+
+	//If we're mad enough and we can see the player, fire
+	if (angry_ > boilingPoint_ && seePlayer != 0)
+	{
+		trigger = true;
+	}
+
+	//Reload if we're cool enough
+	if (angry_ - boilingPoint_ > (angryMAX_ - boilingPoint_) * accuracy_[brainStem_.weapon_training] * moodMult_[brainStem_.aggression]) //*//weapon training, aggression
+	{
+		if (ammo < accuracy_[brainStem_.weapon_training]) //*// weapon training causes later reloads
+			reup();
+	}
+
+	//Chill out when idle
+	if (angry_ == 0 && seePlayer == 0)
+	{
+		chill_ -= 1 * moodMult_[brainStem_.inner_peace];
+
+		if (chill_ <= freezingPoint_)
+		{
+			if (ammo < 1.f)
+				reup();
+
+			spin(-0.05f);
+		}
+	}
+	chill_ = fmax(chill_, chillMIN_);
+
+	return trigger;
+}
 
 #pragma endregion
 

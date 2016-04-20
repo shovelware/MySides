@@ -1526,7 +1526,7 @@ void GameWorld::f5()
 	}
 
 	e.verticesMin = 3;
-	e.ai = 5;
+	e.brain = AIDef::testDef();
 	e.speedScale = 0.5f;
 	e.damageScale = 0.f;
 	e.weapon = dstr;
@@ -1537,6 +1537,7 @@ void GameWorld::f5()
 
 void GameWorld::f6()
 {
+	player_->kill();
 }
 
 void GameWorld::f7()

@@ -546,9 +546,10 @@ namespace Level {
 			e.colSecn = b2Color(1.f, 1.f, 0.f);
 			e.colTert = b2Color(0, 0, 0);
 			e.hpScale = 5;
-			e.speedScale = 0.75f;
+			e.speedScale = 0.6f;
 			e.weapon = "pistol";
 			e.weaponLevel = 0;
+			e.brain = AIDef::testDef();
 
 			wav.addEnemy(e);
 

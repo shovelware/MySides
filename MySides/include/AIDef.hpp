@@ -38,12 +38,34 @@ public:
 		dancer(aid.dancer)
 	{}
 
+	void validate()
+	{
+		aggression = fmax(0, fmin(aggression, 4));
+		inner_peace = fmax(0, fmin(inner_peace, 4));
+
+		sensitivity = fmax(0, fmin(sensitivity, 4));
+
+		personal_space = fmax(0, fmin(personal_space, 4));
+		perserverance = fmax(0, fmin(perserverance, 4));
+
+		friendliness = fmax(0, fmin(friendliness, 4));
+		wanderlust = fmax(0, fmin(wanderlust, 4));
+
+		pain_tolerance = fmax(0, fmin(pain_tolerance, 4));
+		weapon_training = fmax(0, fmin(weapon_training, 4));
+
+		evasiveness = fmax(0, fmin(evasiveness, 4));
+		paranoia = fmax(0, fmin(paranoia, 4));
+
+		dancer = fmax(0, fmin(dancer, 4));
+	}
+
 	int surroundings; //Bounds radius
 	
 	int aggression; //Angry Rate/effects 0 to 4
 	int inner_peace; //Chill rate/effects 0 to 4
 
-	float sensitivity; //Sense radius
+	int sensitivity; //Sense radius 0 to 4
 
 	int personal_space; // ChaseMin 0 to 4
 	int perserverance; //ChaseMAX 0 to 4
@@ -51,7 +73,7 @@ public:
 	int friendliness; //Flock Same, 0 to 4
 	int wanderlust; //Speed/rate of wander 0 to 4
 
-	float pain_tolerance; //How much we can be hurt before we're scared 0 to 1f
+	int pain_tolerance; //How much we can be hurt before we're scared 0 to 4
 	int weapon_training; //Burst length/accuracy 0 to 4
 
 	int evasiveness; //Panic start, 0 to 4
@@ -64,24 +86,74 @@ public:
 	{
 		AIDef base = AIDef();
 		base.aggression = 1;
+		base.inner_peace = 3;
+
 		base.sensitivity = 2;
+		
 		base.personal_space = 2;
 		base.perserverance = 2;
+		
+		base.friendliness = 3;
+		base.wanderlust = 0;
+		
+		base.pain_tolerance = 1;
+		base.weapon_training = 2;
+		
+		base.evasiveness = 2;
+		base.paranoia = 1;
+
+		base.dancer = 3;
 		return base;
 	}
 
-	static AIDef midDef()
+	static AIDef badDef()
 	{
-		AIDef mod = AIDef();
+		AIDef bad = AIDef();
 
-		return mod;
+		bad.aggression = -1;
+		bad.inner_peace = 30;
+
+		bad.sensitivity = 2;
+
+		bad.personal_space = 142;
+		bad.perserverance = 2;
+
+		bad.friendliness = 3;
+		bad.wanderlust = 14;
+
+		bad.pain_tolerance = 2;
+		bad.weapon_training = 7;
+
+		bad.evasiveness = 2;
+		bad.paranoia = FLT_MAX;
+
+		bad.dancer = 5;
+		return bad;
 	}
 
 	static AIDef maxDef()
 	{
-		AIDef modmax = AIDef();;
+		AIDef big = AIDef();
 
-		return modmax;
+		big.aggression = 4;
+		big.inner_peace = 4;
+
+		big.sensitivity = 4;
+
+		big.personal_space = 4;
+		big.perserverance = 4;
+
+		big.friendliness = 4;
+		big.wanderlust = 4;
+
+		big.pain_tolerance = 4;
+		big.weapon_training = 4;
+
+		big.evasiveness = 4;
+		big.paranoia = 4;
+
+		big.dancer = 4;
+		return big;
 	}
 
 
