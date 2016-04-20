@@ -20,12 +20,15 @@ public:
 	float getRange() const;
 	int getVertices() const;
 
-	//AI Functions
+	//AI Profiles
 	void blindFire();
 	void classicAI();
 	void flockTest();
 	void behavTest();
 	void ljpTest();
+
+	//AI Animaton
+	void spin(float speed);
 
 	//AI Behaviours
 	b2Vec2 seek(b2Vec2 target, float dist = 0);		//!< Max Speed to target
@@ -36,6 +39,9 @@ public:
 	b2Vec2 evade(b2Vec2 pursuer, b2Vec2 pVel = b2Vec2_zero, float dist = 0);	//!< Predict target position and go away from there
 
 	b2Vec2 wander(b2Vec2 curDir, float wanderRate);
+
+	//Combat
+	bool fireAt(const b2Vec2& target, float spread);
 
 	//Flocking behaviours
 	b2Vec2 flockToSame(float A, float B, float N, float M);
@@ -72,7 +78,18 @@ private:
 	float minDist(Shape* other);
 	b2Vec2 between(Shape* other);
 
-	float visRange_ = 10.f;
+	float flockRange_ = 10.f; //Flocking range
+	float visRange_ = 20.f; //Vision range
+	float chaseRange_ = 7.5f; //Chase Player range
+	float chaseMAXRange_ = 12.5f; //Stop Chase Player Range
+	bool chasing_; //If we're chasing
+	bool fired_; //If we've fired
+	//LastDamage in enemy
+	float angry_ = 0;
+	float angryMAX_ = 100.f;
+	float chill_ = 0;
+	float chillMIN_ = -100.f;
+	float triggerSatisfaction_ = 20.f;
 };
 
 #endif

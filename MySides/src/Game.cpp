@@ -232,6 +232,22 @@ void Game::handleInput(sf::Time dt)
 	if (key_.isKeyDown(Key::O)) { camera_->zoomOut(); }
 	if (key_.isKeyPressed(Key::L)) { camera_->zoomReset(); }
 
+	//Tab : Menu
+	if (key_.isKeyPressed(Key::Tab))
+	{
+		if (pause_)
+		{
+			world_->returnToMenu();
+			pause_ = false;
+		}
+	}
+
+	//Q : Start Level
+	if (key_.isKeyPressed(Key::Q))
+	{
+		world_->startLevel();
+	}
+
 	//Escape : Quit
 	if (key_.isKeyPressed(Key::Escape)) { quit_ = true; }
 
@@ -363,6 +379,7 @@ void Game::handleInput(sf::Time dt)
 				{
 					world_->di--;
 				}
+				else world_->di--;
 			}
 
 			// + : Debug int increment
@@ -376,6 +393,8 @@ void Game::handleInput(sf::Time dt)
 				{
 					world_->di++;
 				}
+
+				else world_->di++;
 			}
 
 			//G : Scrolling Weapon Select

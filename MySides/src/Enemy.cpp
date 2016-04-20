@@ -71,6 +71,11 @@ bool Enemy::collide(Entity * other, b2Contact& contact, std::string tag)
 
 void Enemy::ai3()
 {
+	ljpTest();
+}
+
+void Enemy::ai4()
+{
 	b2Vec2 steer;
 	Shape* player = getPlayer_();
 	float dist = visRange_ * 2;
@@ -93,9 +98,6 @@ void Enemy::ai3()
 	move(steer);
 	orient(steer);
 }
-
-void Enemy::ai4()
-{}
 
 void Enemy::ai5()
 {}
@@ -238,7 +240,7 @@ void Enemy::flockTest()
 	}
 }
 
-//AI 4
+//AI 3
 void Enemy::behavTest()
 {
 	Shape* player = getPlayer_();
@@ -255,62 +257,142 @@ void Enemy::behavTest()
 	}
 }
 
-//AI 5
+//AI 4
 void Enemy::ljpTest()
 {
 	b2Vec2 sum(0, 0);
+	b2Vec2 chase(0, 0);
 	b2Vec2 fire(0, 0);
 
-	int count = 0;
-	for (Enemy* v : swarm_)
-	{
-		if (v != this)
-		{
-			b2Vec2 myPos = getPosition();
-			b2Vec2 theirPos = v->getPosition();
-			b2Vec2 between = theirPos - myPos;
-			float minDist = v->getSize() + size_;
-			float dist = between.Length();
-
-			if (v->getVertices() == vertices_)
-			{
-				b2Vec2 steer = LJP(theirPos, 100, 300, 1.0, 1.8);
-				
-				if (steer.x != 0 && steer.y != 0)
-				{
-					sum += steer;
-					count++;
-				}
-			}
-		}
-	}
-
+	//Chase and fire at player?
 	Shape* player = getPlayer_();
 	if (player)
 	{
 		b2Vec2 myPos = getPosition();
 		b2Vec2 pPos = player->getPosition();
+		b2Vec2 between = (pPos - myPos);
+		float dist = between.Length();
 
-		if ((pPos - myPos).Length() < visRange_)
+		if (!chasing_ && dist < chaseRange_)
 		{
-			b2Vec2 steer = LJP(player->getPosition(), 100, 100, 1.0, 1.8);
+			chasing_ = true;
+		}
 
-			if (steer.x != 0 && steer.y != 0)
-			{
-				sum += LJP(pPos, 100, 0, 100, 0);
-			}
-			//fire = FiringPotential(player);
+		if (chasing_ && dist < chaseMAXRange_)
+		{
+			chase = LJP(pPos, 100.f, 100, 1.0, 1.8);
+		}
+
+		else chasing_ = false;
+
+		//Fire if in visible range
+		if (dist < visRange_)
+		{
+			fire = LJP(pPos, 100, 0, 2.0, 0);
 		}
 	}
 
-	//get average
-	if (count > 0)
+	if (chasing_)
 	{
-		sum.x /= static_cast<float>(count);
-		sum.y /= static_cast<float>(count);
-		orient(sum);
-		move(sum);
+		move(chase);
+		orient(chase);
 	}
+
+	else
+	{
+		//Swarm to alike shapes
+		int count = 0;
+		for (Enemy* v : swarm_)
+		{
+			if (v != this)
+			{
+				b2Vec2 myPos = getPosition();
+				b2Vec2 theirPos = v->getPosition();
+				b2Vec2 between = theirPos - myPos;
+				float minDist = v->getSize() + size_;
+				float dist = between.Length();
+
+				if (v->getVertices() == vertices_ && between.Length() < flockRange_)
+				{
+					b2Vec2 steer = LJP(theirPos, 75.f, 300.f, 1.0f, 1.8f);
+					if (steer.x != 0 && steer.y != 0)
+					{
+						sum += steer;
+						count++;
+					}
+				}
+			}
+		}
+
+
+		//get average
+		if (count > 0)
+		{
+			sum.x /= static_cast<float>(count);
+			sum.y /= static_cast<float>(count);
+			if (sum.Length() > 1.f) orient(sum);
+			move(sum);
+		}
+	}
+
+	//If we didn't want to fire
+	float seePlayer = fire.Length();
+	if (seePlayer == 0)
+	{
+		angry_ -= angryMAX_ / triggerSatisfaction_;
+	}
+
+	else
+	{
+		orient(fire);
+		chill_ = 0;
+		angry_ += seePlayer;
+	}
+
+	//If we're mad enough
+	float ammo = (float)getWeaponBar() / (float)getWeaponBarMAX();
+	if (angry_ > angryMAX_ && seePlayer != 0)
+	{
+		if (fireAt(fire, 0.2f))
+		{
+			fired_ = true;
+			angry_ -= triggerSatisfaction_;
+		}
+		else release();
+
+		
+		if (ammo< 0.1f)
+			reup();
+	}
+	angry_ = fmax(angry_, 0);
+
+	//Chill out when idle
+	if (angry_ == 0 && seePlayer == 0)
+	{
+		chill_ -= 1;
+
+		if (chill_ <= chillMIN_)
+		{
+			if (ammo < 1.f)
+				reup();
+
+			spin(0.1f);
+		}
+	}
+	chill_ = fmax(chill_, chillMIN_);
+}
+#pragma endregion
+
+#pragma region Animation
+void Enemy::spin(float speed)
+{
+	b2Vec2 orientation = getOrientation();
+
+	float rotation = atan2f(orientation.y, orientation.x);
+	
+	b2Vec2 newDir(cosf(rotation + speed), sinf(rotation + speed));
+	orient(newDir);
+
 }
 #pragma endregion
 
@@ -402,12 +484,33 @@ b2Vec2 Enemy::wander(b2Vec2 curDir, float wanderRate)
 
 	return target;
 }
+
+#pragma endregion
+
+#pragma region Combat
+
+bool Enemy::fireAt(const b2Vec2& target, float spread)
+{
+	if (getWeaponReady())
+	{
+		float rotation = atan2f(target.y, target.x);
+		float adjust = randFloat(-0.4, 0.4);
+		b2Vec2 newDir(cosf(rotation + adjust), sinf(rotation + adjust));
+
+		orient(newDir);
+		trigger(newDir);
+		return true;
+	}
+
+	else return false;
+}
+
 #pragma endregion
 
 #pragma region Flocking
 b2Vec2 Enemy::LenardJonesPotential(const Shape* const other, int& count) const
 {
-	static const float A = 100.0f;	//force of attraction
+	static const float A = 75.0f;	//force of attraction
 	static const float B = 300.0f;	//force of seperation
 	static const float N = 1.0f;	//attraction attenuation
 	static const float M = 1.8f;	//seperatation attenuation
@@ -460,10 +563,10 @@ b2Vec2 Enemy::LenardJonesPotential(const Shape* const other, int& count) const
 
 b2Vec2 Enemy::LJP(b2Vec2& pos, float attractForce, float sepForce, float attrAtten, float sepAtten) const
 {
-	int A = attractForce;
-	int B = sepForce;
-	int N = attrAtten;
-	int M = sepAtten;
+	float A = attractForce;
+	float B = sepForce;
+	float N = attrAtten;
+	float M = sepAtten;
 
 	/*
 	Lenard-Jones Potential function
@@ -482,23 +585,23 @@ b2Vec2 Enemy::LJP(b2Vec2& pos, float attractForce, float sepForce, float attrAtt
 	if (D > 1)	//1 instead of 0, just in case of rounding errors
 	{
 		//Lenard-Jones Potential
-		if (A > 0 && B > 0)
+		if (A != 0 && B != 0)
 		{
-			U = (-A / powf(D, N)) + (B / powf(D, M));
+		U = (-A / powf(D, N)) + (B / powf(D, M));
 		}
-
+		
 		//Attraction only
-		else if (A > 0 && B <= 0)
+		else if (A != 0 && B == 0)
 		{
 			U = (-A / powf(D, N));
 		}
-
+		
 		//Separation only
-		else if (A <= 0 && B > 0)
+		else if (A == 0 && B != 0)
 		{
 			U = (B / powf(D, M));
 		}
-
+		
 		//No Forces, no movement 
 		else U = 0;
 
@@ -506,6 +609,8 @@ b2Vec2 Enemy::LJP(b2Vec2& pos, float attractForce, float sepForce, float attrAtt
 
 		R *= U;
 	}
+
+
 
 	else
 	{
