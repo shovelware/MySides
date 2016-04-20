@@ -271,6 +271,12 @@ void Game::handleInput(sf::Time dt)
 		world_->bomb();
 	}
 
+	//R : Reup
+	if (key_.isKeyPressed(Key::R))
+	{
+		world_->reup();
+	}
+
 #pragma region Debug controls
 	if (!debug_ && key_.isKeyDown(Key::BackSpace) && key_.isKeyDown(Key::BackSlash)) { debug_ = true; }
 	if (!debug_ && con_.checkDown(XINPUT_GAMEPAD_DPAD_DOWN) && con_.checkDown(XINPUT_GAMEPAD_LEFT_THUMB)) { debug_ = true; }

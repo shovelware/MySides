@@ -52,29 +52,36 @@ namespace Level {
 				{
 				case 3:
 					enem = EnemyDef::triDef();
+					enem.weapon = "werfer";
 					break;
 				case 4:
 					enem = EnemyDef::squDef();
+					enem.weapon = "pistol";
 					break;
 				case 5:
 					enem = EnemyDef::penDef();
+					enem.weapon = "shotgun";
 					break;
 				case 6:
 					enem = EnemyDef::hexDef();
+					enem.weapon = "thumper";
 					break;
 				case 7:
 					enem = EnemyDef::hepDef();
+					enem.weapon = "railgun";
 					break;
 				case 8:
 					enem = EnemyDef::octDef();
+					enem.weapon = "cannon";
 					break;
 				}
 
 				enem.position = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
 				enem.position.Normalize();
-				enem.position *= radius * 0.4f;
-
-				enem.hpScale *= 1;
+				enem.position *= radius * 0.1f;
+				enem.ai = 3;
+				enem.speedScale = 0.5f;
+				enem.faction = 2;
 
 				wav.addEnemy(enem, s * 2);
 
@@ -260,6 +267,7 @@ namespace Level {
 					def.colSecn = b2Color(0.2f * j, 0.1f * (i / j), 0.05f * (i + j));
 					def.colTert = b2Color(0.1f * i, 0.3f * i, 1.f * (j - i));
 					def.ai = 2;
+					def.faction = 2;
 
 					wav.addEnemy(def);
 				}
@@ -305,6 +313,7 @@ namespace Level {
 					e.colSecn = b2Color(0.7, 0.4 + (0.05 * i), 0.9 - (0.1 * j));
 					e.colTert = b2Color(1 - (0.05 * (i + j)), 0.7, 0.025 * (i * j));
 					e.ai = 2;
+					e.faction = 2;
 
 					wav.addEnemy(e);
 				}
@@ -372,6 +381,7 @@ namespace Level {
 					e.colSecn = b2Color(0.7, 0.4 + (0.15 * i), 0.9 - (0.1 * i));
 					e.colTert = b2Color(1 - (0.05 * (i + i)), 0.7, 0.025 * (i * i));
 					e.ai = 2;
+					e.faction = 2;
 
 					wav.addEnemy(e);
 				}
@@ -441,6 +451,7 @@ namespace Level {
 				e.colSecn = b2Color(0.7, 0.4 + (0.15 * i), 0.9 - (0.1 * i));
 				e.colTert = b2Color(1 - (0.05 * (i + i)), 0.7, 0.025 * (i * i));
 				e.ai = 2;
+				e.faction = 2;
 				e.weaponLevel = 1;
 
 				switch (i)
@@ -493,6 +504,7 @@ namespace Level {
 				e.colSecn = b2Color(0.7, 0.4 + (0.15 * i), 0.9 - (0.1 * i));
 				e.colTert = b2Color(1 - (0.05 * (i + i)), 0.7, 0.025 * (i * i));
 				e.ai = 2;
+				e.faction = 2;
 
 				wav.addEnemy(e, 4);
 
@@ -529,7 +541,7 @@ namespace Level {
 			EnemyDef e(ShapeDef(b2Vec2_zero, b2Vec2_zero, 3));
 			e.damageScale = 0;
 			e.ai = 3;
-			e.faction = 1;
+			e.faction = 2;
 			e.colPrim = b2Color(1.f, 0.f, 0.f);
 			e.colSecn = b2Color(1.f, 1.f, 0.f);
 			e.colTert = b2Color(0, 0, 0);

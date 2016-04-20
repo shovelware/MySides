@@ -330,7 +330,7 @@ bool Projectile::collide(Entity * other, b2Contact& contact, std::string tag)
 	else if (tag == "player" || tag == "enemy" || tag == "shape")////
 	{
 		Shape* shape = static_cast<Shape*>(other);
-		//Projectiles do not hurt their friends
+		//Projectiles do get hurt by their friends
 		if (faction_ != shape->getFaction() && shape->getFaction() != GOD)
 		{
 			//Onehit projectiles die on hit, precedence over all

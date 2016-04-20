@@ -261,6 +261,7 @@ void Enemy::behavTest()
 void Enemy::ljpTest()
 {
 	b2Vec2 sum(0, 0);
+	b2Vec2 flock(0, 0);
 	b2Vec2 chase(0, 0);
 	b2Vec2 fire(0, 0);
 
@@ -292,48 +293,44 @@ void Enemy::ljpTest()
 		}
 	}
 
-	if (chasing_)
-	{
-		move(chase);
-		orient(chase);
-	}
+	if (chasing_) orient(chase);
 
-	else
+	//Swarm to alike shapes
+	int count = 0;
+	for (Enemy* v : swarm_)
 	{
-		//Swarm to alike shapes
-		int count = 0;
-		for (Enemy* v : swarm_)
+		if (v != this)
 		{
-			if (v != this)
-			{
-				b2Vec2 myPos = getPosition();
-				b2Vec2 theirPos = v->getPosition();
-				b2Vec2 between = theirPos - myPos;
-				float minDist = v->getSize() + size_;
-				float dist = between.Length();
+			b2Vec2 myPos = getPosition();
+			b2Vec2 theirPos = v->getPosition();
+			b2Vec2 between = theirPos - myPos;
+			float minDist = v->getSize() + size_;
+			float dist = between.Length();
 
-				if (v->getVertices() == vertices_ && between.Length() < flockRange_)
+			if (v->getVertices() == vertices_ && between.Length() < flockRange_)
+			{
+				b2Vec2 steer(0, 0);
+				if (!chasing_) steer = LJP(theirPos, 75.f, 300.f, 1.0f, 1.8f);
+				else steer = LJP(theirPos, 0, 100.f, 0, 1.8f);
+
+				if (steer.x != 0 && steer.y != 0)
 				{
-					b2Vec2 steer = LJP(theirPos, 75.f, 300.f, 1.0f, 1.8f);
-					if (steer.x != 0 && steer.y != 0)
-					{
-						sum += steer;
-						count++;
-					}
+					sum += steer;
+					count++;
 				}
 			}
 		}
-
-
-		//get average
-		if (count > 0)
-		{
-			sum.x /= static_cast<float>(count);
-			sum.y /= static_cast<float>(count);
-			if (sum.Length() > 1.f) orient(sum);
-			move(sum);
-		}
 	}
+
+
+	//get average
+	if (count > 0)
+	{
+		sum.x /= static_cast<float>(count);
+		sum.y /= static_cast<float>(count);
+	}
+
+	else sum = b2Vec2_zero;
 
 	//If we didn't want to fire
 	float seePlayer = fire.Length();
@@ -376,10 +373,12 @@ void Enemy::ljpTest()
 			if (ammo < 1.f)
 				reup();
 
-			spin(0.1f);
+			spin(-0.05f);
 		}
 	}
 	chill_ = fmax(chill_, chillMIN_);
+
+	move(chase + sum);
 }
 #pragma endregion
 

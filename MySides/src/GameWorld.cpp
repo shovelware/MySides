@@ -64,7 +64,7 @@ GameWorld::GameWorld() :
 	getControlled_ = std::bind(&GameWorld::getControlled, this);
 
 	//Level
-	populateLevelList();
+	//populateLevelList();
 	//selectedLevel_ = levels_.end();
 	//loadMenu();
 

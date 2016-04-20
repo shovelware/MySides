@@ -606,7 +606,7 @@ bool Shape::collide(Entity* other, b2Contact& contact, std::string tag)
 	{
 		Projectile* proj = static_cast<Projectile*>(other);
 
-		if (proj->getOwner() != this)
+		if (proj->getOwner() != this && (proj->getFaction() != faction_ || proj->getFaction() == GOD))
 		{
 			takeDamage(proj->getDamage(), proj->getDirection());
 		}
