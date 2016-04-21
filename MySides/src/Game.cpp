@@ -13,7 +13,7 @@ Game::Game() :
 	fullscreen_(false),
 	dd_(window_),
 	voidCol_(64,64,64),
-	haptics_(false),
+	haptics_(true),
 	renderDD_(false),
 	renderGAME_(true),
 	renderCAM_(false),
