@@ -41,6 +41,7 @@ namespace Level
 	}
 
 	LevelI::LevelI(const LevelI & other) :
+		afx_(other.afx_),
 		started_(other.started_),
 		time_(other.time_),
 		timeMAX_(other.timeMAX_),

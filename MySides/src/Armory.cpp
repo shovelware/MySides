@@ -373,6 +373,8 @@ void Weapon::Armory::setWeaponLevel(WeaponI * weapon, int level, int projLevel)
 		std::string id = weapon->getID();
 		int lv = std::max(0, std::min(level, 8));
 
+		int faction = weapon->getFaction();
+
 		if (id == "pistol")			upgradePistol(static_cast<Weapon::SemiMag*>(weapon), lv, projLevel);
 		else if (id == "rifle")		upgradeRifle(static_cast<Weapon::AutoMag*>(weapon), lv, projLevel);
 		else if (id == "cannon")	upgradeCannon(static_cast<Weapon::SemiMag*>(weapon), lv, projLevel);
@@ -384,6 +386,7 @@ void Weapon::Armory::setWeaponLevel(WeaponI * weapon, int level, int projLevel)
 		else if (id == "launcher")	upgradeLauncher(static_cast<Weapon::SemiMag*>(weapon), lv, projLevel);
 
 		weapon->reup(true);
+		weapon->setFaction(faction);
 	}
 }
 

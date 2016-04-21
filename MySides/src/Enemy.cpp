@@ -2,13 +2,13 @@
 
 std::list<Enemy*> Enemy::swarm_ = std::list<Enemy*>();
 
-float const Enemy::visRange_[5] = { 16.f, 18.f, 20.f, 22.f, 24.f };
+float const Enemy::visRange_[5] = { 8.f, 16.f, 20.f, 32.f, 48.f };
 
-float const Enemy::chaseRange_[5] = { 1.f, 2.f, 4.f, 6.f, 8.f };
-float const Enemy::chaseRangeMAX_[5] = { 8.f, 10.f, 12.f, 14.f, 16.f};
+float const Enemy::chaseRange_[5] = { 8.f, 10.f, 12.f, 16.f, 20.f };
+float const Enemy::chaseRangeMAX_[5] = { 18.f, 26.f, 32.f, 36.f, 40.f};
 
-float const Enemy::fearRange_[5] = { 0.f, 2.f, 4.f, 6.f, 8.f };
-float const Enemy::fearRangeMIN_[5] = { 8.f, 9.f, 10.f, 12.f, 14.f };
+float const Enemy::fearRange_[5] = { 2.f, 6.f, 10.f, 12.f, 16.f };
+float const Enemy::fearRangeMIN_[5] = { 16.f, 18.f, 20.f, 22.f, 24.f };
 
 float const Enemy::flockN_[5] = { 1.8f, 1.4f, 1.2f, 1.0f, 0.9f };
 
@@ -478,7 +478,7 @@ Enemy::Reaction Enemy::idle()
 		r.look = spin(dance_[brainStem_.dancer] * brainStem_.CCW ? -1 : 1);
 	}
 	
-	std::cout << "A" << angry_ << " C " << chill_ << std::endl;
+	//std::cout << "A" << angry_ << " C " << chill_ << std::endl;
 
 	return r;
 }
@@ -738,7 +738,8 @@ bool Enemy::idleFire(b2Vec2& rFireV)
 	//If we're mad enough and we can see the player, fire
 	if (angry_ > boilingPoint_ && seePlayer != 0)
 	{
-		trigger = true;
+		if (seePlayer <= getRange())
+			trigger = true;
 	}
 
 	//Reload if we're cool enough
@@ -764,7 +765,7 @@ bool Enemy::idleFire(b2Vec2& rFireV)
 	chill_ = fmax(chill_, chillMIN_);
 
 
-	std::cout << seePlayer << "\t" << angry_ << "\t" << chill_ << std::endl;
+	//std::cout << seePlayer << "\t" << angry_ << "\t" << chill_ << std::endl;
 	return trigger;
 }
 

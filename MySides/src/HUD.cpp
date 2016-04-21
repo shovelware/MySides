@@ -270,6 +270,8 @@ void HUD::drawLevelInfo(sf::FloatRect const& box)
 	}
 }
 
+
+
 void HUD::drawTransitionSquare(sf::FloatRect const& win)
 {
 	//Start 0 -> 1 Finish

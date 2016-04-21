@@ -85,22 +85,22 @@ public:
 	static AIDef testDef()
 	{
 		AIDef base = AIDef();
-		base.aggression = 1;
-		base.inner_peace = 3;
+		base.aggression = 4;
+		base.inner_peace = 2;
 
-		base.sensitivity = 2;
+		base.sensitivity = 4;
 		
-		base.personal_space = 2;
-		base.perserverance = 2;
+		base.personal_space = 4;
+		base.perserverance = 3;
 		
-		base.friendliness = 3;
+		base.friendliness = 4;
 		base.wanderlust = 0;
 		
 		base.pain_tolerance = 1;
-		base.weapon_training = 2;
+		base.weapon_training = 3;
 		
-		base.evasiveness = 2;
-		base.paranoia = 1;
+		base.evasiveness = 4;
+		base.paranoia = 4;
 
 		base.dancer = 3;
 		return base;

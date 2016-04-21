@@ -187,14 +187,14 @@ void Camera::drawPause()
 	
 	drawTextAligned("PAUSED", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2), sf::Color::Cyan);
 
-	drawTextAligned("START : CONTINUE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 2.f, sf::Color(64, 64, 64));
-	drawTextAligned("SELECT : QUIT", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 3.f, sf::Color(64, 64, 64));
-	drawTextAligned("Y : RESTART", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 4.f, sf::Color(64, 64, 64));
+	drawTextAligned("START : CONTINUE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 2.f, sf::Color::Black);
+	drawTextAligned("SELECT : QUIT", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 3.f, sf::Color::Black);
+	drawTextAligned("Y : RESTART", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 4.f, sf::Color::Black);
 
-	drawTextAligned("LS : MOVE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 6.f, sf::Color::Cyan);
-	drawTextAligned("RS : FIRE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 7.f, sf::Color::Cyan);
-	drawTextAligned("LB : ZOOM-", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 8.f, sf::Color::Cyan);
-	drawTextAligned("RB : ZOOM+", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 9.f, sf::Color::Cyan);
+	drawTextAligned("LS : MOVE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 6.f, sf::Color::Red);
+	drawTextAligned("RS : LOOK", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 7.f, sf::Color::Red);
+	drawTextAligned("RT : FIRE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 8.f, sf::Color::Red);
+	drawTextAligned("LT + CLICK RIGHT STICK : BOMB", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 9.f, sf::Color::Red);
 
 	//drawTextAligned("RB : ZOOM+", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 7.f, sf::Color::Cyan);
 	//drawTextAligned("RB : ZOOM+", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 8.f, sf::Color::Cyan);
@@ -225,7 +225,7 @@ void Camera::drawOver(int sides, int time)
 	drawTextAligned("TIME: " + std::to_string(time / 1000) + "s", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 3.f, sf::Color::Cyan);
 
 	drawTextAligned("Y : RESTART", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 5.f, sf::Color::Black);
-	drawTextAligned("SELECT : QUIT", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 6.f, sf::Color::Black);
+	drawTextAligned("SELECT : MENU", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 6.f, sf::Color::Black);
 
 	rentrg_.setView(*this);
 }

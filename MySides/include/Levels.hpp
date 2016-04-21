@@ -556,6 +556,616 @@ namespace Level {
 			steerlvl->addPaletteWave(wav);
 			return steerlvl;
 		}
+		
+		//Survival Rifle
+		static Level::LevelI* survRif()
+		{
+			PlayerDef play(basePlayer());
+			play.weapon = "rifle";
+			play.weaponLevel = 0;
+			play.bombRadius = 24;
+			play.bombTime = 15000;
+			play.colPrim = b2Color(0.2f, 0.2f, 0);
+			play.colSecn = b2Color(0.4f, 0.2f, 0);
+			play.colTert = b2Color(0.8f, 0.2f, 0);
+
+			Level::Survival* rifl = new Level::Survival("Rifle", play);
+
+			float radius = 64;
+
+			rifl->addAFX("../assets/wind.ogg", 0, 1, 2000, 2100);
+			rifl->addAFX("../assets/spriterip.ogg", 1, 0, 820, 2100);
+			rifl->setPrimary(b2Color(.75f, .75f, 0));
+			rifl->setSecondary(b2Color(.5f, .5f, 0));
+			rifl->setTertiary(b2Color(0, 0, 0));
+			rifl->setBoundsRadius(radius);
+			rifl->setBoundsPoints(12);
+
+			rifl->setSurvivalTime(120);
+			rifl->setRespiteTimeMAX(10000);
+
+			rifl->setWaveSizeMod(1.f);
+			rifl->setWaveSizeMAX(10.f);
+
+			EnemyDef mod = EnemyDef::modDef();
+			mod.vertices = 1;
+			mod.verticesMax = 1;
+			mod.verticesMin = 1;
+			mod.size = 0.25f;
+
+			rifl->setMod(mod);
+
+			EnemyDef modMax = EnemyDef::maxDef();
+			modMax.vertices = 5;
+			modMax.verticesMax = 5;
+			modMax.verticesMin = 5;
+			modMax.size = 1.5f;
+
+			rifl->setModMAX(modMax);
+			
+			Wave wav = Wave();
+			for (int i = 0; i < 5; ++i)
+			{
+				wav = Wave();
+				b2Vec2 pos = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
+				pos.Normalize();
+				pos *= randFloat(32, 48);
+
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
+				e.damageScale = 0.5f;
+				e.ai = 5;
+				e.faction = 2;
+				e.colPrim = b2Color(0.5f, 0.f, 0.f);
+				e.colSecn = b2Color(0.f, 0.f, 0.f);
+				e.colTert = b2Color(0.5f, 0.5f, 0);
+				e.hpScale = 5;
+				e.speedScale = 0.6f;
+				e.brain = AIDef::testDef();
+				e.brain.dancer = randFloat(0, 4);
+				e.brain.CCW = randFloat(0, 10) > 9;
+
+
+				switch (i)
+				{
+				case 1:	e.weapon = "pistol";	break;
+				case 2: e.weapon = "rifle";		break;
+				case 3: e.weapon = "shotgun";	break;
+				case 4: e.weapon = "cannon";	break;
+				case 5:	e.weapon = "thumper";	break;
+				}
+
+				e.weaponLevel = 0;
+
+				wav.addEnemy(e, i * 2);
+
+				rifl->addPaletteWave(wav);
+			}
+
+			return rifl;
+		}
+
+		//Survival Shotgun
+		static Level::LevelI* survShot()
+		{
+			PlayerDef play(basePlayer());
+			play.weapon = "shotgun";
+			play.weaponLevel = 0;
+			play.bombRadius = 24;
+			play.bombTime = 15000;
+			play.colPrim = b2Color(0.8f, 0.8f, 0);
+			play.colSecn = b2Color(1.f, 0.f, 0);
+			play.colTert = b2Color(1.f, 1.f, 1.f);
+
+			Level::Survival* shot = new Level::Survival("Shotgun", play);
+
+			float radius = 64;
+
+			shot->addAFX("../assets/wind.ogg", 0, 1, 2000, 2100);
+			shot->addAFX("../assets/spriterip.ogg", 1, 0, 820, 2100);
+			shot->setPrimary(b2Color(.75f, .75f, .75f));
+			shot->setSecondary(b2Color(.5f, .5f, .5f));
+			shot->setTertiary(b2Color(.75f, .75f, .75f));
+			shot->setBoundsRadius(radius);
+			shot->setBoundsPoints(12);
+
+			shot->setSurvivalTime(120);
+			shot->setRespiteTimeMAX(10000);
+
+			shot->setWaveSizeMod(1.f);
+			shot->setWaveSizeMAX(15.f);
+
+			EnemyDef mod = EnemyDef::modDef();
+			mod.vertices = 1;
+			mod.verticesMax = 1;
+			mod.verticesMin = 1;
+			mod.size = 0.25f;
+
+			shot->setMod(mod);
+
+			EnemyDef modMax = EnemyDef::maxDef();
+			modMax.vertices = 5;
+			modMax.verticesMax = 5;
+			modMax.verticesMin = 5;
+			modMax.size = 1.5f;
+
+			shot->setModMAX(modMax);
+
+			Wave wav = Wave();
+			for (int i = 0; i < 5; ++i)
+			{
+				wav = Wave();
+				b2Vec2 pos = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
+				pos.Normalize();
+				pos *= randFloat(32, 48);
+
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
+				e.damageScale = 0.5f;
+				e.ai = 5;
+				e.faction = 2;
+				e.colPrim = b2Color(0.f, 0.f, 0.f);
+				e.colSecn = b2Color(0.f, 0.1f, 0.f);
+				e.colTert = b2Color(0, 0, 1.f);
+				e.hpScale = 5;
+				e.speedScale = 0.6f;
+				e.brain = AIDef::testDef();
+				e.brain.dancer = randFloat(0, 4);
+				e.brain.CCW = randFloat(0, 10) > 9;
+
+
+				switch (i)
+				{
+				case 1:	e.weapon = "thumper";	break;
+				case 2: e.weapon = "cannon";	break;
+				case 3: e.weapon = "railgun";	break;
+				case 4: e.weapon = "cannon";	break;
+				case 5:	e.weapon = "pistol";	break;
+				}
+
+				e.weaponLevel = 0;
+
+				wav.addEnemy(e, i * 3);
+
+				shot->addPaletteWave(wav);
+			}
+
+			return shot;
+		}
+
+		//Survival Coilgun
+		static Level::LevelI* survCoil()
+		{
+			PlayerDef play(basePlayer());
+			play.weapon = "coilgun";
+			play.weaponLevel = 0;
+			play.bombRadius = 24;
+			play.bombTime = 15000;
+			play.colPrim = b2Color(0.1f, 0.8f, 0.8f);
+			play.colSecn = b2Color(1.f, 1.f, 1.f);
+			play.colTert = b2Color(1.f, 0.f, 0.f);
+
+			Level::Survival* coil = new Level::Survival("Coilgun", play);
+
+			float radius = 64;
+
+			coil->addAFX("../assets/wind.ogg", 0, 1, 2000, 2100);
+			coil->addAFX("../assets/spriterip.ogg", 1, 0, 820, 2100);
+			coil->setPrimary(b2Color(0, 0, 1));
+			coil->setSecondary(b2Color(0, 0, .4f));
+			coil->setTertiary(b2Color(1, 1, 0));
+			coil->setBoundsRadius(radius);
+			coil->setBoundsPoints(12);
+
+			coil->setSurvivalTime(120);
+			coil->setRespiteTimeMAX(10000);
+
+			coil->setWaveSizeMod(1.f);
+			coil->setWaveSizeMAX(15.f);
+
+			EnemyDef mod = EnemyDef::modDef();
+			mod.vertices = 1;
+			mod.verticesMax = 1;
+			mod.verticesMin = 1;
+			mod.size = 0.25f;
+
+			coil->setMod(mod);
+
+			EnemyDef modMax = EnemyDef::maxDef();
+			modMax.vertices = 5;
+			modMax.verticesMax = 5;
+			modMax.verticesMin = 5;
+			modMax.size = 1.5f;
+
+			coil->setModMAX(modMax);
+
+			Wave wav = Wave();
+			for (int i = 0; i < 5; ++i)
+			{
+				wav = Wave();
+				b2Vec2 pos = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
+				pos.Normalize();
+				pos *= randFloat(32, 48);
+
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
+				e.damageScale = 0.5f;
+				e.ai = 5;
+				e.faction = 2;
+				e.colPrim = b2Color(0.5f, 0.6f, 0.f);
+				e.colSecn = b2Color(0.5f, 0.6f, 0.f);
+				e.colTert = b2Color(0, 0.1, 0);
+				e.hpScale = 5;
+				e.speedScale = 0.6f;
+				e.brain = AIDef::testDef();
+				e.brain.dancer = randFloat(0, 4);
+				e.brain.CCW = randFloat(0, 10) > 9;
+
+
+				switch (i)
+				{
+				case 1:	e.weapon = "werfer";	break;
+				case 2: e.weapon = "pistol";	break;
+				case 3: e.weapon = "rifle";	break;
+				case 4: e.weapon = "thumper";	break;
+				case 5:	e.weapon = "shotgun";	break;
+				}
+
+				e.weaponLevel = 0;
+
+				wav.addEnemy(e, i * 3);
+
+				coil->addPaletteWave(wav);
+			}
+
+			return coil;
+		}
+
+		//Survival Cannon
+		static Level::LevelI* survCann() 
+		{
+			PlayerDef play(basePlayer());
+			play.weapon = "cannon";
+			play.weaponLevel = 0;
+			play.bombRadius = 24;
+			play.bombTime = 15000;
+			play.colPrim = b2Color(0.1f, 0.8f, 0.8f);
+			play.colSecn = b2Color(1.f, 1.f, 1.f);
+			play.colTert = b2Color(1.f, 0.f, 0.f);
+
+			Level::Survival* cann = new Level::Survival("Cannon", play);
+
+			float radius = 64;
+
+			cann->addAFX("../assets/wind.ogg", 0, 1, 2000, 2100);
+			cann->addAFX("../assets/spriterip.ogg", 1, 0, 820, 2100);
+			cann->setPrimary(b2Color(0.2f, 0.2f, 0.2f));
+			cann->setSecondary(b2Color(.1f, .1f, .1f));
+			cann->setTertiary(b2Color(0.2f, 0.2f, 0.2f));
+			cann->setBoundsRadius(radius);
+			cann->setBoundsPoints(12);
+
+			cann->setSurvivalTime(120);
+			cann->setRespiteTimeMAX(10000);
+
+			cann->setWaveSizeMod(1.f);
+			cann->setWaveSizeMAX(15.f);
+
+			EnemyDef mod = EnemyDef::modDef();
+			mod.vertices = 1;
+			mod.verticesMax = 1;
+			mod.verticesMin = 1;
+			mod.size = 0.25f;
+
+			cann->setMod(mod);
+
+			EnemyDef modMax = EnemyDef::maxDef();
+			modMax.vertices = 5;
+			modMax.verticesMax = 5;
+			modMax.verticesMin = 5;
+			modMax.size = 1.5f;
+
+			cann->setModMAX(modMax);
+
+			Wave wav = Wave();
+			for (int i = 0; i < 5; ++i)
+			{
+				wav = Wave();
+				b2Vec2 pos = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
+				pos.Normalize();
+				pos *= randFloat(32, 48);
+
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
+				e.damageScale = 0.5f;
+				e.ai = 5;
+				e.faction = 2;
+				e.colPrim = b2Color(0.5f, 0.6f, 0.f);
+				e.colSecn = b2Color(0.9f, 0.1f, 0.f);
+				e.colTert = b2Color(1.f, 1.f, 0);
+				e.hpScale = 5;
+				e.speedScale = 0.6f;
+				e.brain = AIDef::testDef();
+				e.brain.dancer = randFloat(0, 4);
+				e.brain.CCW = randFloat(0, 10) > 9;
+
+
+				switch (i)
+				{
+				case 1:	e.weapon = "werfer";	break;
+				case 2: e.weapon = "pistol";	break;
+				case 3: e.weapon = "shotgun";	break;
+				case 4: e.weapon = "pistol";	break;
+				case 5:	e.weapon = "werfer";	break;
+				}
+
+				e.weaponLevel = 0;
+
+				wav.addEnemy(e, i * 3);
+
+				cann->addPaletteWave(wav);
+			}
+
+			return cann;
+		}
+
+		//Survival Thumper
+		static Level::LevelI* survThum()
+		{
+			PlayerDef play(basePlayer());
+			play.weapon = "thumper";
+			play.weaponLevel = 0;
+			play.bombRadius = 24;
+			play.bombTime = 15000;
+			play.colPrim = b2Color(0.f, 0.2f, 0.f);
+			play.colSecn = b2Color(1.f, 1.f, 1.f);
+			play.colTert = b2Color(1.f, 1.f, 0.f);
+
+			Level::Survival* thum = new Level::Survival("Thumper", play);
+
+			float radius = 64;
+
+			thum->addAFX("../assets/wind.ogg", 0, 1, 2000, 2100);
+			thum->addAFX("../assets/spriterip.ogg", 1, 0, 820, 2100);
+			thum->setPrimary(b2Color(0, 0.75f, 0));
+			thum->setSecondary(b2Color(0, 0.5f, 0));
+			thum->setTertiary(b2Color(0, 0.75f, 0));
+			thum->setBoundsRadius(radius);
+			thum->setBoundsPoints(12);
+
+			thum->setSurvivalTime(120);
+			thum->setRespiteTimeMAX(10000);
+
+			thum->setWaveSizeMod(1.f);
+			thum->setWaveSizeMAX(20.f);
+
+			EnemyDef mod = EnemyDef::modDef();
+			mod.vertices = 1;
+			mod.verticesMax = 1;
+			mod.verticesMin = 1;
+			mod.size = 0.25f;
+
+			thum->setMod(mod);
+
+			EnemyDef modMax = EnemyDef::maxDef();
+			modMax.vertices = 5;
+			modMax.verticesMax = 5;
+			modMax.verticesMin = 5;
+			modMax.size = 1.5f;
+
+			thum->setModMAX(modMax);
+
+			Wave wav = Wave();
+			for (int i = 0; i < 5; ++i)
+			{
+				wav = Wave();
+				b2Vec2 pos = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
+				pos.Normalize();
+				pos *= randFloat(32, 48);
+
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
+				e.damageScale = 0.5f;
+				e.ai = 5;
+				e.faction = 2;
+				e.colPrim = b2Color(0.2f, 0.1f, 0.4f);
+				e.colSecn = b2Color(0.1f, 0.2f, 0.f);
+				e.colTert = b2Color(1.f, 0.f, 1.f);
+				e.hpScale = 5;
+				e.speedScale = 0.6f;
+				e.brain = AIDef::testDef();
+				e.brain.dancer = randFloat(0, 4);
+				e.brain.CCW = randFloat(0, 10) > 9;
+
+
+				switch (i)
+				{
+				case 1:	e.weapon = "shotgun";	break;
+				case 2: e.weapon = "coilgun";	break;
+				case 3: e.weapon = "railgun";	break;
+				case 4: e.weapon = "pistol";	break;
+				case 5:	e.weapon = "werfer";	break;
+				}
+
+				e.weaponLevel = 2;
+
+				wav.addEnemy(e, i * 3);
+
+				thum->addPaletteWave(wav);
+			}
+
+			return thum;
+		}
+
+		//Survival Launcher
+		static Level::LevelI* survLaun()
+		{
+			PlayerDef play(basePlayer());
+			play.weapon = "launcher";
+			play.weaponLevel = 0;
+			play.bombRadius = 24;
+			play.bombTime = 15000;
+			play.colPrim = b2Color(1.f, 0.2f, 0.f);
+			play.colSecn = b2Color(0.f, 0.f, 0.f);
+			play.colTert = b2Color(0.9f, 0.6f, 0.12f);
+
+			Level::Survival* laun = new Level::Survival("Launcher", play);
+
+			float radius = 64;
+
+			laun->addAFX("../assets/wind.ogg", 0, 1, 2000, 2100);
+			laun->addAFX("../assets/spriterip.ogg", 1, 0, 820, 2100);
+			laun->setPrimary(b2Color(0.7f, 0, 0));
+			laun->setSecondary(b2Color(0.3f, 0, 0));
+			laun->setTertiary(b2Color(0.9f, 0, 0));
+			laun->setBoundsRadius(radius);
+			laun->setBoundsPoints(12);
+
+			laun->setSurvivalTime(120);
+			laun->setRespiteTimeMAX(10000);
+
+			laun->setWaveSizeMod(1.f);
+			laun->setWaveSizeMAX(20.f);
+
+			EnemyDef mod = EnemyDef::modDef();
+			mod.vertices = 1;
+			mod.verticesMax = 1;
+			mod.verticesMin = 1;
+			mod.size = 0.25f;
+
+			laun->setMod(mod);
+
+			EnemyDef modMax = EnemyDef::maxDef();
+			modMax.vertices = 5;
+			modMax.verticesMax = 5;
+			modMax.verticesMin = 5;
+			modMax.size = 1.5f;
+
+			laun->setModMAX(modMax);
+
+			Wave wav = Wave();
+			for (int i = 0; i < 5; ++i)
+			{
+				wav = Wave();
+				b2Vec2 pos = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
+				pos.Normalize();
+				pos *= randFloat(32, 48);
+
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
+				e.damageScale = 0.5f;
+				e.ai = 5;
+				e.faction = 2;
+				e.colPrim = b2Color(0.46f, 0.9f, 0.1f);
+				e.colSecn = b2Color(0.1f, 0.2f, 0.f);
+				e.colTert = b2Color(1.f, 0.4f, 1.f);
+				e.hpScale = 5;
+				e.speedScale = 0.6f;
+				e.brain = AIDef::testDef();
+				e.brain.dancer = randFloat(0, 4);
+				e.brain.CCW = randFloat(0, 10) > 9;
+
+
+				switch (i)
+				{
+				case 1:	e.weapon = "rifle";	break;
+				case 2: e.weapon = "werfer";	break;
+				case 3: e.weapon = "railgun";	break;
+				case 4: e.weapon = "cannon";	break;
+				case 5:	e.weapon = "shotgun";	break;
+				}
+
+				e.weaponLevel = 2;
+
+				wav.addEnemy(e, i * 3);
+
+				laun->addPaletteWave(wav);
+			}
+
+			return laun;
+		}
+
+		//Survival Launcher
+		static Level::LevelI* survWerf()
+		{
+			PlayerDef play(basePlayer());
+			play.weapon = "werfer";
+			play.weaponLevel = 0;
+			play.bombRadius = 24;
+			play.bombTime = 15000;
+			play.colPrim = b2Color(0.3f, 0.2f, 0.f);
+			play.colSecn = b2Color(0.1f, 0.f, 0.3f);
+			play.colTert = b2Color(0.25f, 1.f, 0.12f);
+
+			Level::Survival* laun = new Level::Survival("Werfer", play);
+
+			float radius = 64;
+
+			laun->addAFX("../assets/wind.ogg", 0, 1, 2000, 2100);
+			laun->addAFX("../assets/spriterip.ogg", 1, 0, 820, 2100);
+			laun->setPrimary(b2Color(0.8f, 0.5f, 0.1f));
+			laun->setSecondary(b2Color(0.7f, 0.8f, 0.1f));
+			laun->setTertiary(b2Color(0.2f, 0, 0));
+			laun->setBoundsRadius(radius);
+			laun->setBoundsPoints(12);
+
+			laun->setSurvivalTime(120);
+			laun->setRespiteTimeMAX(10000);
+
+			laun->setWaveSizeMod(1.f);
+			laun->setWaveSizeMAX(20.f);
+
+			EnemyDef mod = EnemyDef::modDef();
+			mod.vertices = 1;
+			mod.verticesMax = 1;
+			mod.verticesMin = 1;
+			mod.size = 0.25f;
+
+			laun->setMod(mod);
+
+			EnemyDef modMax = EnemyDef::maxDef();
+			modMax.vertices = 5;
+			modMax.verticesMax = 5;
+			modMax.verticesMin = 5;
+			modMax.size = 1.5f;
+
+			laun->setModMAX(modMax);
+
+			Wave wav = Wave();
+			for (int i = 0; i < 5; ++i)
+			{
+				wav = Wave();
+				b2Vec2 pos = b2Vec2(randFloat(-1, 1), randFloat(-1, 1));
+				pos.Normalize();
+				pos *= randFloat(32, 48);
+
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
+				e.damageScale = 0.5f;
+				e.ai = 5;
+				e.faction = 2;
+				e.colPrim = b2Color(0.2f, 0.2f, 0.2f);
+				e.colSecn = b2Color(0.4f, 0.4f, 0.4f);
+				e.colTert = b2Color(0.7f, 0.5f, 0.5f);
+				e.hpScale = 5;
+				e.speedScale = 0.6f;
+				e.brain = AIDef::testDef();
+				e.brain.dancer = randFloat(0, 4);
+				e.brain.CCW = randFloat(0, 10) > 9;
+
+
+				switch (i)
+				{
+				case 1:	e.weapon = "coilgun";	break;
+				case 2: e.weapon = "railgun";	break;
+				case 3: e.weapon = "shotgun";	break;
+				case 4: e.weapon = "cannon";	break;
+				case 5:	e.weapon = "rifle";		break;
+				}
+
+				e.weaponLevel = 2;
+
+				wav.addEnemy(e, i * 3);
+
+				laun->addPaletteWave(wav);
+			}
+
+			return laun;
+		}
+
 	}//end atlas
 }//end level
 #endif

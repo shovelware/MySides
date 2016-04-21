@@ -65,12 +65,12 @@ GameWorld::GameWorld() :
 
 	//Level
 	populateLevelList();
-	//selectedLevel_ = levels_.end();
-	//loadMenu();
+	selectedLevel_ = levels_.end();
+	loadMenu();
 
-	menu_ = false;
-	selectedLevel_ = --levels_.end();
-	loadLevel(*selectedLevel_);
+	//menu_ = false;
+	//selectedLevel_ = --levels_.end();
+	//loadLevel(*selectedLevel_);
 }
 
 GameWorld::~GameWorld()
@@ -449,14 +449,23 @@ void GameWorld::clearWorld(bool clearPlayer)
 
 void GameWorld::populateLevelList()
 {
+	#ifdef _DEBUG
 	levels_.push_back(Level::Atlas::testQueue());
-	levels_.push_back(Level::Atlas::testWeapon());
 	levels_.push_back(Level::Atlas::testSize());
-	levels_.push_back(Level::Atlas::testLayer());
 	levels_.push_back(Level::Atlas::testSurv());
 	levels_.push_back(Level::Atlas::testComplete());
 	levels_.push_back(Level::Atlas::testAI());
 	levels_.push_back(Level::Atlas::testSteer());
+	#endif
+	#ifndef _DEBUG
+	levels_.push_back(Level::Atlas::survRif());
+	levels_.push_back(Level::Atlas::survShot());
+	levels_.push_back(Level::Atlas::survCoil());
+	levels_.push_back(Level::Atlas::survCann());
+	levels_.push_back(Level::Atlas::survThum());
+	levels_.push_back(Level::Atlas::survLaun());
+	levels_.push_back(Level::Atlas::survWerf());
+	#endif
 
 	//Menu Level
 	{
@@ -466,7 +475,7 @@ void GameWorld::populateLevelList()
 		play.bombTime = 1000;
 		play.bombRadius = 64.f;
 
-		menuLevel_ = new Level::Menu("testmenu", play, levels_.size());
+		menuLevel_ = new Level::Menu("MENU", play, levels_.size());
 		float radius = 32;
 
 		menuLevel_->addAFX("../assets/wind.ogg", 0, 1, 1500, 2000);
@@ -1107,6 +1116,7 @@ void GameWorld::updateLevel(int dt)
 	//If there's a player and level is started and we're ready
 	if (player && worldLevel_->getStarted() && worldLevel_->getWaveReady())
 	{
+		armory_->upgradeWeapon(player_->getWeapon());
 		//Spawn a wave
 		Wave w = worldLevel_->getWave();
 		std::vector<std::pair<EnemyDef, int>> wv = w.getWave();
