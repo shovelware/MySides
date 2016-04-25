@@ -826,9 +826,9 @@ namespace Level {
 			play.weaponLevel = 0;
 			play.bombRadius = 24;
 			play.bombTime = 15000;
-			play.colPrim = b2Color(0.1f, 0.8f, 0.8f);
-			play.colSecn = b2Color(1.f, 1.f, 1.f);
-			play.colTert = b2Color(1.f, 0.f, 0.f);
+			play.colPrim = b2Color(0.1f, 0.1f, 0.1f);
+			play.colSecn = b2Color(1.f, .75f, 0.f);
+			play.colTert = b2Color(6.f, 6.f, 9.f);
 
 			Level::Survival* cann = new Level::Survival("Cannon", play);
 

@@ -37,7 +37,6 @@ namespace WaveGen {
 		int loops_;			//!< How many loops we've done
 		int loopsMAX_;		//!< Maximum number of loops
 
-		
 		float waveSizeMultMod_; //!< Wave size multiplier increase after loop 1
 		float waveSizeMultMAX_; //!< Max wave size multiplier after x loops
 

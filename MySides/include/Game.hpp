@@ -4,6 +4,10 @@
 #ifndef MS_GAME_HPP
 #define MS_GAME_HPP
 
+#ifndef _DEBUG
+#define NDEBUG
+#endif
+
 #include "stdafx.h"
 
 //SFML
@@ -30,6 +34,8 @@
 
 //////Testing
 #include <sstream>
+
+
 
 class Game
 {

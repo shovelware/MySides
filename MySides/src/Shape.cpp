@@ -2,6 +2,9 @@
 #include "Projectile.hpp"
 #include "Side.hpp"
 
+
+#include <assert.h>
+
 Shape::Shape(b2Body* body, const ShapeDef &def, std::function<void(SideDef&)>& callback) : 
 	Entity(body),
 	weapon_(nullptr),
@@ -260,27 +263,45 @@ void Shape::heal(int health)
 
 void Shape::takeDamage(int damage, b2Vec2 direction)
 {
-	if (!alive_) return;
+	//1
+	if (!alive_)
+	{
+		assert(alive_ == false);
+		return;
+	}
+
 	lastDamage_ = direction;
 	lastDamage_.Normalize();
 
+	//2
 	for (int dmg = damage; dmg > 0; --dmg)
 	{
-		//If we're overhealed
+		assert(dmg > 0);
+
+		//3 //If we're overhealed
 		if (uhp_ > 0)
 		{
+			//6
 			uhp_ -= 1;
+			assert(uhp_ >= 0);
 		}
 
-		//If we're about to go down, go back a side
+		//4 //If we're about to go down, go back a side
 		else if (hp_ == 1)
 		{
+			//7
 			hp_ -= 1;
+
+			assert(hp_ == 0);
 
 			vertices_ = (vertices_ - 1 >= verticesMIN_ ? vertices_ - 1 : verticesMIN_);
 
+			//9
 			if (vertices_ > verticesMIN_)
 			{
+				assert(vertices_ != verticesMIN_);
+
+				//10
 				//Reset health
 				hpMAX_ = vertices_ * hpScale_;
 				hp_ = hpMAX_;
@@ -290,24 +311,28 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 			}
 		}
 
-		//Otherwise just take some hp
-		else
+		//5 //Otherwise just take some hp
+		else if (vertices_ > verticesMIN_)
 		{
-			if (vertices_ > verticesMIN_)
-				hp_ -= 1;
+			hp_ -= 1;
+			assert(hp > 0);
 		}
 
-		//We're dead, stop hurting
+		//11 //We're dead, stop hurting
 		if (vertices_ <= verticesMIN_ && hp_ <= 0 && uhp_ <= 0)
 		{
 			syncHP();
 			break;
 		}
-	}
+	}//End for
 
-	//HP should be refilled in loop, this means we're actually dead
+	//12 //HP should be refilled in loop, this means we're actually dead
 	if (hp_ <= 0)
 	{
+		//13
+		assert(vertices_ <= verticesMIN_);
+		assert(uhp_ <= 0);
+
 		alive_ = false;
 	}
 }

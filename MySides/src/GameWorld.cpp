@@ -465,6 +465,7 @@ void GameWorld::populateLevelList()
 	levels_.push_back(Level::Atlas::survThum());
 	levels_.push_back(Level::Atlas::survLaun());
 	levels_.push_back(Level::Atlas::survWerf());
+	levels_.push_back(Level::Atlas::testAI());
 	#endif
 
 	//Menu Level
