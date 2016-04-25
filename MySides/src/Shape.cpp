@@ -316,7 +316,7 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 		{
 			//8
 			hp_ -= 1;
-			assert(hp > 0);
+			assert(hp_ > 0);
 		}
 
 		//11 //We're dead, stop hurting
