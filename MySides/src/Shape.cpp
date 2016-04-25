@@ -314,6 +314,7 @@ void Shape::takeDamage(int damage, b2Vec2 direction)
 		//5 //Otherwise just take some hp
 		else if (vertices_ > verticesMIN_)
 		{
+			//8
 			hp_ -= 1;
 			assert(hp > 0);
 		}
