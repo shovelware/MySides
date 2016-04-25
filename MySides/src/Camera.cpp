@@ -185,16 +185,19 @@ void Camera::drawPause()
 	rentrg_.setView(rentrg_.getDefaultView());
 	sf::Vector2f offset(0, 20);
 	
-	drawTextAligned("PAUSED", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2), sf::Color::Cyan);
+	drawTextAligned("PAUSED", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) - offset * 7.f, sf::Color::Cyan);
 
-	drawTextAligned("START : CONTINUE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 2.f, sf::Color::Black);
-	drawTextAligned("SELECT : QUIT", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 3.f, sf::Color::Black);
-	drawTextAligned("Y : RESTART", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 4.f, sf::Color::Black);
+	drawTextAligned("START : CONTINUE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) - offset * 6.f, sf::Color::Black);
+	drawTextAligned("SELECT : QUIT", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) - offset * 5.f, sf::Color::Black);
+	drawTextAligned("Y : RESTART", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) - offset * 4.f, sf::Color::Black);
 
-	drawTextAligned("LS : MOVE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 6.f, sf::Color::Red);
-	drawTextAligned("RS : LOOK", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 7.f, sf::Color::Red);
-	drawTextAligned("RT : FIRE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 8.f, sf::Color::Red);
-	drawTextAligned("LT + CLICK RIGHT STICK : BOMB", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 9.f, sf::Color::Red);
+	drawTextAligned("LS : MOVE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 2.f, sf::Color::Red);
+	drawTextAligned("RS : LOOK", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 3.f, sf::Color::Red);
+
+	drawTextAligned("RT : FIRE", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 5.f, sf::Color::Red);
+	drawTextAligned("X : RELOAD", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 6.f, sf::Color::Red);
+
+	drawTextAligned("LT + CLICK RIGHT STICK : BOMB", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 8.f, sf::Color::Red);
 
 	//drawTextAligned("RB : ZOOM+", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 7.f, sf::Color::Cyan);
 	//drawTextAligned("RB : ZOOM+", sf::Vector2f(screenSize_.x / 2, screenSize_.y / 2) + offset * 8.f, sf::Color::Cyan);

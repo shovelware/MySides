@@ -178,6 +178,7 @@ private:
 	const static LJVal flockSameLJ;
 	const static LJVal fleeSameLJ;
 	const static LJVal fleeOtherLJ;
+	const static LJVal tendOriginLJ;
 
 	//Legay AI
 	bool chasing_ = false;

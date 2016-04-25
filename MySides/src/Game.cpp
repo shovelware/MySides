@@ -684,10 +684,10 @@ void Game::render()
 	{
 		if (world_->hasControlled())
 		{
-			camera_->drawPause();
+			if (renderHUD_) camera_->drawPause();
 		}
 
-		else camera_->drawOver(world_->hiSides, 0);
+		else if (renderHUD_) camera_->drawOver(world_->hiSides, 0);
 	}
 
 	window_.display();

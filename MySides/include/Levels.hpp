@@ -599,7 +599,7 @@ namespace Level {
 			modMax.vertices = 5;
 			modMax.verticesMax = 5;
 			modMax.verticesMin = 5;
-			modMax.size = 1.5f;
+			modMax.size = 1.f;
 
 			rifl->setModMAX(modMax);
 			
@@ -611,9 +611,10 @@ namespace Level {
 				pos.Normalize();
 				pos *= randFloat(32, 48);
 
-				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, fmax(i + 3, 8)));
 				e.damageScale = 0.5f;
 				e.ai = 5;
+				e.size = 0.75f;
 				e.faction = 2;
 				e.colPrim = b2Color(0.5f, 0.f, 0.f);
 				e.colSecn = b2Color(0.f, 0.f, 0.f);
@@ -627,16 +628,16 @@ namespace Level {
 
 				switch (i)
 				{
-				case 1:	e.weapon = "pistol";	break;
-				case 2: e.weapon = "rifle";		break;
-				case 3: e.weapon = "shotgun";	break;
-				case 4: e.weapon = "cannon";	break;
-				case 5:	e.weapon = "thumper";	break;
+				case 0:	e.weapon = "pistol";	break;
+				case 1: e.weapon = "rifle";		break;
+				case 2: e.weapon = "shotgun";	break;
+				case 3: e.weapon = "cannon";	break;
+				case 4:	e.weapon = "thumper";	break;
 				}
 
 				e.weaponLevel = 0;
 
-				wav.addEnemy(e, i * 2);
+				wav.addEnemy(e, (i + 1) * 2);
 
 				rifl->addPaletteWave(wav);
 			}
@@ -650,11 +651,13 @@ namespace Level {
 			PlayerDef play(basePlayer());
 			play.weapon = "shotgun";
 			play.weaponLevel = 0;
-			play.bombRadius = 24;
-			play.bombTime = 15000;
+			play.bombRadius = 16;
+			play.bombTime = 10000;
 			play.colPrim = b2Color(0.8f, 0.8f, 0);
 			play.colSecn = b2Color(1.f, 0.f, 0);
 			play.colTert = b2Color(1.f, 1.f, 1.f);
+			play.size = 0.75f;
+			play.speedScale = 1.5f;
 
 			Level::Survival* shot = new Level::Survival("Shotgun", play);
 
@@ -686,7 +689,7 @@ namespace Level {
 			modMax.vertices = 5;
 			modMax.verticesMax = 5;
 			modMax.verticesMin = 5;
-			modMax.size = 1.5f;
+			modMax.size = 0.75f;
 
 			shot->setModMAX(modMax);
 
@@ -698,15 +701,16 @@ namespace Level {
 				pos.Normalize();
 				pos *= randFloat(32, 48);
 
-				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, fmax(i + 3, 8)));
 				e.damageScale = 0.5f;
 				e.ai = 5;
+				e.size = 0.5f;
 				e.faction = 2;
 				e.colPrim = b2Color(0.f, 0.f, 0.f);
 				e.colSecn = b2Color(0.f, 0.1f, 0.f);
 				e.colTert = b2Color(0, 0, 1.f);
-				e.hpScale = 5;
-				e.speedScale = 0.6f;
+				e.hpScale = 1;
+				e.speedScale = 0.4f;
 				e.brain = AIDef::testDef();
 				e.brain.dancer = randFloat(0, 4);
 				e.brain.CCW = randFloat(0, 10) > 9;
@@ -714,16 +718,16 @@ namespace Level {
 
 				switch (i)
 				{
-				case 1:	e.weapon = "thumper";	break;
-				case 2: e.weapon = "cannon";	break;
-				case 3: e.weapon = "railgun";	break;
-				case 4: e.weapon = "cannon";	break;
-				case 5:	e.weapon = "pistol";	break;
+				case 0:	e.weapon = "pistol";	break;
+				case 1: e.weapon = "rifle";		break;
+				case 2: e.weapon = "thumper";	break;
+				case 3: e.weapon = "cannon";	break;
+				case 4:	e.weapon = "launcher";	break;
 				}
 
 				e.weaponLevel = 0;
 
-				wav.addEnemy(e, i * 3);
+				wav.addEnemy(e, (i + 1) * 4);
 
 				shot->addPaletteWave(wav);
 			}
@@ -738,7 +742,7 @@ namespace Level {
 			play.weapon = "coilgun";
 			play.weaponLevel = 0;
 			play.bombRadius = 24;
-			play.bombTime = 15000;
+			play.bombTime = 10000;
 			play.colPrim = b2Color(0.1f, 0.8f, 0.8f);
 			play.colSecn = b2Color(1.f, 1.f, 1.f);
 			play.colTert = b2Color(1.f, 0.f, 0.f);
@@ -759,7 +763,7 @@ namespace Level {
 			coil->setRespiteTimeMAX(10000);
 
 			coil->setWaveSizeMod(1.f);
-			coil->setWaveSizeMAX(15.f);
+			coil->setWaveSizeMAX(2.f);
 
 			EnemyDef mod = EnemyDef::modDef();
 			mod.vertices = 1;
@@ -773,7 +777,7 @@ namespace Level {
 			modMax.vertices = 5;
 			modMax.verticesMax = 5;
 			modMax.verticesMin = 5;
-			modMax.size = 1.5f;
+			modMax.size = 1.75f;
 
 			coil->setModMAX(modMax);
 
@@ -785,32 +789,32 @@ namespace Level {
 				pos.Normalize();
 				pos *= randFloat(32, 48);
 
-				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, fmax(i + 3, 8)));
 				e.damageScale = 0.5f;
 				e.ai = 5;
 				e.faction = 2;
+				e.size = 0.75f;
 				e.colPrim = b2Color(0.5f, 0.6f, 0.f);
-				e.colSecn = b2Color(0.5f, 0.6f, 0.f);
+				e.colSecn = b2Color(1.f, 1.f, 0.f);
 				e.colTert = b2Color(0, 0.1, 0);
 				e.hpScale = 5;
-				e.speedScale = 0.6f;
+				e.speedScale = 0.7f;
 				e.brain = AIDef::testDef();
 				e.brain.dancer = randFloat(0, 4);
 				e.brain.CCW = randFloat(0, 10) > 9;
 
-
 				switch (i)
 				{
-				case 1:	e.weapon = "werfer";	break;
-				case 2: e.weapon = "pistol";	break;
-				case 3: e.weapon = "rifle";	break;
-				case 4: e.weapon = "thumper";	break;
-				case 5:	e.weapon = "shotgun";	break;
+				case 0:	e.weapon = "pistol";	break;
+				case 1: e.weapon = "cannon";	break;
+				case 2: e.weapon = "rifle";		break;
+				case 3: e.weapon = "thumper";	break;
+				case 4:	e.weapon = "railgun";	break;
 				}
 
 				e.weaponLevel = 0;
 
-				wav.addEnemy(e, i * 3);
+				wav.addEnemy(e, (i + 1) * 4);
 
 				coil->addPaletteWave(wav);
 			}
@@ -826,9 +830,11 @@ namespace Level {
 			play.weaponLevel = 0;
 			play.bombRadius = 24;
 			play.bombTime = 15000;
-			play.colPrim = b2Color(0.1f, 0.8f, 0.8f);
-			play.colSecn = b2Color(1.f, 1.f, 1.f);
-			play.colTert = b2Color(1.f, 0.f, 0.f);
+			play.colPrim = b2Color(0.3f, 0.3f, 0.3f);
+			play.colSecn = b2Color(0.6f, 0.6f, 0.6f);
+			play.colTert = b2Color(1.f, 0.5f, 0.f);
+			play.speedScale = 0.75f;
+			play.size = 1.25f;
 
 			Level::Survival* cann = new Level::Survival("Cannon", play);
 
@@ -846,7 +852,7 @@ namespace Level {
 			cann->setRespiteTimeMAX(10000);
 
 			cann->setWaveSizeMod(1.f);
-			cann->setWaveSizeMAX(15.f);
+			cann->setWaveSizeMAX(50.f);
 
 			EnemyDef mod = EnemyDef::modDef();
 			mod.vertices = 1;
@@ -858,9 +864,9 @@ namespace Level {
 
 			EnemyDef modMax = EnemyDef::maxDef();
 			modMax.vertices = 5;
-			modMax.verticesMax = 5;
+			modMax.verticesMax = 8;
 			modMax.verticesMin = 5;
-			modMax.size = 1.5f;
+			modMax.size = 0.5f;
 
 			cann->setModMAX(modMax);
 
@@ -872,14 +878,15 @@ namespace Level {
 				pos.Normalize();
 				pos *= randFloat(32, 48);
 
-				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
-				e.damageScale = 0.5f;
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, fmax(i + 3, 8)));
+				e.damageScale = 0.25f;
 				e.ai = 5;
 				e.faction = 2;
+				e.size = 0.25f;
 				e.colPrim = b2Color(0.5f, 0.6f, 0.f);
 				e.colSecn = b2Color(0.9f, 0.1f, 0.f);
 				e.colTert = b2Color(1.f, 1.f, 0);
-				e.hpScale = 5;
+				e.hpScale = 1;
 				e.speedScale = 0.6f;
 				e.brain = AIDef::testDef();
 				e.brain.dancer = randFloat(0, 4);
@@ -888,16 +895,16 @@ namespace Level {
 
 				switch (i)
 				{
-				case 1:	e.weapon = "werfer";	break;
-				case 2: e.weapon = "pistol";	break;
-				case 3: e.weapon = "shotgun";	break;
-				case 4: e.weapon = "pistol";	break;
-				case 5:	e.weapon = "werfer";	break;
+				case 0:	e.weapon = "pistol";	break;
+				case 1: e.weapon = "rifle";	break;
+				case 2: e.weapon = "shotgun";	break;
+				case 3: e.weapon = "rifle";	break;
+				case 4:	e.weapon = "pistol";	break;
 				}
 
 				e.weaponLevel = 0;
 
-				wav.addEnemy(e, i * 3);
+				wav.addEnemy(e, (i + 1) * 10);
 
 				cann->addPaletteWave(wav);
 			}
@@ -925,7 +932,7 @@ namespace Level {
 			thum->addAFX("../assets/spriterip.ogg", 1, 0, 820, 2100);
 			thum->setPrimary(b2Color(0, 0.75f, 0));
 			thum->setSecondary(b2Color(0, 0.5f, 0));
-			thum->setTertiary(b2Color(0, 0.75f, 0));
+			thum->setTertiary(b2Color(0, 1.f, 1.f));
 			thum->setBoundsRadius(radius);
 			thum->setBoundsPoints(12);
 
@@ -939,7 +946,7 @@ namespace Level {
 			mod.vertices = 1;
 			mod.verticesMax = 1;
 			mod.verticesMin = 1;
-			mod.size = 0.25f;
+			mod.size = 0.1f;
 
 			thum->setMod(mod);
 
@@ -947,7 +954,7 @@ namespace Level {
 			modMax.vertices = 5;
 			modMax.verticesMax = 5;
 			modMax.verticesMin = 5;
-			modMax.size = 1.5f;
+			modMax.size = 0.8f;
 
 			thum->setModMAX(modMax);
 
@@ -959,13 +966,14 @@ namespace Level {
 				pos.Normalize();
 				pos *= randFloat(32, 48);
 
-				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
-				e.damageScale = 0.5f;
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, fmax(i + 3, 8)));
+				e.damageScale = 0.25f;
+				e.size = 0.4f;
 				e.ai = 5;
 				e.faction = 2;
 				e.colPrim = b2Color(0.2f, 0.1f, 0.4f);
 				e.colSecn = b2Color(0.1f, 0.2f, 0.f);
-				e.colTert = b2Color(1.f, 0.f, 1.f);
+				e.colTert = b2Color(1.f, 0.f, 0.5f);
 				e.hpScale = 5;
 				e.speedScale = 0.6f;
 				e.brain = AIDef::testDef();
@@ -975,16 +983,16 @@ namespace Level {
 
 				switch (i)
 				{
-				case 1:	e.weapon = "shotgun";	break;
-				case 2: e.weapon = "coilgun";	break;
-				case 3: e.weapon = "railgun";	break;
-				case 4: e.weapon = "pistol";	break;
-				case 5:	e.weapon = "werfer";	break;
+				case 0:	e.weapon = "shotgun";	break;
+				case 1: e.weapon = "coilgun";	break;
+				case 2: e.weapon = "railgun";	break;
+				case 3: e.weapon = "pistol";	break;
+				case 4:	e.weapon = "werfer";	break;
 				}
 
 				e.weaponLevel = 2;
 
-				wav.addEnemy(e, i * 3);
+				wav.addEnemy(e, (i + 1) * 2);
 
 				thum->addPaletteWave(wav);
 			}
@@ -1046,12 +1054,13 @@ namespace Level {
 				pos.Normalize();
 				pos *= randFloat(32, 48);
 
-				EnemyDef e(ShapeDef(pos, b2Vec2_zero, randFloat(3, 8)));
+				EnemyDef e(ShapeDef(pos, b2Vec2_zero, fmax(i + 3, 8)));
 				e.damageScale = 0.5f;
+				e.size = 0.75f;
 				e.ai = 5;
 				e.faction = 2;
 				e.colPrim = b2Color(0.46f, 0.9f, 0.1f);
-				e.colSecn = b2Color(0.1f, 0.2f, 0.f);
+				e.colSecn = b2Color(0.f, 1.f, 0.f);
 				e.colTert = b2Color(1.f, 0.4f, 1.f);
 				e.hpScale = 5;
 				e.speedScale = 0.6f;
@@ -1062,16 +1071,16 @@ namespace Level {
 
 				switch (i)
 				{
-				case 1:	e.weapon = "rifle";	break;
-				case 2: e.weapon = "werfer";	break;
-				case 3: e.weapon = "railgun";	break;
-				case 4: e.weapon = "cannon";	break;
-				case 5:	e.weapon = "shotgun";	break;
+				case 0:	e.weapon = "rifle";	break;
+				case 1: e.weapon = "werfer";	break;
+				case 2: e.weapon = "railgun";	break;
+				case 3: e.weapon = "cannon";	break;
+				case 4:	e.weapon = "shotgun";	break;
 				}
 
 				e.weaponLevel = 2;
 
-				wav.addEnemy(e, i * 3);
+				wav.addEnemy(e, i + 1);
 
 				laun->addPaletteWave(wav);
 			}
@@ -1085,11 +1094,13 @@ namespace Level {
 			PlayerDef play(basePlayer());
 			play.weapon = "werfer";
 			play.weaponLevel = 0;
-			play.bombRadius = 24;
-			play.bombTime = 15000;
+			play.bombRadius = 8;
+			play.bombTime = 10000;
 			play.colPrim = b2Color(0.3f, 0.2f, 0.f);
 			play.colSecn = b2Color(0.1f, 0.f, 0.3f);
 			play.colTert = b2Color(0.25f, 1.f, 0.12f);
+			play.speedScale = 0.75f;
+			play.size = 1.5f;
 
 			Level::Survival* laun = new Level::Survival("Werfer", play);
 
@@ -1149,16 +1160,16 @@ namespace Level {
 
 				switch (i)
 				{
-				case 1:	e.weapon = "coilgun";	break;
-				case 2: e.weapon = "railgun";	break;
-				case 3: e.weapon = "shotgun";	break;
-				case 4: e.weapon = "cannon";	break;
-				case 5:	e.weapon = "rifle";		break;
+				case 0:	e.weapon = "coilgun";	break;
+				case 1: e.weapon = "railgun";	break;
+				case 2: e.weapon = "shotgun";	break;
+				case 3: e.weapon = "cannon";	break;
+				case 4:	e.weapon = "rifle";		break;
 				}
 
 				e.weaponLevel = 2;
 
-				wav.addEnemy(e, i * 3);
+				wav.addEnemy(e, (i + 1) * 3);
 
 				laun->addPaletteWave(wav);
 			}

@@ -25,6 +25,7 @@ Enemy::LJVal const Enemy::sepOnlyLJ = Enemy::LJVal(0, 100, 0, 1.8f);
 Enemy::LJVal const Enemy::flockSameLJ = Enemy::LJVal(75, 300, 1.0, 1.8f);
 Enemy::LJVal const Enemy::fleeSameLJ = Enemy::LJVal(75, 200, 1.0, 1.8f);
 Enemy::LJVal const Enemy::fleeOtherLJ = Enemy::LJVal(75, 100, 0.5, 1.8f);
+Enemy::LJVal const Enemy::tendOriginLJ = Enemy::LJVal(75, 200, 1.f, 1.8f);
 
 Enemy::Enemy(b2Body* body, const EnemyDef& def, std::function<void(SideDef&)>& callback, std::function<Shape*()> &player) :
 	Shape(body, def, callback),
@@ -439,11 +440,11 @@ Enemy::Reaction Enemy::ruminate()
 		
 	//If we're chilling, check if the player is messing with the bull
 	case IDLE:
-		if (play_ && between < 128 && between <= chaseRange_[brainStem_.personal_space] * size_ || angry_ == angryMAX_) stateOfMind_ = CHASE;
+		if (play_ && between < 128 && between <= chaseRange_[brainStem_.personal_space] || angry_ == angryMAX_) stateOfMind_ = CHASE;
 	
 	//If we're chasing, make sure we can still see him
 	case CHASE:
-			if (play_ && between > chaseRangeMAX_[brainStem_.perserverance] * size_) stateOfMind_ = IDLE;
+			if (play_ && between > chaseRangeMAX_[brainStem_.perserverance]) stateOfMind_ = IDLE;
 	}
 
 	//Execute our current mood
@@ -470,7 +471,7 @@ Enemy::Reaction Enemy::ruminate()
 Enemy::Reaction Enemy::idle()
 {
 	Reaction r;
-	r.move = idleFlock();
+	r.move = idleFlock() + LJP(b2Vec2(0, 0), tendOriginLJ);
 	r.fire = idleFire(r.look);
 
 	if (r.look.Length() <= 0)
