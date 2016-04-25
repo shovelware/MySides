@@ -1239,7 +1239,7 @@ void GameWorld::trigger(b2Vec2& direction)
 
 		bool hasfire = controlled_->getWeaponReady();
 		
-		if (canfire && !hasfire)
+		if (canfire && hasfire)
 		{
 			rightHaptic_ = 50;
 		}
