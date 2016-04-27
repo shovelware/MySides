@@ -899,6 +899,24 @@ void GameWorld::updatePlayer(int dt)
 	{
 		player_->update(dt);
 
+		//Upgrade weapon
+		if (player_->getArmed())
+		{
+			int sides = player_->getSidesCollected();
+
+			int curLevel = player_->getWeaponLevel();
+			if (curLevel < 8)
+			{
+				int requiredSides = (curLevel + 1) * 100;
+
+				if (sides > --requiredSides)
+				{
+					armory_->upgradeWeapon(player_->getWeapon());
+				}
+			}
+		}
+		
+
 		audio_.setListener(B2toSF(player_->getPosition(), true));
 
 		////player_->setActive(true);//Debug invincible players
@@ -1116,7 +1134,6 @@ void GameWorld::updateLevel(int dt)
 	//If there's a player and level is started and we're ready
 	if (player && worldLevel_->getStarted() && worldLevel_->getWaveReady())
 	{
-		armory_->upgradeWeapon(player_->getWeapon());
 		//Spawn a wave
 		Wave w = worldLevel_->getWave();
 		std::vector<std::pair<EnemyDef, int>> wv = w.getWave();
@@ -1547,7 +1564,7 @@ void GameWorld::f5()
 
 void GameWorld::f6()
 {
-	player_->kill();
+	player_->collect(100);
 }
 
 void GameWorld::f7()
