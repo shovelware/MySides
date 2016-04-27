@@ -149,11 +149,6 @@ int Game::run()
 #pragma endregion
 }
 
-b2Vec2 Game::SFtoB2(const sf::Vector2f & vec) //Do we really need to spawn things in screen space co-ords?
-{
-	return b2Vec2(vec.x / _SCALE_, vec.y / _SCALE_ );
-}
-
 void Game::processEvents()
 {
 	sf::Event evt;
@@ -230,7 +225,7 @@ void Game::handleInput(sf::Time dt)
 	//I,O,L : Camera controls
 	if (key_.isKeyDown(Key::I)) { camera_->zoomIn(); }
 	if (key_.isKeyDown(Key::O)) { camera_->zoomOut(); }
-	if (key_.isKeyPressed(Key::L)) { camera_->zoomReset(); }
+	//if (key_.isKeyPressed(Key::L)) { camera_->zoomReset(); }
 
 	//Tab : Menu
 	if (key_.isKeyPressed(Key::Tab))
@@ -525,7 +520,7 @@ void Game::handleInput(sf::Time dt)
 	//LB + RB : Reset zoom
 	if (con_.checkDown(XINPUT_GAMEPAD_LEFT_SHOULDER) && con_.checkDown(XINPUT_GAMEPAD_RIGHT_SHOULDER))
 	{
-		camera_->zoomReset();
+		//camera_->zoomReset();
 	}
 
 	else 
